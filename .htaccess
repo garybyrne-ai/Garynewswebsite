@@ -1,0 +1,20 @@
+# ME News Ireland — root .htaccess for hosts whose web root is the project root (e.g. Cloudways public_html).
+# Preferred: set the web root to public/ instead. This file forwards everything into public/ and
+# blocks direct access to application code and data.
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    # Block dotfiles and private directories
+    RewriteRule (^|/)\. - [F,L]
+    RewriteRule ^(storage|src|database|config|scripts|templates|tests|deploy|vendor)(/|$) - [F,L]
+    # Serve everything from public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<FilesMatch "\.(env|sqlite|sqlite-wal|sqlite-shm|sql|log|md|lock)$">
+    Require all denied
+</FilesMatch>

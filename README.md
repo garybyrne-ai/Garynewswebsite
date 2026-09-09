@@ -94,6 +94,7 @@ See `.env.example`. Key settings: `APP_ENV`, `PUBLIC_BASE_URL`, `OPENAI_API_KEY`
 ## Deployment
 
 - Point the document root at `public/` (see `deploy/apache.conf` or `deploy/nginx.conf`). `.env`, `src/` and `storage/` must stay outside the web root.
+- **Cloudways / shared hosting** where the web root is the project folder itself: the root-level `index.php` and `.htaccess` forward everything into `public/` and block private paths. See `deploy/cloudways.md` for the step-by-step guide (set Webroot to `public_html/public`, PHP 8.2+, run setup over SSH, add the wire cron).
 - Merge `deploy/php.ini` for upload limits.
 - Run `php scripts/setup.php --seed` once, then schedule `scripts/fetch-news.php`.
 - Back up with `php scripts/backup.php /path/outside/public/menews.sqlite` plus `storage/uploads`.
