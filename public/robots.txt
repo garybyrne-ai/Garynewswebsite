@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /newsroom
+Disallow: /api/
+Sitemap: /sitemap.xml

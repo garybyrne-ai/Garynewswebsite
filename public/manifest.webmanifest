@@ -1,0 +1,10 @@
+{
+  "name": "ME News Ireland",
+  "short_name": "ME News",
+  "description": "Your Community. Your News. Live.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
+  "icons": [{ "src": "/assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

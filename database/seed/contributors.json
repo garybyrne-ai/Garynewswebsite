@@ -1,0 +1,62 @@
+[
+  {
+    "handle": "aoife",
+    "email": "aoife@menews.ie",
+    "display_name": "Aoife Ní Bhriain",
+    "title": "Political & National Affairs Correspondent",
+    "desk": "National",
+    "home_town": "Rathmines",
+    "home_county": "Dublin",
+    "accent": "158",
+    "reputation": 96,
+    "bio": "Aoife covers Leinster House, the civil service and the decisions that ripple out to every county. Formerly a Dáil reporter and radio producer, she is happiest with a briefing document, a strong coffee and a deadline that is already too close."
+  },
+  {
+    "handle": "cian",
+    "email": "cian@menews.ie",
+    "display_name": "Cian Ó Súilleabháin",
+    "title": "Sports Editor",
+    "desk": "Sport",
+    "home_town": "Ballincollig",
+    "home_county": "Cork",
+    "accent": "196",
+    "reputation": 94,
+    "bio": "Cian has reported from Croke Park, Thomond Park and more wet Tuesday-night pitches than he can count. He leads ME's coverage of GAA, rugby, soccer, racing and the club stories that never make the national bulletins."
+  },
+  {
+    "handle": "saoirse",
+    "email": "saoirse@menews.ie",
+    "display_name": "Saoirse Mac Cárthaigh",
+    "title": "Culture & What's On Editor",
+    "desk": "Culture",
+    "home_town": "Galway City",
+    "home_county": "Galway",
+    "accent": "268",
+    "reputation": 93,
+    "bio": "Saoirse curates the arts, screen, music and festival life of the island, from the Galway Arts Festival to a trad session in a pub with no phone signal. She is a fluent Irish speaker and a recovering theatre critic."
+  },
+  {
+    "handle": "niamh",
+    "email": "niamh@menews.ie",
+    "display_name": "Niamh Brennan",
+    "title": "Business & Technology Correspondent",
+    "desk": "Business",
+    "home_town": "Limerick City",
+    "home_county": "Limerick",
+    "accent": "32",
+    "reputation": 95,
+    "bio": "Niamh follows the money: multinationals, start-ups, housing, energy prices and the jobs announcements that change a town. A former analyst, she reads company accounts for fun and explains them so nobody else has to."
+  },
+  {
+    "handle": "tadhg",
+    "email": "tadhg@menews.ie",
+    "display_name": "Tadhg Ó Ceallaigh",
+    "title": "Regional & Community Editor",
+    "desk": "Local",
+    "home_town": "Letterkenny",
+    "home_county": "Donegal",
+    "accent": "12",
+    "reputation": 97,
+    "bio": "Tadhg runs the regional desk and the community reporting programme. He believes the best local news is reported by the people who live there, checked by editors who care, and never sensationalised. Ask him about county road maintenance at your peril."
+  }
+]

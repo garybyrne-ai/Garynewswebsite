@@ -1,0 +1,319 @@
+{
+  "PROVINCE_COUNTIES": {
+    "Leinster": [
+      "Carlow",
+      "Dublin",
+      "Kildare",
+      "Kilkenny",
+      "Laois",
+      "Longford",
+      "Louth",
+      "Meath",
+      "Offaly",
+      "Westmeath",
+      "Wexford",
+      "Wicklow"
+    ],
+    "Munster": [
+      "Clare",
+      "Cork",
+      "Kerry",
+      "Limerick",
+      "Tipperary",
+      "Waterford"
+    ],
+    "Connacht": [
+      "Galway",
+      "Leitrim",
+      "Mayo",
+      "Roscommon",
+      "Sligo"
+    ],
+    "Ulster (ROI)": [
+      "Cavan",
+      "Donegal",
+      "Monaghan"
+    ]
+  },
+  "FALLBACK_TOWNS": {
+    "Carlow": [
+      "Carlow",
+      "Tullow",
+      "Muine Bheag",
+      "Borris",
+      "Leighlinbridge",
+      "Rathvilly"
+    ],
+    "Cavan": [
+      "Cavan",
+      "Bailieborough",
+      "Ballyjamesduff",
+      "Belturbet",
+      "Cootehill",
+      "Kingscourt",
+      "Virginia"
+    ],
+    "Clare": [
+      "Ennis",
+      "Shannon",
+      "Kilrush",
+      "Kilkee",
+      "Lahinch",
+      "Ennistymon",
+      "Killaloe",
+      "Scariff",
+      "Sixmilebridge"
+    ],
+    "Cork": [
+      "Cork City",
+      "Ballincollig",
+      "Bandon",
+      "Bantry",
+      "Blarney",
+      "Carrigaline",
+      "Clonakilty",
+      "Cobh",
+      "Fermoy",
+      "Kinsale",
+      "Macroom",
+      "Mallow",
+      "Midleton",
+      "Mitchelstown",
+      "Skibbereen",
+      "Youghal"
+    ],
+    "Donegal": [
+      "Letterkenny",
+      "Buncrana",
+      "Ballybofey",
+      "Stranorlar",
+      "Donegal Town",
+      "Ballyshannon",
+      "Bundoran",
+      "Carndonagh",
+      "Dungloe",
+      "Killybegs",
+      "Lifford",
+      "Moville"
+    ],
+    "Dublin": [
+      "Dublin City Centre",
+      "Balbriggan",
+      "Blackrock",
+      "Blanchardstown",
+      "Booterstown",
+      "Cabinteely",
+      "Castleknock",
+      "Clondalkin",
+      "Clontarf",
+      "Dalkey",
+      "Donabate",
+      "Dún Laoghaire",
+      "Finglas",
+      "Foxrock",
+      "Glasthule",
+      "Howth",
+      "Killiney",
+      "Lucan",
+      "Malahide",
+      "Palmerstown",
+      "Portmarnock",
+      "Ranelagh",
+      "Rathmines",
+      "Saggart",
+      "Sandycove",
+      "Shankill",
+      "Skerries",
+      "Stillorgan",
+      "Swords",
+      "Tallaght",
+      "Templeogue"
+    ],
+    "Galway": [
+      "Galway City",
+      "Athenry",
+      "Ballinasloe",
+      "Clifden",
+      "Gort",
+      "Loughrea",
+      "Oranmore",
+      "Oughterard",
+      "Portumna",
+      "Tuam"
+    ],
+    "Kerry": [
+      "Tralee",
+      "Killarney",
+      "Listowel",
+      "Dingle",
+      "Kenmare",
+      "Castleisland",
+      "Killorglin",
+      "Cahersiveen",
+      "Ballybunion"
+    ],
+    "Kildare": [
+      "Naas",
+      "Newbridge",
+      "Maynooth",
+      "Celbridge",
+      "Leixlip",
+      "Athy",
+      "Kildare",
+      "Clane",
+      "Kilcock",
+      "Monasterevin",
+      "Sallins"
+    ],
+    "Kilkenny": [
+      "Kilkenny",
+      "Callan",
+      "Castlecomer",
+      "Thomastown",
+      "Graiguenamanagh",
+      "Urlingford"
+    ],
+    "Laois": [
+      "Portlaoise",
+      "Portarlington",
+      "Mountmellick",
+      "Abbeyleix",
+      "Mountrath",
+      "Stradbally"
+    ],
+    "Leitrim": [
+      "Carrick-on-Shannon",
+      "Manorhamilton",
+      "Ballinamore",
+      "Mohill",
+      "Drumshanbo"
+    ],
+    "Limerick": [
+      "Limerick City",
+      "Newcastle West",
+      "Abbeyfeale",
+      "Kilmallock",
+      "Rathkeale",
+      "Adare",
+      "Castleconnell"
+    ],
+    "Longford": [
+      "Longford",
+      "Ballymahon",
+      "Granard",
+      "Edgeworthstown",
+      "Lanesborough"
+    ],
+    "Louth": [
+      "Drogheda",
+      "Dundalk",
+      "Ardee",
+      "Carlingford",
+      "Blackrock",
+      "Dunleer"
+    ],
+    "Mayo": [
+      "Castlebar",
+      "Ballina",
+      "Westport",
+      "Claremorris",
+      "Ballinrobe",
+      "Ballyhaunis",
+      "Swinford",
+      "Belmullet",
+      "Foxford",
+      "Charlestown"
+    ],
+    "Meath": [
+      "Navan",
+      "Ashbourne",
+      "Trim",
+      "Kells",
+      "Ratoath",
+      "Dunboyne",
+      "Bettystown",
+      "Laytown",
+      "Duleek",
+      "Enfield",
+      "Athboy"
+    ],
+    "Monaghan": [
+      "Monaghan",
+      "Carrickmacross",
+      "Castleblayney",
+      "Clones",
+      "Ballybay"
+    ],
+    "Offaly": [
+      "Tullamore",
+      "Birr",
+      "Edenderry",
+      "Clara",
+      "Banagher",
+      "Ferbane"
+    ],
+    "Roscommon": [
+      "Roscommon",
+      "Boyle",
+      "Castlerea",
+      "Ballaghaderreen",
+      "Strokestown"
+    ],
+    "Sligo": [
+      "Sligo",
+      "Tubbercurry",
+      "Ballymote",
+      "Strandhill",
+      "Enniscrone",
+      "Collooney"
+    ],
+    "Tipperary": [
+      "Clonmel",
+      "Nenagh",
+      "Thurles",
+      "Carrick-on-Suir",
+      "Cashel",
+      "Roscrea",
+      "Tipperary",
+      "Cahir",
+      "Templemore"
+    ],
+    "Waterford": [
+      "Waterford City",
+      "Dungarvan",
+      "Tramore",
+      "Lismore",
+      "Portlaw",
+      "Tallow"
+    ],
+    "Westmeath": [
+      "Athlone",
+      "Mullingar",
+      "Moate",
+      "Kinnegad",
+      "Kilbeggan"
+    ],
+    "Wexford": [
+      "Wexford",
+      "Gorey",
+      "Enniscorthy",
+      "New Ross",
+      "Rosslare",
+      "Bunclody",
+      "Courtown"
+    ],
+    "Wicklow": [
+      "Bray",
+      "Greystones",
+      "Wicklow",
+      "Arklow",
+      "Blessington",
+      "Enniskerry",
+      "Kilcoole",
+      "Newtownmountkennedy",
+      "Rathdrum",
+      "Aughrim",
+      "Baltinglass"
+    ]
+  }
+}

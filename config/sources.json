@@ -1,0 +1,20 @@
+{
+  "_comment": "Real Irish news sources ingested by the ME News wire. Each item links back to the publisher; only headline, standfirst, image reference and publication time are stored.",
+  "sources": [
+    { "key": "rte-news",            "name": "RTÉ News",          "url": "https://www.rte.ie/feeds/rss/?index=/news/",           "category": "National", "home": "https://www.rte.ie/news/" },
+    { "key": "rte-regional",        "name": "RTÉ News",          "url": "https://www.rte.ie/feeds/rss/?index=/news/regional/",  "category": "Local",    "home": "https://www.rte.ie/news/regional/" },
+    { "key": "rte-business",        "name": "RTÉ News",          "url": "https://www.rte.ie/feeds/rss/?index=/news/business/",  "category": "Business", "home": "https://www.rte.ie/news/business/" },
+    { "key": "rte-sport",           "name": "RTÉ Sport",         "url": "https://www.rte.ie/feeds/rss/?index=/sport/",          "category": "Sport",    "home": "https://www.rte.ie/sport/" },
+    { "key": "rte-culture",         "name": "RTÉ Culture",       "url": "https://www.rte.ie/feeds/rss/?index=/culture/",        "category": "Culture",  "home": "https://www.rte.ie/culture/" },
+    { "key": "irishtimes-ireland",  "name": "The Irish Times",   "url": "https://www.irishtimes.com/arc/outboundfeeds/feed-irish-news/", "category": "National", "home": "https://www.irishtimes.com/ireland/" },
+    { "key": "thejournal-ireland",  "name": "TheJournal.ie",     "url": "https://www.thejournal.ie/feed/?type=ireland",         "category": "National", "home": "https://www.thejournal.ie/" },
+    { "key": "breakingnews-ireland","name": "BreakingNews.ie",   "url": "https://feeds.breakingnews.ie/bnireland",              "category": "National", "home": "https://www.breakingnews.ie/ireland/" },
+    { "key": "breakingnews-business","name": "BreakingNews.ie",  "url": "https://feeds.breakingnews.ie/bnbusiness",             "category": "Business", "home": "https://www.breakingnews.ie/business/" },
+    { "key": "breakingnews-sport",  "name": "BreakingNews.ie",   "url": "https://feeds.breakingnews.ie/bnsport",                "category": "Sport",    "home": "https://www.breakingnews.ie/sport/" },
+    { "key": "independent-irish",   "name": "Irish Independent", "url": "https://www.independent.ie/irish-news/rss/",           "category": "National", "home": "https://www.independent.ie/irish-news/" },
+    { "key": "independent-business","name": "Irish Independent", "url": "https://www.independent.ie/business/rss/",             "category": "Business", "home": "https://www.independent.ie/business/" },
+    { "key": "independent-sport",   "name": "Irish Independent", "url": "https://www.independent.ie/sport/rss/",                "category": "Sport",    "home": "https://www.independent.ie/sport/" },
+    { "key": "dublinlive",          "name": "Dublin Live",       "url": "https://www.dublinlive.ie/?service=rss",               "category": "Local",    "county": "Dublin", "home": "https://www.dublinlive.ie/" },
+    { "key": "corkbeo",             "name": "Cork Beo",          "url": "https://www.corkbeo.ie/?service=rss",                  "category": "Local",    "county": "Cork",   "home": "https://www.corkbeo.ie/" }
+  ]
+}

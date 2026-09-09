@@ -1,0 +1,25 @@
+{
+    "name": "menews/ireland",
+    "description": "ME News Ireland — community-first Irish news platform built on PHP 8.2+ and SQLite.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "ext-pdo_sqlite": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*",
+        "ext-simplexml": "*"
+    },
+    "autoload": {
+        "psr-4": { "MeNews\\": "src/" },
+        "files": ["src/helpers.php"]
+    },
+    "scripts": {
+        "setup": "php scripts/setup.php",
+        "seed": "php scripts/seed.php",
+        "wire": "php scripts/fetch-news.php",
+        "serve": "php -S 127.0.0.1:8000 -t public public/router.php",
+        "test": "php tests/smoke.php"
+    }
+}

@@ -1,0 +1,17 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Runtime storage (database, uploads, logs, caches)
+storage/*
+!storage/.gitkeep
+
+# Local tooling
+vendor/
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
