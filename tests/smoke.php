@@ -13,6 +13,15 @@ $base = rtrim($argv[1] ?? 'http://127.0.0.1:8000', '/');
 $cookies = tempnam(sys_get_temp_dir(), 'me-cookies');
 $failures = 0;
 $stamp = substr(bin2hex(random_bytes(4)), 0, 8);
+$env = [];
+foreach (file(dirname(__DIR__) . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+    if (str_contains($line, '=') && !str_starts_with(trim($line), '#')) {
+        [$k, $v] = explode('=', $line, 2);
+        $env[trim($k)] = trim($v, " \"'");
+    }
+}
+// In production without an OpenAI key the Trust Engine fails closed: comments are held and publication is refused.
+$failClosed = ($env['APP_ENV'] ?? 'production') === 'production' && ($env['OPENAI_API_KEY'] ?? '') === '';
 
 function http(string $method, string $path, array $body = [], array $headers = [], bool $json = true): array
 {
@@ -96,7 +105,7 @@ $reportId = $rep['id'] ?? '';
 [$s, $mine] = http('GET', '/api/me/reports');
 check('my reports', $s === 200 && ($mine[0]['id'] ?? '') === $reportId);
 [$s, $cm] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/comment', ['body' => 'Smoke test comment — factual and respectful.']);
-check('comment on a wire story', $s === 200 && ($cm['status'] ?? '') === 'published');
+check('comment on a wire story', $s === 200 && ($cm['status'] ?? '') === ($failClosed ? 'review' : 'published'), 'status ' . ($cm['status'] ?? '?'));
 [$s, $cf] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/confirm', []);
 check('confirm a story', $s === 200 && ($cf['confirmations'] ?? 0) >= 1);
 [$s] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/confirm', []);
@@ -110,13 +119,6 @@ http('POST', '/api/auth/logout');
 check('logout clears session', $s === 401);
 
 echo "\nNewsroom\n";
-$env = [];
-foreach (file(dirname(__DIR__) . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
-    if (str_contains($line, '=') && !str_starts_with(trim($line), '#')) {
-        [$k, $v] = explode('=', $line, 2);
-        $env[trim($k)] = trim($v, " \"'");
-    }
-}
 [$s, $login] = http('POST', '/api/auth/login', ['email' => $env['ADMIN_EMAIL'] ?? 'admin@menews.ie', 'password' => $env['ADMIN_PASSWORD'] ?? '']);
 check('admin login', $s === 200 && ($login['user']['role'] ?? '') === 'admin');
 [$s, $sum] = http('GET', '/api/admin/summary');
@@ -124,13 +126,19 @@ check('summary', $s === 200 && isset($sum['pending']), 'pending ' . ($sum['pendi
 [$s, $queue] = http('GET', '/api/admin/stories?kind=community&status=review');
 check('review queue lists the report', $s === 200 && in_array($reportId, array_column($queue, 'id'), true));
 [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'publish', 'label' => 'Verified', 'note' => 'Published by smoke test']);
-check('publish decision', $s === 200 && ($dec['status'] ?? '') === 'published', $dec['detail'] ?? '');
-[$s, $pub] = http('GET', '/api/story/' . $reportId);
-check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
+if ($failClosed) {
+    check('publish refused without clean OpenAI screening (production)', $s === 409, $dec['detail'] ?? '');
+    [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'hold', 'label' => 'Developing', 'note' => 'Held by smoke test']);
+    check('hold decision', $s === 200 && ($dec['status'] ?? '') === 'hold');
+} else {
+    check('publish decision', $s === 200 && ($dec['status'] ?? '') === 'published', $dec['detail'] ?? '');
+    [$s, $pub] = http('GET', '/api/story/' . $reportId);
+    check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
+}
 [$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Community', 'county' => 'Wicklow', 'label' => 'Verified', 'is_featured' => '1', 'location_name' => 'Bray']);
 check('feature a story', $s === 200);
 [$s, $html] = http('GET', '/', [], [], false);
-check('featured story leads the home page', $s === 200 && str_contains($html, "Smoke test report {$stamp}"));
+check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
 [$s] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
 check('reject (cleanup)', $s === 200);
 [$s, $ads] = http('GET', '/api/admin/ads');

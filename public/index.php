@@ -25,7 +25,17 @@ Auth::boot($request);
 
 try {
     if (!MeNews\Database::installed()) {
-        throw new HttpException(503, 'ME News is not installed yet. Run "php scripts/setup.php" on the server.');
+        // Not installed yet: offer the browser installer (or the CLI: php scripts/setup.php --seed).
+        if ($request->path === '/install') {
+            $handler = $request->method === 'POST' ? 'run' : 'form';
+            MeNews\Controllers\InstallController::$handler($request)->send();
+            exit;
+        }
+        if ($request->wantsJson()) {
+            throw new HttpException(503, 'ME News is not installed yet. Open /install in a browser or run php scripts/setup.php --seed.');
+        }
+        Response::redirect('/install')->send();
+        exit;
     }
     $router = new Router();
     (require ME_ROOT . '/src/routes.php')($router);
