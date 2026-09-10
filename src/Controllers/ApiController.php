@@ -94,6 +94,36 @@ final class ApiController
     }
 
     /**
+     * Stories near a position. GET /api/near?lat=..&lng=..[&radius=40][&limit=12]
+     * Also returns the rendered "Near you" section so the page can drop it in without a reload.
+     */
+    public static function near(Request $r): Response
+    {
+        $lat = $r->query('lat', '', 20);
+        $lng = $r->query('lng', '', 20);
+        if (!is_numeric($lat) || !is_numeric($lng) || abs((float)$lat) > 90 || abs((float)$lng) > 180) {
+            throw new HttpException(400, 'Send lat and lng');
+        }
+        $lat = (float)$lat;
+        $lng = (float)$lng;
+        $place = \MeNews\Support\Geo::nearest($lat, $lng);
+        $radius = $r->int('radius', 40, 5, 200);
+        $limit = $r->int('limit', 12, 1, 40);
+        $stories = $place['in_ireland'] ? Stories::near($lat, $lng, $radius, $limit, $place['county']) : [];
+        if ($place['in_ireland'] && count($stories) < 4 && $radius < 80) {
+            $radius = 80;
+            $stories = Stories::near($lat, $lng, $radius, $limit, $place['county']);
+        }
+        $title = $place['in_ireland'] ? ($place['town'] ? $place['town'] . ', Co. ' . $place['county'] : 'Co. ' . $place['county']) : 'Outside Ireland';
+        $locality = ['mode' => $place['in_ireland'] ? 'gps' : 'abroad', 'place' => $place, 'stories' => $stories, 'radius' => $radius, 'county' => $place['county'], 'title' => $title, 'position' => ['lat' => $lat, 'lng' => $lng]];
+        return Response::json([
+            'place' => $place, 'title' => $title, 'radius' => $radius, 'items' => $stories,
+            'county_url' => $place['county'] ? '/county/' . slugify($place['county']) : null,
+            'html' => \MeNews\View::partial('partials/near', ['locality' => $locality, 'counties' => Locations::countyNames(), 'compact' => (bool)$r->query('compact')]),
+        ]);
+    }
+
+    /**
      * Cron / uptime-monitor endpoint: GET /cron/wire?key=CRON_KEY[&force=1].
      * Refreshes the wire when stale (or always with force=1). Safe to call as often as you like.
      */

@@ -47,7 +47,7 @@ function check(string $name, bool $ok, string $detail = ''): void
 }
 
 echo "ME News smoke test → {$base}\n\nPublic pages\n";
-foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
+foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
     [$s, $html] = http('GET', $p, [], [], false);
     check("GET {$p}", $s === 200 && strlen($html) > 20, "HTTP {$s}");
 }
@@ -91,6 +91,14 @@ check('daily word search', $s === 200 && count($ws['words'] ?? []) >= 8 && count
 check('daily quiz', $s === 200 && count($qz['questions'] ?? []) === 5);
 [$s, $cg] = http('GET', '/api/kids/county');
 check('county game', $s === 200 && count($cg['rounds'] ?? []) === 10);
+[$s, $near] = http('GET', '/api/near?lat=53.203&lng=-6.099&limit=6');
+check('near-me API resolves Bray, Co. Wicklow', $s === 200 && ($near['place']['town'] ?? '') === 'Bray' && ($near['place']['county'] ?? '') === 'Wicklow' && count($near['items'] ?? []) >= 3, ($near['title'] ?? '?') . ', ' . count($near['items'] ?? []) . ' stories within ' . ($near['radius'] ?? '?') . ' km');
+[$s, $far] = http('GET', '/api/near?lat=51.5&lng=-0.12');
+check('near-me API flags positions outside Ireland', $s === 200 && empty($far['place']['in_ireland']));
+[$s] = http('GET', '/api/near?lat=999&lng=0');
+check('near-me API validates coordinates', $s === 400);
+[$s, $html] = http('GET', '/near', [], [], false);
+check('near page renders without a location', $s === 200 && str_contains($html, 'data-mode="none"'));
 [$s] = http('GET', '/cron/wire?key=wrong', [], [], false);
 check('cron endpoint rejects a bad key', $s === 403);
 [$s, $w] = http('POST', '/api/wire/refresh');

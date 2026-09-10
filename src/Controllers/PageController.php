@@ -67,6 +67,8 @@ final class PageController
             'crossword' => \MeNews\Services\Puzzles::crossword(\MeNews\Support\Daily::date(), 'junior'),
             'quiz' => \MeNews\Services\Puzzles::quiz(\MeNews\Support\Daily::date()),
             'youngReaders' => \MeNews\Controllers\KidsController::youngReaders(3),
+            'locality' => \MeNews\Support\Visitor::locality(8),
+            'countyNames' => Locations::countyNames(),
             'bodyClass' => 'page-home',
         ]));
     }
@@ -173,6 +175,19 @@ final class PageController
             'more' => Stories::feed(['exclude' => [$story['id']]], 5),
             'ads' => self::ads($story['county'] ?? ''),
             'bodyClass' => 'page-story',
+        ]));
+    }
+
+    public static function near(Request $r): Response
+    {
+        $locality = \MeNews\Support\Visitor::locality(24);
+        return View::page('near', self::base([
+            'title' => ($locality['mode'] === 'none' ? 'Near me' : $locality['title']) . ' — ME News Ireland',
+            'description' => 'Local stories for wherever you are in Ireland, chosen by your location.',
+            'locality' => $locality,
+            'counties' => Locations::countyNames(),
+            'mapPoints' => $locality['position'] ? array_values(array_filter($locality['stories'], static fn($s) => $s['latitude'] !== null)) : [],
+            'bodyClass' => 'page-near',
         ]));
     }
 
@@ -290,7 +305,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/map', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
+        $urls = ['/', '/near', '/map', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }

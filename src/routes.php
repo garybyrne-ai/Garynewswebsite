@@ -16,6 +16,7 @@ return static function (Router $r): void {
     $r->get('/story/{slug:[a-z0-9-]+}', [Page::class, 'story']);
     $r->get('/search', [Page::class, 'search']);
     $r->get('/map', [Page::class, 'map']);
+    $r->get('/near', [Page::class, 'near']);
     $r->get('/kids', [Kids::class, 'hub']);
     $r->get('/kids/crossword', [Kids::class, 'crossword']);
     $r->get('/kids/crossword/{date:[0-9]+-[0-9]+-[0-9]+}', [Kids::class, 'crossword']);
@@ -47,6 +48,7 @@ return static function (Router $r): void {
     $r->get('/api/feed', [Api::class, 'feed']);
     $r->get('/api/story/{key:[a-z0-9-]+}', [Api::class, 'story']);
     $r->get('/api/map', [Api::class, 'map']);
+    $r->get('/api/near', [Api::class, 'near']);
     $r->get('/cron/wire', [Api::class, 'cronWire']);
     $r->get('/api/pulse', [Api::class, 'pulse']);
     $r->get('/api/ads', [Api::class, 'ads']);

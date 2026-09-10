@@ -49,6 +49,8 @@
 <div class="container layout">
   <div class="layout__main">
 
+    <?= \MeNews\View::partial('partials/near', ['locality' => $locality, 'counties' => $countyNames, 'compact' => true]) ?>
+
     <?php $n = 1; foreach ($sections as $name => $rows): ?>
       <section class="block reveal">
         <header class="block__head">

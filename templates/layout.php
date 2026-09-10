@@ -84,7 +84,8 @@ $isApp = str_contains($bodyClass, 'page-app');
   </div>
   <nav class="sections" aria-label="Sections">
     <div class="container sections__in">
-      <a href="/" class="<?= $path === '/' ? 'is-active' : '' ?>">Around Me</a>
+      <a href="/" class="<?= $path === '/' ? 'is-active' : '' ?>">Top stories</a>
+      <a href="/near" class="sections__near <?= $path === '/near' ? 'is-active' : '' ?>">◎ Near me</a>
       <?php foreach ($nav as $name): $slug = \MeNews\Support\Categories::slug($name); ?>
         <a href="/section/<?= e($slug) ?>" class="<?= str_starts_with($path, '/section/' . $slug) ? 'is-active' : '' ?>"><?= e($name) ?></a>
       <?php endforeach; ?>
@@ -95,6 +96,13 @@ $isApp = str_contains($bodyClass, 'page-app');
     </div>
   </nav>
 </header>
+
+<div class="locbar" id="locbar" hidden>
+  <div class="container locbar__in">
+    <span class="locbar__text"><b>Local stories for your area.</b> Allow location on your phone or computer and ME adds a section for your town and county.</span>
+    <span class="locbar__actions"><button class="btn btn--primary btn--sm" type="button" data-locate-me>◎ Use my location</button><button class="btn btn--ghost btn--sm" type="button" data-locbar-dismiss>Not now</button></span>
+  </div>
+</div>
 
 <main id="main" class="<?= $isApp ? 'app' : 'site' ?>">
 <?= $content ?>
@@ -191,7 +199,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 <div class="toast mono" id="toast" role="status" aria-live="polite"></div>
 <div class="newpill mono" id="new-stories" hidden><button type="button">◌ New stories on the wire — refresh</button></div>
 
-<script>window.ME={user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
+<script>window.ME={located:<?= (\MeNews\Support\Visitor::position() || \MeNews\Support\Visitor::county()) ? 'true' : 'false' ?>,user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
 <script src="/assets/js/menews.js?v=<?= e(ME_VERSION) ?>" defer></script>
 <script src="/assets/vendor/leaflet/leaflet.js" defer></script>
 <script src="/assets/js/map.js?v=<?= e(ME_VERSION) ?>" defer></script>

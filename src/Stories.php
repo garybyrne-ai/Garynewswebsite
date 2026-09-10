@@ -166,6 +166,42 @@ final class Stories
         return $rows;
     }
 
+    /**
+     * Stories closest to a position: bounding-box query, exact distance in PHP, nearest first.
+     * Stories from the same county without coordinates are appended so nothing local is missed.
+     */
+    public static function near(float $lat, float $lng, int $radiusKm = 40, int $limit = 12, ?string $county = null): array
+    {
+        $dLat = $radiusKm / 111.0;
+        $dLng = $radiusKm / (111.0 * max(0.2, cos(deg2rad($lat))));
+        $rows = Database::all(self::SELECT . " WHERE s.status='published' AND s.latitude BETWEEN ? AND ? AND s.longitude BETWEEN ? AND ? ORDER BY COALESCE(s.published_at,s.created_at) DESC LIMIT 400",
+            [$lat - $dLat, $lat + $dLat, $lng - $dLng, $lng + $dLng]);
+        $out = [];
+        foreach ($rows as $r) {
+            $km = \MeNews\Support\Geo::distanceKm($lat, $lng, (float)$r['latitude'], (float)$r['longitude']);
+            if ($km <= $radiusKm) {
+                $r = self::present($r);
+                $r['distance_km'] = round($km, 1);
+                $out[] = $r;
+            }
+        }
+        // Freshness-weighted distance: a story from an hour ago 20 km away beats one from last week next door.
+        usort($out, static function ($a, $b) {
+            $ageA = (time() - (int)strtotime($a['time'])) / 3600;
+            $ageB = (time() - (int)strtotime($b['time'])) / 3600;
+            return ($a['distance_km'] + $ageA * 0.4) <=> ($b['distance_km'] + $ageB * 0.4);
+        });
+        $out = array_slice($out, 0, $limit);
+        if ($county && count($out) < $limit) {
+            $seen = array_column($out, 'id');
+            foreach (self::feed(['county' => $county, 'exclude' => $seen ?: ['-']], $limit - count($out)) as $r) {
+                $r['distance_km'] = null;
+                $out[] = $r;
+            }
+        }
+        return $out;
+    }
+
     /** Published stories per county (last 7 days) with county centroids, for the map heat layer. */
     public static function countyPoints(): array
     {

@@ -61,6 +61,10 @@ Change every password before any public deployment (`ADMIN_PASSWORD`, `CONTRIBUT
 
 Every calendar day (Irish time) the site changes: an **edition number** and masthead date, **live weather** for eight Irish cities with sunrise and sunset (Open-Meteo, cached 30 min), the **Irish word of the day** (*Focal an lae*), a subtle daily hue shift in the background, and a brand-new set of puzzles.
 
+## Near me (visitor location)
+
+On first visit a slim banner offers **Use my location**. With permission (phones and computers, over HTTPS) the browser sends coordinates to `/api/near`, which resolves the nearest of 227 towns and its county from `config/geo.json`, gathers every published story within 40 km (widening to 80 km when quiet) ordered by a freshness-weighted distance, and drops a **Near you · Town, Co. County** section into the home page without a reload. The choice is kept in two small cookies (`me_loc`, rounded to ~100 m, and `me_county`) for 30 days and is never attached to an account; visitors can pick a county manually instead, or tap *Forget*. `/near` is the full page with a map centred on the visitor.
+
 ## ME Óg · The Junior Post (kids section)
 
 `/kids` is an old-school newspaper inside the futuristic site — cream newsprint, a serif masthead and a puzzle corner that resets at midnight:

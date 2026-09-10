@@ -40,7 +40,10 @@
       return pts;
     }
     let pts = render();
-    if (pts.length) map.fitBounds(L.featureGroup(pinLayer.getLayers()).getBounds().pad(.12), { maxZoom: full ? 8 : 7 });
+    if (opts.center) {
+      L.circleMarker([opts.center.lat, opts.center.lng], { radius: 8, color: '#fff', weight: 2, fillColor: '#ff4d6d', fillOpacity: 1 }).bindTooltip('You are here', { className: 'me-tip' }).addTo(map);
+      map.setView([opts.center.lat, opts.center.lng], 9);
+    } else if (pts.length) map.fitBounds(L.featureGroup(pinLayer.getLayers()).getBounds().pad(.12), { maxZoom: full ? 8 : 7 });
 
     if (opts.list) opts.list.addEventListener('click', e => {
       const b = e.target.closest('[data-i]'); if (!b) return;
@@ -65,11 +68,11 @@
   };
 
   document.querySelectorAll('[data-map]').forEach(el => {
-    let points = [], counties = [], colours = {};
-    try { points = JSON.parse(el.dataset.points || '[]'); counties = JSON.parse(el.dataset.counties || '[]'); colours = JSON.parse(el.dataset.colours || '{}'); } catch (e) { }
+    let points = [], counties = [], colours = {}, center = null;
+    try { points = JSON.parse(el.dataset.points || '[]'); counties = JSON.parse(el.dataset.counties || '[]'); colours = JSON.parse(el.dataset.colours || '{}'); center = el.dataset.center ? JSON.parse(el.dataset.center) : null; } catch (e) { }
     const root = el.closest('[data-map-root]') || document;
     window.ME.initMap(el, {
-      points, counties, colours, full: el.dataset.map === 'full',
+      points, counties, colours, center, full: el.dataset.map === 'full',
       count: root.querySelector('[data-map-count]'), list: root.querySelector('[data-map-list]'),
       chips: Array.from(root.querySelectorAll('[data-map-chip]')), locate: root.querySelector('[data-locate]'),
     });

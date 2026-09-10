@@ -187,6 +187,44 @@
     });
   }
 
+  /* ---------- near me (geolocation) ---------- */
+  const setCookie = (k, v, days) => { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=' + (days * 86400) + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : ''); };
+  const delCookie = k => { document.cookie = k + '=;path=/;max-age=0;SameSite=Lax'; };
+  const dismissed = () => { try { return (Number(localStorage.getItem('me_loc_dismissed') || 0)) > Date.now(); } catch (e) { return false; } };
+  const locbar = $('#locbar');
+  if (locbar && !window.ME.located && !dismissed() && !document.body.classList.contains('page-app') && 'geolocation' in navigator) locbar.hidden = false;
+  $('[data-locbar-dismiss]')?.addEventListener('click', () => { locbar.hidden = true; try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
+  async function applyPosition(lat, lng) {
+    setCookie('me_loc', lat.toFixed(3) + ',' + lng.toFixed(3), 30); delCookie('me_county');
+    const near = $('[data-near]');
+    if (near) {
+      near.classList.add('is-loading');
+      try {
+        const j = await api(`/api/near?lat=${lat.toFixed(3)}&lng=${lng.toFixed(3)}${document.body.classList.contains('page-home') ? '&compact=1&limit=8' : '&limit=24'}`);
+        const tmp = document.createElement('div'); tmp.innerHTML = j.html;
+        const fresh = tmp.firstElementChild; near.replaceWith(fresh); fresh.classList.add('is-in'); bindNear();
+        toast(j.place.in_ireland ? 'Local section set to ' + j.title : 'You seem to be outside Ireland — choose a county');
+        if (!document.body.classList.contains('page-home')) location.reload();
+      } catch (e) { near.classList.remove('is-loading'); toast(e.message); }
+    } else location.reload();
+  }
+  function locateMe(btn) {
+    if (!('geolocation' in navigator)) return toast('Location is not available in this browser');
+    if (location.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(location.hostname)) return toast('Location needs a secure (https) connection');
+    if (btn) { btn.disabled = true; btn.textContent = 'Locating…'; }
+    navigator.geolocation.getCurrentPosition(
+      pos => { if (locbar) locbar.hidden = true; applyPosition(pos.coords.latitude, pos.coords.longitude); },
+      err => { if (btn) { btn.disabled = false; btn.textContent = '◎ Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a county instead' : 'Could not get your location'); },
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 }
+    );
+  }
+  function bindNear() {
+    $$('[data-locate-me]').forEach(b => { if (b.dataset.bound) return; b.dataset.bound = '1'; b.addEventListener('click', () => locateMe(b)); });
+    $$('[data-county-pick]').forEach(sel => { if (sel.dataset.bound) return; sel.dataset.bound = '1'; sel.addEventListener('change', () => { if (!sel.value) return; setCookie('me_county', sel.value, 30); delCookie('me_loc'); if (locbar) locbar.hidden = true; location.reload(); }); });
+    $$('[data-forget-location]').forEach(b => { if (b.dataset.bound) return; b.dataset.bound = '1'; b.addEventListener('click', () => { delCookie('me_loc'); delCookie('me_county'); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } toast('Location forgotten'); location.reload(); }); });
+  }
+  bindNear();
+
   /* ---------- live wire refresh ---------- */
   const wireStatus = $('#wire-status');
   function ago(iso) { if (!iso) return ''; const s = (Date.now() - new Date(iso).getTime()) / 1000; if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago'; return Math.floor(s / 3600) + ' hr ago'; }

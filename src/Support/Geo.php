@@ -90,6 +90,52 @@ final class Geo
         return $n;
     }
 
+    /** Great-circle distance in kilometres. */
+    public static function distanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $r = 6371.0;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+        return 2 * $r * asin(min(1.0, sqrt($a)));
+    }
+
+    /**
+     * Resolve a position to the nearest known Irish town and its county.
+     * @return array{town:?string,county:?string,province:string,town_km:?float,county_km:?float,in_ireland:bool}
+     */
+    public static function nearest(float $lat, float $lng): array
+    {
+        $d = self::data();
+        $bestTown = null;
+        $bestTownKm = INF;
+        foreach ($d['towns'] as $key => $pt) {
+            $km = self::distanceKm($lat, $lng, (float)$pt[0], (float)$pt[1]);
+            if ($km < $bestTownKm) {
+                $bestTownKm = $km;
+                $bestTown = $key;
+            }
+        }
+        $bestCounty = null;
+        $bestCountyKm = INF;
+        foreach ($d['counties'] as $name => $pt) {
+            $km = self::distanceKm($lat, $lng, (float)$pt[0], (float)$pt[1]);
+            if ($km < $bestCountyKm) {
+                $bestCountyKm = $km;
+                $bestCounty = $name;
+            }
+        }
+        $inIreland = $bestCountyKm < 120;
+        $town = $inIreland && $bestTown !== null && $bestTownKm < 35 ? explode('|', $bestTown)[0] : null;
+        // The nearest town is a better county guess than the nearest centroid.
+        $county = $inIreland ? ($bestTown !== null && $bestTownKm < 35 ? explode('|', $bestTown)[1] : $bestCounty) : null;
+        return [
+            'town' => $town, 'county' => $county, 'province' => $county ? Locations::provinceFor($county) : '',
+            'town_km' => $bestTownKm === INF ? null : round($bestTownKm, 1), 'county_km' => $bestCountyKm === INF ? null : round($bestCountyKm, 1),
+            'in_ireland' => $inIreland,
+        ];
+    }
+
     public static function colour(string $category): string
     {
         return self::COLOURS[$category] ?? '#47d5ff';
