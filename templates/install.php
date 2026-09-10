@@ -29,7 +29,9 @@
         <a class="btn btn--primary" href="/">Open the site</a>
         <a class="btn btn--ghost" href="/newsroom">Open the newsroom</a>
       </div>
-      <p class="form__legal">Keep the wire fresh with a cron job every 15 minutes: <code>php <?= e(ME_ROOT) ?>/scripts/fetch-news.php --if-stale</code>. Without cron the wire still refreshes itself whenever a visitor loads a page and it is older than <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes.</p>
+      <div class="trustnote" style="margin-top:18px"><b>Automatic news updates are on.</b> The wire refreshes itself in the background whenever it is older than <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes and a page is visited. For guaranteed updates even with no visitors, point a cron job or uptime monitor at your private refresh URL (shown once here, and again in Newsroom → News wire):</div>
+      <div class="cred"><span>Refresh URL (keep private)</span><code style="word-break:break-all"><?= e($result['cron_url']) ?></code></div>
+      <div class="cred"><span>Cloudways cron (every 15 min)</span><code>curl -s "<?= e($result['cron_url']) ?>"</code></div>
     </section>
   <?php else: ?>
     <section class="panel">

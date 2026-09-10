@@ -26,8 +26,9 @@ $isApp = str_contains($bodyClass, 'page-app');
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" title="ME News Ireland" href="/feed.xml">
-<link rel="preload" href="/assets/fonts/Syne.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/Sora.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_VERSION) ?>">
 <script>try{var t=localStorage.getItem('me_theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
@@ -86,6 +87,7 @@ $isApp = str_contains($bodyClass, 'page-app');
       <?php foreach ($nav as $name): $slug = \MeNews\Support\Categories::slug($name); ?>
         <a href="/section/<?= e($slug) ?>" class="<?= str_starts_with($path, '/section/' . $slug) ? 'is-active' : '' ?>"><?= e($name) ?></a>
       <?php endforeach; ?>
+      <a href="/map" class="<?= $path === '/map' ? 'is-active' : '' ?>">Map</a>
       <a href="/contributors" class="<?= str_starts_with($path, '/contributors') ? 'is-active' : '' ?>">Contributors</a>
       <a href="/plus" class="sections__plus <?= $path === '/plus' ? 'is-active' : '' ?>">ME+</a>
     </div>
@@ -188,6 +190,8 @@ $isApp = str_contains($bodyClass, 'page-app');
 
 <script>window.ME={user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
 <script src="/assets/js/menews.js?v=<?= e(ME_VERSION) ?>" defer></script>
+<script src="/assets/vendor/leaflet/leaflet.js" defer></script>
+<script src="/assets/js/map.js?v=<?= e(ME_VERSION) ?>" defer></script>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>
 </body>
 </html>

@@ -1,0 +1,1018 @@
+{
+    "counties": {
+        "Carlow": [
+            52.6906,
+            -6.8249
+        ],
+        "Cavan": [
+            54.035,
+            -7.2937
+        ],
+        "Clare": [
+            52.8573,
+            -8.9374
+        ],
+        "Cork": [
+            51.9175,
+            -8.586
+        ],
+        "Donegal": [
+            54.9208,
+            -7.9524
+        ],
+        "Dublin": [
+            53.4065,
+            -6.2867
+        ],
+        "Galway": [
+            53.3435,
+            -8.8734
+        ],
+        "Kerry": [
+            52.1453,
+            -9.5174
+        ],
+        "Kildare": [
+            53.1545,
+            -6.8184
+        ],
+        "Kilkenny": [
+            52.5687,
+            -7.189
+        ],
+        "Laois": [
+            52.9985,
+            -7.398
+        ],
+        "Leitrim": [
+            54.1402,
+            -8.0525
+        ],
+        "Limerick": [
+            52.5188,
+            -8.7958
+        ],
+        "Longford": [
+            53.732,
+            -7.6953
+        ],
+        "Louth": [
+            53.9063,
+            -6.5321
+        ],
+        "Mayo": [
+            53.9087,
+            -9.2981
+        ],
+        "Meath": [
+            53.6498,
+            -6.5884
+        ],
+        "Monaghan": [
+            54.1611,
+            -6.9464
+        ],
+        "Offaly": [
+            53.1362,
+            -7.8103
+        ],
+        "Roscommon": [
+            53.6983,
+            -8.2183
+        ],
+        "Sligo": [
+            54.193,
+            -8.7305
+        ],
+        "Tipperary": [
+            52.6848,
+            -7.8981
+        ],
+        "Waterford": [
+            52.1509,
+            -7.6578
+        ],
+        "Westmeath": [
+            53.5578,
+            -7.3479
+        ],
+        "Wexford": [
+            52.4602,
+            -6.6065
+        ],
+        "Wicklow": [
+            52.9582,
+            -6.3814
+        ]
+    },
+    "towns": {
+        "Abbeyfeale|Limerick": [
+            52.3848,
+            -9.3015
+        ],
+        "Abbeyleix|Laois": [
+            52.9145,
+            -7.3482
+        ],
+        "Adare|Limerick": [
+            52.5637,
+            -8.7924
+        ],
+        "Ardee|Louth": [
+            53.8553,
+            -6.5389
+        ],
+        "Arklow|Wicklow": [
+            52.7982,
+            -6.154
+        ],
+        "Ashbourne|Meath": [
+            53.5116,
+            -6.3982
+        ],
+        "Athboy|Meath": [
+            53.6165,
+            -6.9032
+        ],
+        "Athenry|Galway": [
+            53.3014,
+            -8.7489
+        ],
+        "Athlone|Westmeath": [
+            53.4228,
+            -7.9426
+        ],
+        "Athy|Kildare": [
+            52.9924,
+            -6.9836
+        ],
+        "Aughrim|Wicklow": [
+            52.8551,
+            -6.329
+        ],
+        "Bailieborough|Cavan": [
+            53.9169,
+            -6.9707
+        ],
+        "Balbriggan|Dublin": [
+            53.6119,
+            -6.1823
+        ],
+        "Ballaghaderreen|Roscommon": [
+            53.9014,
+            -8.5789
+        ],
+        "Ballinamore|Leitrim": [
+            54.0527,
+            -7.8003
+        ],
+        "Ballinasloe|Galway": [
+            53.3303,
+            -8.2214
+        ],
+        "Ballina|Mayo": [
+            54.1143,
+            -9.1532
+        ],
+        "Ballincollig|Cork": [
+            51.8883,
+            -8.5918
+        ],
+        "Ballinrobe|Mayo": [
+            53.6241,
+            -9.2221
+        ],
+        "Ballybay|Monaghan": [
+            54.1289,
+            -6.903
+        ],
+        "Ballybofey|Donegal": [
+            54.7991,
+            -7.7819
+        ],
+        "Ballybunion|Kerry": [
+            52.5112,
+            -9.6701
+        ],
+        "Ballyhaunis|Mayo": [
+            53.7617,
+            -8.7585
+        ],
+        "Ballyjamesduff|Cavan": [
+            53.8639,
+            -7.2062
+        ],
+        "Ballymahon|Longford": [
+            53.5617,
+            -7.7617
+        ],
+        "Ballymote|Sligo": [
+            54.0885,
+            -8.5155
+        ],
+        "Ballyshannon|Donegal": [
+            54.502,
+            -8.1898
+        ],
+        "Baltinglass|Wicklow": [
+            52.9402,
+            -6.7084
+        ],
+        "Banagher|Offaly": [
+            53.1899,
+            -7.9869
+        ],
+        "Bandon|Cork": [
+            51.7462,
+            -8.7369
+        ],
+        "Bantry|Cork": [
+            51.6798,
+            -9.4524
+        ],
+        "Belmullet|Mayo": [
+            54.2241,
+            -9.9872
+        ],
+        "Belturbet|Cavan": [
+            54.1007,
+            -7.444
+        ],
+        "Bettystown|Meath": [
+            53.6983,
+            -6.2444
+        ],
+        "Birr|Offaly": [
+            53.1057,
+            -7.7572
+        ],
+        "Blackrock|Dublin": [
+            53.3019,
+            -6.1788
+        ],
+        "Blackrock|Louth": [
+            53.9621,
+            -6.3664
+        ],
+        "Blanchardstown|Dublin": [
+            53.3845,
+            -6.3829
+        ],
+        "Blarney|Cork": [
+            51.9325,
+            -8.5681
+        ],
+        "Blessington|Wicklow": [
+            53.1726,
+            -6.5331
+        ],
+        "Booterstown|Dublin": [
+            53.31,
+            -6.1952
+        ],
+        "Borris|Carlow": [
+            52.5988,
+            -6.9202
+        ],
+        "Boyle|Roscommon": [
+            53.9907,
+            -8.2665
+        ],
+        "Bray|Wicklow": [
+            53.2015,
+            -6.1105
+        ],
+        "Bunclody|Wexford": [
+            52.6551,
+            -6.6521
+        ],
+        "Buncrana|Donegal": [
+            55.1354,
+            -7.4531
+        ],
+        "Bundoran|Donegal": [
+            54.4789,
+            -8.2783
+        ],
+        "Cabinteely|Dublin": [
+            53.2613,
+            -6.1506
+        ],
+        "Cahersiveen|Kerry": [
+            51.9472,
+            -10.2238
+        ],
+        "Cahir|Tipperary": [
+            52.3779,
+            -7.9226
+        ],
+        "Callan|Kilkenny": [
+            52.5446,
+            -7.3901
+        ],
+        "Carlingford|Louth": [
+            54.0411,
+            -6.1865
+        ],
+        "Carlow|Carlow": [
+            52.8408,
+            -6.9261
+        ],
+        "Carndonagh|Donegal": [
+            55.2513,
+            -7.2611
+        ],
+        "Carrick-on-Shannon|Leitrim": [
+            53.9441,
+            -8.0953
+        ],
+        "Carrick-on-Suir|Tipperary": [
+            52.3492,
+            -7.4131
+        ],
+        "Carrickmacross|Monaghan": [
+            53.977,
+            -6.7194
+        ],
+        "Carrigaline|Cork": [
+            51.815,
+            -8.3923
+        ],
+        "Cashel|Tipperary": [
+            52.5167,
+            -7.8879
+        ],
+        "Castlebar|Mayo": [
+            53.8568,
+            -9.298
+        ],
+        "Castleblayney|Monaghan": [
+            54.1202,
+            -6.7404
+        ],
+        "Castlecomer|Kilkenny": [
+            52.8061,
+            -7.2106
+        ],
+        "Castleconnell|Limerick": [
+            52.7131,
+            -8.4979
+        ],
+        "Castleisland|Kerry": [
+            52.2312,
+            -9.4637
+        ],
+        "Castleknock|Dublin": [
+            53.373,
+            -6.3625
+        ],
+        "Castlerea|Roscommon": [
+            53.7616,
+            -8.4858
+        ],
+        "Cavan|Cavan": [
+            53.9911,
+            -7.3603
+        ],
+        "Celbridge|Kildare": [
+            53.3383,
+            -6.5396
+        ],
+        "Charlestown|Mayo": [
+            53.9642,
+            -8.7942
+        ],
+        "Clane|Kildare": [
+            53.2912,
+            -6.6861
+        ],
+        "Clara|Offaly": [
+            53.3398,
+            -7.6164
+        ],
+        "Claremorris|Mayo": [
+            53.7197,
+            -8.9988
+        ],
+        "Clifden|Galway": [
+            53.4885,
+            -10.0211
+        ],
+        "Clonakilty|Cork": [
+            51.6232,
+            -8.8914
+        ],
+        "Clondalkin|Dublin": [
+            53.322,
+            -6.3943
+        ],
+        "Clones|Monaghan": [
+            54.1792,
+            -7.2321
+        ],
+        "Clonmel|Tipperary": [
+            52.3611,
+            -7.6992
+        ],
+        "Clontarf|Dublin": [
+            53.3608,
+            -6.1969
+        ],
+        "Cobh|Cork": [
+            51.8502,
+            -8.2951
+        ],
+        "Collooney|Sligo": [
+            54.1837,
+            -8.4925
+        ],
+        "Cootehill|Cavan": [
+            54.0725,
+            -7.0823
+        ],
+        "Cork City|Cork": [
+            51.8898,
+            -8.4654
+        ],
+        "Courtown|Wexford": [
+            52.6448,
+            -6.2278
+        ],
+        "Dalkey|Dublin": [
+            53.2755,
+            -6.1026
+        ],
+        "Dingle|Kerry": [
+            52.1415,
+            -10.2895
+        ],
+        "Donabate|Dublin": [
+            53.4857,
+            -6.1513
+        ],
+        "Donegal Town|Donegal": [
+            54.6538,
+            -8.1103
+        ],
+        "Drogheda|Louth": [
+            53.715,
+            -6.3524
+        ],
+        "Drumshanbo|Leitrim": [
+            54.0467,
+            -8.0402
+        ],
+        "Dublin City Centre|Dublin": [
+            53.3488,
+            -6.2432
+        ],
+        "Duleek|Meath": [
+            53.6563,
+            -6.4147
+        ],
+        "Dunboyne|Meath": [
+            53.4194,
+            -6.476
+        ],
+        "Dundalk|Louth": [
+            54.0046,
+            -6.4009
+        ],
+        "Dungarvan|Waterford": [
+            52.0897,
+            -7.621
+        ],
+        "Dungloe|Donegal": [
+            54.9507,
+            -8.3597
+        ],
+        "Dunleer|Louth": [
+            53.8316,
+            -6.3951
+        ],
+        "Dún Laoghaire|Dublin": [
+            53.2923,
+            -6.136
+        ],
+        "Edenderry|Offaly": [
+            53.3434,
+            -7.0489
+        ],
+        "Edgeworthstown|Longford": [
+            53.6888,
+            -7.6031
+        ],
+        "Enfield|Meath": [
+            53.4162,
+            -6.8342
+        ],
+        "Enniscorthy|Wexford": [
+            52.5046,
+            -6.5663
+        ],
+        "Enniscrone|Sligo": [
+            54.2132,
+            -9.0935
+        ],
+        "Enniskerry|Wicklow": [
+            53.1927,
+            -6.1704
+        ],
+        "Ennistymon|Clare": [
+            52.9401,
+            -9.2934
+        ],
+        "Ennis|Clare": [
+            52.8435,
+            -8.9837
+        ],
+        "Ferbane|Offaly": [
+            53.2716,
+            -7.8278
+        ],
+        "Fermoy|Cork": [
+            52.1382,
+            -8.2752
+        ],
+        "Finglas|Dublin": [
+            53.3892,
+            -6.2969
+        ],
+        "Foxford|Mayo": [
+            53.9829,
+            -9.1365
+        ],
+        "Foxrock|Dublin": [
+            53.2668,
+            -6.1838
+        ],
+        "Galway City|Galway": [
+            53.2842,
+            -9.0378
+        ],
+        "Glasthule|Dublin": [
+            53.2872,
+            -6.1234
+        ],
+        "Gorey|Wexford": [
+            52.6712,
+            -6.292
+        ],
+        "Gort|Galway": [
+            53.0672,
+            -8.8142
+        ],
+        "Graiguenamanagh|Kilkenny": [
+            52.552,
+            -6.9914
+        ],
+        "Granard|Longford": [
+            53.7794,
+            -7.491
+        ],
+        "Greystones|Wicklow": [
+            53.1449,
+            -6.0632
+        ],
+        "Howth|Dublin": [
+            53.3858,
+            -6.0651
+        ],
+        "Kells|Meath": [
+            53.7272,
+            -6.8768
+        ],
+        "Kenmare|Kerry": [
+            51.8791,
+            -9.584
+        ],
+        "Kilbeggan|Westmeath": [
+            53.3695,
+            -7.5027
+        ],
+        "Kilcock|Kildare": [
+            53.399,
+            -6.6689
+        ],
+        "Kilcoole|Wicklow": [
+            53.1069,
+            -6.041
+        ],
+        "Kildare|Kildare": [
+            53.1568,
+            -6.9117
+        ],
+        "Kilkee|Clare": [
+            52.6792,
+            -9.6442
+        ],
+        "Kilkenny|Kilkenny": [
+            52.6506,
+            -7.2514
+        ],
+        "Killaloe|Clare": [
+            52.8051,
+            -8.4459
+        ],
+        "Killarney|Kerry": [
+            52.0596,
+            -9.5053
+        ],
+        "Killiney|Dublin": [
+            53.2554,
+            -6.113
+        ],
+        "Killorglin|Kerry": [
+            52.1062,
+            -9.7868
+        ],
+        "Killybegs|Donegal": [
+            54.6362,
+            -8.4443
+        ],
+        "Kilmallock|Limerick": [
+            52.4006,
+            -8.5712
+        ],
+        "Kilrush|Clare": [
+            52.6397,
+            -9.4833
+        ],
+        "Kingscourt|Cavan": [
+            53.905,
+            -6.8047
+        ],
+        "Kinnegad|Westmeath": [
+            53.4548,
+            -7.1012
+        ],
+        "Kinsale|Cork": [
+            51.7057,
+            -8.523
+        ],
+        "Lahinch|Clare": [
+            52.9321,
+            -9.3459
+        ],
+        "Lanesborough|Longford": [
+            53.6729,
+            -7.9896
+        ],
+        "Laytown|Meath": [
+            53.6795,
+            -6.2428
+        ],
+        "Leighlinbridge|Carlow": [
+            52.736,
+            -6.9766
+        ],
+        "Leixlip|Kildare": [
+            53.3645,
+            -6.4897
+        ],
+        "Letterkenny|Donegal": [
+            54.9518,
+            -7.7354
+        ],
+        "Lifford|Donegal": [
+            54.8327,
+            -7.4835
+        ],
+        "Limerick City|Limerick": [
+            52.6486,
+            -8.4523
+        ],
+        "Lismore|Waterford": [
+            52.1368,
+            -7.9331
+        ],
+        "Listowel|Kerry": [
+            52.4472,
+            -9.4847
+        ],
+        "Longford|Longford": [
+            53.7278,
+            -7.7964
+        ],
+        "Loughrea|Galway": [
+            53.1982,
+            -8.5691
+        ],
+        "Lucan|Dublin": [
+            53.3567,
+            -6.4502
+        ],
+        "Macroom|Cork": [
+            51.905,
+            -8.9599
+        ],
+        "Malahide|Dublin": [
+            53.4508,
+            -6.1537
+        ],
+        "Mallow|Cork": [
+            52.1389,
+            -8.6551
+        ],
+        "Manorhamilton|Leitrim": [
+            54.304,
+            -8.1754
+        ],
+        "Maynooth|Kildare": [
+            53.383,
+            -6.5923
+        ],
+        "Midleton|Cork": [
+            51.9212,
+            -8.1757
+        ],
+        "Mitchelstown|Cork": [
+            52.2595,
+            -8.2378
+        ],
+        "Moate|Westmeath": [
+            53.3962,
+            -7.7241
+        ],
+        "Mohill|Leitrim": [
+            53.9218,
+            -7.8653
+        ],
+        "Monaghan|Monaghan": [
+            54.2486,
+            -6.9689
+        ],
+        "Monasterevin|Kildare": [
+            53.1427,
+            -7.0635
+        ],
+        "Mountmellick|Laois": [
+            53.1175,
+            -7.3252
+        ],
+        "Mountrath|Laois": [
+            53.0012,
+            -7.4743
+        ],
+        "Moville|Donegal": [
+            55.1889,
+            -7.0405
+        ],
+        "Muine Bheag|Carlow": [
+            52.7018,
+            -6.9567
+        ],
+        "Mullingar|Westmeath": [
+            53.5258,
+            -7.3413
+        ],
+        "Naas|Kildare": [
+            53.2215,
+            -6.6574
+        ],
+        "Navan|Meath": [
+            53.6531,
+            -6.684
+        ],
+        "Nenagh|Tipperary": [
+            52.8619,
+            -8.1967
+        ],
+        "New Ross|Wexford": [
+            52.3956,
+            -6.9446
+        ],
+        "Newbridge|Kildare": [
+            53.1801,
+            -6.7982
+        ],
+        "Newcastle West|Limerick": [
+            52.4489,
+            -9.0529
+        ],
+        "Newtownmountkennedy|Wicklow": [
+            53.0895,
+            -6.111
+        ],
+        "Oranmore|Galway": [
+            53.2755,
+            -8.9473
+        ],
+        "Oughterard|Galway": [
+            53.4258,
+            -9.3195
+        ],
+        "Palmerstown|Dublin": [
+            53.356,
+            -6.3705
+        ],
+        "Portarlington|Laois": [
+            53.1622,
+            -7.1911
+        ],
+        "Portlaoise|Laois": [
+            53.034,
+            -7.3001
+        ],
+        "Portlaw|Waterford": [
+            52.3036,
+            -7.3432
+        ],
+        "Portmarnock|Dublin": [
+            53.4177,
+            -6.1513
+        ],
+        "Portumna|Galway": [
+            53.0923,
+            -8.2193
+        ],
+        "Ranelagh|Dublin": [
+            53.3252,
+            -6.2551
+        ],
+        "Rathdrum|Wicklow": [
+            52.9305,
+            -6.2261
+        ],
+        "Rathkeale|Limerick": [
+            52.5236,
+            -8.9377
+        ],
+        "Rathmines|Dublin": [
+            53.3265,
+            -6.2649
+        ],
+        "Rathvilly|Carlow": [
+            52.8808,
+            -6.6945
+        ],
+        "Ratoath|Meath": [
+            53.5073,
+            -6.4641
+        ],
+        "Roscommon|Roscommon": [
+            53.6312,
+            -8.1907
+        ],
+        "Roscrea|Tipperary": [
+            52.9552,
+            -7.799
+        ],
+        "Rosslare|Wexford": [
+            52.2736,
+            -6.3869
+        ],
+        "Saggart|Dublin": [
+            53.2588,
+            -6.4443
+        ],
+        "Sallins|Kildare": [
+            53.249,
+            -6.6657
+        ],
+        "Sandycove|Dublin": [
+            53.2859,
+            -6.1156
+        ],
+        "Scariff|Clare": [
+            52.9155,
+            -8.5396
+        ],
+        "Shankill|Dublin": [
+            53.2367,
+            -6.117
+        ],
+        "Shannon|Clare": [
+            52.6913,
+            -8.6186
+        ],
+        "Sixmilebridge|Clare": [
+            52.7381,
+            -8.7858
+        ],
+        "Skerries|Dublin": [
+            53.574,
+            -6.1192
+        ],
+        "Skibbereen|Cork": [
+            51.5478,
+            -9.2662
+        ],
+        "Sligo|Sligo": [
+            54.2721,
+            -8.4751
+        ],
+        "Stillorgan|Dublin": [
+            53.2888,
+            -6.1983
+        ],
+        "Stradbally|Laois": [
+            53.0161,
+            -7.15
+        ],
+        "Strandhill|Sligo": [
+            54.27,
+            -8.5943
+        ],
+        "Stranorlar|Donegal": [
+            54.8045,
+            -7.7692
+        ],
+        "Strokestown|Roscommon": [
+            53.7766,
+            -8.1022
+        ],
+        "Swinford|Mayo": [
+            53.9435,
+            -8.9498
+        ],
+        "Swords|Dublin": [
+            53.4595,
+            -6.2192
+        ],
+        "Tallaght|Dublin": [
+            53.2878,
+            -6.3624
+        ],
+        "Tallow|Waterford": [
+            52.0675,
+            -7.9967
+        ],
+        "Templemore|Tipperary": [
+            52.7947,
+            -7.8339
+        ],
+        "Templeogue|Dublin": [
+            53.2979,
+            -6.3043
+        ],
+        "Thomastown|Kilkenny": [
+            52.5232,
+            -7.1489
+        ],
+        "Thurles|Tipperary": [
+            52.6767,
+            -7.8219
+        ],
+        "Tipperary|Tipperary": [
+            52.4735,
+            -8.1614
+        ],
+        "Tralee|Kerry": [
+            52.2692,
+            -9.7057
+        ],
+        "Tramore|Waterford": [
+            52.1836,
+            -7.1496
+        ],
+        "Trim|Meath": [
+            53.5543,
+            -6.7898
+        ],
+        "Tuam|Galway": [
+            53.5148,
+            -8.8513
+        ],
+        "Tubbercurry|Sligo": [
+            54.0539,
+            -8.7306
+        ],
+        "Tullamore|Offaly": [
+            53.2744,
+            -7.4927
+        ],
+        "Tullow|Carlow": [
+            52.8031,
+            -6.7377
+        ],
+        "Urlingford|Kilkenny": [
+            52.7242,
+            -7.5727
+        ],
+        "Virginia|Cavan": [
+            53.8351,
+            -7.0832
+        ],
+        "Waterford City|Waterford": [
+            52.263,
+            -7.115
+        ],
+        "Westport|Mayo": [
+            53.8001,
+            -9.5202
+        ],
+        "Wexford|Wexford": [
+            52.3368,
+            -6.4601
+        ],
+        "Wicklow|Wicklow": [
+            52.9802,
+            -6.0414
+        ],
+        "Youghal|Cork": [
+            51.9495,
+            -7.8432
+        ]
+    }
+}

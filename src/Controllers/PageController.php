@@ -55,7 +55,8 @@ final class PageController
             'counties' => Stories::countyActivity(8),
             'contributors' => $contributors,
             'counts' => Stories::categoryCounts(),
-            'mapPoints' => Stories::mapPoints(),
+            'mapPoints' => Stories::mapPoints(120),
+            'mapCounties' => Stories::countyPoints(),
             'ads' => self::ads(),
             'totalPublished' => Stories::countPublished(),
             'bodyClass' => 'page-home',
@@ -167,6 +168,18 @@ final class PageController
         ]));
     }
 
+    public static function map(Request $r): Response
+    {
+        return View::page('map', self::base([
+            'title' => 'Live map — ME News Ireland',
+            'description' => 'Every published story pinned across the island, from the wire and the community desk.',
+            'points' => Stories::mapPoints(300),
+            'counties' => Stories::countyPoints(),
+            'colours' => \MeNews\Support\Geo::COLOURS,
+            'bodyClass' => 'page-map',
+        ]));
+    }
+
     public static function contributors(): array
     {
         $rows = Database::all("SELECT id,display_name,handle,title,desk,bio,accent,home_town,home_county,reputation,is_verified,created_at FROM users WHERE role='contributor' ORDER BY created_at");
@@ -269,7 +282,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/contributors', '/about', '/plus'];
+        $urls = ['/', '/map', '/contributors', '/about', '/plus'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }

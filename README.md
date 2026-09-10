@@ -8,7 +8,7 @@
 
 ME News Ireland is a community-first Irish news platform built on plain **PHP 8.2+** and **SQLite** — no framework, no build step, no Composer dependencies. It combines a live **wire of real headlines** from established Irish publishers with **community reporting** that is screened by the ME Trust Engine and labelled by human editors.
 
-The design is a premium, dark-first "Aurora / 2090" system: luminous gradients, HUD detailing, self-hosted variable fonts (Syne, Manrope, JetBrains Mono), a live map, a newsroom pulse sparkline and a light theme toggle.
+The design is a premium, dark-first "Aurora / 2090" system: luminous gradients, HUD detailing, self-hosted variable fonts (Sora, Manrope, JetBrains Mono), a live map, a newsroom pulse sparkline and a light theme toggle.
 
 ---
 
@@ -45,9 +45,13 @@ Change every password before any public deployment (`ADMIN_PASSWORD`, `CONTRIBUT
 - infers the section (National, Local, Business, Sport, Culture, Traffic, Council, What's On, World) and the county/town from the text;
 - files each story to the ME contributor who runs that desk, so every story has a named editor;
 - de-duplicates across feeds, prunes stale items and logs each run in `wire_runs`;
-- refreshes itself when a visitor loads a page and the wire is older than `WIRE_REFRESH_MINUTES` (a lock prevents overlapping runs), or on demand from the newsroom, or from cron:
+- pins every story on the live map using town/county coordinates (`config/geo.json`, built from OpenStreetMap by `scripts/geocode-locations.php`);
+- **updates itself automatically**: once the wire is older than `WIRE_REFRESH_MINUTES` (default 20) the next page view triggers a refresh in the background (`fastcgi_finish_request` under PHP-FPM, so visitors never wait; a browser ping is the fallback). A lock prevents overlapping runs.
+- for guaranteed updates even without visitors, call the private endpoint from cron or an uptime monitor (the key is generated at install and shown in Newsroom → News wire):
 
 ```
+*/15 * * * *  curl -s "https://yourdomain.ie/cron/wire?key=YOUR_CRON_KEY"
+# or, on the server itself
 */15 * * * *  php /var/www/menews/scripts/fetch-news.php --if-stale >> /var/www/menews/storage/logs/wire.log 2>&1
 ```
 
@@ -77,7 +81,7 @@ tests/smoke.php         end-to-end smoke test against a running server
 
 ## Features
 
-**Public site (server-rendered, SEO-ready)** — home with featured story, live wire ticker, per-section blocks, community desk, contributor cards, newsroom pulse sparkline, county signal, live Leaflet map; section, county, search, story, contributor, about and ME+ pages; JSON-LD, Open Graph, sitemap.xml, feed.xml, manifest; dark/light theme; reduced-motion support.
+**Public site (server-rendered, SEO-ready)** — home with featured story, live wire ticker, per-section blocks, community desk, contributor cards, newsroom pulse sparkline, county signal, live Leaflet map with category-coloured pins, county activity circles, filters and a full-screen `/map` page; section, county, search, story, contributor, about and ME+ pages; JSON-LD, Open Graph, sitemap.xml, feed.xml, manifest; dark/light theme; reduced-motion support.
 
 **Accounts** — email/password registration, hashed passwords, random sessions stored as SHA-256 hashes, HttpOnly cookie + bearer token, CSRF guard on cookie sessions, persistent rate limits, roles (member, contributor, editor, admin), dashboard with reports, profile, followed areas (1 free / 10 on ME+), notifications, advertising and password change.
 

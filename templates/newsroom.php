@@ -46,6 +46,7 @@
 
       <div id="view-wire" class="view">
         <div class="inline" style="justify-content:space-between"><div><h1>News wire</h1><p class="pagehead__blurb">Headlines are pulled from established Irish publishers every <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes and filed to the matching desk editor.</p></div><button class="btn btn--primary" id="wire-refresh" type="button">Refresh wire now</button></div>
+        <div class="panel" id="wire-schedule"></div>
         <ul class="sources" id="wire-sources"></ul>
         <h2>Recent runs</h2>
         <div id="wire-runs"></div>

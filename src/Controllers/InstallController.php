@@ -81,6 +81,7 @@ final class InstallController
                 Installer::writeEnv([
                     'APP_ENV' => $env, 'PUBLIC_BASE_URL' => $base, 'ADMIN_EMAIL' => $email,
                     'ADMIN_PASSWORD' => $password, 'CONTRIBUTOR_PASSWORD' => $contributorPassword,
+                    'CRON_KEY' => Config::get('CRON_KEY') ?: bin2hex(random_bytes(16)),
                 ]);
                 Installer::createDatabase();
                 Installer::ensureAdmin($email, $password, true);
@@ -92,6 +93,7 @@ final class InstallController
                     'wire' => $wire,
                     'stories' => Database::count("SELECT COUNT(*) FROM stories WHERE status='published'"),
                     'base' => $base,
+                    'cron_url' => $base . '/cron/wire?key=' . rawurlencode(Config::get('CRON_KEY')),
                 ];
             } catch (Throwable $e) {
                 error_log('Install failed: ' . $e);

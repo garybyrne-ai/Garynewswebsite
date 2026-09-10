@@ -21,11 +21,16 @@ nano .env
 php scripts/setup.php --seed
 ```
 
-4. Add a cron job (Application → Cron Job Management → Advanced):
+4. News updates are automatic: the wire refreshes in the background whenever it is older than
+   20 minutes and a page is visited. To guarantee updates even with no visitors, add a cron job
+   (Application → Cron Job Management → Advanced) using the private URL shown after install
+   (also in Newsroom → News wire):
 
 ```
-*/15 * * * *  php /home/master/applications/<app-folder>/public_html/scripts/fetch-news.php --if-stale
+*/15 * * * *  curl -s "https://your-app.cloudwaysapps.com/cron/wire?key=YOUR_CRON_KEY"
 ```
+
+   or the CLI equivalent: `*/15 * * * * php /home/master/applications/<app-folder>/public_html/scripts/fetch-news.php --if-stale`
 
 ## Option B: keep the default web root
 

@@ -239,7 +239,19 @@ final class AdminController
     public static function wireRuns(Request $r): Response
     {
         self::staff();
-        return Response::json(['sources' => NewsWire::sources(), 'runs' => Database::all('SELECT * FROM wire_runs ORDER BY id DESC LIMIT 60'), 'last_refresh' => NewsWire::lastRefresh()]);
+        $u = Auth::user();
+        $key = \MeNews\Config::get('CRON_KEY');
+        return Response::json([
+            'sources' => NewsWire::sources(),
+            'runs' => Database::all('SELECT * FROM wire_runs ORDER BY id DESC LIMIT 60'),
+            'last_refresh' => NewsWire::lastRefresh(),
+            'refresh_count' => (int)Database::setting('wire_refresh_count', '0'),
+            'interval_minutes' => \MeNews\Config::int('WIRE_REFRESH_MINUTES', 20),
+            'auto_refresh' => \MeNews\Config::bool('WIRE_AUTO_REFRESH', true),
+            'background_capable' => function_exists('fastcgi_finish_request'),
+            'cron_url' => $u && $u['role'] === 'admin' && $key !== '' ? absolute_url('/cron/wire?key=' . rawurlencode($key)) : null,
+            'cron_cli' => 'php ' . ME_ROOT . '/scripts/fetch-news.php --if-stale',
+        ]);
     }
 
     public static function audit(Request $r): Response

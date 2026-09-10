@@ -7,6 +7,7 @@ use MeNews\Config;
 use MeNews\Database;
 use MeNews\Stories;
 use MeNews\Support\Categories;
+use MeNews\Support\Geo;
 use MeNews\Support\Locations;
 use SimpleXMLElement;
 use Throwable;
@@ -98,12 +99,45 @@ final class NewsWire
                 }
             }
             self::prune();
+            Geo::backfill();
             Database::setSetting('wire_last_refresh', now());
+            Database::setSetting('wire_refresh_count', (string)((int)Database::setting('wire_refresh_count', '0') + 1));
         } finally {
             flock($lock, LOCK_UN);
             fclose($lock);
         }
         return $summary;
+    }
+
+    /**
+     * Keep the wire fresh without cron: called by the front controller after the response has
+     * been sent. Under PHP-FPM the connection is closed first (fastcgi_finish_request) so the
+     * visitor never waits; on other SAPIs the browser-side ping (/api/wire/refresh) is used
+     * instead and this method returns immediately.
+     */
+    public static function afterResponse(): void
+    {
+        if (!self::enabled() || !Config::bool('WIRE_AUTO_REFRESH', true) || !Database::installed() || !self::isStale()) {
+            return;
+        }
+        if (!function_exists('fastcgi_finish_request')) {
+            return;
+        }
+        ignore_user_abort(true);
+        fastcgi_finish_request();
+        set_time_limit(240);
+        try {
+            self::refresh(false);
+        } catch (\Throwable $e) {
+            error_log('Background wire refresh: ' . $e->getMessage());
+        }
+    }
+
+    /** Seconds since the last refresh, or null when never refreshed. */
+    public static function age(): ?int
+    {
+        $last = self::lastRefresh();
+        return $last ? max(0, time() - (int)strtotime($last)) : null;
     }
 
     /** Download and parse one RSS source into normalised story arrays. */
@@ -286,6 +320,7 @@ final class NewsWire
         }
         $contributor = self::contributorFor($story['category']);
         $id = uuid();
+        $point = Geo::forStory($story['location_name'] ?? null, $story['county'] ?? null, $story['external_id']);
         Database::insert('stories', [
             'id' => $id,
             'slug' => Stories::makeSlug($story['title'], $id),
@@ -302,6 +337,8 @@ final class NewsWire
             'county' => $story['county'],
             'province' => $story['province'],
             'category' => $story['category'],
+            'latitude' => $point[0] ?? null,
+            'longitude' => $point[1] ?? null,
             'image_url' => $story['image_url'],
             'image_credit' => $story['image_credit'],
             'source_name' => $story['source_name'],

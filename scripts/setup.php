@@ -30,6 +30,10 @@ try {
     if ($problem = Installer::passwordProblem($password, Config::production())) {
         throw new RuntimeException('ADMIN_PASSWORD: ' . $problem);
     }
+    if (Config::get('CRON_KEY') === '') {
+        Installer::writeEnv(['CRON_KEY' => bin2hex(random_bytes(16))]);
+        echo "Generated CRON_KEY in .env (used by /cron/wire).\n";
+    }
     $storage = Config::storage();
     $path = Database::path();
     $fresh = Installer::createDatabase();

@@ -39,7 +39,7 @@ final class Remote
             CURLOPT_MAXREDIRS => 5,
             CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
             CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
-            CURLOPT_USERAGENT => Config::get('WIRE_USER_AGENT', 'MENewsWire/4.0'),
+            CURLOPT_USERAGENT => Config::get("WIRE_USER_AGENT", "MENewsWire/4.0 (+https://menews.ie; contact newsroom@menews.ie)"),
             CURLOPT_ENCODING => '',
         ]);
         if ($body !== null) {

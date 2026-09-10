@@ -91,5 +91,5 @@
     </section>
 
   </div>
-  <?= \MeNews\View::partial('partials/sidebar', compact('pulse', 'mapPoints', 'counties', 'trending', 'contributors', 'ads')) ?>
+  <?= \MeNews\View::partial('partials/sidebar', compact('pulse', 'mapPoints', 'mapCounties', 'counties', 'trending', 'contributors', 'ads')) ?>
 </div>

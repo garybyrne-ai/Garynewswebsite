@@ -142,13 +142,43 @@ final class Stories
         return array_column($rows, 'n', 'category');
     }
 
-    public static function mapPoints(int $limit = 60): array
+    public static function mapPoints(int $limit = 200, string $category = '', string $kind = ''): array
     {
-        $rows = Database::all("SELECT id,slug,title,location_name,county,category,latitude,longitude FROM stories WHERE status='published' AND latitude IS NOT NULL AND longitude IS NOT NULL ORDER BY COALESCE(published_at,created_at) DESC LIMIT ?", [$limit]);
+        $sql = "SELECT id,slug,title,location_name,county,category,kind,source_name,image_url,media_type,media_public,latitude,longitude,COALESCE(published_at,created_at) AS time FROM stories WHERE status='published' AND latitude IS NOT NULL AND longitude IS NOT NULL";
+        $args = [];
+        if ($category !== '') {
+            $sql .= ' AND category=?';
+            $args[] = $category;
+        }
+        if ($kind !== '') {
+            $sql .= ' AND kind=?';
+            $args[] = $kind;
+        }
+        $rows = Database::all($sql . ' ORDER BY time DESC LIMIT ' . (int)$limit, $args);
         foreach ($rows as &$r) {
             $r['url'] = '/story/' . $r['slug'];
+            $r['image'] = $r['media_type'] === 'image' && $r['media_public'] ? '/media/' . $r['id'] : ($r['image_url'] ?: null);
+            $r['ago'] = time_ago($r['time']);
+            $r['latitude'] = (float)$r['latitude'];
+            $r['longitude'] = (float)$r['longitude'];
+            unset($r['image_url'], $r['media_type'], $r['media_public']);
         }
         return $rows;
+    }
+
+    /** Published stories per county (last 7 days) with county centroids, for the map heat layer. */
+    public static function countyPoints(): array
+    {
+        $since = gmdate('Y-m-d\TH:i:s', time() - 7 * 86400) . '+00:00';
+        $rows = Database::all("SELECT county, COUNT(*) AS n FROM stories WHERE status='published' AND county IS NOT NULL AND county<>'' AND COALESCE(published_at,created_at)>? GROUP BY county", [$since]);
+        $out = [];
+        foreach ($rows as $r) {
+            $pt = \MeNews\Support\Geo::county($r['county']);
+            if ($pt) {
+                $out[] = ['county' => $r['county'], 'n' => (int)$r['n'], 'latitude' => $pt[0], 'longitude' => $pt[1], 'url' => '/county/' . slugify($r['county'])];
+            }
+        }
+        return $out;
     }
 
     public static function comments(string $storyId): array

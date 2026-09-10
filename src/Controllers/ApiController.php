@@ -83,7 +83,32 @@ final class ApiController
 
     public static function map(Request $r): Response
     {
-        return Response::json(Stories::mapPoints($r->int('limit', 60, 1, 200)));
+        $category = $r->query('category', '', 40);
+        $kind = in_array($r->query('kind'), ['wire', 'community'], true) ? $r->query('kind') : '';
+        return Response::json([
+            'points' => Stories::mapPoints($r->int('limit', 200, 1, 400), $category, $kind),
+            'counties' => Stories::countyPoints(),
+            'colours' => \MeNews\Support\Geo::COLOURS,
+            'generated_at' => now(),
+        ]);
+    }
+
+    /**
+     * Cron / uptime-monitor endpoint: GET /cron/wire?key=CRON_KEY[&force=1].
+     * Refreshes the wire when stale (or always with force=1). Safe to call as often as you like.
+     */
+    public static function cronWire(Request $r): Response
+    {
+        $key = Config::get('CRON_KEY');
+        if ($key === '' || !hash_equals($key, $r->query('key', '', 200))) {
+            throw new HttpException(403, 'Invalid cron key');
+        }
+        set_time_limit(280);
+        $force = $r->query('force') === '1';
+        $summary = NewsWire::refresh($force);
+        $summary['last_refresh'] = NewsWire::lastRefresh();
+        $summary['stories_published'] = Stories::countPublished();
+        return Response::json($summary);
     }
 
     public static function pulse(Request $r): Response

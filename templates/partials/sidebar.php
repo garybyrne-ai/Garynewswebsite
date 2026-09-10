@@ -14,11 +14,16 @@ $ads = $ads ?? [];
   </section>
   <?php endif; ?>
 
-  <?php if (isset($mapPoints)): ?>
-  <section class="panel panel--map reveal">
-    <header class="panel__head"><span class="kicker">Live local map</span><span class="mono panel__hint" id="map-count"><?= count($mapPoints) ?> pins</span></header>
-    <div id="map" class="map" data-points='<?= e(json_encode($mapPoints, JSON_UNESCAPED_UNICODE)) ?>'></div>
-    <p class="panel__note">Pins mark published community reports with reporter GPS. <button type="button" class="linkbtn" data-locate>Use my location</button></p>
+  <?php if (isset($mapPoints)): $colours = \MeNews\Support\Geo::COLOURS; ?>
+  <section class="panel panel--map reveal" data-map-root>
+    <header class="panel__head"><span class="kicker">Live map</span><a class="mono panel__hint" href="/map" data-map-count><?= count($mapPoints) ?> pins</a></header>
+    <div class="mapchips">
+      <button type="button" class="is-active" data-map-chip>All</button>
+      <button type="button" data-map-chip data-kind="community" style="--c:<?= e($colours['Community']) ?>"><i></i>Community</button>
+      <?php foreach (['Local', 'Traffic', 'Sport', 'Business'] as $c): ?><button type="button" data-map-chip data-category="<?= e($c) ?>" style="--c:<?= e($colours[$c]) ?>"><i></i><?= e($c) ?></button><?php endforeach; ?>
+    </div>
+    <div id="map" class="map" data-map="side" data-points='<?= e(json_encode($mapPoints, JSON_UNESCAPED_UNICODE)) ?>' data-counties='<?= e(json_encode($mapCounties ?? [], JSON_UNESCAPED_UNICODE)) ?>' data-colours='<?= e(json_encode($colours)) ?>'></div>
+    <p class="panel__note">Pins are placed by town or county; community reports with GPS sit exactly where they were filed. <button type="button" class="linkbtn" data-locate>Use my location</button> · <a href="/map">Full map →</a></p>
   </section>
   <?php endif; ?>
 

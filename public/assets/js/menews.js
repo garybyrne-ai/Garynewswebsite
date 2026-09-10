@@ -203,27 +203,4 @@
     setInterval(() => { wireStatus.textContent = 'Updated ' + ago(wireStatus.dataset.last); }, 60000);
   }
 
-  /* ---------- map (Leaflet loaded on demand) ---------- */
-  const mapEl = $('#map');
-  if (mapEl) {
-    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css);
-    const s = document.createElement('script'); s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    s.onload = () => {
-      const L = window.L; if (!L) return;
-      const map = L.map(mapEl, { zoomControl: false, attributionControl: true }).setView([53.4, -7.9], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-      let pts = [];
-      try { pts = JSON.parse(mapEl.dataset.points || '[]'); } catch (e) { }
-      const icon = L.divIcon({ className: '', html: '<div class="me-pin"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
-      const group = L.featureGroup(pts.map(p => L.marker([p.latitude, p.longitude], { icon }).bindPopup(`<b><a href="${esc(p.url)}">${esc(p.title)}</a></b><br>${esc(p.location_name || '')} · ${esc(p.category)}`)));
-      group.addTo(map);
-      if (pts.length) map.fitBounds(group.getBounds().pad(.35));
-      $('[data-locate]')?.addEventListener('click', () => {
-        if (!navigator.geolocation) return toast('Location is unavailable');
-        navigator.geolocation.getCurrentPosition(p => { map.setView([p.coords.latitude, p.coords.longitude], 11); toast('Map centred near you'); }, () => toast('Location permission was not granted'));
-      });
-    };
-    document.head.appendChild(s);
-  }
 })();

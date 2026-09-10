@@ -40,6 +40,9 @@ try {
     $router = new Router();
     (require ME_ROOT . '/src/routes.php')($router);
     $router->dispatch($request)->send();
+    if ($request->method === 'GET' && !$request->wantsJson()) {
+        MeNews\Services\NewsWire::afterResponse();
+    }
 } catch (HttpException $e) {
     if ($request->wantsJson()) {
         Response::json(['detail' => $e->getMessage()], $e->status)->send();
