@@ -47,7 +47,7 @@ function check(string $name, bool $ok, string $detail = ''): void
 }
 
 echo "ME News smoke test → {$base}\n\nPublic pages\n";
-foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
+foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
     [$s, $html] = http('GET', $p, [], [], false);
     check("GET {$p}", $s === 200 && strlen($html) > 20, "HTTP {$s}");
 }
@@ -134,8 +134,15 @@ check('comment on a wire story', $s === 200 && ($cm['status'] ?? '') === ($failC
 check('confirm a story', $s === 200 && ($cf['confirmations'] ?? 0) >= 1);
 [$s] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/confirm', []);
 check('double confirmation rejected', $s === 409);
-[$s, $ad] = http('POST', '/api/ads/submit', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread', 'body' => 'Baked daily.', 'url' => 'https://example.ie', 'target_county' => 'Wicklow']);
-check('submit advert', $s === 200 && ($ad['status'] ?? '') === 'review');
+[$s, $pv] = http('POST', '/api/ads/preview', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'template' => 'paper']);
+check('ad designer preview renders', $s === 200 && str_contains($pv['sidebar'] ?? '', 'ad--sidebar') && str_contains($pv['banner'] ?? '', 'ad--banner'));
+[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'body' => 'Baked daily.', 'cta' => 'Find us', 'url' => 'https://example.ie', 'target_county' => 'Wicklow', 'template' => 'paper', 'submit' => '1']);
+$ad = $adRes['ad'] ?? [];
+check('design + submit advert', $s === 200 && ($ad['status'] ?? '') === 'review', $ad['state_label'] ?? ($adRes['detail'] ?? '?'));
+[$s] = http('POST', '/api/me/ads', ['business_name' => 'Bad', 'title' => 'Nope', 'url' => 'not-a-url']);
+check('advert validation rejects a bad landing URL', $s === 400);
+[$s] = http('POST', '/api/me/ads/' . ($ad['id'] ?? 'x') . '/checkout/stripe', []);
+check('checkout blocked before approval', $s === 409 || $s === 503);
 [$s] = http('GET', '/api/admin/summary');
 check('member cannot access newsroom', $s === 403);
 http('POST', '/api/auth/logout');
@@ -165,10 +172,23 @@ check('feature a story', $s === 200);
 check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
 [$s] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
 check('reject (cleanup)', $s === 200);
-[$s, $ads] = http('GET', '/api/admin/ads');
-check('ads queue', $s === 200 && count($ads) >= 1);
-[$s] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'reject']);
-check('ad decision', $s === 200);
+[$s, $ads] = http('GET', '/api/admin/ads?status=review');
+check('ads review queue', $s === 200 && in_array($ad['id'] ?? '-', array_column($ads['ads'] ?? [], 'id'), true), count($ads['ads'] ?? []) . ' waiting · ' . ($ads['pricing']['price_label'] ?? '?'));
+[$s, $dec] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'approve']);
+check('approve advert starts the free trial', $s === 200 && ($dec['ad']['plan_status'] ?? '') === 'trial' && !empty($dec['ad']['live']), $dec['ad']['state_label'] ?? '');
+[$s, $served] = http('GET', '/api/ads?county=Wicklow&limit=4');
+check('approved advert is served in its county', $s === 200 && in_array('Smoke Bakery', array_column($served, 'business_name'), true));
+[$s, $servedElse] = http('GET', '/api/ads?county=Kerry&limit=4');
+check('county-targeted advert is not served elsewhere', $s === 200 && !in_array('Smoke Bakery', array_column($servedElse, 'business_name'), true));
+[$s, $act] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'activate', 'months' => '1', 'paid' => '1']);
+check('manual activation records a paid period', $s === 200 && ($act['ad']['plan_status'] ?? '') === 'active' && ($act['ad']['gateway'] ?? '') === 'manual');
+[$s, $set] = http('POST', '/api/admin/ads/settings', ['price' => '30', 'trial_days' => '10', 'currency' => 'EUR']);
+check('price and trial editable from the newsroom', $s === 200 && ($set['pricing']['price_cents'] ?? 0) === 3000 && ($set['pricing']['trial_days'] ?? 0) === 10);
+http('POST', '/api/admin/ads/settings', ['price' => '25', 'trial_days' => '7', 'currency' => 'EUR']);
+[$s] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'delete']);
+check('delete advert (cleanup)', $s === 200);
+[$s, $html] = http('GET', '/kids', [], [], false);
+check('kids section is ad-free', $s === 200 && !str_contains($html, 'class="ad ad--'));
 [$s, $users] = http('GET', '/api/admin/users?q=smoke');
 check('user search', $s === 200 && count($users) >= 1);
 [$s, $audit] = http('GET', '/api/admin/audit');

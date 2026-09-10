@@ -19,7 +19,7 @@
   $$('.appnav button').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
 
   async function init() {
-    try { me = await api('/api/me'); if (['editor', 'admin'].includes(me.role)) return open(); } catch (e) { }
+    try { me = await api('/api/me'); window.NEWSROOM.role = me.role; if (['editor', 'admin'].includes(me.role)) return open(); } catch (e) { }
     $('#gate').hidden = false;
   }
   $('#gate-form').addEventListener('submit', async e => {
@@ -140,15 +140,7 @@
     try { await api('/api/admin/users/' + row.dataset.id, { method: 'POST', body: fd({ role: $('[data-role]', row).value, is_verified: $('[data-verified]', row).checked ? '1' : '0', reputation: $('[data-rep]', row).value, title: $('[data-title]', row).value, desk: $('[data-desk]', row).value }) }); toast('User saved'); } catch (err) { toast(err.message); }
   });
 
-  async function loadAds() {
-    const a = await api('/api/admin/ads');
-    $('#ads-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="mono" style="color:var(--muted)">${fmt(x.created_at)}</span></div><h3>${esc(x.title)}</h3><div class="meta"><b>${esc(x.business_name)}</b> · ${esc(x.target_town || 'All towns')} · ${esc(x.target_county || 'All Ireland')} · ${x.impressions} impressions · ${x.clicks} clicks</div><p>${esc(x.body)}</p>${x.url ? `<a class="mono" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.url)}</a>` : ''}${x.status === 'review' ? '<div class="actions"><button class="btn btn--good btn--sm" data-a="approve">Approve</button><button class="btn btn--hot btn--sm" data-a="reject">Reject</button></div>' : ''}</div>`).join('') : '<div class="empty"><div class="empty__glyph">◌</div><h3>No adverts submitted.</h3></div>';
-  }
-  $('#ads-list').addEventListener('click', async e => {
-    const d = e.target.dataset.a; if (!d) return;
-    try { await api('/api/admin/ads/' + e.target.closest('[data-id]').dataset.id, { method: 'POST', body: fd({ decision: d }) }); loadAds(); summary(); } catch (err) { toast(err.message); }
-  });
-
+  async function loadAds() { if (window.ME.loadAds) window.ME.loadAds(); }
   async function loadWire() {
     const j = await api('/api/admin/wire/runs');
     $('#wire-schedule').innerHTML = `<span class="kicker">Automatic updates</span>

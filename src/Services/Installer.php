@@ -133,6 +133,32 @@ final class Installer
         return $out;
     }
 
+    /** Seed the publisher's own house ads from database/seed/house-ads.json (skips ones already present). */
+    public static function seedHouseAds(?string $ownerId = null): int
+    {
+        $file = ME_ROOT . '/database/seed/house-ads.json';
+        if (!is_file($file)) {
+            return 0;
+        }
+        $ownerId ??= Database::value("SELECT id FROM users WHERE role='admin' ORDER BY created_at LIMIT 1") ?: null;
+        $n = 0;
+        foreach (json_decode((string)file_get_contents($file), true) ?: [] as $ad) {
+            if (Database::one('SELECT id FROM ads WHERE url=? AND is_house=1', [$ad['url']])) {
+                continue;
+            }
+            $design = Ads::sanitizeDesign($ad['design'] ?? []);
+            Database::insert('ads', [
+                'id' => uuid(), 'user_id' => $ownerId, 'created_at' => now(), 'updated_at' => now(),
+                'business_name' => $ad['business_name'], 'title' => $ad['title'], 'body' => $ad['body'] ?? '', 'cta' => $ad['cta'] ?? 'Learn more', 'badge' => $ad['badge'] ?? '',
+                'url' => $ad['url'], 'target_county' => $ad['target_county'] ?? '', 'target_town' => $ad['target_town'] ?? '', 'placement' => $ad['placement'] ?? 'both',
+                'status' => 'approved', 'approved_at' => now(), 'is_house' => 1, 'plan_status' => 'none', 'weight' => (int)($ad['weight'] ?? 1),
+                'design_json' => json_encode($design, JSON_UNESCAPED_UNICODE),
+            ]);
+            $n++;
+        }
+        return $n;
+    }
+
     /** Import the bundled snapshot and, optionally, refresh from the live sources. */
     public static function loadWire(bool $live, ?callable $progress = null): array
     {

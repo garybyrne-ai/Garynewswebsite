@@ -86,6 +86,7 @@ final class InstallController
                 Installer::createDatabase();
                 Installer::ensureAdmin($email, $password, true);
                 $contributors = Installer::seedContributors($contributorPassword);
+                Installer::seedHouseAds();
                 $wire = Installer::loadWire($live);
                 $result = [
                     'email' => $email,

@@ -42,7 +42,16 @@
 
       <div id="view-users" class="view"><h1>People</h1><div class="filters"><input id="users-q" placeholder="Search name or email…"></div><div id="users-table"></div></div>
 
-      <div id="view-ads" class="view"><h1>Local advertising approvals</h1><div id="ads-list"></div></div>
+      <div id="view-ads" class="view">
+        <div class="inline" style="justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+          <div><h1>Advertising</h1><p class="pagehead__blurb">Review advertiser submissions, run house ads for your own brands, and set the price and trial length.</p></div>
+          <button class="btn btn--primary" type="button" data-ad-new>+ House ad</button>
+        </div>
+        <div class="panel" id="ads-settings"></div>
+        <div class="filters"><select id="ads-status"><option value="">All adverts</option><option value="review">Awaiting review</option><option value="approved">Approved</option><option value="draft">Drafts</option><option value="rejected">Rejected</option></select></div>
+        <div id="ads-list"></div>
+        <?= \MeNews\View::partial('partials/ad-designer', ['counties' => $counties, 'formId' => 'ad-form', 'admin' => true]) ?>
+      </div>
 
       <div id="view-wire" class="view">
         <div class="inline" style="justify-content:space-between"><div><h1>News wire</h1><p class="pagehead__blurb">Headlines are pulled from established Irish publishers every <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes and filed to the matching desk editor.</p></div><button class="btn btn--primary" id="wire-refresh" type="button">Refresh wire now</button></div>

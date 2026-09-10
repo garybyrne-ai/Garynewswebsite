@@ -8,6 +8,7 @@
   <?php endif; ?>
   <div class="pagehead__meta mono"><?= (int)$total ?> published · page <?= (int)$page ?> of <?= (int)$pages ?></div>
 </section>
+<?php if (!empty($banner)): ?><div class="container adslot adslot--top"><?= \MeNews\Services\Ads::render($banner, 'banner') ?></div><?php endif; ?>
 <div class="container layout">
   <div class="layout__main">
     <?php if ($rows): ?>

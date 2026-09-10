@@ -53,6 +53,7 @@ final class Database
     {
         $pdo ??= self::pdo();
         $pdo->exec(file_get_contents(ME_ROOT . '/database/schema.sql'));
+        Migrations::run($pdo);
     }
 
     public static function query(string $sql, array $args = []): PDOStatement

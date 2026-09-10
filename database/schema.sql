@@ -192,3 +192,25 @@ CREATE INDEX IF NOT EXISTS idx_follows_user             ON follows(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_story_status    ON comments(story_id, status);
 CREATE INDEX IF NOT EXISTS idx_confirmations_story_user ON confirmations(story_id, user_id);
 CREATE INDEX IF NOT EXISTS idx_wire_runs_started        ON wire_runs(started_at DESC);
+
+-- Advertising (ME Ads): self-serve designed ads with trial + subscription billing
+CREATE TABLE IF NOT EXISTS ad_stats (
+  ad_id       TEXT NOT NULL,
+  day         TEXT NOT NULL,
+  impressions INTEGER NOT NULL DEFAULT 0,
+  clicks      INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (ad_id, day)
+);
+
+CREATE TABLE IF NOT EXISTS ad_payments (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  ad_id        TEXT NOT NULL,
+  gateway      TEXT NOT NULL,
+  reference    TEXT,
+  amount_cents INTEGER NOT NULL DEFAULT 0,
+  currency     TEXT NOT NULL DEFAULT 'EUR',
+  status       TEXT NOT NULL DEFAULT 'paid',
+  created_at   TEXT NOT NULL,
+  detail       TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_ad_payments_ad ON ad_payments(ad_id, created_at DESC);

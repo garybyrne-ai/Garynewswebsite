@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use MeNews\Controllers\AccountController as Account;
 use MeNews\Controllers\AdminController as Admin;
+use MeNews\Controllers\AdsController as AdsC;
 use MeNews\Controllers\ApiController as Api;
 use MeNews\Controllers\KidsController as Kids;
 use MeNews\Controllers\PageController as Page;
@@ -51,8 +52,14 @@ return static function (Router $r): void {
     $r->get('/api/near', [Api::class, 'near']);
     $r->get('/cron/wire', [Api::class, 'cronWire']);
     $r->get('/api/pulse', [Api::class, 'pulse']);
+    $r->get('/advertise', [AdsC::class, 'advertisePage']);
     $r->get('/api/ads', [Api::class, 'ads']);
-    $r->get('/ads/{id:[a-f0-9]+}/go', [Api::class, 'adClick']);
+    $r->get('/api/ads/pricing', [AdsC::class, 'pricing']);
+    $r->post('/api/ads/preview', [AdsC::class, 'preview']);
+    $r->get('/ads/{id:[a-f0-9]+}/go', [AdsC::class, 'go']);
+    $r->get('/media/ad/{id:[a-f0-9]+}/{kind:logo|image}', [AdsC::class, 'media']);
+    $r->get('/billing/paypal/return', [AdsC::class, 'paypalReturn']);
+    $r->post('/api/paypal/webhook', [AdsC::class, 'paypalWebhook']);
     $r->get('/api/wire/status', [Api::class, 'wireStatus']);
     $r->post('/api/wire/refresh', [Api::class, 'wireRefresh']);
 
@@ -69,13 +76,18 @@ return static function (Router $r): void {
     $r->get('/api/me/follows', [Account::class, 'follows']);
     $r->post('/api/me/follows', [Account::class, 'follow']);
     $r->delete('/api/me/follows/{id:\d+}', [Account::class, 'unfollow']);
-    $r->get('/api/me/ads', [Account::class, 'myAds']);
+    $r->get('/api/me/ads', [AdsC::class, 'mine']);
+    $r->post('/api/me/ads', [AdsC::class, 'save']);
+    $r->post('/api/me/ads/{id:[a-f0-9]+}/submit', [AdsC::class, 'submit']);
+    $r->post('/api/me/ads/{id:[a-f0-9]+}/pause', [AdsC::class, 'pause']);
+    $r->post('/api/me/ads/{id:[a-f0-9]+}/delete', [AdsC::class, 'delete']);
+    $r->post('/api/me/ads/{id:[a-f0-9]+}/checkout/stripe', [AdsC::class, 'checkoutStripe']);
+    $r->post('/api/me/ads/{id:[a-f0-9]+}/checkout/paypal', [AdsC::class, 'checkoutPaypal']);
 
     // ---- Community reporting & engagement
     $r->post('/api/report', [Account::class, 'report']);
     $r->post('/api/story/{id:[a-f0-9]+}/confirm', [Account::class, 'confirm']);
     $r->post('/api/story/{id:[a-f0-9]+}/comment', [Account::class, 'comment']);
-    $r->post('/api/ads/submit', [Account::class, 'adSubmit']);
 
     // ---- Billing
     $r->get('/api/billing/status', [Account::class, 'billingStatus']);
@@ -92,8 +104,12 @@ return static function (Router $r): void {
     $r->get('/api/admin/users', [Admin::class, 'users']);
     $r->post('/api/admin/users/{id:[a-f0-9]+}', [Admin::class, 'updateUser']);
     $r->get('/api/admin/comments', [Admin::class, 'comments']);
-    $r->get('/api/admin/ads', [Admin::class, 'ads']);
-    $r->post('/api/admin/{table:comments|ads}/{id:[a-zA-Z0-9-]+}', [Admin::class, 'itemDecision']);
+    $r->get('/api/admin/ads', [AdsC::class, 'adminList']);
+    $r->post('/api/admin/ads/settings', [AdsC::class, 'adminSettings']);
+    $r->post('/api/admin/ads/save', [AdsC::class, 'adminSave']);
+    $r->get('/api/admin/ads/{id:[a-f0-9]+}/stats', [AdsC::class, 'adminStats']);
+    $r->post('/api/admin/ads/{id:[a-f0-9]+}', [AdsC::class, 'adminDecision']);
+    $r->post('/api/admin/{table:comments}/{id:[a-zA-Z0-9-]+}', [Admin::class, 'itemDecision']);
     $r->post('/api/admin/locations/refresh', [Admin::class, 'refreshLocations']);
     $r->post('/api/admin/wire/refresh', [Admin::class, 'refreshWire']);
     $r->get('/api/admin/wire/runs', [Admin::class, 'wireRuns']);

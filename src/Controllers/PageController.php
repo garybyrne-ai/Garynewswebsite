@@ -57,7 +57,8 @@ final class PageController
             'counts' => Stories::categoryCounts(),
             'mapPoints' => Stories::mapPoints(120),
             'mapCounties' => Stories::countyPoints(),
-            'ads' => self::ads(),
+            'ads' => self::ads((string)(\MeNews\Support\Visitor::locality(1)['county'] ?? '')),
+            'banner' => self::banner((string)(\MeNews\Support\Visitor::locality(1)['county'] ?? '')),
             'totalPublished' => Stories::countPublished(),
             'weather' => \MeNews\Services\Weather::today(),
             'edition' => \MeNews\Support\Daily::edition(),
@@ -97,6 +98,7 @@ final class PageController
             'basePath' => '/section/' . $p['slug'],
             'trending' => Stories::trending(5),
             'ads' => self::ads(),
+            'banner' => self::banner(),
         ]));
     }
 
@@ -129,6 +131,7 @@ final class PageController
             'basePath' => '/county/' . $p['slug'],
             'trending' => Stories::trending(5),
             'ads' => self::ads($county),
+            'banner' => self::banner($county),
         ]));
     }
 
@@ -173,7 +176,8 @@ final class PageController
             'confirmations' => Stories::confirmations($story['id']),
             'related' => Stories::related($story, 4),
             'more' => Stories::feed(['exclude' => [$story['id']]], 5),
-            'ads' => self::ads($story['county'] ?? ''),
+            'ads' => self::ads($story['county'] ?? '', (string)($story['location_name'] ?? '')),
+            'banner' => self::banner($story['county'] ?? '', (string)($story['location_name'] ?? '')),
             'bodyClass' => 'page-story',
         ]));
     }
@@ -305,7 +309,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/near', '/map', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
+        $urls = ['/', '/near', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }
@@ -332,24 +336,14 @@ final class PageController
         return Response::text($xml . '</channel></rss>', 'application/rss+xml; charset=utf-8');
     }
 
-    private static function ads(string $county = ''): array
+    private static function ads(string $county = '', string $town = '', int $limit = 2): array
     {
-        if (!Database::installed()) {
-            return [];
-        }
-        $sql = "SELECT * FROM ads WHERE status='approved'";
-        $args = [];
-        if ($county !== '') {
-            $sql .= " AND (target_county IS NULL OR target_county='' OR target_county=?)";
-            $args[] = $county;
-        }
-        $rows = Database::all($sql . ' ORDER BY created_at DESC LIMIT 3', $args);
-        foreach ($rows as &$ad) {
-            Database::query('UPDATE ads SET impressions=impressions+1 WHERE id=?', [$ad['id']]);
-            if (!preg_match('~^https?://~i', (string)($ad['url'] ?? ''))) {
-                $ad['url'] = '';
-            }
-        }
-        return $rows;
+        return \MeNews\Services\Ads::pick('sidebar', $county, $town, $limit);
+    }
+
+    private static function banner(string $county = '', string $town = ''): ?array
+    {
+        $rows = \MeNews\Services\Ads::pick('banner', $county, $town, 1);
+        return $rows[0] ?? null;
     }
 }

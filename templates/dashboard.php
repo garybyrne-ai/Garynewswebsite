@@ -61,16 +61,12 @@
     </div>
 
     <div id="view-advertising" class="view">
-      <h1>Local business advertising</h1>
-      <p class="pagehead__blurb">Advertising remains separate from editorial decisions and must be approved before it appears. Adverts are always marked as sponsored.</p>
-      <form id="ad-form" class="form panel">
-        <div class="form__row"><label>Business name<input name="business_name" required maxlength="120"></label><label>Advert headline<input name="title" required maxlength="140"></label></div>
-        <label>Advert copy<textarea name="body" required maxlength="500" rows="3"></textarea></label>
-        <label>Website URL<input name="url" type="url" placeholder="https://"></label>
-        <div class="form__row"><label>Target county<select name="target_county" data-county-select><option value="">All Ireland</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label><label>Target town<input name="target_town" list="all-locations" autocomplete="off" placeholder="All towns"></label></div>
-        <div class="form__actions"><button class="btn btn--primary" type="submit">Send for approval</button></div>
-      </form>
-      <div id="ad-list"></div>
+      <div class="inline" style="justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+        <div><h1>Advertising</h1><p class="pagehead__blurb">Design an ad, get it approved, run it free for <span data-trial-days>7</span> days, then <span data-price-label>€25/month</span>. It appears in sidebars and as a banner across ME News. <a href="/advertise">How it works →</a></p></div>
+        <button class="btn btn--primary" type="button" data-ad-new>+ New advert</button>
+      </div>
+      <div id="my-ads"></div>
+      <?= \MeNews\View::partial('partials/ad-designer', ['counties' => $counties, 'formId' => 'ad-form', 'admin' => false]) ?>
     </div>
 
     <div id="view-notifications" class="view">

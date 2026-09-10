@@ -1,0 +1,54 @@
+[
+  {
+    "business_name": "Gary's Tech Hub",
+    "title": "Cracked screen? Sorted before your coffee's cold.",
+    "body": "Phone repairs from €29, computer repairs from €39 — same day at Killiney Shopping Centre. 12-month warranty.",
+    "cta": "Book a repair",
+    "badge": "From €29",
+    "url": "https://www.garystechhub.ie/",
+    "target_county": "Dublin",
+    "target_town": "",
+    "placement": "both",
+    "weight": 3,
+    "design": { "template": "aurora", "bg1": "#0b2a3a", "bg2": "#12604f", "fg": "#eef7f4", "ac": "#2ef2a8", "shape": "orb", "align": "left" }
+  },
+  {
+    "business_name": "Gary's Tech Hub Shop",
+    "title": "50,000+ tech products, delivered anywhere in Ireland.",
+    "body": "Phones, laptops, PC parts, cables and smart home from Ireland's local tech superstore. Nationwide delivery from €7.",
+    "cta": "Shop now",
+    "badge": "Delivery from €7",
+    "url": "https://shop.garystechhub.ie/",
+    "target_county": "",
+    "target_town": "",
+    "placement": "both",
+    "weight": 2,
+    "design": { "template": "bold", "bg1": "#ff6a1f", "bg2": "#c8102e", "fg": "#ffffff", "ac": "#111111", "shape": "stripes", "align": "left" }
+  },
+  {
+    "business_name": "KnowIT",
+    "title": "Is your business email protected? Most Irish SMEs aren't.",
+    "body": "Managed SPF, DKIM and DMARC email security, backed by 20 years supporting Irish businesses.",
+    "cta": "Book a free assessment",
+    "badge": "Managed IT",
+    "url": "https://knowit.ie/",
+    "target_county": "",
+    "target_town": "",
+    "placement": "both",
+    "weight": 2,
+    "design": { "template": "clean", "bg1": "#ffffff", "bg2": "#eef3fb", "fg": "#0a1a33", "ac": "#0b4fd1", "shape": "grid", "align": "left" }
+  },
+  {
+    "business_name": "VanQuotes.ie",
+    "title": "Moving house? Get up to 4 free quotes from local drivers.",
+    "body": "Compare 700+ independent man-with-a-van operators across Ireland. No obligation, quotes in minutes.",
+    "cta": "Get free quotes",
+    "badge": "Free quotes",
+    "url": "https://vanquotes.ie/",
+    "target_county": "",
+    "target_town": "",
+    "placement": "both",
+    "weight": 2,
+    "design": { "template": "night", "bg1": "#0a0e18", "bg2": "#143d2b", "fg": "#f2f4fa", "ac": "#2ef2a8", "shape": "orb", "align": "left" }
+  }
+]

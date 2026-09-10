@@ -800,3 +800,90 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
 .card__km{color:var(--em);font-weight:700}
 .block--near.is-loading{opacity:.5;pointer-events:none}
 @media (max-width:760px){.block--near .block__head{grid-template-columns:1fr;grid-template-areas:"index" "title" "blurb" "more"}.near__controls{justify-content:flex-start}.near__empty{grid-template-columns:1fr;text-align:center;justify-items:center}}
+
+/* =====================================================================
+   ME Ads — designed adverts (sidebar card + banner), designer, advertise page
+   ===================================================================== */
+.ad{--bg1:#0b2a3a;--bg2:#12604f;--fg:#eef7f4;--ac:#2ef2a8;position:relative;display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:16px;overflow:hidden;color:var(--fg);background:linear-gradient(140deg,var(--bg1),var(--bg2));border:1px solid rgba(255,255,255,.08);isolation:isolate;text-decoration:none;transition:transform .2s,box-shadow .2s;min-height:200px}
+.ad:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.ad--center{text-align:center;align-items:center}
+.ad__deco{position:absolute;inset:0;pointer-events:none;z-index:-1}
+.ad--shape-orb .ad__deco{background:radial-gradient(circle at 85% 15%,color-mix(in srgb,var(--ac) 45%,transparent),transparent 45%),radial-gradient(circle at 10% 100%,rgba(255,255,255,.12),transparent 40%)}
+.ad--shape-grid .ad__deco{background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:22px 22px;-webkit-mask-image:radial-gradient(circle at 100% 0,#000,transparent 75%);mask-image:radial-gradient(circle at 100% 0,#000,transparent 75%)}
+.ad--shape-stripes .ad__deco{background:repeating-linear-gradient(-45deg,rgba(255,255,255,.08) 0 10px,transparent 10px 26px);-webkit-mask-image:linear-gradient(90deg,transparent 40%,#000);mask-image:linear-gradient(90deg,transparent 40%,#000)}
+.ad--tpl-clean{border-color:rgba(10,26,51,.12)}
+.ad--tpl-clean .ad__deco{opacity:.6}
+.ad--tpl-paper{background:linear-gradient(140deg,var(--bg1),var(--bg2)) , repeating-linear-gradient(0deg,rgba(0,0,0,.02) 0 1px,transparent 1px 3px);border-color:rgba(28,24,19,.2)}
+.ad--tpl-photo{background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.75)),var(--img,linear-gradient(140deg,var(--bg1),var(--bg2))) center/cover}
+.ad--tpl-photo .ad__deco{display:none}
+.ad__tag{position:absolute;top:10px;right:12px;font:600 .55rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.ad__top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ad__logo{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center;overflow:hidden;flex:none;backdrop-filter:blur(4px)}
+.ad__logo img{width:100%;height:100%;object-fit:contain}
+.ad__logo--mono{font:800 1rem/1 var(--display);letter-spacing:-.02em;background:var(--ac);color:var(--bg1)}
+.ad--tpl-clean .ad__logo--mono{color:#fff}
+.ad__badge{font:700 .62rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--fg) 35%,transparent);color:var(--fg)}
+.ad__body{display:flex;flex-direction:column;gap:6px;flex:1}
+.ad__head{font:700 1.15rem/1.18 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.ad__sub{font-size:.86rem;line-height:1.45;opacity:.88}
+.ad__foot{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.ad--center .ad__foot{align-items:center}
+.ad__cta{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:9px 14px;border-radius:999px;background:var(--ac);color:var(--bg1);font:700 .82rem/1 var(--body);transition:.2s}
+.ad--tpl-clean .ad__cta,.ad--tpl-paper .ad__cta{color:#fff}
+.ad--tpl-bold .ad__cta{color:#fff}
+.ad:hover .ad__cta{filter:brightness(1.08)}
+.ad__biz{font:500 .62rem/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.ad--sidebar{aspect-ratio:1/1.05}
+.ad--banner{flex-direction:row;align-items:center;gap:18px;min-height:0;padding:16px 22px;border-radius:14px}
+.ad--banner .ad__top{flex:none}
+.ad--banner .ad__body{min-width:0}
+.ad--banner .ad__head{font-size:1.1rem}
+.ad--banner .ad__sub{font-size:.82rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ad--banner .ad__foot{margin:0;flex:none;align-items:flex-end;text-align:right}
+.ad--banner .ad__cta{align-self:auto}
+.ad--banner .ad__tag{top:6px;right:10px}
+.panel--ads .ad + .ad{margin-top:12px}
+.adslot{margin:14px auto 0}
+.adslot--top{margin-top:14px}
+.adslot--inline{margin:6px 0}
+.adslot--inline .ad--banner{border-radius:var(--r)}
+@media (max-width:760px){.ad--banner{flex-direction:column;align-items:flex-start}.ad--banner .ad__foot{align-items:flex-start;text-align:left}}
+
+/* designer */
+.designer{border:1px solid var(--line-2);border-radius:var(--r);background:var(--surface);padding:18px;margin-top:18px}
+.designer__head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.designer__head h2{margin-top:6px}
+.designer__grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:24px;align-items:start}
+.designer__form label{display:grid;grid-template-columns:1fr auto;gap:6px 8px;align-items:center}
+.designer__form label small{color:var(--muted);text-transform:none;letter-spacing:0;font-size:.62rem;justify-self:end}
+.designer__form label input,.designer__form label select,.designer__form label textarea,.designer__form label .designer__file{grid-column:1/-1}
+.designer__templates{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.designer__templates legend{margin-bottom:8px;color:var(--muted)}
+.tpl{display:inline-flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font-size:.82rem;font-weight:600}
+.tpl i{width:22px;height:22px;border-radius:50%;background:linear-gradient(140deg,var(--bg1),var(--bg2));border:2px solid var(--ac)}
+.tpl.is-active{border-color:var(--cy);box-shadow:var(--glow)}
+.designer__colours{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.designer__colours label{grid-template-columns:1fr}
+.designer__colours input[type=color]{height:40px;padding:3px;width:100%;background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;cursor:pointer}
+.designer__file{font-size:.62rem;color:var(--muted);text-transform:none;letter-spacing:0}
+.designer__preview{position:sticky;top:100px;display:flex;flex-direction:column;gap:14px}
+.designer__side{max-width:340px}
+.designer__bannerwrap{grid-column:1/-1;display:flex;flex-direction:column;gap:8px;padding-top:6px;border-top:1px solid var(--line)}
+.designer__banner .ad--banner{width:100%}
+.adcard{display:grid;grid-template-columns:260px 1fr;gap:18px;padding:16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:14px;align-items:start}
+.adcard__meta{display:flex;flex-direction:column;gap:8px;min-width:0}
+.adcard__meta h3{font-size:1.05rem}
+.adcard__state{font:700 .7rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1px solid var(--line-2);display:inline-block}
+.adcard__state.is-good{color:var(--em);border-color:color-mix(in srgb,var(--em) 40%,transparent)}
+.adcard__state.is-warn{color:var(--am);border-color:color-mix(in srgb,var(--am) 40%,transparent)}
+.adcard__state.is-bad{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 40%,transparent)}
+.adcard__state.is-muted{color:var(--muted)}
+.adcard__stats{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted)}
+.adcard__stats b{color:var(--ink);font-family:var(--display);font-size:1.1rem;margin-right:4px}
+.adbars{display:flex;gap:2px;align-items:flex-end;height:36px}
+.adbars i{flex:1;background:linear-gradient(180deg,var(--cy),var(--em));border-radius:2px 2px 0 0;min-height:2px;opacity:.85}
+.adcard__actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.adv-demo{display:grid;grid-template-columns:340px 1fr;gap:26px;align-items:start;padding:18px 0 6px}
+.adv-demo .kicker{display:flex;margin-bottom:10px}
+@media (max-width:1024px){.designer__grid{grid-template-columns:1fr}.designer__preview{position:static}.adcard{grid-template-columns:1fr}.adv-demo{grid-template-columns:1fr}}
+@media (max-width:760px){.designer__colours{grid-template-columns:1fr 1fr}}

@@ -24,6 +24,8 @@
     if (hash && $('#view-' + hash)) show(hash);
     const qs = new URLSearchParams(location.search);
     if (qs.get('billing') === 'success') toast('Thank you — ME+ will activate as soon as Stripe confirms payment.');
+    if (qs.get('ad') === 'success' || qs.get('ad') === 'paypal-success') { toast('Thank you — your advertising subscription is being confirmed.'); show('advertising'); }
+    if (qs.get('ad') === 'paypal-pending') { toast('PayPal is still confirming your subscription — check back in a minute.'); show('advertising'); }
   }
 
   async function loadReports() {
@@ -66,14 +68,7 @@
     e.preventDefault();
     try { await api('/api/me/password', { method: 'POST', body: new FormData(e.target) }); toast('Password updated'); e.target.reset(); } catch (err) { toast(err.message); }
   });
-  $('#ad-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    try { await api('/api/ads/submit', { method: 'POST', body: new FormData(e.target) }); toast('Advert submitted for newsroom approval'); e.target.reset(); loadAds(); } catch (err) { toast(err.message); }
-  });
-  async function loadAds() {
-    const a = await api('/api/me/ads');
-    $('#ad-list').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Advert</th><th>Target</th><th>Status</th><th>Impressions</th><th>Clicks</th></tr></thead><tbody>${a.map(x => `<tr><td><b>${esc(x.title)}</b><span class="sub">${esc(x.business_name)}</span></td><td>${esc(x.target_town || 'All towns')}<span class="sub">${esc(x.target_county || 'All Ireland')}</span></td><td><span class="status ${esc(x.status)}">${esc(x.status)}</span></td><td>${x.impressions}</td><td>${x.clicks}</td></tr>`).join('')}</tbody></table></div>` : '';
-  }
+  async function loadAds() { if (window.ME.loadAds) window.ME.loadAds(); }
 
   async function loadNotifications() {
     const a = await api('/api/me/notifications');

@@ -28,6 +28,7 @@ try {
     foreach (Installer::seedContributors(Config::get('CONTRIBUTOR_PASSWORD')) as $name => $password) {
         echo $password === null ? "  = {$name} (exists)\n" : "  + {$name}  password: {$password}\n";
     }
+    echo "\nHouse ads\n  " . Installer::seedHouseAds() . " created\n";
     echo "\nNews wire\n";
     $wire = Installer::loadWire(!in_array('--offline', $argv, true), static function (string $key, int $fetched, int $inserted, ?string $error): void {
         echo '  ' . str_pad($key, 24) . ($error ? "ERROR {$error}" : "{$fetched} fetched, {$inserted} new") . "\n";

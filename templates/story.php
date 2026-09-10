@@ -46,6 +46,8 @@ if ($isWire) { $jsonld['isBasedOn'] = $story['source_url']; }
         <figure class="article__media"><video controls preload="metadata" src="<?= e($story['media_url']) ?>"></video></figure>
       <?php endif; ?>
 
+      <?php if (!empty($banner)): ?><div class="adslot adslot--inline"><?= \MeNews\Services\Ads::render($banner, 'banner') ?></div><?php endif; ?>
+
       <?php if ($isWire): ?>
         <div class="article__body">
           <p class="article__lede"><?= e($story['summary']) ?></p>
@@ -112,8 +114,8 @@ if ($isWire) { $jsonld['isBasedOn'] = $story['source_url']; }
         <div class="minis"><?php foreach ($more as $r): ?><?= Ui::card($r, 'mini') ?><?php endforeach; ?></div>
       </section>
       <?php if ($ads): ?>
-        <section class="panel reveal"><header class="panel__head"><span class="kicker">Local businesses</span><span class="mono panel__hint">Sponsored</span></header>
-          <?php foreach ($ads as $ad): ?><div class="ad"><b><?= e($ad['title']) ?></b><p><?= e($ad['body']) ?></p><?= $ad['url'] ? '<a href="/ads/' . e($ad['id']) . '/go" rel="sponsored nofollow" target="_blank">' . e($ad['business_name']) . ' →</a>' : '<span>' . e($ad['business_name']) . '</span>' ?></div><?php endforeach; ?>
+        <section class="panel panel--ads reveal"><header class="panel__head"><span class="kicker">Local businesses</span><a class="mono panel__hint" href="/advertise">Advertise →</a></header>
+          <?php foreach ($ads as $ad): ?><?= \MeNews\Services\Ads::render($ad, 'sidebar') ?><?php endforeach; ?>
         </section>
       <?php endif; ?>
     </aside>

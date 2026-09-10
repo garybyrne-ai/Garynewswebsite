@@ -31,7 +31,7 @@ final class AdminController
         foreach ([
             'pending' => "stories WHERE status='review'", 'held' => "stories WHERE status='hold'", 'published' => "stories WHERE status='published'",
             'community' => "stories WHERE kind='community' AND status='published'", 'wire' => "stories WHERE kind='wire' AND status='published'",
-            'users' => 'users', 'comments_review' => "comments WHERE status='review'", 'ads_review' => "ads WHERE status='review'",
+            'users' => 'users', 'comments_review' => "comments WHERE status='review'", 'ads_review' => "ads WHERE status='review'", 'ads_live' => "ads WHERE status='approved' AND paused=0",
         ] as $k => $from) {
             $out[$k] = Database::count('SELECT COUNT(*) FROM ' . $from);
         }
@@ -192,12 +192,6 @@ final class AdminController
     {
         self::staff();
         return Response::json(Database::all("SELECT c.*, s.title, s.slug FROM comments c JOIN stories s ON s.id=c.story_id WHERE c.status='review' ORDER BY c.created_at DESC LIMIT 200"));
-    }
-
-    public static function ads(Request $r): Response
-    {
-        self::staff();
-        return Response::json(Database::all('SELECT * FROM ads ORDER BY created_at DESC LIMIT 300'));
     }
 
     public static function itemDecision(Request $r, array $p): Response

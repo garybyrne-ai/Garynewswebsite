@@ -65,6 +65,18 @@ Every calendar day (Irish time) the site changes: an **edition number** and mast
 
 On first visit a slim banner offers **Use my location**. With permission (phones and computers, over HTTPS) the browser sends coordinates to `/api/near`, which resolves the nearest of 227 towns and its county from `config/geo.json`, gathers every published story within 40 km (widening to 80 km when quiet) ordered by a freshness-weighted distance, and drops a **Near you · Town, Co. County** section into the home page without a reload. The choice is kept in two small cookies (`me_loc`, rounded to ~100 m, and `me_county`) for 30 days and is never attached to an account; visitors can pick a county manually instead, or tap *Forget*. `/near` is the full page with a map centred on the visitor.
 
+## ME Ads (advertising platform)
+
+Self-serve local advertising at `/advertise`:
+
+- **Designer** — advertisers (and the newsroom, for house ads) build an ad in the browser: six templates (Aurora, Bold, Clean, Night, Paper, Photo), custom colours, headline, supporting line, button text, badge, logo and photo uploads, decoration and alignment, with a live server-rendered preview of both formats. Ads are stored as a structured spec and rendered by `Services/Ads.php`, so no advertiser HTML ever reaches a page.
+- **Placements** — sidebar card (home, sections, counties, articles) and banner (under the home masthead, on section pages, inline in every article). County or town targeting; local ads outrank national ones; weighted rotation; the kids' section is always ad-free. Every ad is labelled Sponsored and opens in a new tab through `/ads/{id}/go`, which records clicks.
+- **Lifecycle** — draft → review → approved. Approval starts the free trial (default 7 days, editable); the advertiser then subscribes monthly (default €25, editable) by **Stripe Checkout** (inline price, trial aligned with the remaining days) or **PayPal Subscriptions** (plan created on demand, billing starts when the trial ends). Webhooks (`/api/stripe/webhook`, `/api/paypal/webhook`, signature-verified) keep `plan_status` and `current_period_end` in sync; ads stop showing automatically when unpaid. Admins can also mark bank-transfer or complimentary periods manually.
+- **Newsroom** — review queue, approve/reject with a note, pause, weight, make house ad, mark paid, delete, per-ad daily impressions/clicks and payment history, and the price/trial/currency settings. Gateway status shows which `.env` keys are missing.
+- **House ads** — `database/seed/house-ads.json` ships four ads for Gary's Tech Hub, the Tech Hub Shop, KnowIT and VanQuotes.ie, seeded at install.
+
+Set `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` and/or `PAYPAL_CLIENT_ID` + `PAYPAL_CLIENT_SECRET` + `PAYPAL_WEBHOOK_ID` (`PAYPAL_MODE=sandbox|live`) in `.env`, then point the providers' webhooks at the two endpoints above.
+
 ## ME Óg · The Junior Post (kids section)
 
 `/kids` is an old-school newspaper inside the futuristic site — cream newsprint, a serif masthead and a puzzle corner that resets at midnight:
@@ -109,7 +121,7 @@ tests/smoke.php         end-to-end smoke test against a running server
 
 **Newsroom** — review queue with media preview, publish/hold/reject, re-run safety, edit any story (section, county, label, featured), flagged comments, people & roles, advertising approvals, wire control panel with run log, official CSO / Tailte Éireann town import, full audit log.
 
-**Billing** — Stripe Checkout for ME+ with signed webhook handling.
+**Billing** — Stripe Checkout for ME+ and ME Ads, PayPal Subscriptions for ME Ads, signed webhook handling for both.
 
 ## Configuration
 

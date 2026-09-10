@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 
 define('ME_ROOT', dirname(__DIR__));
-define('ME_VERSION', '4.0.0');
+define('ME_VERSION', '4.1.0');
 
 spl_autoload_register(static function (string $class): void {
     if (!str_starts_with($class, 'MeNews\\')) {

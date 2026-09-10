@@ -69,16 +69,12 @@ $ads = $ads ?? [];
     <a class="btn btn--primary btn--block" href="/plus">Get ME+</a>
   </section>
 
-  <section class="panel reveal">
-    <header class="panel__head"><span class="kicker">Local businesses</span><span class="mono panel__hint">Sponsored</span></header>
+  <section class="panel panel--ads reveal">
+    <header class="panel__head"><span class="kicker">Local businesses</span><a class="mono panel__hint" href="/advertise">Advertise →</a></header>
     <?php if ($ads): foreach ($ads as $ad): ?>
-      <div class="ad">
-        <b><?= e($ad['title']) ?></b>
-        <p><?= e($ad['body']) ?></p>
-        <?= $ad['url'] ? '<a href="/ads/' . e($ad['id']) . '/go" rel="sponsored nofollow" target="_blank">' . e($ad['business_name']) . ' →</a>' : '<span>' . e($ad['business_name']) . '</span>' ?>
-      </div>
+      <?= \MeNews\Services\Ads::render($ad, 'sidebar') ?>
     <?php endforeach; else: ?>
-      <p class="panel__note">Area-targeted advertising from local businesses appears here after newsroom approval. <a href="/dashboard#advertising">Advertise with ME</a>.</p>
+      <p class="panel__note">Your business could be here — designed in minutes, <?= e(\MeNews\Services\Ads::priceLabel()) ?> after a free trial. <a href="/advertise">Advertise with ME</a>.</p>
     <?php endif; ?>
   </section>
 </aside>

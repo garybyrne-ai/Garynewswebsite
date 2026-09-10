@@ -127,7 +127,7 @@ $isApp = str_contains($bodyClass, 'page-app');
       <a href="/about">How ME works</a>
       <a href="/about#sources">Our sources</a>
       <a href="/plus">ME+ membership</a>
-      <a href="/dashboard">Advertise locally</a>
+      <a href="/advertise">Advertise with ME</a>
       <a href="/feed.xml">RSS</a>
     </div>
     <div class="footer__col">
@@ -205,5 +205,6 @@ $isApp = str_contains($bodyClass, 'page-app');
 <script src="/assets/js/map.js?v=<?= e(ME_VERSION) ?>" defer></script>
 <?php if (str_contains($bodyClass, 'page-kids')): ?><script src="/assets/js/kids.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>
+<?php if (str_contains($bodyClass, 'page-app')): ?><script src="/assets/js/ads.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>
 </body>
 </html>

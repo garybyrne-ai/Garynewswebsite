@@ -299,33 +299,6 @@ final class AccountController
         return Response::json(['ok' => true, 'status' => $status, 'comments' => Stories::comments($s['id'])]);
     }
 
-    public static function adSubmit(Request $r): Response
-    {
-        $u = Auth::require();
-        $id = uuid();
-        $row = ['id' => $id, 'user_id' => $u['id'], 'created_at' => now()];
-        foreach (['business_name' => 120, 'title' => 140, 'body' => 500, 'url' => 500, 'target_county' => 80, 'target_town' => 100] as $field => $max) {
-            $row[$field] = $r->post($field, '', $max);
-        }
-        foreach (['business_name', 'title', 'body'] as $f) {
-            if ($row[$f] === '') {
-                throw new HttpException(400, 'Enter ' . str_replace('_', ' ', $f));
-            }
-        }
-        if ($row['url'] !== '' && (!filter_var($row['url'], FILTER_VALIDATE_URL) || !preg_match('~^https?://~i', $row['url']))) {
-            throw new HttpException(400, 'Use an http or https business URL');
-        }
-        Database::insert('ads', $row);
-        Audit::log($u['id'], 'ad.submit', 'ad', $id);
-        return Response::json(['ok' => true, 'id' => $id, 'status' => 'review']);
-    }
-
-    public static function myAds(Request $r): Response
-    {
-        $u = Auth::require();
-        return Response::json(Database::all('SELECT id,created_at,business_name,title,status,impressions,clicks,target_county,target_town FROM ads WHERE user_id=? ORDER BY created_at DESC', [$u['id']]));
-    }
-
     // ---------------------------------------------------------------- billing
 
     public static function billingStatus(Request $r): Response

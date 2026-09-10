@@ -148,32 +148,11 @@ final class ApiController
 
     public static function ads(Request $r): Response
     {
-        $sql = "SELECT id,business_name,title,body,url,target_county,target_town FROM ads WHERE status='approved'";
-        $args = [];
-        foreach (['county' => 'target_county', 'town' => 'target_town'] as $param => $field) {
-            if ($v = $r->query($param, '', 80)) {
-                $sql .= " AND ({$field} IS NULL OR {$field}='' OR {$field}=?)";
-                $args[] = $v;
-            }
-        }
-        $rows = Database::all($sql . ' ORDER BY created_at DESC LIMIT ' . $r->int('limit', 3, 1, 10), $args);
+        $rows = \MeNews\Services\Ads::pick($r->query('placement', 'sidebar') === 'banner' ? 'banner' : 'sidebar', $r->query('county', '', 60), $r->query('town', '', 80), $r->int('limit', 2, 1, 4));
         foreach ($rows as &$ad) {
-            Database::query('UPDATE ads SET impressions=impressions+1 WHERE id=?', [$ad['id']]);
-            if (!preg_match('~^https?://~i', (string)($ad['url'] ?? ''))) {
-                $ad['url'] = '';
-            }
+            $ad = ['id' => $ad['id'], 'business_name' => $ad['business_name'], 'title' => $ad['title'], 'html' => \MeNews\Services\Ads::render($ad, $r->query('placement', 'sidebar') === 'banner' ? 'banner' : 'sidebar')];
         }
         return Response::json($rows);
-    }
-
-    public static function adClick(Request $r, array $p): Response
-    {
-        $ad = Database::one("SELECT url FROM ads WHERE id=? AND status='approved'", [$p['id']]);
-        if (!$ad || !preg_match('~^https?://~i', (string)$ad['url'])) {
-            throw new HttpException(404, 'Advert not found');
-        }
-        Database::query('UPDATE ads SET clicks=clicks+1 WHERE id=?', [$p['id']]);
-        return Response::redirect($ad['url']);
     }
 
     /** Refresh the wire if it is stale. Safe to call from the browser; a lock prevents overlap. */

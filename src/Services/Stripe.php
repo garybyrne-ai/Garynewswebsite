@@ -15,6 +15,12 @@ final class Stripe
         return Config::get('STRIPE_SECRET_KEY') !== '' && Config::get('STRIPE_PRICE_ME_PLUS') !== '';
     }
 
+    /** Stripe usable for advertising (only the secret key is needed; prices are inline). */
+    public static function adsConfigured(): bool
+    {
+        return Config::get('STRIPE_SECRET_KEY') !== '';
+    }
+
     public static function checkoutUrl(array $user): string
     {
         if (!self::configured()) {
@@ -36,6 +42,40 @@ final class Stripe
             'metadata' => ['user_id' => $user['id']],
             'subscription_data' => ['metadata' => ['user_id' => $user['id']]],
         ], ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY')], 'form');
+        return (string)$session['url'];
+    }
+
+    /** Stripe Checkout for an advertising subscription (price from settings, trial aligned with ours). */
+    public static function adCheckoutUrl(array $user, array $ad): string
+    {
+        if (Config::get('STRIPE_SECRET_KEY') === '') {
+            throw new HttpException(503, 'Stripe is not configured yet');
+        }
+        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
+            throw new HttpException(503, 'Configure the public HTTPS URL');
+        }
+        $body = [
+            'mode' => 'subscription',
+            'line_items' => [[
+                'quantity' => 1,
+                'price_data' => [
+                    'currency' => strtolower(Ads::currency()), 'unit_amount' => Ads::price(), 'recurring' => ['interval' => 'month'],
+                    'product_data' => ['name' => Config::appName() . ' advertising — ' . $ad['business_name'], 'description' => 'Sidebar and banner placements, local targeting, monthly'],
+                ],
+            ]],
+            'success_url' => $base . '/dashboard?ad=success&session_id={CHECKOUT_SESSION_ID}#advertising',
+            'cancel_url' => $base . '/dashboard?ad=cancelled#advertising',
+            'customer_email' => $user['email'],
+            'client_reference_id' => $ad['id'],
+            'metadata' => ['kind' => 'ad', 'ad_id' => $ad['id'], 'user_id' => $user['id']],
+            'subscription_data' => ['metadata' => ['kind' => 'ad', 'ad_id' => $ad['id'], 'user_id' => $user['id']]],
+        ];
+        $left = Ads::trialDaysLeft($ad);
+        if ($left >= 1) {
+            $body['subscription_data']['trial_period_days'] = $left;
+        }
+        $session = Remote::json('https://api.stripe.com/v1/checkout/sessions', $body, ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY')], 'form');
         return (string)$session['url'];
     }
 
@@ -66,6 +106,36 @@ final class Stripe
         $obj = $event['data']['object'];
         Database::transaction(static function () use ($event, $obj): void {
             Database::insert('stripe_events', ['id' => $event['id'], 'created_at' => now()]);
+            // ---- Advertising subscriptions (metadata.kind = ad)
+            if (($obj['metadata']['kind'] ?? '') === 'ad' && !empty($obj['metadata']['ad_id'])) {
+                $adId = (string)$obj['metadata']['ad_id'];
+                if ($event['type'] === 'checkout.session.completed') {
+                    Ads::applySubscription($adId, 'stripe', ['status' => 'active', 'subscription_id' => $obj['subscription'] ?? null, 'customer_id' => $obj['customer'] ?? null]);
+                } elseif (in_array($event['type'], ['customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted'], true)) {
+                    $status = $event['type'] === 'customer.subscription.deleted' ? 'cancelled' : (string)($obj['status'] ?? 'incomplete');
+                    $map = ['active' => 'active', 'trialing' => 'active', 'past_due' => 'past_due', 'canceled' => 'cancelled', 'cancelled' => 'cancelled', 'unpaid' => 'past_due', 'incomplete' => 'past_due', 'incomplete_expired' => 'cancelled', 'paused' => 'cancelled'];
+                    $end = !empty($obj['current_period_end']) ? gmdate('Y-m-d\TH:i:s', (int)$obj['current_period_end']) . '+00:00' : null;
+                    Ads::applySubscription($adId, 'stripe', ['status' => $map[$status] ?? 'past_due', 'subscription_id' => $obj['id'] ?? null, 'customer_id' => $obj['customer'] ?? null] + ($end ? ['period_end' => $end] : []));
+                }
+                return;
+            }
+            if ($event['type'] === 'invoice.paid' && !empty($obj['subscription'])) {
+                $ad = Ads::findBySubscription((string)$obj['subscription']);
+                if ($ad) {
+                    $line = $obj['lines']['data'][0] ?? [];
+                    $end = !empty($line['period']['end']) ? gmdate('Y-m-d\TH:i:s', (int)$line['period']['end']) . '+00:00' : null;
+                    Ads::applySubscription($ad['id'], 'stripe', ['status' => 'active', 'reference' => 'stripe:' . ($obj['id'] ?? uuid()), 'amount_cents' => (int)($obj['amount_paid'] ?? 0), 'detail' => 'Stripe invoice'] + ($end ? ['period_end' => $end] : []));
+                }
+                return;
+            }
+            if ($event['type'] === 'invoice.payment_failed' && !empty($obj['subscription'])) {
+                $ad = Ads::findBySubscription((string)$obj['subscription']);
+                if ($ad) {
+                    Ads::applySubscription($ad['id'], 'stripe', ['status' => 'past_due']);
+                }
+                return;
+            }
+            // ---- ME+ membership
             if ($event['type'] === 'checkout.session.completed' && ($obj['mode'] ?? '') === 'subscription') {
                 $uid = (string)($obj['metadata']['user_id'] ?? '');
                 if (in_array($obj['payment_status'] ?? '', ['paid', 'no_payment_required'], true) && Database::one('SELECT id FROM users WHERE id=?', [$uid])) {

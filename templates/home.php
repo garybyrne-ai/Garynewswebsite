@@ -19,6 +19,8 @@
   </div>
 </div>
 
+<?php if (!empty($banner)): ?><div class="container adslot adslot--top"><?= \MeNews\Services\Ads::render($banner, 'banner') ?></div><?php endif; ?>
+
 <section class="container hero">
   <div class="hero__intro">
     <span class="kicker kicker--glow">Around me · Ireland</span>
