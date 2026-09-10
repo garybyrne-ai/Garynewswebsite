@@ -47,7 +47,7 @@ function check(string $name, bool $ok, string $detail = ''): void
 }
 
 echo "ME News smoke test → {$base}\n\nPublic pages\n";
-foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css'] as $p) {
+foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
     [$s, $html] = http('GET', $p, [], [], false);
     check("GET {$p}", $s === 200 && strlen($html) > 20, "HTTP {$s}");
 }
@@ -77,6 +77,22 @@ check('categories', $s === 200 && count($cats) >= 9);
 check('pulse', $s === 200 && count($p['hours'] ?? []) === 24);
 [$s, $w] = http('GET', '/api/wire/status');
 check('wire status', $s === 200 && !empty($w['last_refresh']), 'last refresh ' . ($w['last_refresh'] ?? '?'));
+[$s, $m] = http('GET', '/api/map?limit=50');
+check('map API returns pinned stories', $s === 200 && count($m['points'] ?? []) >= 10 && count($m['counties'] ?? []) >= 5, count($m['points'] ?? []) . ' pins, ' . count($m['counties'] ?? []) . ' counties');
+[$s, $x] = http('GET', '/api/kids/crossword?level=junior');
+check('daily junior crossword', $s === 200 && ($x['words'] ?? 0) >= 7 && count($x['across'] ?? []) + count($x['down'] ?? []) === ($x['words'] ?? -1), ($x['words'] ?? 0) . ' words, ' . ($x['rows'] ?? 0) . 'x' . ($x['cols'] ?? 0));
+[$s, $x2] = http('GET', '/api/kids/crossword?level=adult');
+check('daily grown-up crossword', $s === 200 && ($x2['words'] ?? 0) >= 12, ($x2['words'] ?? 0) . ' words');
+[$s, $x3] = http('GET', '/api/kids/crossword?level=junior');
+check('crossword is stable for the day', $s === 200 && ($x3['id'] ?? '') === ($x['id'] ?? '-') && $x3['cells'] === $x['cells']);
+[$s, $ws] = http('GET', '/api/kids/wordsearch');
+check('daily word search', $s === 200 && count($ws['words'] ?? []) >= 8 && count($ws['grid'] ?? []) === 12, ($ws['theme'] ?? '?'));
+[$s, $qz] = http('GET', '/api/kids/quiz');
+check('daily quiz', $s === 200 && count($qz['questions'] ?? []) === 5);
+[$s, $cg] = http('GET', '/api/kids/county');
+check('county game', $s === 200 && count($cg['rounds'] ?? []) === 10);
+[$s] = http('GET', '/cron/wire?key=wrong', [], [], false);
+check('cron endpoint rejects a bad key', $s === 403);
 [$s, $w] = http('POST', '/api/wire/refresh');
 check('wire refresh endpoint', $s === 200 && array_key_exists('ran', $w), $w['ran'] ? 'ran, ' . ($w['inserted'] ?? 0) . ' new' : 'fresh, skipped');
 

@@ -10,7 +10,7 @@ $path = $_SERVER['REQUEST_URI'] ?? '/';
 $isStaff = \MeNews\Auth::isStaff($user);
 $isApp = str_contains($bodyClass, 'page-app');
 ?><!doctype html>
-<html lang="en-IE" data-theme="dark">
+<html lang="en-IE" data-theme="dark" style="--day-shift:<?= \MeNews\Support\Daily::hueShift() ?>deg">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -28,6 +28,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 <link rel="alternate" type="application/rss+xml" title="ME News Ireland" href="/feed.xml">
 <link rel="preload" href="/assets/fonts/Sora.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
+<?php if (str_contains($bodyClass, 'page-kids') || str_contains($bodyClass, 'page-home')): ?><link rel="preload" href="/assets/fonts/Fraunces.woff2" as="font" type="font/woff2" crossorigin><?php endif; ?>
 <link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_VERSION) ?>">
 <script>try{var t=localStorage.getItem('me_theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
@@ -88,6 +89,7 @@ $isApp = str_contains($bodyClass, 'page-app');
         <a href="/section/<?= e($slug) ?>" class="<?= str_starts_with($path, '/section/' . $slug) ? 'is-active' : '' ?>"><?= e($name) ?></a>
       <?php endforeach; ?>
       <a href="/map" class="<?= $path === '/map' ? 'is-active' : '' ?>">Map</a>
+      <a href="/kids" class="sections__kids <?= str_starts_with($path, '/kids') ? 'is-active' : '' ?>">ME Óg · Kids</a>
       <a href="/contributors" class="<?= str_starts_with($path, '/contributors') ? 'is-active' : '' ?>">Contributors</a>
       <a href="/plus" class="sections__plus <?= $path === '/plus' ? 'is-active' : '' ?>">ME+</a>
     </div>
@@ -112,6 +114,7 @@ $isApp = str_contains($bodyClass, 'page-app');
     </div>
     <div class="footer__col">
       <h4>ME News</h4>
+      <a href="/kids">ME Óg · Kids &amp; puzzles</a>
       <a href="/contributors">Contributors</a>
       <a href="/about">How ME works</a>
       <a href="/about#sources">Our sources</a>
@@ -192,6 +195,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 <script src="/assets/js/menews.js?v=<?= e(ME_VERSION) ?>" defer></script>
 <script src="/assets/vendor/leaflet/leaflet.js" defer></script>
 <script src="/assets/js/map.js?v=<?= e(ME_VERSION) ?>" defer></script>
+<?php if (str_contains($bodyClass, 'page-kids')): ?><script src="/assets/js/kids.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>
 </body>
 </html>

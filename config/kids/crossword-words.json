@@ -1,0 +1,1865 @@
+{
+ "_comment": "Crossword word bank. Junior entries are kid-friendly; adult puzzles draw from both.",
+ "words": [
+  {
+   "word": "DUBLIN",
+   "clue": "Ireland's capital city",
+   "level": "junior"
+  },
+  {
+   "word": "CORK",
+   "clue": "County and city in the south with a famous harbour",
+   "level": "junior"
+  },
+  {
+   "word": "GALWAY",
+   "clue": "City of the Tribes on the west coast",
+   "level": "junior"
+  },
+  {
+   "word": "SHAMROCK",
+   "clue": "Three-leafed plant and symbol of Ireland",
+   "level": "junior"
+  },
+  {
+   "word": "HARP",
+   "clue": "Instrument on Irish euro coins",
+   "level": "junior"
+  },
+  {
+   "word": "SHANNON",
+   "clue": "Ireland's longest river",
+   "level": "junior"
+  },
+  {
+   "word": "LIFFEY",
+   "clue": "River that flows through Dublin",
+   "level": "junior"
+  },
+  {
+   "word": "GREEN",
+   "clue": "Colour of Ireland's rugby jerseys",
+   "level": "junior"
+  },
+  {
+   "word": "RAINBOW",
+   "clue": "Colourful arc after the rain",
+   "level": "junior"
+  },
+  {
+   "word": "SHEEP",
+   "clue": "Woolly animals on Irish hillsides",
+   "level": "junior"
+  },
+  {
+   "word": "COW",
+   "clue": "Farm animal that gives milk",
+   "level": "junior"
+  },
+  {
+   "word": "PUFFIN",
+   "clue": "Seabird with a colourful beak that nests on the Skelligs",
+   "level": "junior"
+  },
+  {
+   "word": "SEAL",
+   "clue": "Sea mammal often spotted in Irish harbours",
+   "level": "junior"
+  },
+  {
+   "word": "DOLPHIN",
+   "clue": "Fungie was a famous one in Dingle",
+   "level": "junior"
+  },
+  {
+   "word": "HURLING",
+   "clue": "Fast Irish sport played with a sliotar",
+   "level": "junior"
+  },
+  {
+   "word": "SLIOTAR",
+   "clue": "Ball used in hurling",
+   "level": "junior"
+  },
+  {
+   "word": "CAMOGIE",
+   "clue": "Hurling played by women and girls",
+   "level": "junior"
+  },
+  {
+   "word": "GOAL",
+   "clue": "Worth three points in Gaelic football",
+   "level": "junior"
+  },
+  {
+   "word": "BREAD",
+   "clue": "Soda ___, a classic Irish loaf",
+   "level": "junior"
+  },
+  {
+   "word": "POTATO",
+   "clue": "Spud!",
+   "level": "junior"
+  },
+  {
+   "word": "BUTTER",
+   "clue": "Spread made from cream; Kerrygold makes it",
+   "level": "junior"
+  },
+  {
+   "word": "TEA",
+   "clue": "Ireland's favourite hot drink",
+   "level": "junior"
+  },
+  {
+   "word": "SCONE",
+   "clue": "Baked treat served with jam and cream",
+   "level": "junior"
+  },
+  {
+   "word": "CRISPS",
+   "clue": "Tayto makes these salty snacks",
+   "level": "junior"
+  },
+  {
+   "word": "FIDDLE",
+   "clue": "The violin at a trad session",
+   "level": "junior"
+  },
+  {
+   "word": "BODHRAN",
+   "clue": "Irish drum played with a tipper",
+   "level": "junior"
+  },
+  {
+   "word": "CEILI",
+   "clue": "Irish dance gathering",
+   "level": "junior"
+  },
+  {
+   "word": "JIG",
+   "clue": "Lively Irish dance tune",
+   "level": "junior"
+  },
+  {
+   "word": "REEL",
+   "clue": "Irish dance tune, faster than a jig",
+   "level": "junior"
+  },
+  {
+   "word": "CASTLE",
+   "clue": "Bunratty and Blarney are famous ones",
+   "level": "junior"
+  },
+  {
+   "word": "BLARNEY",
+   "clue": "Kiss its stone for the gift of the gab",
+   "level": "junior"
+  },
+  {
+   "word": "CLIFFS",
+   "clue": "The ___ of Moher in County Clare",
+   "level": "junior"
+  },
+  {
+   "word": "MOHER",
+   "clue": "Cliffs of ___, Co. Clare",
+   "level": "junior"
+  },
+  {
+   "word": "BOG",
+   "clue": "Wet land where turf is cut",
+   "level": "junior"
+  },
+  {
+   "word": "TURF",
+   "clue": "Fuel cut from a bog",
+   "level": "junior"
+  },
+  {
+   "word": "RAIN",
+   "clue": "Ireland gets plenty of this weather",
+   "level": "junior"
+  },
+  {
+   "word": "WIND",
+   "clue": "Weather that flies a kite",
+   "level": "junior"
+  },
+  {
+   "word": "SUN",
+   "clue": "It shines during a rare Irish heatwave",
+   "level": "junior"
+  },
+  {
+   "word": "CLOUD",
+   "clue": "Fluffy white thing in the sky",
+   "level": "junior"
+  },
+  {
+   "word": "BEACH",
+   "clue": "Sandy place by the sea, like Brittas Bay",
+   "level": "junior"
+  },
+  {
+   "word": "ISLAND",
+   "clue": "Ireland is one, and so is Achill",
+   "level": "junior"
+  },
+  {
+   "word": "ARAN",
+   "clue": "Islands famous for woolly jumpers",
+   "level": "junior"
+  },
+  {
+   "word": "ACHILL",
+   "clue": "County Mayo's biggest island",
+   "level": "junior"
+  },
+  {
+   "word": "BOAT",
+   "clue": "It floats on water",
+   "level": "junior"
+  },
+  {
+   "word": "FERRY",
+   "clue": "Boat that carries cars across the sea",
+   "level": "junior"
+  },
+  {
+   "word": "TRAIN",
+   "clue": "Travels on rails from Heuston Station",
+   "level": "junior"
+  },
+  {
+   "word": "BUS",
+   "clue": "Big vehicle that carries lots of passengers",
+   "level": "junior"
+  },
+  {
+   "word": "BIKE",
+   "clue": "Two wheels and pedals",
+   "level": "junior"
+  },
+  {
+   "word": "SCHOOL",
+   "clue": "Where you learn with your teacher",
+   "level": "junior"
+  },
+  {
+   "word": "TEACHER",
+   "clue": "Múinteoir, in English",
+   "level": "junior"
+  },
+  {
+   "word": "BOOK",
+   "clue": "You read one",
+   "level": "junior"
+  },
+  {
+   "word": "PENCIL",
+   "clue": "Writing tool you can rub out",
+   "level": "junior"
+  },
+  {
+   "word": "LIBRARY",
+   "clue": "Free place to borrow books",
+   "level": "junior"
+  },
+  {
+   "word": "CROKE",
+   "clue": "___ Park, Dublin's GAA stadium",
+   "level": "junior"
+  },
+  {
+   "word": "PARK",
+   "clue": "Phoenix ___, home to Dublin's deer",
+   "level": "junior"
+  },
+  {
+   "word": "DEER",
+   "clue": "Antlered animals living in the Phoenix Park",
+   "level": "junior"
+  },
+  {
+   "word": "FOX",
+   "clue": "Red bushy-tailed animal (sionnach)",
+   "level": "junior"
+  },
+  {
+   "word": "BADGER",
+   "clue": "Black-and-white striped animal (broc)",
+   "level": "junior"
+  },
+  {
+   "word": "HARE",
+   "clue": "Long-eared animal, faster than a rabbit",
+   "level": "junior"
+  },
+  {
+   "word": "ROBIN",
+   "clue": "Red-breasted garden bird (spideog)",
+   "level": "junior"
+  },
+  {
+   "word": "SWAN",
+   "clue": "The Children of Lir were turned into these",
+   "level": "junior"
+  },
+  {
+   "word": "LIR",
+   "clue": "Legendary king whose children became swans",
+   "level": "junior"
+  },
+  {
+   "word": "SALMON",
+   "clue": "The fish of knowledge in Irish legend",
+   "level": "junior"
+  },
+  {
+   "word": "FINN",
+   "clue": "___ McCool, giant of Irish legend",
+   "level": "junior"
+  },
+  {
+   "word": "GIANT",
+   "clue": "The ___'s Causeway",
+   "level": "junior"
+  },
+  {
+   "word": "OAK",
+   "clue": "Tree hidden in Kildare's name (Cill Dara)",
+   "level": "junior"
+  },
+  {
+   "word": "HOLLY",
+   "clue": "Prickly Christmas leaves",
+   "level": "junior"
+  },
+  {
+   "word": "DAISY",
+   "clue": "Small white flower with a yellow middle",
+   "level": "junior"
+  },
+  {
+   "word": "MOON",
+   "clue": "It shines at night",
+   "level": "junior"
+  },
+  {
+   "word": "STAR",
+   "clue": "It twinkles in the night sky",
+   "level": "junior"
+  },
+  {
+   "word": "SNOW",
+   "clue": "White winter weather",
+   "level": "junior"
+  },
+  {
+   "word": "FROST",
+   "clue": "Icy coating on a cold morning",
+   "level": "junior"
+  },
+  {
+   "word": "PIRATE",
+   "clue": "Grace O'Malley was a famous Irish one",
+   "level": "junior"
+  },
+  {
+   "word": "QUEEN",
+   "clue": "Grace O'Malley, the pirate ___",
+   "level": "junior"
+  },
+  {
+   "word": "KING",
+   "clue": "Brian Boru was a High ___",
+   "level": "junior"
+  },
+  {
+   "word": "VIKING",
+   "clue": "Sea raider who helped found Dublin",
+   "level": "junior"
+  },
+  {
+   "word": "TOWER",
+   "clue": "Round ___ at Glendalough",
+   "level": "junior"
+  },
+  {
+   "word": "MONK",
+   "clue": "Someone who lived at Glendalough long ago",
+   "level": "junior"
+  },
+  {
+   "word": "SAINT",
+   "clue": "Patrick, Brigid or Colmcille",
+   "level": "junior"
+  },
+  {
+   "word": "PATRICK",
+   "clue": "Ireland's patron saint",
+   "level": "junior"
+  },
+  {
+   "word": "BRIGID",
+   "clue": "Saint with a special cross made of rushes",
+   "level": "junior"
+  },
+  {
+   "word": "CROSS",
+   "clue": "Saint Brigid's is woven from rushes",
+   "level": "junior"
+  },
+  {
+   "word": "FEAST",
+   "clue": "A big celebration meal",
+   "level": "junior"
+  },
+  {
+   "word": "MUSIC",
+   "clue": "Trad sessions are full of it",
+   "level": "junior"
+  },
+  {
+   "word": "SONG",
+   "clue": "You sing one",
+   "level": "junior"
+  },
+  {
+   "word": "DANCE",
+   "clue": "Riverdance is a famous Irish one",
+   "level": "junior"
+  },
+  {
+   "word": "STAGE",
+   "clue": "Where performers act",
+   "level": "junior"
+  },
+  {
+   "word": "ZOO",
+   "clue": "Dublin's is in the Phoenix Park",
+   "level": "junior"
+  },
+  {
+   "word": "PONY",
+   "clue": "Connemara has its own breed of this",
+   "level": "junior"
+  },
+  {
+   "word": "HORSE",
+   "clue": "Ridden at the Dublin Horse Show",
+   "level": "junior"
+  },
+  {
+   "word": "DONKEY",
+   "clue": "Long-eared farm animal",
+   "level": "junior"
+  },
+  {
+   "word": "PIG",
+   "clue": "Farm animal that says oink",
+   "level": "junior"
+  },
+  {
+   "word": "HEN",
+   "clue": "Farm bird that lays eggs",
+   "level": "junior"
+  },
+  {
+   "word": "EGG",
+   "clue": "A hen lays one",
+   "level": "junior"
+  },
+  {
+   "word": "MILK",
+   "clue": "White drink from cows",
+   "level": "junior"
+  },
+  {
+   "word": "CHEESE",
+   "clue": "Made from milk; Cashel Blue is one",
+   "level": "junior"
+  },
+  {
+   "word": "APPLE",
+   "clue": "Armagh is the orchard county for these",
+   "level": "junior"
+  },
+  {
+   "word": "CAKE",
+   "clue": "Birthday treat with candles",
+   "level": "junior"
+  },
+  {
+   "word": "SWEETS",
+   "clue": "Sugary treats (milseáin)",
+   "level": "junior"
+  },
+  {
+   "word": "IRISH",
+   "clue": "Gaeilge, the language you learn at school",
+   "level": "junior"
+  },
+  {
+   "word": "GAEILGE",
+   "clue": "The Irish language, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "MADRA",
+   "clue": "Dog, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "CAT",
+   "clue": "Purring pet, the same word in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "GRIAN",
+   "clue": "Sun, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "UISCE",
+   "clue": "Water, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "TEACH",
+   "clue": "House, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "SIOPA",
+   "clue": "Shop, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "BAILE",
+   "clue": "Town, in Irish (as in Baile Átha Cliath)",
+   "level": "junior"
+  },
+  {
+   "word": "SLAN",
+   "clue": "Goodbye, in Irish",
+   "level": "junior"
+  },
+  {
+   "word": "FOUR",
+   "clue": "Number of provinces in Ireland",
+   "level": "junior"
+  },
+  {
+   "word": "LEINSTER",
+   "clue": "Province that includes Dublin",
+   "level": "junior"
+  },
+  {
+   "word": "MUNSTER",
+   "clue": "Province of Cork and Kerry",
+   "level": "junior"
+  },
+  {
+   "word": "ULSTER",
+   "clue": "Ireland's northern province",
+   "level": "junior"
+  },
+  {
+   "word": "CONNACHT",
+   "clue": "Ireland's western province",
+   "level": "junior"
+  },
+  {
+   "word": "COUNTY",
+   "clue": "The island of Ireland has 32 of these",
+   "level": "junior"
+  },
+  {
+   "word": "KERRY",
+   "clue": "County with Ireland's highest mountain",
+   "level": "junior"
+  },
+  {
+   "word": "MAYO",
+   "clue": "County of Croagh Patrick and Achill",
+   "level": "junior"
+  },
+  {
+   "word": "CLARE",
+   "clue": "County of the Cliffs of Moher and the Burren",
+   "level": "junior"
+  },
+  {
+   "word": "BURREN",
+   "clue": "Rocky limestone landscape in Clare",
+   "level": "junior"
+  },
+  {
+   "word": "DONEGAL",
+   "clue": "County in the far north-west",
+   "level": "junior"
+  },
+  {
+   "word": "SLIGO",
+   "clue": "Yeats's county",
+   "level": "junior"
+  },
+  {
+   "word": "WEXFORD",
+   "clue": "Sunny south-east county famous for strawberries",
+   "level": "junior"
+  },
+  {
+   "word": "KILDARE",
+   "clue": "County famous for racehorses",
+   "level": "junior"
+  },
+  {
+   "word": "MEATH",
+   "clue": "County of Newgrange and the Hill of Tara",
+   "level": "junior"
+  },
+  {
+   "word": "TARA",
+   "clue": "Hill where the High Kings were crowned",
+   "level": "junior"
+  },
+  {
+   "word": "LOUGH",
+   "clue": "Irish word for lake",
+   "level": "junior"
+  },
+  {
+   "word": "NEAGH",
+   "clue": "Lough ___, Ireland's largest lake",
+   "level": "junior"
+  },
+  {
+   "word": "DINGLE",
+   "clue": "Kerry town where Fungie lived",
+   "level": "junior"
+  },
+  {
+   "word": "TAYTO",
+   "clue": "Ireland's famous crisps",
+   "level": "junior"
+  },
+  {
+   "word": "WICKLOW",
+   "clue": "The Garden of Ireland",
+   "level": "junior"
+  },
+  {
+   "word": "KILKENNY",
+   "clue": "Marble City famous for hurling",
+   "level": "junior"
+  },
+  {
+   "word": "LIMERICK",
+   "clue": "City on the Shannon, and a funny five-line poem",
+   "level": "junior"
+  },
+  {
+   "word": "BELFAST",
+   "clue": "Capital of Northern Ireland",
+   "level": "junior"
+  },
+  {
+   "word": "DART",
+   "clue": "Dublin's coastal train",
+   "level": "junior"
+  },
+  {
+   "word": "LUAS",
+   "clue": "Dublin's tram; Irish for speed",
+   "level": "junior"
+  },
+  {
+   "word": "SPIRE",
+   "clue": "Tall silver needle on O'Connell Street",
+   "level": "junior"
+  },
+  {
+   "word": "HOWTH",
+   "clue": "Fishing village on Dublin Bay",
+   "level": "junior"
+  },
+  {
+   "word": "BRAY",
+   "clue": "Wicklow seaside town at the end of the DART",
+   "level": "junior"
+  },
+  {
+   "word": "MOLLY",
+   "clue": "___ Malone and her wheelbarrow",
+   "level": "junior"
+  },
+  {
+   "word": "COCKLES",
+   "clue": "Molly Malone sold these and mussels",
+   "level": "junior"
+  },
+  {
+   "word": "SEAWEED",
+   "clue": "Slippery green stuff on the rocks at the beach",
+   "level": "junior"
+  },
+  {
+   "word": "CRAB",
+   "clue": "Sideways-walking creature in a rock pool",
+   "level": "junior"
+  },
+  {
+   "word": "SHELL",
+   "clue": "A snail carries its home in one",
+   "level": "junior"
+  },
+  {
+   "word": "KITE",
+   "clue": "Fly it on a windy beach",
+   "level": "junior"
+  },
+  {
+   "word": "SANDCASTLE",
+   "clue": "Build one with a bucket and spade",
+   "level": "junior"
+  },
+  {
+   "word": "LIGHTHOUSE",
+   "clue": "Tall tower that guides ships at night",
+   "level": "junior"
+  },
+  {
+   "word": "RIVER",
+   "clue": "Water that flows to the sea",
+   "level": "junior"
+  },
+  {
+   "word": "LAKE",
+   "clue": "Lough, in English",
+   "level": "junior"
+  },
+  {
+   "word": "HILL",
+   "clue": "Smaller than a mountain",
+   "level": "junior"
+  },
+  {
+   "word": "FIELD",
+   "clue": "Cows graze in one",
+   "level": "junior"
+  },
+  {
+   "word": "FARM",
+   "clue": "Where tractors and animals live",
+   "level": "junior"
+  },
+  {
+   "word": "TRACTOR",
+   "clue": "Farmer's big machine",
+   "level": "junior"
+  },
+  {
+   "word": "WELLIES",
+   "clue": "Boots for muddy puddles",
+   "level": "junior"
+  },
+  {
+   "word": "UMBRELLA",
+   "clue": "Keeps the rain off",
+   "level": "junior"
+  },
+  {
+   "word": "JUMPER",
+   "clue": "Aran islanders are famous for knitting these",
+   "level": "junior"
+  },
+  {
+   "word": "WOOL",
+   "clue": "Sheep give us this",
+   "level": "junior"
+  },
+  {
+   "word": "HONEY",
+   "clue": "Bees make it",
+   "level": "junior"
+  },
+  {
+   "word": "BEE",
+   "clue": "Buzzing insect that makes honey",
+   "level": "junior"
+  },
+  {
+   "word": "FROG",
+   "clue": "Green hopper that says ribbit",
+   "level": "junior"
+  },
+  {
+   "word": "LADYBIRD",
+   "clue": "Red beetle with black spots",
+   "level": "junior"
+  },
+  {
+   "word": "LEPRECHAUN",
+   "clue": "Mischievous little folk with a pot of gold",
+   "level": "adult"
+  },
+  {
+   "word": "CARRAUNTOOHIL",
+   "clue": "Ireland's highest peak",
+   "level": "adult"
+  },
+  {
+   "word": "GLENDALOUGH",
+   "clue": "Wicklow monastic valley of two lakes",
+   "level": "adult"
+  },
+  {
+   "word": "KILMAINHAM",
+   "clue": "Dublin gaol that is now a museum",
+   "level": "adult"
+  },
+  {
+   "word": "KELLS",
+   "clue": "Book of ___, kept at Trinity College",
+   "level": "adult"
+  },
+  {
+   "word": "TRINITY",
+   "clue": "Dublin college founded in 1592",
+   "level": "adult"
+  },
+  {
+   "word": "OIREACHTAS",
+   "clue": "Ireland's national parliament",
+   "level": "adult"
+  },
+  {
+   "word": "DAIL",
+   "clue": "Lower house of the Oireachtas",
+   "level": "adult"
+  },
+  {
+   "word": "SEANAD",
+   "clue": "Upper house of the Oireachtas",
+   "level": "adult"
+  },
+  {
+   "word": "TAOISEACH",
+   "clue": "Head of the Irish Government",
+   "level": "adult"
+  },
+  {
+   "word": "TANAISTE",
+   "clue": "Deputy head of the Irish Government",
+   "level": "adult"
+  },
+  {
+   "word": "ARAS",
+   "clue": "___ an Uachtaráin, the President's residence",
+   "level": "adult"
+  },
+  {
+   "word": "GARDA",
+   "clue": "Irish police officer",
+   "level": "adult"
+  },
+  {
+   "word": "SEANCHAI",
+   "clue": "Traditional Irish storyteller",
+   "level": "adult"
+  },
+  {
+   "word": "UILLEANN",
+   "clue": "Irish pipes powered by a bellows",
+   "level": "adult"
+  },
+  {
+   "word": "CLADDAGH",
+   "clue": "Ring with hands, a heart and a crown",
+   "level": "adult"
+  },
+  {
+   "word": "CONNEMARA",
+   "clue": "Rugged region of west Galway",
+   "level": "adult"
+  },
+  {
+   "word": "SKELLIG",
+   "clue": "___ Michael, monastic island off Kerry",
+   "level": "adult"
+  },
+  {
+   "word": "BOYNE",
+   "clue": "River of a famous 1690 battle",
+   "level": "adult"
+  },
+  {
+   "word": "CORRIB",
+   "clue": "Lough and river at Galway",
+   "level": "adult"
+  },
+  {
+   "word": "SUIR",
+   "clue": "River through Clonmel and Waterford",
+   "level": "adult"
+  },
+  {
+   "word": "BARROW",
+   "clue": "River through Carlow and New Ross",
+   "level": "adult"
+  },
+  {
+   "word": "NORE",
+   "clue": "River through Kilkenny",
+   "level": "adult"
+  },
+  {
+   "word": "LEE",
+   "clue": "River through Cork city",
+   "level": "adult"
+  },
+  {
+   "word": "LAGAN",
+   "clue": "River through Belfast",
+   "level": "adult"
+  },
+  {
+   "word": "FOYLE",
+   "clue": "River and lough at Derry",
+   "level": "adult"
+  },
+  {
+   "word": "ERNE",
+   "clue": "Fermanagh's lough",
+   "level": "adult"
+  },
+  {
+   "word": "SWILLY",
+   "clue": "Donegal lough",
+   "level": "adult"
+  },
+  {
+   "word": "WATERFORD",
+   "clue": "Ireland's oldest city, famous for crystal",
+   "level": "adult"
+  },
+  {
+   "word": "CRYSTAL",
+   "clue": "Waterford's famous glassware",
+   "level": "adult"
+  },
+  {
+   "word": "GUINNESS",
+   "clue": "Stout brewed at St James's Gate",
+   "level": "adult"
+  },
+  {
+   "word": "STOUT",
+   "clue": "Dark beer such as Murphy's or Beamish",
+   "level": "adult"
+  },
+  {
+   "word": "WHISKEY",
+   "clue": "Uisce beatha, the water of life",
+   "level": "adult"
+  },
+  {
+   "word": "JAMESON",
+   "clue": "Whiskey first distilled on Bow Street",
+   "level": "adult"
+  },
+  {
+   "word": "YEATS",
+   "clue": "Poet buried under Ben Bulben",
+   "level": "adult"
+  },
+  {
+   "word": "JOYCE",
+   "clue": "Author of Ulysses",
+   "level": "adult"
+  },
+  {
+   "word": "BLOOMSDAY",
+   "clue": "16 June celebration of a Dublin novel",
+   "level": "adult"
+  },
+  {
+   "word": "ULYSSES",
+   "clue": "Joyce's novel set on a single Dublin day",
+   "level": "adult"
+  },
+  {
+   "word": "HEANEY",
+   "clue": "Nobel-winning poet from County Derry",
+   "level": "adult"
+  },
+  {
+   "word": "BECKETT",
+   "clue": "He wrote Waiting for Godot",
+   "level": "adult"
+  },
+  {
+   "word": "WILDE",
+   "clue": "Oscar, author of The Importance of Being Earnest",
+   "level": "adult"
+  },
+  {
+   "word": "SWIFT",
+   "clue": "Dean who wrote Gulliver's Travels",
+   "level": "adult"
+  },
+  {
+   "word": "STOKER",
+   "clue": "Bram, creator of Dracula",
+   "level": "adult"
+  },
+  {
+   "word": "BINCHY",
+   "clue": "Maeve, author of Circle of Friends",
+   "level": "adult"
+  },
+  {
+   "word": "ROONEY",
+   "clue": "Sally, author of Normal People",
+   "level": "adult"
+  },
+  {
+   "word": "DOYLE",
+   "clue": "Roddy, author of The Commitments",
+   "level": "adult"
+  },
+  {
+   "word": "BONO",
+   "clue": "U2's frontman",
+   "level": "adult"
+  },
+  {
+   "word": "ENYA",
+   "clue": "Donegal singer of Orinoco Flow",
+   "level": "adult"
+  },
+  {
+   "word": "CRANBERRIES",
+   "clue": "Limerick band fronted by Dolores O'Riordan",
+   "level": "adult"
+  },
+  {
+   "word": "CHIEFTAINS",
+   "clue": "Trad group founded by Paddy Moloney",
+   "level": "adult"
+  },
+  {
+   "word": "HOZIER",
+   "clue": "Wicklow singer of Take Me to Church",
+   "level": "adult"
+  },
+  {
+   "word": "RIVERDANCE",
+   "clue": "Show born as a Eurovision interval act",
+   "level": "adult"
+  },
+  {
+   "word": "EUROVISION",
+   "clue": "Song contest Ireland has won seven times",
+   "level": "adult"
+  },
+  {
+   "word": "ABBEY",
+   "clue": "Dublin's national theatre",
+   "level": "adult"
+  },
+  {
+   "word": "GAIETY",
+   "clue": "South King Street theatre",
+   "level": "adult"
+  },
+  {
+   "word": "OLYMPIA",
+   "clue": "Dame Street theatre",
+   "level": "adult"
+  },
+  {
+   "word": "DRUID",
+   "clue": "Galway theatre company",
+   "level": "adult"
+  },
+  {
+   "word": "FLEADH",
+   "clue": "Trad music festival, ___ Cheoil",
+   "level": "adult"
+  },
+  {
+   "word": "OYSTER",
+   "clue": "Shellfish celebrated at a Galway festival",
+   "level": "adult"
+  },
+  {
+   "word": "PLOUGHING",
+   "clue": "The National ___ Championships",
+   "level": "adult"
+  },
+  {
+   "word": "TRALEE",
+   "clue": "Kerry town of the Rose festival",
+   "level": "adult"
+  },
+  {
+   "word": "CURRAGH",
+   "clue": "Kildare plain and racecourse",
+   "level": "adult"
+  },
+  {
+   "word": "LEOPARDSTOWN",
+   "clue": "South Dublin racecourse",
+   "level": "adult"
+  },
+  {
+   "word": "FAIRYHOUSE",
+   "clue": "Meath racecourse of the Irish Grand National",
+   "level": "adult"
+  },
+  {
+   "word": "PUNCHESTOWN",
+   "clue": "Kildare festival racecourse",
+   "level": "adult"
+  },
+  {
+   "word": "LANSDOWNE",
+   "clue": "Road with Ireland's rugby stadium",
+   "level": "adult"
+  },
+  {
+   "word": "THOMOND",
+   "clue": "Limerick rugby park",
+   "level": "adult"
+  },
+  {
+   "word": "KEANE",
+   "clue": "Roy, Cork footballer turned pundit",
+   "level": "adult"
+  },
+  {
+   "word": "TAYLOR",
+   "clue": "Katie, Bray's boxing champion",
+   "level": "adult"
+  },
+  {
+   "word": "MCILROY",
+   "clue": "Rory, Holywood golfer",
+   "level": "adult"
+  },
+  {
+   "word": "HARRINGTON",
+   "clue": "Pádraig, three-time major winner",
+   "level": "adult"
+  },
+  {
+   "word": "SEXTON",
+   "clue": "Johnny, Ireland out-half",
+   "level": "adult"
+  },
+  {
+   "word": "MAGUIRE",
+   "clue": "Sam ___ Cup for Gaelic football",
+   "level": "adult"
+  },
+  {
+   "word": "LIAM",
+   "clue": "___ MacCarthy Cup for hurling",
+   "level": "adult"
+  },
+  {
+   "word": "HANDBALL",
+   "clue": "GAA game played against a wall",
+   "level": "adult"
+  },
+  {
+   "word": "ROUNDERS",
+   "clue": "GAA bat-and-ball game",
+   "level": "adult"
+  },
+  {
+   "word": "DUBS",
+   "clue": "Dublin GAA nickname",
+   "level": "adult"
+  },
+  {
+   "word": "KINGDOM",
+   "clue": "Kerry's nickname",
+   "level": "adult"
+  },
+  {
+   "word": "REBELS",
+   "clue": "Cork's nickname",
+   "level": "adult"
+  },
+  {
+   "word": "CATS",
+   "clue": "Kilkenny hurlers' nickname",
+   "level": "adult"
+  },
+  {
+   "word": "TRIBESMEN",
+   "clue": "Galway's nickname",
+   "level": "adult"
+  },
+  {
+   "word": "BANNER",
+   "clue": "Clare's county nickname",
+   "level": "adult"
+  },
+  {
+   "word": "NEWGRANGE",
+   "clue": "Passage tomb lit by the winter solstice sun",
+   "level": "adult"
+  },
+  {
+   "word": "DOLMEN",
+   "clue": "Portal tomb such as Poulnabrone",
+   "level": "adult"
+  },
+  {
+   "word": "POULNABRONE",
+   "clue": "Burren dolmen",
+   "level": "adult"
+  },
+  {
+   "word": "OGHAM",
+   "clue": "Ancient Irish alphabet of notches",
+   "level": "adult"
+  },
+  {
+   "word": "CELTIC",
+   "clue": "___ Tiger, the 1990s boom",
+   "level": "adult"
+  },
+  {
+   "word": "EURO",
+   "clue": "Irish currency since 2002",
+   "level": "adult"
+  },
+  {
+   "word": "PUNT",
+   "clue": "Irish currency before the euro",
+   "level": "adult"
+  },
+  {
+   "word": "FAMINE",
+   "clue": "The Great Hunger of the 1840s",
+   "level": "adult"
+  },
+  {
+   "word": "DIASPORA",
+   "clue": "Irish people living abroad",
+   "level": "adult"
+  },
+  {
+   "word": "RISING",
+   "clue": "Easter 1916 ___",
+   "level": "adult"
+  },
+  {
+   "word": "PEARSE",
+   "clue": "He read the Proclamation in 1916",
+   "level": "adult"
+  },
+  {
+   "word": "COLLINS",
+   "clue": "Michael, the Big Fellow",
+   "level": "adult"
+  },
+  {
+   "word": "DEVALERA",
+   "clue": "Éamon, the Long Fellow",
+   "level": "adult"
+  },
+  {
+   "word": "MARKIEVICZ",
+   "clue": "Countess elected to Westminster in 1918",
+   "level": "adult"
+  },
+  {
+   "word": "PARNELL",
+   "clue": "The Uncrowned King of Ireland",
+   "level": "adult"
+  },
+  {
+   "word": "OCONNELL",
+   "clue": "Daniel, the Liberator",
+   "level": "adult"
+  },
+  {
+   "word": "GPO",
+   "clue": "1916 headquarters on O'Connell Street",
+   "level": "adult"
+  },
+  {
+   "word": "HAPENNY",
+   "clue": "___ Bridge over the Liffey",
+   "level": "adult"
+  },
+  {
+   "word": "TITANIC",
+   "clue": "Liner built in Belfast",
+   "level": "adult"
+  },
+  {
+   "word": "HARLAND",
+   "clue": "___ and Wolff shipyard",
+   "level": "adult"
+  },
+  {
+   "word": "COBH",
+   "clue": "Titanic's last port of call",
+   "level": "adult"
+  },
+  {
+   "word": "DERRY",
+   "clue": "Walled city on the Foyle",
+   "level": "adult"
+  },
+  {
+   "word": "ARMAGH",
+   "clue": "Ecclesiastical capital of Ireland",
+   "level": "adult"
+  },
+  {
+   "word": "MOURNE",
+   "clue": "Mountains that sweep down to the sea",
+   "level": "adult"
+  },
+  {
+   "word": "CAUSEWAY",
+   "clue": "Giant's ___, basalt columns in Antrim",
+   "level": "adult"
+  },
+  {
+   "word": "ANTRIM",
+   "clue": "County of the Giant's Causeway",
+   "level": "adult"
+  },
+  {
+   "word": "FERMANAGH",
+   "clue": "Lakeland county",
+   "level": "adult"
+  },
+  {
+   "word": "TYRONE",
+   "clue": "County of Omagh and Cookstown",
+   "level": "adult"
+  },
+  {
+   "word": "LAOIS",
+   "clue": "County town: Portlaoise",
+   "level": "adult"
+  },
+  {
+   "word": "OFFALY",
+   "clue": "County of Birr and Tullamore",
+   "level": "adult"
+  },
+  {
+   "word": "LONGFORD",
+   "clue": "Midlands county on the Shannon",
+   "level": "adult"
+  },
+  {
+   "word": "ROSCOMMON",
+   "clue": "Connacht county of Boyle and Strokestown",
+   "level": "adult"
+  },
+  {
+   "word": "LEITRIM",
+   "clue": "County with Ireland's shortest coastline",
+   "level": "adult"
+  },
+  {
+   "word": "CAVAN",
+   "clue": "Said to have a lake for every day of the year",
+   "level": "adult"
+  },
+  {
+   "word": "MONAGHAN",
+   "clue": "Drumlin county of Patrick Kavanagh",
+   "level": "adult"
+  },
+  {
+   "word": "KAVANAGH",
+   "clue": "Poet of Raglan Road",
+   "level": "adult"
+  },
+  {
+   "word": "LOUTH",
+   "clue": "Ireland's smallest county",
+   "level": "adult"
+  },
+  {
+   "word": "CARLOW",
+   "clue": "County of the Browneshill dolmen",
+   "level": "adult"
+  },
+  {
+   "word": "TIPPERARY",
+   "clue": "It's a long way to it",
+   "level": "adult"
+  },
+  {
+   "word": "CASHEL",
+   "clue": "Rock of ___",
+   "level": "adult"
+  },
+  {
+   "word": "WESTMEATH",
+   "clue": "County of Athlone and Mullingar",
+   "level": "adult"
+  },
+  {
+   "word": "ATHLONE",
+   "clue": "Shannon town at the centre of Ireland",
+   "level": "adult"
+  },
+  {
+   "word": "LEAP",
+   "clue": "Card for Irish public transport",
+   "level": "adult"
+  },
+  {
+   "word": "MOTORWAY",
+   "clue": "The M50 is one",
+   "level": "adult"
+  },
+  {
+   "word": "AERLINGUS",
+   "clue": "Airline with a shamrock on its tail",
+   "level": "adult"
+  },
+  {
+   "word": "RYANAIR",
+   "clue": "Low-fares airline headquartered at Swords",
+   "level": "adult"
+  },
+  {
+   "word": "KNOCK",
+   "clue": "Mayo airport and shrine",
+   "level": "adult"
+  },
+  {
+   "word": "KYLEMORE",
+   "clue": "Connemara abbey with a Victorian walled garden",
+   "level": "adult"
+  },
+  {
+   "word": "BUNRATTY",
+   "clue": "Clare castle famous for medieval banquets",
+   "level": "adult"
+  },
+  {
+   "word": "MUCKROSS",
+   "clue": "Killarney house and abbey",
+   "level": "adult"
+  },
+  {
+   "word": "KILLARNEY",
+   "clue": "Kerry's lakes town",
+   "level": "adult"
+  },
+  {
+   "word": "RING",
+   "clue": "___ of Kerry scenic drive",
+   "level": "adult"
+  },
+  {
+   "word": "BENBULBEN",
+   "clue": "Sligo's flat-topped mountain",
+   "level": "adult"
+  },
+  {
+   "word": "ERRIGAL",
+   "clue": "Donegal's highest mountain",
+   "level": "adult"
+  },
+  {
+   "word": "SLIEVE",
+   "clue": "Irish for mountain, as in ___ League",
+   "level": "adult"
+  },
+  {
+   "word": "CROAGH",
+   "clue": "___ Patrick, the Reek",
+   "level": "adult"
+  },
+  {
+   "word": "PILGRIM",
+   "clue": "Climbs the Reek on Reek Sunday",
+   "level": "adult"
+  },
+  {
+   "word": "INISHMORE",
+   "clue": "Largest of the Aran Islands",
+   "level": "adult"
+  },
+  {
+   "word": "CURRACH",
+   "clue": "Traditional west-coast rowing boat",
+   "level": "adult"
+  },
+  {
+   "word": "HOOKER",
+   "clue": "Galway sailing boat with red sails",
+   "level": "adult"
+  },
+  {
+   "word": "CARRAGEEN",
+   "clue": "Irish moss seaweed",
+   "level": "adult"
+  },
+  {
+   "word": "BOXTY",
+   "clue": "Potato pancake",
+   "level": "adult"
+  },
+  {
+   "word": "COLCANNON",
+   "clue": "Mash with cabbage or kale",
+   "level": "adult"
+  },
+  {
+   "word": "CODDLE",
+   "clue": "Dublin sausage and rasher stew",
+   "level": "adult"
+  },
+  {
+   "word": "BARMBRACK",
+   "clue": "Halloween loaf hiding a ring",
+   "level": "adult"
+  },
+  {
+   "word": "CRUBEENS",
+   "clue": "Pigs' trotters",
+   "level": "adult"
+  },
+  {
+   "word": "DRISHEEN",
+   "clue": "Cork blood pudding",
+   "level": "adult"
+  },
+  {
+   "word": "RASHER",
+   "clue": "Bacon for the fry",
+   "level": "adult"
+  },
+  {
+   "word": "BLAA",
+   "clue": "Waterford's floury bread roll",
+   "level": "adult"
+  },
+  {
+   "word": "SPICEBAG",
+   "clue": "Chipper favourite of crispy chicken and chips",
+   "level": "adult"
+  },
+  {
+   "word": "CHIPPER",
+   "clue": "Where you order a single",
+   "level": "adult"
+  },
+  {
+   "word": "BREAKFAST",
+   "clue": "Full Irish ___",
+   "level": "adult"
+  },
+  {
+   "word": "TED",
+   "clue": "Father ___ of Craggy Island",
+   "level": "adult"
+  },
+  {
+   "word": "CRAGGY",
+   "clue": "___ Island, home of Father Ted",
+   "level": "adult"
+  },
+  {
+   "word": "BANSHEE",
+   "clue": "Wailing spirit of Irish legend",
+   "level": "adult"
+  },
+  {
+   "word": "PUCA",
+   "clue": "Shape-shifting fairy spirit",
+   "level": "adult"
+  },
+  {
+   "word": "DULLAHAN",
+   "clue": "Headless horseman of legend",
+   "level": "adult"
+  },
+  {
+   "word": "TIRNANOG",
+   "clue": "Land of eternal youth",
+   "level": "adult"
+  },
+  {
+   "word": "OISIN",
+   "clue": "Warrior-poet who rode to Tír na nÓg",
+   "level": "adult"
+  },
+  {
+   "word": "NIAMH",
+   "clue": "Golden-haired maiden of Tír na nÓg",
+   "level": "adult"
+  },
+  {
+   "word": "CUCHULAINN",
+   "clue": "The Hound of Ulster",
+   "level": "adult"
+  },
+  {
+   "word": "SETANTA",
+   "clue": "Cúchulainn's boyhood name",
+   "level": "adult"
+  },
+  {
+   "word": "MAEVE",
+   "clue": "Warrior queen of Connacht",
+   "level": "adult"
+  },
+  {
+   "word": "TAIN",
+   "clue": "___ Bó Cúailnge, the Cattle Raid of Cooley",
+   "level": "adult"
+  },
+  {
+   "word": "FIANNA",
+   "clue": "Finn McCool's warrior band",
+   "level": "adult"
+  },
+  {
+   "word": "DEIRDRE",
+   "clue": "___ of the Sorrows",
+   "level": "adult"
+  },
+  {
+   "word": "SAMHAIN",
+   "clue": "Celtic festival that became Halloween",
+   "level": "adult"
+  },
+  {
+   "word": "IMBOLC",
+   "clue": "Saint Brigid's festival on 1 February",
+   "level": "adult"
+  },
+  {
+   "word": "BEALTAINE",
+   "clue": "May Day festival",
+   "level": "adult"
+  },
+  {
+   "word": "LUGHNASA",
+   "clue": "August harvest festival",
+   "level": "adult"
+  },
+  {
+   "word": "COLMCILLE",
+   "clue": "Saint who founded Iona",
+   "level": "adult"
+  },
+  {
+   "word": "KEVIN",
+   "clue": "Saint of Glendalough",
+   "level": "adult"
+  },
+  {
+   "word": "CIARAN",
+   "clue": "Saint of Clonmacnoise",
+   "level": "adult"
+  },
+  {
+   "word": "CLONMACNOISE",
+   "clue": "Monastery on the Shannon",
+   "level": "adult"
+  },
+  {
+   "word": "PALE",
+   "clue": "Area around Dublin once under English rule",
+   "level": "adult"
+  },
+  {
+   "word": "STRONGBOW",
+   "clue": "Norman who married Aoife in 1170",
+   "level": "adult"
+  },
+  {
+   "word": "CROMWELL",
+   "clue": "He arrived in 1649, to Ireland's cost",
+   "level": "adult"
+  },
+  {
+   "word": "HEDGE",
+   "clue": "___ school, a secret classroom",
+   "level": "adult"
+  },
+  {
+   "word": "QUAY",
+   "clue": "Riverside road in Dublin",
+   "level": "adult"
+  },
+  {
+   "word": "GEORGIAN",
+   "clue": "Style of Merrion Square's doors",
+   "level": "adult"
+  },
+  {
+   "word": "PHOENIX",
+   "clue": "___ Park, Europe's largest enclosed city park",
+   "level": "adult"
+  },
+  {
+   "word": "MALONE",
+   "clue": "Molly of the wheelbarrow",
+   "level": "adult"
+  },
+  {
+   "word": "GRAFTON",
+   "clue": "Dublin's pedestrian shopping street",
+   "level": "adult"
+  },
+  {
+   "word": "TEMPLE",
+   "clue": "___ Bar, Dublin's cultural quarter",
+   "level": "adult"
+  },
+  {
+   "word": "DALKEY",
+   "clue": "South Dublin village with a castle",
+   "level": "adult"
+  },
+  {
+   "word": "POWERSCOURT",
+   "clue": "Wicklow estate with Ireland's tallest waterfall",
+   "level": "adult"
+  },
+  {
+   "word": "LUGNAQUILLA",
+   "clue": "Wicklow's highest mountain",
+   "level": "adult"
+  },
+  {
+   "word": "SUGARLOAF",
+   "clue": "Cone-shaped Wicklow hill",
+   "level": "adult"
+  },
+  {
+   "word": "LAMBAY",
+   "clue": "Dublin island with wallabies",
+   "level": "adult"
+  },
+  {
+   "word": "WALLABY",
+   "clue": "Marsupial living on Lambay Island",
+   "level": "adult"
+  },
+  {
+   "word": "SKERRIES",
+   "clue": "North Dublin town with windmills",
+   "level": "adult"
+  },
+  {
+   "word": "MALAHIDE",
+   "clue": "North Dublin castle village",
+   "level": "adult"
+  },
+  {
+   "word": "SWORDS",
+   "clue": "Fingal's county town",
+   "level": "adult"
+  },
+  {
+   "word": "FINGAL",
+   "clue": "North Dublin council area",
+   "level": "adult"
+  },
+  {
+   "word": "TALLAGHT",
+   "clue": "South-west Dublin suburb",
+   "level": "adult"
+  },
+  {
+   "word": "HOGAN",
+   "clue": "___ Stand at Croke Park",
+   "level": "adult"
+  },
+  {
+   "word": "CUSACK",
+   "clue": "GAA founder honoured with a Croke Park stand",
+   "level": "adult"
+  },
+  {
+   "word": "NEWROSS",
+   "clue": "Wexford town with the Dunbrody famine ship",
+   "level": "adult"
+  },
+  {
+   "word": "STRAWBERRY",
+   "clue": "Wexford's famous summer fruit",
+   "level": "adult"
+  },
+  {
+   "word": "LIMESTONE",
+   "clue": "Rock of the Burren",
+   "level": "adult"
+  },
+  {
+   "word": "PEAT",
+   "clue": "Turf, before it is cut",
+   "level": "adult"
+  },
+  {
+   "word": "SEANNOS",
+   "clue": "Old-style unaccompanied Irish singing",
+   "level": "adult"
+  },
+  {
+   "word": "GAELTACHT",
+   "clue": "Irish-speaking region",
+   "level": "adult"
+  },
+  {
+   "word": "SCOIL",
+   "clue": "School, in Irish",
+   "level": "adult"
+  },
+  {
+   "word": "FAILTE",
+   "clue": "Welcome, in Irish",
+   "level": "adult"
+  },
+  {
+   "word": "CRAIC",
+   "clue": "Fun and good conversation",
+   "level": "adult"
+  },
+  {
+   "word": "SLAINTE",
+   "clue": "Cheers, in Irish",
+   "level": "adult"
+  },
+  {
+   "word": "GAA",
+   "clue": "Ireland's largest sporting body",
+   "level": "adult"
+  },
+  {
+   "word": "CROKEPARK",
+   "clue": "Ireland's biggest stadium",
+   "level": "adult"
+  },
+  {
+   "word": "AVIVA",
+   "clue": "Lansdowne Road stadium's current name",
+   "level": "adult"
+  }
+ ]
+}

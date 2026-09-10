@@ -57,6 +57,22 @@ Change every password before any public deployment (`ADMIN_PASSWORD`, `CONTRIBUT
 
 `database/seed/wire-snapshot.json` is a captured snapshot so a fresh install shows real news even offline (`php scripts/seed.php --offline`). Regenerate it with `php scripts/fetch-news.php --snapshot`.
 
+## Fresh every day
+
+Every calendar day (Irish time) the site changes: an **edition number** and masthead date, **live weather** for eight Irish cities with sunrise and sunset (Open-Meteo, cached 30 min), the **Irish word of the day** (*Focal an lae*), a subtle daily hue shift in the background, and a brand-new set of puzzles.
+
+## ME Óg · The Junior Post (kids section)
+
+`/kids` is an old-school newspaper inside the futuristic site — cream newsprint, a serif masthead and a puzzle corner that resets at midnight:
+
+- **Daily crossword** — generated deterministically from the date by `Services/Puzzles.php` using a 370-word Irish-flavoured bank (`config/kids/crossword-words.json`). Junior (11×11, 10 clues) and Grown-up (15×15, 18 clues) grids, on-screen solving with check/reveal, saved progress, printing and a 14-day archive.
+- **Daily word search** — ten words on a rotating theme (counties, animals in Irish, food, GAA, legends…), drag to find.
+- **Know Your Ireland quiz** — five questions a day from a 60-question bank, each with a fact.
+- **Find the County** — a Leaflet map game using the geocoded county centroids.
+- **Focal an lae**, a curated list of genuinely free things to do across Ireland, "bright side" wire stories filtered for young readers, and a junior reporter prompt.
+
+Puzzles are cached in `storage/cache/` so generation costs nothing after the first visitor of the day.
+
 ## Project layout
 
 ```
@@ -72,7 +88,7 @@ src/                    application code (PSR-4, namespace MeNews)
 templates/              PHP templates (layout, home, story, listing, contributors, about, plus, dashboard, newsroom)
 database/schema.sql     SQLite schema (idempotent)
 database/seed/          contributors.json, wire-snapshot.json
-config/                 sources.json (RSS feeds), locations.json (provinces, counties, towns)
+config/                 sources.json (RSS feeds), locations.json (places), geo.json (coordinates), kids/ (puzzle banks)
 scripts/                setup.php, seed.php, fetch-news.php, backup.php, import-locations.php, serve.sh, start.bat
 storage/                runtime data (git-ignored): data/menews.sqlite, uploads/, logs/, cache/
 deploy/                 apache.conf, nginx.conf, php.ini

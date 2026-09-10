@@ -1,0 +1,521 @@
+{
+ "_comment": "Focal an lae — Irish word of the day.",
+ "words": [
+  {
+   "irish": "madra",
+   "english": "dog",
+   "say": "MOD-ra",
+   "example": "Tá madra agam. — I have a dog."
+  },
+  {
+   "irish": "cat",
+   "english": "cat",
+   "say": "cat",
+   "example": "Tá an cat ina chodladh. — The cat is asleep."
+  },
+  {
+   "irish": "capall",
+   "english": "horse",
+   "say": "KOP-ul",
+   "example": "Capall bán. — A white horse."
+  },
+  {
+   "irish": "bó",
+   "english": "cow",
+   "say": "boh",
+   "example": "Tá an bhó sa pháirc. — The cow is in the field."
+  },
+  {
+   "irish": "caora",
+   "english": "sheep",
+   "say": "KAY-ra",
+   "example": "Caora ar an sliabh. — A sheep on the mountain."
+  },
+  {
+   "irish": "muc",
+   "english": "pig",
+   "say": "muk",
+   "example": "Muc bheag. — A little pig."
+  },
+  {
+   "irish": "éan",
+   "english": "bird",
+   "say": "ayn",
+   "example": "Éan ar an gcrann. — A bird on the tree."
+  },
+  {
+   "irish": "iasc",
+   "english": "fish",
+   "say": "EE-usk",
+   "example": "Iasc san abhainn. — A fish in the river."
+  },
+  {
+   "irish": "grian",
+   "english": "sun",
+   "say": "GREE-un",
+   "example": "Tá an ghrian ag taitneamh. — The sun is shining."
+  },
+  {
+   "irish": "báisteach",
+   "english": "rain",
+   "say": "BAWSH-tukh",
+   "example": "Tá sé ag cur báistí. — It is raining."
+  },
+  {
+   "irish": "gaoth",
+   "english": "wind",
+   "say": "gwee",
+   "example": "Gaoth láidir. — A strong wind."
+  },
+  {
+   "irish": "sneachta",
+   "english": "snow",
+   "say": "SHNAKH-ta",
+   "example": "Tá sneachta ann! — There is snow!"
+  },
+  {
+   "irish": "scamall",
+   "english": "cloud",
+   "say": "SKOM-ul",
+   "example": "Scamall mór dubh. — A big black cloud."
+  },
+  {
+   "irish": "farraige",
+   "english": "sea",
+   "say": "FAR-ig-eh",
+   "example": "Cois farraige. — By the sea."
+  },
+  {
+   "irish": "abhainn",
+   "english": "river",
+   "say": "OW-in",
+   "example": "Abhainn na Sionainne. — The River Shannon."
+  },
+  {
+   "irish": "loch",
+   "english": "lake",
+   "say": "lokh",
+   "example": "Loch nEathach. — Lough Neagh."
+  },
+  {
+   "irish": "sliabh",
+   "english": "mountain",
+   "say": "shleev",
+   "example": "Sliabh ard. — A high mountain."
+  },
+  {
+   "irish": "crann",
+   "english": "tree",
+   "say": "kron",
+   "example": "Crann darach. — An oak tree."
+  },
+  {
+   "irish": "bláth",
+   "english": "flower",
+   "say": "blaw",
+   "example": "Bláth buí. — A yellow flower."
+  },
+  {
+   "irish": "teach",
+   "english": "house",
+   "say": "chakh",
+   "example": "Mo theach. — My house."
+  },
+  {
+   "irish": "scoil",
+   "english": "school",
+   "say": "skul",
+   "example": "Táim ar scoil. — I am at school."
+  },
+  {
+   "irish": "leabhar",
+   "english": "book",
+   "say": "LOW-er",
+   "example": "Leabhar maith. — A good book."
+  },
+  {
+   "irish": "peann",
+   "english": "pen",
+   "say": "pyan",
+   "example": "Peann dearg. — A red pen."
+  },
+  {
+   "irish": "cara",
+   "english": "friend",
+   "say": "KOR-a",
+   "example": "Mo chara. — My friend."
+  },
+  {
+   "irish": "teaghlach",
+   "english": "family",
+   "say": "CHAI-lukh",
+   "example": "Mo theaghlach. — My family."
+  },
+  {
+   "irish": "máthair",
+   "english": "mother",
+   "say": "MAW-hir",
+   "example": "Mo mháthair. — My mother."
+  },
+  {
+   "irish": "athair",
+   "english": "father",
+   "say": "AH-hir",
+   "example": "M'athair. — My father."
+  },
+  {
+   "irish": "deartháir",
+   "english": "brother",
+   "say": "DRAH-hawr",
+   "example": "Mo dheartháir. — My brother."
+  },
+  {
+   "irish": "deirfiúr",
+   "english": "sister",
+   "say": "DREF-oor",
+   "example": "Mo dheirfiúr. — My sister."
+  },
+  {
+   "irish": "bia",
+   "english": "food",
+   "say": "BEE-a",
+   "example": "Bia blasta. — Tasty food."
+  },
+  {
+   "irish": "uisce",
+   "english": "water",
+   "say": "ISH-ka",
+   "example": "Gloine uisce. — A glass of water."
+  },
+  {
+   "irish": "bainne",
+   "english": "milk",
+   "say": "BAN-ya",
+   "example": "Bainne te. — Warm milk."
+  },
+  {
+   "irish": "arán",
+   "english": "bread",
+   "say": "a-RAWN",
+   "example": "Arán donn. — Brown bread."
+  },
+  {
+   "irish": "im",
+   "english": "butter",
+   "say": "im",
+   "example": "Arán agus im. — Bread and butter."
+  },
+  {
+   "irish": "úll",
+   "english": "apple",
+   "say": "ool",
+   "example": "Úll glas. — A green apple."
+  },
+  {
+   "irish": "prátaí",
+   "english": "potatoes",
+   "say": "PRAW-tee",
+   "example": "Prátaí rósta. — Roast potatoes."
+  },
+  {
+   "irish": "tae",
+   "english": "tea",
+   "say": "tay",
+   "example": "Cupán tae. — A cup of tea."
+  },
+  {
+   "irish": "cáca",
+   "english": "cake",
+   "say": "KAW-ka",
+   "example": "Cáca milis. — A sweet cake."
+  },
+  {
+   "irish": "milseán",
+   "english": "a sweet",
+   "say": "mil-SHAWN",
+   "example": "Milseáin! — Sweets!"
+  },
+  {
+   "irish": "lá",
+   "english": "day",
+   "say": "law",
+   "example": "Lá breá. — A fine day."
+  },
+  {
+   "irish": "oíche",
+   "english": "night",
+   "say": "EE-ha",
+   "example": "Oíche mhaith. — Good night."
+  },
+  {
+   "irish": "maidin",
+   "english": "morning",
+   "say": "MOD-jin",
+   "example": "Maidin mhaith. — Good morning."
+  },
+  {
+   "irish": "tráthnóna",
+   "english": "evening",
+   "say": "traw-NOH-na",
+   "example": "Tráthnóna maith. — Good evening."
+  },
+  {
+   "irish": "dearg",
+   "english": "red",
+   "say": "JAR-ug",
+   "example": "Carr dearg. — A red car."
+  },
+  {
+   "irish": "glas",
+   "english": "green",
+   "say": "gloss",
+   "example": "Féar glas. — Green grass."
+  },
+  {
+   "irish": "gorm",
+   "english": "blue",
+   "say": "GUR-um",
+   "example": "Spéir ghorm. — A blue sky."
+  },
+  {
+   "irish": "buí",
+   "english": "yellow",
+   "say": "bwee",
+   "example": "Grian bhuí. — A yellow sun."
+  },
+  {
+   "irish": "bán",
+   "english": "white",
+   "say": "bawn",
+   "example": "Sneachta bán. — White snow."
+  },
+  {
+   "irish": "dubh",
+   "english": "black",
+   "say": "duv",
+   "example": "Cat dubh. — A black cat."
+  },
+  {
+   "irish": "mór",
+   "english": "big",
+   "say": "more",
+   "example": "Teach mór. — A big house."
+  },
+  {
+   "irish": "beag",
+   "english": "small",
+   "say": "byug",
+   "example": "Madra beag. — A small dog."
+  },
+  {
+   "irish": "te",
+   "english": "hot",
+   "say": "cheh",
+   "example": "Tae te. — Hot tea."
+  },
+  {
+   "irish": "fuar",
+   "english": "cold",
+   "say": "FOO-ur",
+   "example": "Lá fuar. — A cold day."
+  },
+  {
+   "irish": "sásta",
+   "english": "happy",
+   "say": "SAWS-ta",
+   "example": "Táim sásta. — I am happy."
+  },
+  {
+   "irish": "brónach",
+   "english": "sad",
+   "say": "BROH-nukh",
+   "example": "Tá sé brónach. — He is sad."
+  },
+  {
+   "irish": "go raibh maith agat",
+   "english": "thank you",
+   "say": "guh rev mah AG-ut",
+   "example": "Go raibh maith agat, a mhúinteoir! — Thank you, teacher!"
+  },
+  {
+   "irish": "fáilte",
+   "english": "welcome",
+   "say": "FAWL-cha",
+   "example": "Céad míle fáilte! — A hundred thousand welcomes!"
+  },
+  {
+   "irish": "slán",
+   "english": "goodbye",
+   "say": "slawn",
+   "example": "Slán go fóill. — Bye for now."
+  },
+  {
+   "irish": "Dia duit",
+   "english": "hello",
+   "say": "DEE-a gwit",
+   "example": "Dia duit, a Aoife! — Hello, Aoife!"
+  },
+  {
+   "irish": "craic",
+   "english": "fun",
+   "say": "crack",
+   "example": "Bhí craic againn. — We had fun."
+  },
+  {
+   "irish": "ceol",
+   "english": "music",
+   "say": "kyol",
+   "example": "Ceol traidisiúnta. — Traditional music."
+  },
+  {
+   "irish": "damhsa",
+   "english": "dance",
+   "say": "DOW-sa",
+   "example": "Damhsa Gaelach. — Irish dancing."
+  },
+  {
+   "irish": "spórt",
+   "english": "sport",
+   "say": "spohrt",
+   "example": "Is maith liom spórt. — I like sport."
+  },
+  {
+   "irish": "peil",
+   "english": "football",
+   "say": "pel",
+   "example": "Cluiche peile. — A football match."
+  },
+  {
+   "irish": "iománaíocht",
+   "english": "hurling",
+   "say": "uh-MAW-nee-ukht",
+   "example": "Camán agus sliotar. — Hurley and sliotar."
+  },
+  {
+   "irish": "rothar",
+   "english": "bicycle",
+   "say": "ROH-har",
+   "example": "Rothar nua. — A new bike."
+  },
+  {
+   "irish": "carr",
+   "english": "car",
+   "say": "kor",
+   "example": "Carr gorm. — A blue car."
+  },
+  {
+   "irish": "bád",
+   "english": "boat",
+   "say": "bawd",
+   "example": "Bád beag. — A little boat."
+  },
+  {
+   "irish": "traein",
+   "english": "train",
+   "say": "trayn",
+   "example": "Ar an traein. — On the train."
+  },
+  {
+   "irish": "Éire",
+   "english": "Ireland",
+   "say": "AIR-a",
+   "example": "Éire go deo! — Ireland forever!"
+  },
+  {
+   "irish": "baile",
+   "english": "town",
+   "say": "BAL-ya",
+   "example": "Baile Átha Cliath. — Dublin."
+  },
+  {
+   "irish": "cathair",
+   "english": "city",
+   "say": "KA-hir",
+   "example": "Cathair na Gaillimhe. — Galway city."
+  },
+  {
+   "irish": "trá",
+   "english": "beach",
+   "say": "traw",
+   "example": "Ar an trá. — At the beach."
+  },
+  {
+   "irish": "oileán",
+   "english": "island",
+   "say": "IL-awn",
+   "example": "Oileán Acla. — Achill Island."
+  },
+  {
+   "irish": "bogha báistí",
+   "english": "rainbow",
+   "say": "BOW-a BAWSH-tee",
+   "example": "Féach, bogha báistí! — Look, a rainbow!"
+  },
+  {
+   "irish": "réalta",
+   "english": "star",
+   "say": "RAYL-ta",
+   "example": "Réalta sa spéir. — A star in the sky."
+  },
+  {
+   "irish": "gealach",
+   "english": "moon",
+   "say": "GYAL-ukh",
+   "example": "Gealach lán. — A full moon."
+  },
+  {
+   "irish": "leabharlann",
+   "english": "library",
+   "say": "LOW-er-lon",
+   "example": "Sa leabharlann. — In the library."
+  },
+  {
+   "irish": "múinteoir",
+   "english": "teacher",
+   "say": "MOON-chore",
+   "example": "Múinteoir deas. — A nice teacher."
+  },
+  {
+   "irish": "páiste",
+   "english": "child",
+   "say": "PAWSH-cha",
+   "example": "Páiste sona. — A happy child."
+  },
+  {
+   "irish": "gáire",
+   "english": "a laugh",
+   "say": "GAW-ra",
+   "example": "Rinne mé gáire. — I laughed."
+  },
+  {
+   "irish": "aimsir",
+   "english": "weather",
+   "say": "AM-shir",
+   "example": "Aimsir bhreá. — Fine weather."
+  },
+  {
+   "irish": "samhradh",
+   "english": "summer",
+   "say": "SOW-ra",
+   "example": "Laethanta saoire an tsamhraidh. — Summer holidays."
+  },
+  {
+   "irish": "geimhreadh",
+   "english": "winter",
+   "say": "GEV-ra",
+   "example": "Geimhreadh fuar. — A cold winter."
+  },
+  {
+   "irish": "earrach",
+   "english": "spring",
+   "say": "AR-ukh",
+   "example": "San earrach. — In spring."
+  },
+  {
+   "irish": "fómhar",
+   "english": "autumn",
+   "say": "FOH-wur",
+   "example": "Duilleoga an fhómhair. — Autumn leaves."
+  }
+ ]
+}

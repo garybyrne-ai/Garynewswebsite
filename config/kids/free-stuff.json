@@ -1,0 +1,89 @@
+{
+ "_comment": "Free things for kids and families across Ireland.",
+ "items": [
+  {
+   "name": "National Museum of Ireland",
+   "blurb": "Free entry at all four sites: Archaeology, Natural History (the 'Dead Zoo'), Decorative Arts and Country Life in Mayo.",
+   "url": "https://www.museum.ie",
+   "where": "Dublin & Castlebar",
+   "tag": "Museums"
+  },
+  {
+   "name": "National Gallery of Ireland",
+   "blurb": "Free entry, family trails and a great café. Look for the Jack B. Yeats room.",
+   "url": "https://www.nationalgallery.ie",
+   "where": "Dublin",
+   "tag": "Art"
+  },
+  {
+   "name": "Chester Beatty",
+   "blurb": "Free museum of manuscripts and treasures from around the world, inside Dublin Castle's gardens.",
+   "url": "https://chesterbeatty.ie",
+   "where": "Dublin",
+   "tag": "Museums"
+  },
+  {
+   "name": "National Botanic Gardens",
+   "blurb": "Free glasshouses, squirrels and a river walk in Glasnevin.",
+   "url": "https://botanicgardens.ie",
+   "where": "Dublin",
+   "tag": "Outdoors"
+  },
+  {
+   "name": "Heritage Ireland free first Wednesdays",
+   "blurb": "Many OPW heritage sites — castles, abbeys and gardens — are free on the first Wednesday of every month.",
+   "url": "https://heritageireland.ie",
+   "where": "Nationwide",
+   "tag": "Heritage"
+  },
+  {
+   "name": "Your local library",
+   "blurb": "Free membership, free books, free events, free Wi-Fi. Ask about Summer Stars and Spring into Storytime.",
+   "url": "https://www.librariesireland.ie",
+   "where": "Every county",
+   "tag": "Reading"
+  },
+  {
+   "name": "Cúla4",
+   "blurb": "TG4's free Irish-language channel and app for kids — cartoons, games and songs as Gaeilge.",
+   "url": "https://www.cula4.com",
+   "where": "Online",
+   "tag": "Gaeilge"
+  },
+  {
+   "name": "RTÉjr",
+   "blurb": "Free shows, podcasts and games from RTÉ's kids' channel.",
+   "url": "https://www.rte.ie/rtejr/",
+   "where": "Online",
+   "tag": "Screen"
+  },
+  {
+   "name": "CoderDojo",
+   "blurb": "Free volunteer-led coding clubs for 7–17 year olds. It started in Cork in 2011 and is now worldwide.",
+   "url": "https://coderdojo.com",
+   "where": "Nationwide",
+   "tag": "Tech"
+  },
+  {
+   "name": "junior parkrun",
+   "blurb": "Free 2 km timed runs for 4–14 year olds every Sunday morning.",
+   "url": "https://www.parkrun.ie",
+   "where": "Nationwide",
+   "tag": "Outdoors"
+  },
+  {
+   "name": "Ask About Ireland",
+   "blurb": "Free learning resources about Irish history, geography and nature from Ireland's libraries.",
+   "url": "https://www.askaboutireland.ie",
+   "where": "Online",
+   "tag": "Learning"
+  },
+  {
+   "name": "Phoenix Park",
+   "blurb": "Europe's largest enclosed city park: wild deer, the Visitor Centre and Ashtown Castle are free.",
+   "url": "https://phoenixpark.ie",
+   "where": "Dublin",
+   "tag": "Outdoors"
+  }
+ ]
+}

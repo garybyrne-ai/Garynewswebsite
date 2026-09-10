@@ -3,6 +3,7 @@
 $ads = $ads ?? [];
 ?>
 <aside class="side">
+  <?php if (isset($edition)): ?><?= \MeNews\View::partial('partials/edition', ['weather' => $weather ?? null, 'edition' => $edition, 'longDate' => $longDate, 'focal' => $focal, 'greeting' => $greeting ?? 'Dia duit']) ?><?php endif; ?>
   <?php if (isset($pulse)): ?>
   <section class="panel panel--pulse reveal">
     <header class="panel__head"><span class="kicker">Newsroom pulse</span><span class="mono panel__hint">24 h</span></header>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 use MeNews\Controllers\AccountController as Account;
 use MeNews\Controllers\AdminController as Admin;
 use MeNews\Controllers\ApiController as Api;
+use MeNews\Controllers\KidsController as Kids;
 use MeNews\Controllers\PageController as Page;
 use MeNews\Http\Router;
 
@@ -15,6 +16,18 @@ return static function (Router $r): void {
     $r->get('/story/{slug:[a-z0-9-]+}', [Page::class, 'story']);
     $r->get('/search', [Page::class, 'search']);
     $r->get('/map', [Page::class, 'map']);
+    $r->get('/kids', [Kids::class, 'hub']);
+    $r->get('/kids/crossword', [Kids::class, 'crossword']);
+    $r->get('/kids/crossword/{date:[0-9]+-[0-9]+-[0-9]+}', [Kids::class, 'crossword']);
+    $r->get('/kids/wordsearch', [Kids::class, 'wordsearch']);
+    $r->get('/kids/wordsearch/{date:[0-9]+-[0-9]+-[0-9]+}', [Kids::class, 'wordsearch']);
+    $r->get('/kids/quiz', [Kids::class, 'quiz']);
+    $r->get('/kids/quiz/{date:[0-9]+-[0-9]+-[0-9]+}', [Kids::class, 'quiz']);
+    $r->get('/kids/county-game', [Kids::class, 'county']);
+    $r->get('/api/kids/crossword', [Kids::class, 'apiCrossword']);
+    $r->get('/api/kids/wordsearch', [Kids::class, 'apiWordsearch']);
+    $r->get('/api/kids/quiz', [Kids::class, 'apiQuiz']);
+    $r->get('/api/kids/county', [Kids::class, 'apiCounty']);
     $r->get('/contributors', [Page::class, 'contributorsPage']);
     $r->get('/contributors/{handle:[a-z0-9-]+}', [Page::class, 'contributor']);
     $r->get('/about', [Page::class, 'about']);

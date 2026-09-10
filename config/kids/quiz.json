@@ -1,0 +1,665 @@
+{
+ "_comment": "Ireland quiz bank. Option index 'answer' is the correct one; options are shuffled at play time.",
+ "questions": [
+  {
+   "q": "What is the capital city of Ireland?",
+   "options": [
+    "Dublin",
+    "Cork",
+    "Galway",
+    "Belfast"
+   ],
+   "answer": 0,
+   "fact": "Dublin (Baile Átha Cliath) has been Ireland's capital for centuries."
+  },
+  {
+   "q": "Which is Ireland's longest river?",
+   "options": [
+    "Shannon",
+    "Liffey",
+    "Boyne",
+    "Lee"
+   ],
+   "answer": 0,
+   "fact": "The Shannon runs about 360 km from Cavan to the Atlantic below Limerick."
+  },
+  {
+   "q": "Ireland's highest mountain is…",
+   "options": [
+    "Carrauntoohil",
+    "Errigal",
+    "Lugnaquilla",
+    "Croagh Patrick"
+   ],
+   "answer": 0,
+   "fact": "Carrauntoohil in Kerry's MacGillycuddy's Reeks is 1,039 m high."
+  },
+  {
+   "q": "How many provinces does Ireland have?",
+   "options": [
+    "Four",
+    "Three",
+    "Five",
+    "Six"
+   ],
+   "answer": 0,
+   "fact": "Leinster, Munster, Connacht and Ulster."
+  },
+  {
+   "q": "Ireland's largest lake is…",
+   "options": [
+    "Lough Neagh",
+    "Lough Corrib",
+    "Lough Derg",
+    "Lough Erne"
+   ],
+   "answer": 0,
+   "fact": "Lough Neagh in the north is the biggest lake on the island."
+  },
+  {
+   "q": "The Cliffs of Moher are in which county?",
+   "options": [
+    "Clare",
+    "Kerry",
+    "Galway",
+    "Mayo"
+   ],
+   "answer": 0,
+   "fact": "They rise over 200 m above the Atlantic near Doolin."
+  },
+  {
+   "q": "Which plant is a symbol of Ireland?",
+   "options": [
+    "Shamrock",
+    "Rose",
+    "Thistle",
+    "Daffodil"
+   ],
+   "answer": 0,
+   "fact": "Saint Patrick is said to have used its three leaves to explain the Trinity."
+  },
+  {
+   "q": "Saint Patrick's Day is on…",
+   "options": [
+    "17 March",
+    "1 February",
+    "23 June",
+    "31 October"
+   ],
+   "answer": 0,
+   "fact": "It is Ireland's national holiday."
+  },
+  {
+   "q": "What currency is used in the Republic of Ireland?",
+   "options": [
+    "Euro",
+    "Punt",
+    "Pound",
+    "Dollar"
+   ],
+   "answer": 0,
+   "fact": "The euro replaced the Irish punt in 2002."
+  },
+  {
+   "q": "Which GAA sport uses a sliotar?",
+   "options": [
+    "Hurling",
+    "Gaelic football",
+    "Handball",
+    "Rounders"
+   ],
+   "answer": 0,
+   "fact": "A sliotar is the small leather ball; camogie uses one too."
+  },
+  {
+   "q": "Croke Park is in which city?",
+   "options": [
+    "Dublin",
+    "Cork",
+    "Limerick",
+    "Galway"
+   ],
+   "answer": 0,
+   "fact": "It holds over 82,000 people and is the GAA's headquarters."
+  },
+  {
+   "q": "Where is the Book of Kells kept?",
+   "options": [
+    "Trinity College Dublin",
+    "The National Museum",
+    "Kells, Co. Meath",
+    "Kilkenny Castle"
+   ],
+   "answer": 0,
+   "fact": "The 9th-century manuscript is displayed in the Old Library."
+  },
+  {
+   "q": "The Titanic was built in…",
+   "options": [
+    "Belfast",
+    "Cobh",
+    "Dublin",
+    "Liverpool"
+   ],
+   "answer": 0,
+   "fact": "Harland & Wolff built her; she last called at Cobh in 1912."
+  },
+  {
+   "q": "Which county is called the Garden of Ireland?",
+   "options": [
+    "Wicklow",
+    "Kildare",
+    "Meath",
+    "Wexford"
+   ],
+   "answer": 0,
+   "fact": "Home to Powerscourt, Glendalough and the Wicklow Mountains."
+  },
+  {
+   "q": "Ireland's smallest county is…",
+   "options": [
+    "Louth",
+    "Carlow",
+    "Dublin",
+    "Longford"
+   ],
+   "answer": 0,
+   "fact": "Louth is called the Wee County."
+  },
+  {
+   "q": "Ireland's largest county is…",
+   "options": [
+    "Cork",
+    "Galway",
+    "Mayo",
+    "Donegal"
+   ],
+   "answer": 0,
+   "fact": "Cork is known as the Rebel County."
+  },
+  {
+   "q": "Newgrange is in which county?",
+   "options": [
+    "Meath",
+    "Louth",
+    "Kildare",
+    "Westmeath"
+   ],
+   "answer": 0,
+   "fact": "The passage tomb is older than Stonehenge and the pyramids of Giza."
+  },
+  {
+   "q": "The Giant's Causeway is in which county?",
+   "options": [
+    "Antrim",
+    "Derry",
+    "Down",
+    "Donegal"
+   ],
+   "answer": 0,
+   "fact": "Legend says Finn McCool built it to reach Scotland."
+  },
+  {
+   "q": "How do you say hello in Irish?",
+   "options": [
+    "Dia duit",
+    "Slán",
+    "Go raibh maith agat",
+    "Fáilte"
+   ],
+   "answer": 0,
+   "fact": "It literally means 'God be with you'."
+  },
+  {
+   "q": "What is the Irish word for water?",
+   "options": [
+    "Uisce",
+    "Bainne",
+    "Tae",
+    "Arán"
+   ],
+   "answer": 0,
+   "fact": "Whiskey comes from 'uisce beatha', the water of life."
+  },
+  {
+   "q": "Who wrote Ulysses?",
+   "options": [
+    "James Joyce",
+    "W. B. Yeats",
+    "Oscar Wilde",
+    "Seamus Heaney"
+   ],
+   "answer": 0,
+   "fact": "The novel follows Leopold Bloom around Dublin on 16 June 1904."
+  },
+  {
+   "q": "Which Irish poet won the Nobel Prize in Literature in 1995?",
+   "options": [
+    "Seamus Heaney",
+    "W. B. Yeats",
+    "Samuel Beckett",
+    "Patrick Kavanagh"
+   ],
+   "answer": 0,
+   "fact": "Heaney was born in Co. Derry."
+  },
+  {
+   "q": "W. B. Yeats is buried in which county?",
+   "options": [
+    "Sligo",
+    "Galway",
+    "Dublin",
+    "Mayo"
+   ],
+   "answer": 0,
+   "fact": "His grave at Drumcliffe lies under Ben Bulben."
+  },
+  {
+   "q": "What is Dublin's tram system called?",
+   "options": [
+    "Luas",
+    "DART",
+    "Leap",
+    "Rapid"
+   ],
+   "answer": 0,
+   "fact": "Luas is the Irish word for speed."
+  },
+  {
+   "q": "What are the letters of Ireland's national broadcaster?",
+   "options": [
+    "RTÉ",
+    "BBC",
+    "TG3",
+    "IRN"
+   ],
+   "answer": 0,
+   "fact": "Raidió Teilifís Éireann."
+  },
+  {
+   "q": "What is the head of the Irish Government called?",
+   "options": [
+    "Taoiseach",
+    "Tánaiste",
+    "President",
+    "Ceann Comhairle"
+   ],
+   "answer": 0,
+   "fact": "The Tánaiste is the deputy."
+  },
+  {
+   "q": "Where does the President of Ireland live?",
+   "options": [
+    "Áras an Uachtaráin",
+    "Leinster House",
+    "Dublin Castle",
+    "Farmleigh"
+   ],
+   "answer": 0,
+   "fact": "It stands in the Phoenix Park."
+  },
+  {
+   "q": "Ireland's oldest city is…",
+   "options": [
+    "Waterford",
+    "Dublin",
+    "Cork",
+    "Limerick"
+   ],
+   "answer": 0,
+   "fact": "Founded by Vikings in 914."
+  },
+  {
+   "q": "The Aran Islands are off which county?",
+   "options": [
+    "Galway",
+    "Clare",
+    "Kerry",
+    "Mayo"
+   ],
+   "answer": 0,
+   "fact": "Inis Mór, Inis Meáin and Inis Oírr."
+  },
+  {
+   "q": "Skellig Michael is off which county?",
+   "options": [
+    "Kerry",
+    "Cork",
+    "Clare",
+    "Donegal"
+   ],
+   "answer": 0,
+   "fact": "Its beehive huts appeared in Star Wars."
+  },
+  {
+   "q": "Which river flows through Cork city?",
+   "options": [
+    "Lee",
+    "Shannon",
+    "Suir",
+    "Blackwater"
+   ],
+   "answer": 0,
+   "fact": "The city centre sits on an island in the Lee."
+  },
+  {
+   "q": "Which river flows through Dublin?",
+   "options": [
+    "Liffey",
+    "Boyne",
+    "Dodder",
+    "Tolka"
+   ],
+   "answer": 0,
+   "fact": "The Dodder and Tolka are Dublin rivers too, but the Liffey is the big one."
+  },
+  {
+   "q": "Croagh Patrick is in which county?",
+   "options": [
+    "Mayo",
+    "Galway",
+    "Sligo",
+    "Donegal"
+   ],
+   "answer": 0,
+   "fact": "Pilgrims climb 'the Reek' on the last Sunday of July."
+  },
+  {
+   "q": "What are the colours of the Irish flag, in order?",
+   "options": [
+    "Green, white, orange",
+    "Orange, white, green",
+    "Green, gold, white",
+    "White, green, orange"
+   ],
+   "answer": 0,
+   "fact": "Green for the Gaelic tradition, orange for the followers of William of Orange, white for peace."
+  },
+  {
+   "q": "Which instrument appears on Irish euro coins?",
+   "options": [
+    "Harp",
+    "Fiddle",
+    "Bodhrán",
+    "Uilleann pipes"
+   ],
+   "answer": 0,
+   "fact": "The harp has been Ireland's emblem for centuries."
+  },
+  {
+   "q": "Which city is the City of the Tribes?",
+   "options": [
+    "Galway",
+    "Limerick",
+    "Kilkenny",
+    "Waterford"
+   ],
+   "answer": 0,
+   "fact": "Named after the 14 merchant families who ran the town."
+  },
+  {
+   "q": "Kilkenny is most famous for which sport?",
+   "options": [
+    "Hurling",
+    "Rugby",
+    "Soccer",
+    "Rowing"
+   ],
+   "answer": 0,
+   "fact": "The Cats have won the Liam MacCarthy Cup many times."
+  },
+  {
+   "q": "Donegal is in which province?",
+   "options": [
+    "Ulster",
+    "Connacht",
+    "Leinster",
+    "Munster"
+   ],
+   "answer": 0,
+   "fact": "Three Ulster counties are in the Republic: Donegal, Cavan and Monaghan."
+  },
+  {
+   "q": "Kerry is in which province?",
+   "options": [
+    "Munster",
+    "Connacht",
+    "Leinster",
+    "Ulster"
+   ],
+   "answer": 0,
+   "fact": "Munster also includes Cork, Clare, Limerick, Tipperary and Waterford."
+  },
+  {
+   "q": "Galway is in which province?",
+   "options": [
+    "Connacht",
+    "Munster",
+    "Leinster",
+    "Ulster"
+   ],
+   "answer": 0,
+   "fact": "Connacht is the western province."
+  },
+  {
+   "q": "Dublin is in which province?",
+   "options": [
+    "Leinster",
+    "Munster",
+    "Connacht",
+    "Ulster"
+   ],
+   "answer": 0,
+   "fact": "Leinster has twelve counties."
+  },
+  {
+   "q": "What is Tír na nÓg?",
+   "options": [
+    "The land of eternal youth",
+    "A mountain in Kerry",
+    "An island in Lough Neagh",
+    "A famous hurling team"
+   ],
+   "answer": 0,
+   "fact": "Oisín rode there with Niamh on a white horse."
+  },
+  {
+   "q": "Who is known as the Hound of Ulster?",
+   "options": [
+    "Cúchulainn",
+    "Finn McCool",
+    "Brian Boru",
+    "Oisín"
+   ],
+   "answer": 0,
+   "fact": "As a boy he was called Setanta."
+  },
+  {
+   "q": "The Children of Lir were turned into…",
+   "options": [
+    "Swans",
+    "Deer",
+    "Seals",
+    "Ravens"
+   ],
+   "answer": 0,
+   "fact": "They spent 900 years as swans."
+  },
+  {
+   "q": "Fungie, who lived in Dingle harbour, was a…",
+   "options": [
+    "Dolphin",
+    "Seal",
+    "Whale",
+    "Basking shark"
+   ],
+   "answer": 0,
+   "fact": "He arrived in 1983 and stayed for decades."
+  },
+  {
+   "q": "Which ancient festival became Halloween?",
+   "options": [
+    "Samhain",
+    "Imbolc",
+    "Bealtaine",
+    "Lughnasa"
+   ],
+   "answer": 0,
+   "fact": "Samhain marked the end of the harvest and the start of winter."
+  },
+  {
+   "q": "How many times has Ireland won the Eurovision Song Contest?",
+   "options": [
+    "Seven",
+    "Three",
+    "Five",
+    "Nine"
+   ],
+   "answer": 0,
+   "fact": "More than any other country, including three in a row from 1992 to 1994."
+  },
+  {
+   "q": "The Spire stands on which Dublin street?",
+   "options": [
+    "O'Connell Street",
+    "Grafton Street",
+    "Dame Street",
+    "Henry Street"
+   ],
+   "answer": 0,
+   "fact": "It is 120 m tall."
+  },
+  {
+   "q": "How many counties are on the island of Ireland?",
+   "options": [
+    "32",
+    "26",
+    "28",
+    "30"
+   ],
+   "answer": 0,
+   "fact": "26 in the Republic and 6 in Northern Ireland."
+  },
+  {
+   "q": "What is the Dáil?",
+   "options": [
+    "The lower house of parliament",
+    "The upper house of parliament",
+    "The Supreme Court",
+    "The Central Bank"
+   ],
+   "answer": 0,
+   "fact": "TDs sit in Dáil Éireann at Leinster House."
+  },
+  {
+   "q": "Molly Malone sold…",
+   "options": [
+    "Cockles and mussels",
+    "Apples and pears",
+    "Fish and chips",
+    "Flowers"
+   ],
+   "answer": 0,
+   "fact": "'Alive, alive-oh!' Her statue is on Suffolk Street."
+  },
+  {
+   "q": "Which county is nicknamed The Kingdom?",
+   "options": [
+    "Kerry",
+    "Cork",
+    "Tipperary",
+    "Clare"
+   ],
+   "answer": 0,
+   "fact": "Kerry has won more All-Ireland football titles than anyone."
+  },
+  {
+   "q": "The Sam Maguire Cup is awarded in…",
+   "options": [
+    "Gaelic football",
+    "Hurling",
+    "Rugby",
+    "Camogie"
+   ],
+   "answer": 0,
+   "fact": "The hurling equivalent is the Liam MacCarthy Cup."
+  },
+  {
+   "q": "Limerick is nicknamed…",
+   "options": [
+    "The Treaty City",
+    "The Marble City",
+    "The Rebel City",
+    "The Tribes"
+   ],
+   "answer": 0,
+   "fact": "After the Treaty of Limerick of 1691."
+  },
+  {
+   "q": "The Rock of Cashel is in which county?",
+   "options": [
+    "Tipperary",
+    "Kilkenny",
+    "Limerick",
+    "Cork"
+   ],
+   "answer": 0,
+   "fact": "It was the seat of the Kings of Munster."
+  },
+  {
+   "q": "Which Irish saint's cross is woven from rushes?",
+   "options": [
+    "Brigid",
+    "Patrick",
+    "Colmcille",
+    "Kevin"
+   ],
+   "answer": 0,
+   "fact": "Saint Brigid's Day, 1 February, is now a public holiday."
+  },
+  {
+   "q": "What does 'Slán' mean?",
+   "options": [
+    "Goodbye",
+    "Hello",
+    "Thank you",
+    "Please"
+   ],
+   "answer": 0,
+   "fact": "Slán go fóill means 'bye for now'."
+  },
+  {
+   "q": "Which county is known as the Rebel County?",
+   "options": [
+    "Cork",
+    "Kerry",
+    "Wexford",
+    "Tipperary"
+   ],
+   "answer": 0,
+   "fact": "The name goes back to the 1490s."
+  },
+  {
+   "q": "Which Irish city is called the Marble City?",
+   "options": [
+    "Kilkenny",
+    "Galway",
+    "Waterford",
+    "Derry"
+   ],
+   "answer": 0,
+   "fact": "Its dark limestone polishes like marble."
+  },
+  {
+   "q": "Bunratty Castle is in which county?",
+   "options": [
+    "Clare",
+    "Limerick",
+    "Galway",
+    "Tipperary"
+   ],
+   "answer": 0,
+   "fact": "It stands near Shannon Airport."
+  }
+ ]
+}

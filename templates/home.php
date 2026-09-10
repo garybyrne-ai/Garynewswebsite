@@ -7,6 +7,18 @@
   </div>
 </div>
 
+<div class="masthead">
+  <div class="container masthead__in mono">
+    <span class="masthead__ed">Edition No. <?= (int)$edition ?></span>
+    <span class="masthead__date"><?= e($longDate) ?></span>
+    <?php if ($weather): ?>
+      <span class="masthead__sun">☀ <?= e($weather['sunrise']) ?> · ☾ <?= e($weather['sunset']) ?></span>
+      <span class="masthead__wx"><?php foreach (array_slice($weather['cities'], 0, 5) as $c): ?><span><?= e($c['icon']) ?> <?= e($c['name']) ?> <b><?= (int)$c['temp'] ?>°</b></span><?php endforeach; ?></span>
+    <?php endif; ?>
+    <span class="masthead__focal">Focal an lae: <b><?= e($focal['irish']) ?></b> — <?= e($focal['english']) ?></span>
+  </div>
+</div>
+
 <section class="container hero">
   <div class="hero__intro">
     <span class="kicker kicker--glow">Around me · Ireland</span>
@@ -71,6 +83,8 @@
       <?php endif; ?>
     </section>
 
+    <?= \MeNews\View::partial('partials/kids-corner', compact('crossword', 'quiz', 'focal', 'edition', 'longDate', 'youngReaders')) ?>
+
     <section class="block reveal">
       <header class="block__head">
         <span class="block__index mono">◈</span>
@@ -91,5 +105,5 @@
     </section>
 
   </div>
-  <?= \MeNews\View::partial('partials/sidebar', compact('pulse', 'mapPoints', 'mapCounties', 'counties', 'trending', 'contributors', 'ads')) ?>
+  <?= \MeNews\View::partial('partials/sidebar', compact('pulse', 'mapPoints', 'mapCounties', 'counties', 'trending', 'contributors', 'ads', 'weather', 'edition', 'longDate', 'focal', 'greeting')) ?>
 </div>

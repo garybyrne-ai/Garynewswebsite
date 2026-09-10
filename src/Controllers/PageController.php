@@ -59,6 +59,14 @@ final class PageController
             'mapCounties' => Stories::countyPoints(),
             'ads' => self::ads(),
             'totalPublished' => Stories::countPublished(),
+            'weather' => \MeNews\Services\Weather::today(),
+            'edition' => \MeNews\Support\Daily::edition(),
+            'longDate' => \MeNews\Support\Daily::longDate(),
+            'focal' => \MeNews\Support\Daily::focal(),
+            'greeting' => \MeNews\Support\Daily::greeting(),
+            'crossword' => \MeNews\Services\Puzzles::crossword(\MeNews\Support\Daily::date(), 'junior'),
+            'quiz' => \MeNews\Services\Puzzles::quiz(\MeNews\Support\Daily::date()),
+            'youngReaders' => \MeNews\Controllers\KidsController::youngReaders(3),
             'bodyClass' => 'page-home',
         ]));
     }
@@ -282,7 +290,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/map', '/contributors', '/about', '/plus'];
+        $urls = ['/', '/map', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }
