@@ -10,9 +10,10 @@ use MeNews\Http\HttpException;
 /** ME+ membership billing through Stripe Checkout and signed webhooks. */
 final class Stripe
 {
+    /** ME+ needs only the secret key: prices come from the newsroom settings (inline price_data). */
     public static function configured(): bool
     {
-        return Config::get('STRIPE_SECRET_KEY') !== '' && Config::get('STRIPE_PRICE_ME_PLUS') !== '';
+        return Config::get('STRIPE_SECRET_KEY') !== '';
     }
 
     /** Stripe usable for advertising (only the secret key is needed; prices are inline). */
@@ -21,7 +22,7 @@ final class Stripe
         return Config::get('STRIPE_SECRET_KEY') !== '';
     }
 
-    public static function checkoutUrl(array $user): string
+    public static function checkoutUrl(array $user, string $interval = 'month'): string
     {
         if (!self::configured()) {
             throw new HttpException(503, 'Stripe is not configured yet');
@@ -33,9 +34,17 @@ final class Stripe
         if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
             throw new HttpException(503, 'Configure the public HTTPS URL');
         }
+        $annual = $interval === 'year';
+        $lineItem = Config::get('STRIPE_PRICE_ME_PLUS') !== '' && !$annual
+            ? ['price' => Config::get('STRIPE_PRICE_ME_PLUS'), 'quantity' => 1]
+            : ['quantity' => 1, 'price_data' => [
+                'currency' => 'eur', 'unit_amount' => $annual ? Membership::annualCents() : Membership::priceCents(),
+                'recurring' => ['interval' => $annual ? 'year' : 'month'],
+                'product_data' => ['name' => 'ME+ membership (' . ($annual ? 'annual' : 'monthly') . ')', 'description' => 'Ad-free reading, alerts for up to ten areas, the 7am email and the archive'],
+            ]];
         $session = Remote::json('https://api.stripe.com/v1/checkout/sessions', [
             'mode' => 'subscription',
-            'line_items' => [['price' => Config::get('STRIPE_PRICE_ME_PLUS'), 'quantity' => 1]],
+            'line_items' => [$lineItem],
             'success_url' => $base . '/dashboard?billing=success',
             'cancel_url' => $base . '/dashboard?billing=cancelled',
             'customer_email' => $user['email'],

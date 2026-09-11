@@ -53,11 +53,11 @@
       <div class="panel panel--plus">
         <span class="chip chip--plus">ME+</span>
         <h2 style="margin-top:10px">ME+ membership</h2>
-        <p>Follow up to ten areas, receive local alerts first, fewer adverts and a member badge.</p>
-        <div class="price"><b><?= e(\MeNews\Config::get('ME_PLUS_PRICE_LABEL', '€6.99/month')) ?></b></div>
+        <p>Ad-free reading, death notice and closure alerts for up to ten areas, the 7am email for each, the full archive and the members' county newsletter.</p>
+        <div class="price"><b><?= e(\MeNews\Services\Membership::priceLabel()) ?></b><small>or <?= e(\MeNews\Services\Membership::annualLabel()) ?></small></div>
         <p id="plan-state"></p>
-        <div class="form__actions" style="justify-content:flex-start;margin-top:12px"><button class="btn btn--primary" id="checkout-btn" type="button">Upgrade with Stripe</button><a class="btn btn--ghost" href="/plus">Compare plans</a></div>
-        <p class="form__legal">Stripe Checkout becomes live when the Stripe keys and the ME+ price are configured in .env.</p>
+        <div class="form__actions" style="justify-content:flex-start;margin-top:12px"><button class="btn btn--primary" id="checkout-btn" type="button" data-interval="month">Monthly with Stripe</button><button class="btn btn--ghost" id="checkout-year-btn" type="button" data-interval="year">Annual · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button><a class="btn btn--ghost" href="/plus">Compare plans</a></div>
+        <p class="form__legal">Stripe Checkout becomes live when the Stripe secret key is configured in .env. Prices are set in the newsroom.</p>
       </div>
     </div>
 

@@ -1295,3 +1295,17 @@ body.has-bottombar .consent{bottom:64px}
 .evidence a{color:var(--cy)}
 .grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:760px){.grid--2{grid-template-columns:1fr}}
+.me-cluster{width:var(--s);height:var(--s);border-radius:50%;background:color-mix(in srgb,var(--g2) 82%,#fff);border:2px solid #fff;box-shadow:0 6px 18px rgba(8,26,16,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:transform .2s}
+.me-cluster:hover{transform:scale(1.08)}
+.me-cluster b{font:800 .95rem/1 var(--display)}
+.me-cluster small{font:600 .5rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;opacity:.9;max-width:calc(var(--s) - 8px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mapchips__sep{width:1px;height:20px;background:var(--line-2);margin:0 4px}
+.me-pop__more{font:700 .78rem/1 var(--body);color:var(--cy)}
+.countystrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:4px 0 22px}
+.countystrip__item{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);transition:.2s;min-width:0}
+.countystrip__item:hover{border-color:var(--cy);transform:translateY(-1px)}
+.countystrip__item .icon{font-size:1.3rem;color:var(--cy);flex:none}
+.countystrip__item.is-live .icon{color:var(--am)}
+.countystrip__item b{display:block;font-size:.9rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.countystrip__item small{color:var(--muted);font-size:.74rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.countystrip__item span{min-width:0}

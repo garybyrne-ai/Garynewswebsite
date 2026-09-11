@@ -77,6 +77,8 @@ final class PageController
             'poll' => \MeNews\Services\Polls::current($county),
             'signalBoard' => \MeNews\Services\Signal::featured(8, 'today'),
             'signalStats' => \MeNews\Services\Signal::stats(),
+            'canonical' => absolute_url('/'),
+            'jsonld' => ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'potentialAction' => ['@type' => 'SearchAction', 'target' => absolute_url('/search?q={search_term_string}'), 'query-input' => 'required name=search_term_string']],
             'bodyClass' => 'page-home' . ($county ? ' has-county' : ''),
         ]));
     }
@@ -92,6 +94,9 @@ final class PageController
         $rows = Stories::feed(['category' => $name], $per, ($page - 1) * $per);
         $total = Stories::countPublished(['category' => $name]);
         $extra = [];
+        if ($name === 'Sport') {
+            $extra['clubResults'] = \MeNews\Services\Notices::recent(['kind' => 'result'], 6);
+        }
         if ($name === 'Community') {
             $since = gmdate('Y-m-d\TH:i:s', time() - 30 * 86400) . '+00:00';
             $extra['leaderboard'] = [
@@ -133,12 +138,24 @@ final class PageController
         $per = 24;
         $rows = Stories::feed(['county' => $county], $per, ($page - 1) * $per);
         $total = Stories::countPublished(['county' => $county]);
+        $province = Locations::provinceFor($county);
+        $towns = array_values(array_unique(array_column(array_filter(Locations::all(), static fn($t) => $t['county'] === $county), 'town')));
+        $week = Database::count("SELECT COUNT(*) FROM stories WHERE status='published' AND county=? AND COALESCE(published_at,created_at)>?", [$county, gmdate('Y-m-d\TH:i:s', time() - 7 * 86400) . '+00:00']);
+        $topTowns = Database::all("SELECT location_name, COUNT(*) AS n FROM stories WHERE status='published' AND county=? AND location_name IS NOT NULL AND location_name NOT LIKE 'Co. %' AND COALESCE(published_at,created_at)>? GROUP BY location_name ORDER BY n DESC LIMIT 6", [$county, gmdate('Y-m-d\TH:i:s', time() - 30 * 86400) . '+00:00']);
+        $deaths = \MeNews\Services\Notices::recent(['county' => $county, 'kind' => 'death'], 4);
+        $events = \MeNews\Services\Notices::recent(['county' => $county, 'kind' => 'event', 'upcoming' => true], 3);
+        $warning = \MeNews\Services\Alerts::headline($county);
+        $closures = \MeNews\Services\Alerts::closures($county, 1);
+        $intro = 'County ' . $county . ' news from ME News Ireland: ' . ($week ? $week . ' stories this week' : 'the latest stories') . ' across ' . count($towns) . ' towns and villages in ' . ($province ?: 'Ireland')
+            . ($topTowns ? ', busiest lately in ' . implode(', ', array_map(static fn($t) => $t['location_name'], array_slice($topTowns, 0, 3))) : '')
+            . '. Alongside the wire from RTÉ, the Irish Times, TheJournal and the local press, this page carries what nobody else publishes for ' . possessive($county) . ' communities: death notices and funeral arrangements, school closures and Met Éireann warnings, club results, planning notices and reports from neighbours on the ground.';
         return View::page('listing', self::base([
-            'title' => 'Co. ' . $county . ' news — ME News Ireland',
-            'description' => 'The latest news and community reports from County ' . $county . '.',
+            'title' => $county . ' news today: local stories, deaths, school closures & alerts — ME News Ireland',
+            'description' => 'Local news for County ' . $county . ' updated all day, plus death notices, school closures, weather warnings, planning notices, club results and community reports from ' . implode(', ', array_slice($towns, 0, 4)) . ' and every town in the county.',
+            'canonical' => absolute_url('/county/' . $p['slug'] . ($page > 1 ? '?page=' . $page : '')),
             'heading' => 'Co. ' . $county,
-            'kicker' => Locations::provinceFor($county) ?: 'County',
-            'blurb' => 'Everything published from County ' . $county . ', newest first.',
+            'kicker' => ($province ?: 'County') . ' · ' . count($towns) . ' towns',
+            'blurb' => $intro,
             'icon' => 'pin',
             'rows' => $rows,
             'page' => $page,
@@ -148,6 +165,9 @@ final class PageController
             'trending' => Stories::trending(5),
             'ads' => self::ads($county),
             'banner' => self::banner($county),
+            'county' => $county,
+            'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
+            'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => 'County ' . $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => 'County ' . $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'Ireland']]],
         ]));
     }
 
@@ -231,6 +251,33 @@ final class PageController
         ]));
     }
 
+    /** A county's own permanent map page (an SEO asset as much as a product). */
+    public static function countyMap(Request $r, array $p): Response
+    {
+        $county = null;
+        foreach (Locations::countyNames() as $c) {
+            if (slugify($c) === $p['slug']) {
+                $county = $c;
+            }
+        }
+        if ($county === null) {
+            throw new HttpException(404, 'County not found');
+        }
+        $points = array_values(array_filter(Stories::mapPoints(400), static fn($pt) => $pt['county'] === $county));
+        $centre = \MeNews\Support\Geo::county($county);
+        return View::page('map', self::base([
+            'title' => $county . ' news map: every story in County ' . $county . ', placed — ME News Ireland',
+            'description' => 'A live map of County ' . $county . ': wire stories by town, community reports where they were filed, filtered by section and time.',
+            'points' => $points,
+            'counties' => array_values(array_filter(Stories::countyPoints(), static fn($cp) => $cp['county'] === $county)),
+            'colours' => \MeNews\Support\Geo::COLOURS,
+            'focus' => $centre ? ['lat' => $centre[0], 'lng' => $centre[1]] : null,
+            'focusCounty' => $county,
+            'canonical' => absolute_url('/county/' . $p['slug'] . '/map'),
+            'bodyClass' => 'page-map',
+        ]));
+    }
+
     public static function contributors(): array
     {
         $rows = Database::all("SELECT id,display_name,handle,title,desk,bio,accent,home_town,home_county,reputation,is_verified,created_at FROM users WHERE role='contributor' ORDER BY created_at");
@@ -283,6 +330,14 @@ final class PageController
             'description' => 'The ME Trust Engine, editorial labels, our sources and how community reporting is screened.',
             'sources' => NewsWire::sources(),
             'runs' => Database::installed() ? Database::all('SELECT * FROM wire_runs ORDER BY id DESC LIMIT 16') : [],
+            'contributors' => self::contributors(),
+            'pulse' => Stories::pulse(),
+            'jsonld' => ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => [
+                ['@type' => 'Question', 'name' => 'What does the Wire label mean?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'A headline from an established Irish publisher, curated by our desk and linked to the original. ME has not independently checked it.']],
+                ['@type' => 'Question', 'name' => 'What does Verified mean on ME News?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'An ME editor contacted the reporter, examined the media and location, and the facts stood up. Never applied to wire headlines.']],
+                ['@type' => 'Question', 'name' => 'What is a Corroborated report?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'A community report that three separate people have independently confirmed with “I saw this too”.']],
+                ['@type' => 'Question', 'name' => 'Do I need an account to report something?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'No. A first report needs only a name and an email or mobile number, confirmed by a one-tap link; an editor reads every report before it appears.']],
+            ]],
         ]));
     }
 
@@ -291,7 +346,9 @@ final class PageController
         return View::page('plus', self::base([
             'title' => 'ME+ membership — ME News Ireland',
             'description' => 'Follow up to ten local areas, receive local alerts first and support independent Irish community journalism.',
-            'priceLabel' => \MeNews\Config::get('ME_PLUS_PRICE_LABEL', '€6.99/month'),
+            'priceLabel' => \MeNews\Services\Membership::priceLabel(),
+            'annualLabel' => \MeNews\Services\Membership::annualLabel(),
+            'benefits' => \MeNews\Services\Membership::benefits(),
         ]));
     }
 
@@ -399,11 +456,17 @@ final class PageController
 
     private static function ads(string $county = '', string $town = '', int $limit = 2): array
     {
+        if (\MeNews\Services\Membership::isPlus(Auth::user())) {
+            return [];
+        }
         return \MeNews\Services\Ads::pick('sidebar', $county, $town, $limit);
     }
 
     private static function banner(string $county = '', string $town = ''): ?array
     {
+        if (\MeNews\Services\Membership::isPlus(Auth::user())) {
+            return null;
+        }
         $rows = \MeNews\Services\Ads::pick('banner', $county, $town, 1);
         return $rows[0] ?? null;
     }

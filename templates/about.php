@@ -35,6 +35,11 @@
     </table></div>
   <?php endif; ?>
 
+  <h2 id="desk">The desk and the newsroom pulse</h2>
+  <p>Five desk editors curate the wire and check community reports. The pulse shows stories published per hour over the last day.</p>
+  <?php if (!empty($contributors)): ?><ul class="sources"><?php foreach ($contributors as $c): ?><li><a href="/contributors/<?= e($c['handle']) ?>"><b><?= e($c['display_name']) ?></b><span class="mono">Curates <?= e($c['desk']) ?> · <?= (int)$c['reported'] ?> original · <?= (int)$c['curated'] ?> curated</span></a></li><?php endforeach; ?></ul><?php endif; ?>
+  <?php if (!empty($pulse)): ?><div class="panel panel--pulse" style="max-width:520px"><header class="panel__head"><span class="kicker">Newsroom pulse</span><span class="mono panel__hint">24 h</span></header><?= \MeNews\Ui::sparkline($pulse) ?><div class="pulse__stats mono"><span><b><?= e((string)array_sum($pulse)) ?></b> stories / 24 h</span><span><b><?= e((string)max($pulse)) ?></b> peak per hour</span></div></div><?php endif; ?>
+
   <h2>Principles</h2>
   <p><b>Safety is not truth.</b> The safety score asks whether content presents a harmful-content or privacy risk. The confidence score is only an evidence signal. Neither is permission to call a claim true.</p>
   <p><b>Advertising never touches editorial.</b> Local business adverts are approved separately and are always marked as sponsored.</p>

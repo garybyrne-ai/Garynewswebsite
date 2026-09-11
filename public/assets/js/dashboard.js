@@ -56,9 +56,11 @@
     $('#plan-state').innerHTML = `Current plan: <b>${esc(j.plan)}</b>`;
     const btn = $('#checkout-btn');
     btn.disabled = !j.stripe_configured || j.plan === 'ME+';
-    btn.textContent = j.plan === 'ME+' ? 'ME+ is active' : (j.stripe_configured ? 'Upgrade with Stripe · ' + j.price_label : 'Stripe not configured yet');
+    btn.textContent = j.plan === 'ME+' ? 'ME+ is active' : (j.stripe_configured ? 'Monthly · ' + j.price_label : 'Stripe not configured yet');
+    const yb = $('#checkout-year-btn'); if (yb) { yb.disabled = !j.stripe_configured || j.plan === 'ME+'; yb.textContent = 'Annual · ' + j.annual_label; }
+    const up = qs.get('upgrade'); if (up && j.stripe_configured && j.plan !== 'ME+') { const b = up === 'year' ? yb : btn; if (b) b.click(); }
   }
-  $('#checkout-btn').addEventListener('click', async () => { try { const j = await api('/api/billing/checkout', { method: 'POST' }); location.href = j.url; } catch (e) { toast(e.message); } });
+  ['#checkout-btn', '#checkout-year-btn'].forEach(sel => $(sel)?.addEventListener('click', async e => { const f = new FormData(); f.append('interval', e.currentTarget.dataset.interval || 'month'); try { const j = await api('/api/billing/checkout', { method: 'POST', body: f }); location.href = j.url; } catch (err) { toast(err.message); } }));
 
   $('#profile-form').addEventListener('submit', async e => {
     e.preventDefault();

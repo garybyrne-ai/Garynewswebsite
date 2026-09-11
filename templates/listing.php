@@ -9,8 +9,25 @@
   <div class="pagehead__meta mono"><?= (int)$total ?> published · page <?= (int)$page ?> of <?= (int)$pages ?></div>
 </section>
 <?php if (!empty($banner)): ?><div class="container adslot adslot--top"><?= \MeNews\Services\Ads::render($banner, 'banner') ?></div><?php endif; ?>
+<?php if (!empty($countyStrip)): $cs = $countyStrip; ?>
+<div class="container countystrip">
+  <a class="countystrip__item <?= $cs['warning'] ? 'is-live' : '' ?>" href="/alerts?county=<?= rawurlencode($county) ?>"><?= icon('alert') ?><span><b><?= $cs['warning'] ? e($cs['warning']) : 'No weather warnings' ?></b><small><?= $cs['closures'] ? count($cs['closures']) . ' school closure' . (count($cs['closures']) === 1 ? '' : 's') . ' today' : 'No school closures reported' ?> · alerts by email →</small></span></a>
+  <a class="countystrip__item" href="/notices?county=<?= rawurlencode($county) ?>"><?= icon('candle') ?><span><b><?= $cs['deaths'] ? 'Deaths: ' . e(implode(', ', array_map(static fn($n) => $n['title'], array_slice($cs['deaths'], 0, 2)))) . (count($cs['deaths']) > 2 ? ' +' . (count($cs['deaths']) - 2) : '') : 'Death notices & funerals' ?></b><small><?= $cs['deaths'] ? 'All ' . e($county) . ' notices →' : 'Free to place · alerts by email →' ?></small></span></a>
+  <a class="countystrip__item" href="/notices/event?county=<?= rawurlencode($county) ?>"><?= icon('calendar') ?><span><b><?= $cs['events'] ? e($cs['events'][0]['title']) : "What's on in " . e($county) ?></b><small><?= $cs['events'] ? e(date_irish($cs['events'][0]['event_at'], 'D j M')) . ' · more events →' : 'Add your event, free →' ?></small></span></a>
+  <a class="countystrip__item" href="/county/<?= e($cs['slug']) ?>/map"><?= icon('map') ?><span><b><?= e($county) ?> on the map</b><small><?= $cs['towns'] ? 'Busiest: ' . e(implode(', ', array_map(static fn($t) => $t['location_name'], array_slice($cs['towns'], 0, 3)))) : 'Every story placed' ?> →</small></span></a>
+  <?php if (!empty($cs['whatsapp'])): ?><a class="countystrip__item" href="<?= e($cs['whatsapp']) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><b>WhatsApp channel</b><small>Join the <?= e($county) ?> channel →</small></span></a><?php endif; ?>
+</div>
+<?php endif; ?>
 <div class="container layout">
   <div class="layout__main">
+    <?php if (!empty($clubResults)): ?>
+      <section class="block reveal" style="margin-bottom:28px">
+        <header class="block__head"><span class="block__index mono"><?= icon('trophy') ?></span><h2 class="block__title"><a href="/notices/result">Club sport</a></h2><p class="block__blurb">Results, fixtures and notes sent in by club PROs. National sport is everywhere; this is not.</p><a class="btn btn--ghost btn--sm" href="/notices/submit?kind=result"><?= icon('plus') ?> Send a result</a></header>
+        <div class="noticegrid"><?php foreach ($clubResults as $n): ?><?= \MeNews\View::partial('partials/notice-card', ['n' => $n]) ?><?php endforeach; ?></div>
+      </section>
+    <?php elseif (isset($clubResults)): ?>
+      <section class="reportcta" style="margin-bottom:28px"><div class="reportcta__text"><h3>Club results, fixtures and notes.</h3><p>Junior B scores, underage fixtures and club notes are nearly impossible to find online. Club PROs can post them here in a minute, free, and they go out in the county's 7am email.</p><a class="btn btn--primary" href="/notices/submit?kind=result"><?= icon('trophy') ?> Send your club's result</a></div><div class="reportcta__card"><span class="kicker">What it looks like</span><article class="noticecard"><span class="noticecard__kind mono"><?= icon('trophy') ?> Club result · Example</span><h3>Rathdrum through to county semi-final</h3><p class="noticecard__score"><span>Rathdrum</span><b>1-12 – 0-09</b><span>Avondale</span></p><p class="noticecard__line mono">Wicklow Junior B Football Championship</p></article></div></section>
+    <?php endif; ?>
     <?php if (!empty($leaderboard)): ?>
       <section class="block reveal" style="margin-bottom:28px">
         <header class="block__head"><span class="block__index mono"><?= icon('trophy') ?></span><h2 class="block__title">Who's reporting</h2><p class="block__blurb">The towns and neighbours keeping their county on the map this month. Reports are screened and read by an editor before they appear.</p><button class="btn btn--hot" type="button" data-open-report><?= icon('report') ?> Report a story</button></header>

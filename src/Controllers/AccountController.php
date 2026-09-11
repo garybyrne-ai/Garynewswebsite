@@ -239,7 +239,7 @@ final class AccountController
         if (mb_strlen($title) < 5) {
             // Headline from the first sentence of the description
             $first = preg_split('/(?<=[.!?])\s+/u', trim($body), 2)[0] ?? $body;
-            $title = excerpt($first, 110);
+            $title = rtrim(excerpt($first, 110), '.');
         }
         $loc = $r->post('location_name', '', 100);
         if ($loc === '') {
@@ -390,13 +390,13 @@ final class AccountController
     public static function billingStatus(Request $r): Response
     {
         $u = Auth::require();
-        return Response::json(['plan' => $u['plan'], 'stripe_configured' => Stripe::configured(), 'price_label' => Config::get('ME_PLUS_PRICE_LABEL', '€6.99/month')]);
+        return Response::json(['plan' => $u['plan'], 'stripe_configured' => Stripe::configured(), 'price_label' => \MeNews\Services\Membership::priceLabel(), 'annual_label' => \MeNews\Services\Membership::annualLabel(), 'benefits' => \MeNews\Services\Membership::benefits()]);
     }
 
     public static function checkout(Request $r): Response
     {
         $u = Auth::require();
-        return Response::json(['url' => Stripe::checkoutUrl($u)]);
+        return Response::json(['url' => Stripe::checkoutUrl($u, $r->post('interval', 'month') === 'year' ? 'year' : 'month')]);
     }
 
     public static function stripeWebhook(Request $r): Response

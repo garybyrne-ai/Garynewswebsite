@@ -16,31 +16,46 @@
 
     const pinLayer = L.layerGroup().addTo(map);
     const countyLayer = L.layerGroup().addTo(map);
-    let all = opts.points || [], counties = opts.counties || [], filter = { category: '', kind: '' };
+    let all = opts.points || [], counties = opts.counties || [], filter = { category: '', kind: '', hours: 0 };
+    const CLUSTER_ZOOM = 8; // below this, counties cluster; at or above it, individual pins
 
     const pinIcon = (p, i) => L.divIcon({
       className: '',
-      html: `<div class="me-pin ${i < 8 ? 'is-new' : ''} ${p.kind === 'community' ? 'is-community' : ''}" style="--c:${colours[p.category] || '#47d5ff'}"><i></i></div>`,
+      html: `<div class="me-pin ${i < 8 ? 'is-new' : ''} ${p.kind === 'community' ? 'is-community' : ''}" style="--c:${colours[p.category] || '#139a5c'}"><i></i></div>`,
       iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -10],
     });
-    const popup = p => `<article class="me-pop">${p.image ? `<a class="me-pop__img" href="${esc(p.url)}"><img src="${esc(p.image)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></a>` : ''}<div class="me-pop__body"><span class="me-pop__cat" style="--c:${colours[p.category] || '#47d5ff'}">${esc(p.category)}</span><a class="me-pop__title" href="${esc(p.url)}">${esc(p.title)}</a><span class="me-pop__meta">${esc(p.location_name || p.county || '')} · ${esc(p.source_name || 'Community report')} · ${esc(p.ago)}</span></div></article>`;
+    const popup = p => `<article class="me-pop">${p.image ? `<a class="me-pop__img" href="${esc(p.url)}"><img src="${esc(p.image)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></a>` : ''}<div class="me-pop__body"><span class="me-pop__cat" style="--c:${colours[p.category] || '#139a5c'}">${esc(p.category)}${p.kind === 'community' ? ' · Community report' : ''}</span><a class="me-pop__title" href="${esc(p.url)}">${esc(p.title)}</a><span class="me-pop__meta">${esc(p.location_name || p.county || '')} · ${esc(p.source_name || 'Community')} · ${esc(p.ago)}</span><a class="me-pop__more" href="${esc(p.url)}">Read →</a></div></article>`;
 
+    const within = p => !filter.hours || (Date.now() - new Date(p.time).getTime()) <= filter.hours * 3600000;
     function render() {
       pinLayer.clearLayers(); countyLayer.clearLayers();
-      const pts = all.filter(p => (!filter.category || p.category === filter.category) && (!filter.kind || p.kind === filter.kind));
-      pts.forEach((p, i) => L.marker([p.latitude, p.longitude], { icon: pinIcon(p, i), riseOnHover: true }).bindPopup(popup(p), { maxWidth: 300, className: 'me-popup' }).addTo(pinLayer));
-      if (!filter.category && !filter.kind) {
-        const max = Math.max(1, ...counties.map(c => c.n));
-        counties.forEach(c => L.circleMarker([c.latitude, c.longitude], { radius: 10 + Math.sqrt(c.n / max) * 26, color: 'rgba(38,192,114,.35)', weight: 1, fillColor: '#47d5ff', fillOpacity: .07, interactive: true })
-          .bindTooltip(`<b>Co. ${esc(c.county)}</b> · ${c.n} stories this week`, { className: 'me-tip', direction: 'top' })
-          .on('click', () => location.href = c.url).addTo(countyLayer));
+      const pts = all.filter(p => (!filter.category || p.category === filter.category) && (!filter.kind || p.kind === filter.kind) && within(p));
+      const clustered = map.getZoom() < CLUSTER_ZOOM;
+      if (clustered) {
+        // County clusters: one bubble per county with a count of the filtered pins
+        const by = {};
+        pts.forEach(p => { if (p.county) (by[p.county] ??= { n: 0, lat: 0, lng: 0, url: '/county/' + p.county.toLowerCase().replace(/[^a-z]+/g, '-') + '/map' }).n++; });
+        counties.forEach(c => { if (by[c.county]) { by[c.county].lat = c.latitude; by[c.county].lng = c.longitude; } });
+        pts.forEach(p => { const b = by[p.county]; if (b && !b.lat) { b.lat = p.latitude; b.lng = p.longitude; } });
+        const max = Math.max(1, ...Object.values(by).map(b => b.n));
+        Object.entries(by).forEach(([county, b]) => {
+          if (!b.lat) return;
+          const size = 30 + Math.sqrt(b.n / max) * 34;
+          L.marker([b.lat, b.lng], { icon: L.divIcon({ className: '', html: `<div class="me-cluster" style="--s:${size}px"><b>${b.n}</b><small>${esc(county)}</small></div>`, iconSize: [size, size], iconAnchor: [size / 2, size / 2] }) })
+            .on('click', () => map.flyTo([b.lat, b.lng], CLUSTER_ZOOM + 1, { duration: .6 })).addTo(countyLayer);
+        });
+      } else {
+        pts.forEach((p, i) => L.marker([p.latitude, p.longitude], { icon: pinIcon(p, i), riseOnHover: true }).bindPopup(popup(p), { maxWidth: 300, className: 'me-popup' }).addTo(pinLayer));
       }
-      if (opts.count) opts.count.textContent = pts.length + ' pins';
-      if (opts.list) opts.list.innerHTML = pts.slice(0, 40).map((p, i) => `<button type="button" class="maplist__item" data-i="${all.indexOf(p)}"><span class="maplist__dot" style="--c:${colours[p.category] || '#47d5ff'}"></span><span><b>${esc(p.title)}</b><small>${esc(p.location_name || p.county || 'Ireland')} · ${esc(p.ago)}</small></span></button>`).join('');
+      if (opts.count) opts.count.textContent = pts.length + (clustered ? ' stories · zoom in for pins' : ' pins');
+      if (opts.list) opts.list.innerHTML = pts.slice(0, 40).map((p, i) => `<button type="button" class="maplist__item" data-i="${all.indexOf(p)}"><span class="maplist__dot" style="--c:${colours[p.category] || '#139a5c'}"></span><span><b>${esc(p.title)}</b><small>${esc(p.location_name || p.county || 'Ireland')} · ${esc(p.ago)}</small></span></button>`).join('');
       return pts;
     }
     let pts = render();
-    if (opts.center) {
+    map.on('zoomend', () => { pts = render(); });
+    if (opts.focus && opts.focus.lat) {
+      map.setView([opts.focus.lat, opts.focus.lng], 9);
+    } else if (opts.center) {
       L.circleMarker([opts.center.lat, opts.center.lng], { radius: 8, color: '#fff', weight: 2, fillColor: '#ff4d6d', fillOpacity: 1 }).bindTooltip('You are here', { className: 'me-tip' }).addTo(map);
       map.setView([opts.center.lat, opts.center.lng], 9);
     } else if (pts.length) map.fitBounds(L.featureGroup(pinLayer.getLayers()).getBounds().pad(.12), { maxZoom: full ? 8 : 7 });
@@ -52,9 +67,13 @@
     });
     (opts.chips || []).forEach(chip => chip.addEventListener('click', () => {
       (opts.chips || []).forEach(c => c.classList.remove('is-active')); chip.classList.add('is-active');
-      filter = { category: chip.dataset.category || '', kind: chip.dataset.kind || '' };
+      filter.category = chip.dataset.category || ''; filter.kind = chip.dataset.kind || '';
       pts = render();
-      if (pts.length) map.fitBounds(L.featureGroup(pinLayer.getLayers()).getBounds().pad(.15), { maxZoom: 9 });
+      if (pts.length && !opts.focus) { const layers = pinLayer.getLayers().length ? pinLayer.getLayers() : countyLayer.getLayers(); if (layers.length) map.fitBounds(L.featureGroup(layers).getBounds().pad(.15), { maxZoom: 9 }); }
+    }));
+    (opts.timeChips || []).forEach(chip => chip.addEventListener('click', () => {
+      (opts.timeChips || []).forEach(c => c.classList.remove('is-active')); chip.classList.add('is-active');
+      filter.hours = Number(chip.dataset.hours || 0); pts = render();
     }));
     if (opts.locate) opts.locate.addEventListener('click', () => {
       if (!navigator.geolocation) return toast('Location is unavailable');
@@ -68,13 +87,13 @@
   };
 
   document.querySelectorAll('[data-map]').forEach(el => {
-    let points = [], counties = [], colours = {}, center = null;
-    try { points = JSON.parse(el.dataset.points || '[]'); counties = JSON.parse(el.dataset.counties || '[]'); colours = JSON.parse(el.dataset.colours || '{}'); center = el.dataset.center ? JSON.parse(el.dataset.center) : null; } catch (e) { }
+    let points = [], counties = [], colours = {}, center = null, focus = null;
+    try { points = JSON.parse(el.dataset.points || '[]'); counties = JSON.parse(el.dataset.counties || '[]'); colours = JSON.parse(el.dataset.colours || '{}'); center = el.dataset.center ? JSON.parse(el.dataset.center) : null; focus = el.dataset.focus ? JSON.parse(el.dataset.focus) : null; } catch (e) { }
     const root = el.closest('[data-map-root]') || document;
     window.ME.initMap(el, {
-      points, counties, colours, center, full: el.dataset.map === 'full',
+      points, counties, colours, center, focus, full: el.dataset.map === 'full',
       count: root.querySelector('[data-map-count]'), list: root.querySelector('[data-map-list]'),
-      chips: Array.from(root.querySelectorAll('[data-map-chip]')), locate: root.querySelector('[data-locate]'),
+      chips: Array.from(root.querySelectorAll('[data-map-chip]')), timeChips: Array.from(root.querySelectorAll('[data-map-time]')), locate: root.querySelector('[data-locate]'),
     });
   });
 })();
