@@ -28,6 +28,7 @@ php scripts/setup.php --seed
 
 ```
 */15 * * * *  curl -s "https://your-app.cloudwaysapps.com/cron/wire?key=YOUR_CRON_KEY"
+*/15 * * * *  curl -s "https://your-app.cloudwaysapps.com/cron/daily?key=YOUR_CRON_KEY"
 ```
 
    or the CLI equivalent: `*/15 * * * * php /home/master/applications/<app-folder>/public_html/scripts/fetch-news.php --if-stale`
@@ -47,3 +48,15 @@ from `public_html/` directly.
 - Back up with `php scripts/backup.php ~/menews-backup-$(date +%F).sqlite` (outside `public_html`).
 - The error `directory index of ".../public_html/" is forbidden` means neither `index.php`
   nor the `public/` web root was in place — pull this branch and repeat Option A or B.
+
+## Email (7am digest, notice alerts, report confirmations)
+
+Set `MAIL_TRANSPORT=mail` in `.env` to send through PHP `mail()` (works out of the box on Cloudways, but
+add SPF/DKIM for your domain or use `MAIL_TRANSPORT=smtp` with your SMTP provider's details). Set
+`MAIL_FROM` and `MAIL_REPLY_TO` to addresses on your domain. In `log` mode nothing is sent; messages are
+written to `storage/logs/mail.log`.
+
+## After pulling an update
+
+Nothing to run: the database upgrades itself on the first request (tables, columns, the Wire label,
+clustering of existing stories). Check `storage/logs/app.log` if a page ever shows a 500.

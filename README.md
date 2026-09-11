@@ -51,11 +51,31 @@ Change every password before any public deployment (`ADMIN_PASSWORD`, `CONTRIBUT
 
 ```
 */15 * * * *  curl -s "https://yourdomain.ie/cron/wire?key=YOUR_CRON_KEY"
+*/15 * * * *  curl -s "https://yourdomain.ie/cron/daily?key=YOUR_CRON_KEY"
 # or, on the server itself
 */15 * * * *  php /var/www/menews/scripts/fetch-news.php --if-stale >> /var/www/menews/storage/logs/wire.log 2>&1
 ```
 
 `database/seed/wire-snapshot.json` is a captured snapshot so a fresh install shows real news even offline (`php scripts/seed.php --offline`). Regenerate it with `php scripts/fetch-news.php --snapshot`.
+
+## The local layer (roadmap, September 2026)
+
+The product review's thesis: stop competing on national news and become the place Irish people go for the local things nobody else publishes. What shipped:
+
+- **County-first.** One-tap county picker on first visit (no location permission needed), a county chip in the header, a county-first home page with one lead story at real size, a six-item primary nav with a More menu, and a mobile bottom bar (County · Signal · Report · Search · More).
+- **Deaths & notices** (`/notices`): death notices, in memoriam, events (with Event structured data), local jobs, planning and statutory notices, lost & found pets and club results. Placed without an account, confirmed by email, published from Newsroom → Notices, emailed to county subscribers. Free while the site grows; promoted slots from the newsroom.
+- **Alerts** (`/alerts`): Met Éireann warnings by county from the open-data feed (cached 10 min), school closures submitted and confirmed by principals from a school email, email alerts per county, WhatsApp channel links, and a 90-second spoken bulletin.
+- **Your 7am county morning**: five stories, weather, deaths and what's on, sent by `GET /cron/daily?key=CRON_KEY` (call it every 15 minutes; it sends once per day after 07:00 Irish time, pushes new weather warnings and expires old notices). Preview at `/digest/{county}`.
+- **Weekly county poll** (`/poll`) with a county-by-county breakdown.
+- **Community reporting that works**: photo-first report form with prompts, first report without an account (name + email/mobile, one-tap confirmation), WhatsApp reporting numbers per county (Newsroom → Settings), "I saw this too" corroboration (three confirmations = Corroborated), incident clustering for editors, EXIF/GPS checks, duplicate-image flags and reverse-image links in the review queue, published JPEGs stripped of metadata, contributor track records and county leaderboards, status emails.
+- **Wire content position**: cross-source clustering ("6 outlets covering this" with ME's own framing of who led), a `wire_mode` setting (clustered / full / links) and `wire_images`, the **Wire** label (Verified is reserved for checked community reports), publisher bylines, desk editors shown as curating, wire pages canonical to the publisher and noindex, sitemap limited to our own pages.
+- **Section check**: a tightened classifier suggests a section for every wire story; Newsroom → Section check re-files or locks in one click.
+- **Trust pages**: corrections policy and public log, ownership and funding, privacy and cookies (with a consent strip), moderation policy with a DSA notice-and-action form, "How we check things" linked from every label.
+- **Map**: county clusters when zoomed out, pins when zoomed in, section and time filters, card popups, and a permanent map per county (`/county/{county}/map`).
+- **ME+** repriced (€3.99/month or €39/year, editable in Newsroom → Settings), ad-free for members, checkout via inline Stripe prices.
+- **Design**: Irish green gradient, light theme by default, a real icon set, 18–19px article type on a 68 ch measure and a text-size control.
+
+Not code, still on the list: move to a real .ie domain before any marketing; take an Irish media solicitor's view on the wire position you choose in Settings (clustered is the default); media liability insurance before scaling user reports; Press Council membership; Google Publisher Center once the domain and ownership page are live.
 
 ## Fresh every day
 
