@@ -16,11 +16,16 @@
       <div class="appnav__head"><span class="livedot"></span><span><b id="who">Newsroom</b><small id="who-role">editor</small></span></div>
       <button class="is-active" data-view="review">Review queue <span class="badge" id="nav-review-count">0</span></button>
       <button data-view="stories">All stories</button>
+      <button data-view="sections">Section check <span class="badge" id="nav-sections-count">0</span></button>
+      <button data-view="notices">Notices <span class="badge" id="nav-notices-count">0</span></button>
+      <button data-view="closures">Closures</button>
       <button data-view="comments">Comments <span class="badge" id="nav-comments-count">0</span></button>
       <button data-view="users">People</button>
       <button data-view="ads">Advertising <span class="badge" id="nav-ads-count">0</span></button>
       <button data-view="wire">News wire</button>
       <button data-view="locations">Irish locations</button>
+      <button data-view="trust">Corrections &amp; takedowns <span class="badge" id="nav-takedowns-count">0</span></button>
+      <button data-view="settings">Settings</button>
       <button data-view="audit">Audit log</button>
     </nav>
     <section>
@@ -64,6 +69,37 @@
       <div id="view-locations" class="view">
         <h1>Irish location database</h1>
         <div class="panel"><p style="margin-bottom:12px">ME ships with a curated fallback list of towns. Administrators can replace it with the complete official CSO / Tailte Éireann 2022 Urban Areas layer (CC BY 4.0).</p><button class="btn btn--primary" id="loc-refresh" type="button">Import official Irish towns</button><p class="form__result" id="loc-result"></p></div>
+      </div>
+
+      <div id="view-sections" class="view">
+        <h1>Section check</h1><p class="pagehead__blurb">Wire stories where the classifier now suggests a different section. Accept in one click, or keep and lock the current section so it is never re-filed.</p>
+        <div id="sections-table"></div>
+      </div>
+
+      <div id="view-notices" class="view">
+        <div class="inline" style="justify-content:space-between"><div><h1>Notices</h1><p class="pagehead__blurb">Death notices, in memoriam, events, jobs, planning, pets and club results. Confirmed by the sender's email; you publish.</p></div><select id="notices-status" class="filters"><option value="review">Awaiting review</option><option value="published">Published</option><option value="rejected">Rejected</option><option value="expired">Expired</option><option value="all">All</option></select></div>
+        <div class="queue" id="notices-queue"></div>
+      </div>
+
+      <div id="view-closures" class="view"><h1>School closures</h1><p class="pagehead__blurb">Closures confirmed from a school email go live immediately; unconfirmed ones wait here.</p><div id="closures-table"></div></div>
+
+      <div id="view-trust" class="view">
+        <h1>Corrections &amp; takedowns</h1>
+        <div class="panel" style="margin-bottom:18px"><span class="kicker">Log a correction</span>
+          <form class="form" id="correction-form" style="margin-top:10px">
+            <div class="form__row"><label>Title<input name="title" required placeholder="What the correction concerns"></label><label>Story id (optional)<input name="story_id" placeholder="Paste the story id to attach a note"></label></div>
+            <label>What changed<input name="summary" required placeholder="One sentence, published in the log"></label>
+            <label>Detail (optional)<textarea name="detail" rows="2"></textarea></label>
+            <div class="form__actions"><button class="btn btn--primary btn--sm" type="submit">Publish to the log</button></div>
+          </form>
+        </div>
+        <h2>Removal requests</h2><div id="takedowns-table"></div>
+        <h2 style="margin-top:22px">Corrections log</h2><div id="corrections-table"></div>
+      </div>
+
+      <div id="view-settings" class="view">
+        <h1>Settings</h1><p class="pagehead__blurb">Prices, the wire's display mode, WhatsApp numbers and the ownership page. Administrators only.</p>
+        <form class="form" id="settings-form"><div class="settingsgrid" id="settings-grid"></div><div class="form__actions"><button class="btn btn--primary" type="submit">Save settings</button></div><p class="form__result" id="settings-result"></p></form>
       </div>
 
       <div id="view-audit" class="view"><h1>Audit log</h1><div id="audit-list"></div></div>

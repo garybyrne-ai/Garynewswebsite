@@ -5,22 +5,24 @@
 </section>
 <div class="container prose">
   <div class="steps">
-    <div class="step reveal"><span class="mono">01</span><h3>Report</h3><p>Signed-in members send text, photos or video. Everything lands in private quarantine — nothing is public yet.</p></div>
+    <div class="step reveal"><span class="mono">01</span><h3>Report</h3><p>Anyone can send a photo, a location and a line — no account for the first one. Everything lands in private quarantine; nothing is public yet.</p></div>
     <div class="step reveal"><span class="mono">02</span><h3>Screen</h3><p>The Trust Engine probes media, samples video frames, transcribes audio and runs safety moderation. It produces a <b>safety score</b> and a separate <b>confidence score</b>.</p></div>
-    <div class="step reveal"><span class="mono">03</span><h3>Decide</h3><p>An editor publishes, holds or rejects. They alone choose the public label: Community Report, Developing, Verified or Official.</p></div>
+    <div class="step reveal"><span class="mono">03</span><h3>Decide</h3><p>An editor publishes, holds or rejects. They alone choose the public label: Community Report, Developing, Corroborated, Verified or Official.</p></div>
     <div class="step reveal"><span class="mono">04</span><h3>Confirm</h3><p>Neighbours add independent confirmations and local context. Confidence rises with evidence, never with popularity.</p></div>
   </div>
 
-  <h2 id="labels">The four labels</h2>
+  <h2 id="labels">How we check things: the labels</h2>
   <div class="labels-grid">
+    <div><?= \MeNews\Ui::label('Wire') ?><p>A headline from an established publisher, curated by our desk and linked to the original. ME has not independently checked it; the publisher's own standards apply.</p></div>
+    <div><?= \MeNews\Ui::label('Corroborated') ?><p>A community report that three separate people have independently confirmed with “I saw this too”.</p></div>
     <div><?= \MeNews\Ui::label('Community Report') ?><p>Reported by a member of the public. Screened for safety but not yet corroborated.</p></div>
     <div><?= \MeNews\Ui::label('Developing') ?><p>Editors are actively checking. Details may change.</p></div>
-    <div><?= \MeNews\Ui::label('Verified') ?><p>Corroborated by an editor, or sourced from an established publisher with a live link back to the original.</p></div>
+    <div><?= \MeNews\Ui::label('Verified') ?><p>Checked by an ME editor: the reporter was contacted, the media and location examined, and the facts stood up. Never applied to wire headlines.</p></div>
     <div><?= \MeNews\Ui::label('Official') ?><p>Based on a published statement from a public body such as a council, Garda Síochána or a Government department.</p></div>
   </div>
 
   <h2 id="sources">Our wire sources</h2>
-  <p>The wire stores only the headline, standfirst, image reference and publication time. Every wire story links to the publisher, who retains all rights to the full article.</p>
+  <p>The wire stores only the headline, standfirst, image reference and publication time. Every wire story links to the publisher, who retains all rights to the full article, and wire pages point search engines to the original. When several outlets cover the same story we show one card with our own line on who led and who followed.</p>
   <ul class="sources">
     <?php foreach ($sources as $s): ?><li><a href="<?= e($s['home'] ?? $s['url']) ?>" target="_blank" rel="noopener"><b><?= e($s['name']) ?></b><span class="mono"><?= e($s['category']) ?><?= !empty($s['county']) ? ' · ' . e($s['county']) : '' ?></span></a></li><?php endforeach; ?>
   </ul>

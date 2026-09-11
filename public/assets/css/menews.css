@@ -1270,3 +1270,23 @@ body.has-bottombar .consent{bottom:64px}
 .bulletin button{color:inherit;font-weight:700}
 .bulletin__line{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:760px){.noticegrid{grid-template-columns:1fr}.factlist{grid-template-columns:1fr}.reportcats--7{grid-template-columns:1fr 1fr}.form__row--score{grid-template-columns:1fr 1fr}.alertshead{padding:22px 18px}}
+.chip--cluster{color:var(--vi);border-color:color-mix(in srgb,var(--vi) 40%,transparent)}
+.card__media--typo{display:grid;place-items:center;background:linear-gradient(135deg,hsl(var(--h) 45% 92%),hsl(calc(var(--h) + 40) 45% 86%))}
+[data-theme="dark"] .card__media--typo{background:linear-gradient(135deg,hsl(var(--h) 40% 16%),hsl(calc(var(--h) + 40) 40% 11%))}
+.card__typo{font:800 2.4rem/1 var(--display);letter-spacing:-.04em;color:hsl(var(--h) 55% 38% / .7)}
+[data-theme="dark"] .card__typo{color:hsl(var(--h) 70% 70% / .6)}
+.coverage{border:1px solid var(--line);border-radius:var(--r);padding:20px;background:var(--surface)}
+.coverage__framing{color:var(--ink-2);font-size:.95rem;margin-bottom:14px}
+.timeline{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line-2);display:flex;flex-direction:column;gap:12px}
+.timeline li{position:relative;display:grid;grid-template-columns:72px 1fr;gap:12px;font-size:.92rem}
+.timeline li::before{content:"";position:absolute;left:-21px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--bg-2);border:2px solid var(--cy)}
+.timeline li.is-current::before{background:var(--cy);box-shadow:0 0 0 4px color-mix(in srgb,var(--cy) 25%,transparent)}
+.timeline time{color:var(--muted);padding-top:2px}
+.timeline a{color:var(--ink-2)}
+.timeline a:hover{color:var(--cy)}
+.timeline .mono{color:var(--muted)}
+.sectioncheck td .sub{color:var(--muted)}
+.settingsgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.settingsgrid label{display:flex;flex-direction:column;gap:4px;font:600 .68rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.settingsgrid input,.settingsgrid select{background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;color:var(--ink);font:500 .9rem/1.3 var(--body);letter-spacing:0;text-transform:none}
+.settingsgrid details{grid-column:1/-1}

@@ -37,6 +37,7 @@ try {
         Response::redirect('/install')->send();
         exit;
     }
+    \MeNews\Services\Clusters::backfillIfPending();
     $router = new Router();
     (require ME_ROOT . '/src/routes.php')($router);
     $router->dispatch($request)->send();

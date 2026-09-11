@@ -172,8 +172,14 @@ final class PageController
         }
         Database::query('UPDATE stories SET views=views+1 WHERE id=?', [$story['id']]);
         $story['views']++;
-        $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role FROM users WHERE id=?', [$story['author_user_id']]) : null;
+        $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role,reports_published FROM users WHERE id=?', [$story['author_user_id']]) : null;
+        $isWire = $story['kind'] === 'wire';
         return View::page('story', self::base([
+            // Wire pages canonicalise to the publisher and stay out of the index: the original is the article.
+            'canonical' => $isWire ? $story['source_url'] : absolute_url($story['url']),
+            'robots' => $isWire ? 'noindex,follow' : null,
+            'cluster' => \MeNews\Services\Clusters::get($story['cluster_id'] ?? null),
+            'members' => \MeNews\Services\Clusters::members($story['cluster_id'] ?? null, $story['id']),
             'title' => $story['title'] . ' — ME News Ireland',
             'description' => excerpt($story['summary'] ?: $story['body'], 200),
             'ogImage' => $story['image'],
@@ -221,6 +227,8 @@ final class PageController
         $rows = Database::all("SELECT id,display_name,handle,title,desk,bio,accent,home_town,home_county,reputation,is_verified,created_at FROM users WHERE role='contributor' ORDER BY created_at");
         foreach ($rows as &$c) {
             $c['stories'] = Database::count("SELECT COUNT(*) FROM stories WHERE author_user_id=? AND status='published'", [$c['id']]);
+            $c['curated'] = Database::count("SELECT COUNT(*) FROM stories WHERE author_user_id=? AND status='published' AND kind='wire'", [$c['id']]);
+            $c['reported'] = $c['stories'] - $c['curated'];
             $c['latest'] = Database::value("SELECT MAX(COALESCE(published_at,created_at)) FROM stories WHERE author_user_id=? AND status='published'", [$c['id']]) ?: null;
         }
         return $rows;
@@ -245,6 +253,8 @@ final class PageController
         $per = 18;
         $rows = Stories::feed(['author' => $c['id']], $per, ($page - 1) * $per);
         $total = Database::count("SELECT COUNT(*) FROM stories WHERE author_user_id=? AND status='published'", [$c['id']]);
+        $c['curated'] = Database::count("SELECT COUNT(*) FROM stories WHERE author_user_id=? AND status='published' AND kind='wire'", [$c['id']]);
+        $c['reported'] = $total - $c['curated'];
         return View::page('contributor', self::base([
             'title' => $c['display_name'] . ' — ME News Ireland',
             'description' => $c['title'] . '. ' . excerpt($c['bio'], 150),
@@ -329,7 +339,26 @@ final class PageController
         foreach ($urls as $u) {
             $xml .= '<url><loc>' . e(absolute_url($u)) . '</loc></url>';
         }
-        foreach (Database::all("SELECT slug, COALESCE(updated_at,created_at) AS u FROM stories WHERE status='published' ORDER BY COALESCE(published_at,created_at) DESC LIMIT 2000") as $s) {
+        // Only our own pages are indexed: county, section, utility and community pages. Wire headlines belong to their publishers.
+        $urls[] = '/notices';
+        $urls[] = '/alerts';
+        $urls[] = '/poll';
+        $urls[] = '/corrections';
+        $urls[] = '/ownership';
+        $urls[] = '/privacy';
+        $urls[] = '/moderation';
+        foreach (\MeNews\Services\Notices::KINDS as $k => $meta) {
+            $urls[] = '/notices/' . $k;
+        }
+        foreach (Locations::countyNames() as $c) {
+            $urls[] = '/county/' . slugify($c) . '/map';
+            $urls[] = '/notices?county=' . rawurlencode($c);
+            $urls[] = '/alerts?county=' . rawurlencode($c);
+        }
+        foreach (Database::all("SELECT kind, slug, COALESCE(updated_at,created_at) AS u FROM notices WHERE status='published' ORDER BY published_at DESC LIMIT 2000") as $n) {
+            $xml .= '<url><loc>' . e(absolute_url('/notices/' . $n['kind'] . '/' . $n['slug'])) . '</loc><lastmod>' . e(substr((string)$n['u'], 0, 10)) . '</lastmod></url>';
+        }
+        foreach (Database::all("SELECT slug, COALESCE(updated_at,created_at) AS u FROM stories WHERE status='published' AND kind='community' ORDER BY COALESCE(published_at,created_at) DESC LIMIT 2000") as $s) {
             $xml .= '<url><loc>' . e(absolute_url('/story/' . $s['slug'])) . '</loc><lastmod>' . e(substr((string)$s['u'], 0, 10)) . '</lastmod></url>';
         }
         return Response::text($xml . '</urlset>', 'application/xml; charset=utf-8');
@@ -340,7 +369,8 @@ final class PageController
         $rows = Stories::feed([], 40);
         $xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>ME News Ireland</title><link>' . e(absolute_url('/')) . '</link><description>Your Community. Your News. Live.</description>';
         foreach ($rows as $s) {
-            $xml .= '<item><title>' . e($s['title']) . '</title><link>' . e(absolute_url($s['url'])) . '</link><guid>' . e(absolute_url($s['url'])) . '</guid><description>' . e($s['summary'] ?: excerpt($s['body'], 240)) . '</description><pubDate>' . e(gmdate('D, d M Y H:i:s', strtotime($s['time']) ?: time())) . ' GMT</pubDate><category>' . e($s['category']) . '</category></item>';
+            $link = $s['kind'] === 'wire' ? $s['source_url'] : absolute_url($s['url']);
+            $xml .= '<item><title>' . e($s['title']) . '</title><link>' . e($link) . '</link><guid>' . e(absolute_url($s['url'])) . '</guid><source url="' . e(absolute_url('/feed.xml')) . '">' . e($s['kind'] === 'wire' ? $s['source_name'] : 'ME News Ireland') . '</source><description>' . e($s['summary'] ?: excerpt($s['body'], 240)) . '</description><pubDate>' . e(gmdate('D, d M Y H:i:s', strtotime($s['time']) ?: time())) . ' GMT</pubDate><category>' . e($s['category']) . '</category></item>';
         }
         return Response::text($xml . '</channel></rss>', 'application/rss+xml; charset=utf-8');
     }

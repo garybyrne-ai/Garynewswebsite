@@ -22,7 +22,16 @@ use Throwable;
  */
 final class NewsWire
 {
-    private const WORLD_TAGS = ['uk', 'world', 'us', 'europe', 'middle east', 'asia', 'africa', 'americas', 'australia', 'international'];
+    private const WORLD_TAGS = ['uk', 'world', 'us', 'europe', 'middle east', 'asia', 'africa', 'americas', 'australia', 'international', 'uk news', 'us news', 'world news'];
+
+    /** Strong signals that a story is about somewhere other than Ireland. */
+    private const WORLD_RE = '/\b(trump|white house|washington|congress|pentagon|kremlin|putin|zelensky|ukraine|russia|gaza|israel|hamas|iran|tehran|beijing|china|taiwan|india|pakistan|nato|united nations|downing street|westminster|starmer|farage|reform uk|labour party|tories|tory|conservative party|house of commons|scotland|scottish|wales|welsh|england|english government|british government|bank of england|ons|uk gdp|uk economy|nhs|australia|australian|canada|canadian|new zealand|france|french|germany|german|spain|spanish|italy|italian|brussels|european commission|eu summit|macron|merz|nfl|nba|mlb|super bowl|premier league|champions league|wimbledon|us open|french open|australian open|masters|ryder cup|formula one|f1|grand prix|olympic)\b/iu';
+    private const IRISH_RE = '/\b(taoiseach|tánaiste|dáil|seanad|oireachtas|garda|gardaí|hse|rté|fianna fáil|fine gael|sinn féin|aontú|leinster house|áras|president higgins|irish (?:government|economy|exports|firms?|company|companies|jobs|workers|farmers|schools?|hospitals?)|cso|revenue commissioners|central bank of ireland|esb|eir|ryanair|aer lingus|dubliner|irish|ireland|mary lou|mcdonald|micheál martin|micheal martin|simon harris|president connolly|minister|\btds?\b|councillors?|dublin|cork|galway|limerick|waterford|belfast|donegal|kerry|mayo|meath|kildare|wicklow|wexford|tipperary|clare|louth|sligo|leitrim|roscommon|offaly|laois|kilkenny|carlow|westmeath|longford|cavan|monaghan)\b/iu';
+    /** A single strong term is enough for Sport; weak terms need two of them. */
+    private const SPORT_STRONG_RE = '/\b(gaa|hurling|camogie|all-ireland|league of ireland|premier league|champions league|europa league|fai cup|rugby|six nations|leinster rugby|munster rugby|connacht rugby|ulster rugby|gaelic games|ladies football|lgfa|nfl|nba|mlb|nhl|super bowl|wimbledon|ryder cup|cheltenham|galway races|tour de france|grand slam|match report|player ratings|kick-?off|us open|french open|australian open|open championship|the masters|jockey|snooker|darts|olympic|paralympic|tennis|cricket|marathon|formula one|f1|grand prix|world cup|euro 2028|nations league|croke park|aviva stadium|thomond park|ireland (?:beat|lose|win|v |vs)|inter-?county|intercounty|man united|man utd|liverpool fc|arsenal|chelsea|celtic|rangers|shamrock rovers|bohemians|st patrick\'s athletic|derry city|dundalk fc|katie taylor|rory mcilroy|shane lowry)\b/iu';
+    private const SPORT_WEAK_RE = '/\b(final|semi-final|quarter-final|championship|goals?|scored|scorer|manager|coach|striker|midfielder|defender|goalkeeper|racing|golf|boxing|bout|title fight|athletics|swimming|cycling|motorsport|fixtures|results|squad|captain|clash|derby|replay|penalty|penalties|injury time|second half|first half|extra time|referee|umpire|title race|points table|relegation|promotion|play-?offs?|trophy|medal|podium|underage|minor|under-\d+|u\d+s?)\b/iu';
+    private const BUSINESS_RE = '/\b(gdp|inflation|interest rates?|ecb|central bank|shares|stock market|iseq|ftse|dow jones|nasdaq|profits?|revenue|earnings|takeover|acquisition|merger|ipo|investors?|start-?up|venture capital|exports?|imports?|tariffs?|trade deal|recession|budget \d{4}|corporation tax|multinational|pharma|tech giant|apple|google|meta|microsoft|amazon|intel|pfizer|price of|prices|oil|crude|barrel|opec|per litre|mortgage|property of the week|home of the week|on the market|for sale|asking price|house prices|property market|rents?|landlords?|retail sales|consumer|employment figures|unemployment|jobs announced|redundanc)\b/iu';
+    private const CULTURE_RE = '/\b(film|movie|cinema|netflix|series|season \d|episode|album|single|tour dates|concert|gig|festival|theatre|play|novel|book|author|booker|oscar|bafta|ifta|emmy|grammy|eurovision|late late|rté player|podcast|exhibition|gallery|museum|art|artist|actor|actress|singer|band|dj|comedian|documentary|streaming)\b/iu';
 
     /** Editorial desk → contributor handle. */
     private const DESKS = [
@@ -230,22 +239,41 @@ final class NewsWire
 
     private static function categorise(array $source, string $title, string $summary, array $tags): string
     {
-        $category = $source['category'] ?? 'National';
+        return self::suggest($source['category'] ?? 'National', $title, $summary, $tags, $source);
+    }
+
+    /**
+     * Classifier: source section → tags → strong keyword signals. Public so the newsroom can
+     * show a "suggested section" for stories already stored and re-file them in one click.
+     */
+    public static function suggest(string $category, string $title, string $summary, array $tags = [], array $source = []): string
+    {
         foreach ($tags as $tag) {
             if (in_array($tag, self::WORLD_TAGS, true)) {
                 return 'World';
             }
-            if (in_array($tag, ['business', 'irish business', 'technology'], true)) {
+            if (in_array($tag, ['business', 'irish business', 'technology', 'property', 'personal finance', 'markets'], true)) {
                 $category = 'Business';
-            } elseif (in_array($tag, ['regional', 'dublin news', 'local news'], true)) {
+            } elseif (in_array($tag, ['regional', 'dublin news', 'local news', 'cork news', 'munster', 'connacht', 'leinster', 'ulster'], true)) {
                 $category = 'Local';
-            } elseif (in_array($tag, ['entertainment', 'culture', 'arts', 'music', 'tv & radio', 'movies'], true)) {
+            } elseif (in_array($tag, ['entertainment', 'culture', 'arts', 'music', 'tv & radio', 'movies', 'film', 'books', 'lifestyle', 'life & style'], true)) {
                 $category = 'Culture';
-            } elseif (in_array($tag, ['gaa', 'rugby', 'soccer', 'football', 'hurling', 'racing', 'golf', 'athletics'], true) && $category !== 'Sport') {
+            } elseif (in_array($tag, ['gaa', 'rugby', 'soccer', 'football', 'hurling', 'racing', 'golf', 'athletics', 'sport', 'boxing', 'other sports'], true) && $category !== 'Sport') {
                 $category = 'Sport';
             }
         }
-        $t = mb_strtolower($title . ' ' . $summary);
+        $text = $title . ' ' . $summary;
+        $t = mb_strtolower($text);
+        $sportFeed = ($source['category'] ?? '') === 'Sport' || $category === 'Sport';
+        // Sport first: an NFL game or a tennis final is Sport, wherever it happened.
+        $notSport = preg_match('/\b(garda|gardaí|court|crash|collision|council|planning|died|death|funeral|hospital|€|bank|tax|budget|minister|dáil|election|concert|gig|tour dates|album|singer|announces .{0,20}dates)\b/iu', $title);
+        if (!$sportFeed && !$notSport && (preg_match(self::SPORT_STRONG_RE, $title) || preg_match_all(self::SPORT_WEAK_RE, $title) >= 2)) {
+            $category = 'Sport';
+        }
+        // World: strong foreign markers in the headline and no Irish anchor.
+        if (in_array($category, ['National', 'Local', 'Business', 'Culture'], true) && preg_match(self::WORLD_RE, $title) && !preg_match(self::IRISH_RE, $title)) {
+            return 'World';
+        }
         if (in_array($category, ['National', 'Local'], true)) {
             if (!str_contains($t, 'air traffic') && preg_match('/\b(m50|m7|m8|m9|m11|n11|n4|n7|motorway|road closed|road closure|road traffic|traffic updates|traffic chaos|traffic delays|gridlock|the dart|luas|irish rail|bus éireann|dublin bus|road crash|road collision|multi-vehicle|road safety authority|rsa)\b/u', $t)) {
                 return 'Traffic';
@@ -256,8 +284,30 @@ final class NewsWire
             if (preg_match('/\b(festival|gig|concert|exhibition|fleadh|parade|things to do|what\'s on|line-?up announced|tickets go on sale)\b/u', $t)) {
                 return "What's On";
             }
+            if (preg_match(self::BUSINESS_RE, $title) && !preg_match('/\b(garda|court|crash|died|killed)\b/iu', $title)) {
+                return 'Business';
+            }
+            if (preg_match(self::CULTURE_RE, $title) && preg_match('/\b(review|stars?|premiere|releases?|tour|lineup|line-up|wins|nominated|interview)\b/iu', $title)) {
+                return 'Culture';
+            }
         }
         return Categories::valid($category) ? $category : 'National';
+    }
+
+    /** Compute suggested_category for stored wire stories that lack one (newsroom "Section check"). */
+    public static function resuggest(int $limit = 500): int
+    {
+        $sources = [];
+        foreach (self::sources() as $src) {
+            $sources[$src['name']][] = $src;
+        }
+        $rows = Database::all("SELECT id,title,summary,category,source_name FROM stories WHERE kind='wire' AND status='published' AND suggested_category IS NULL LIMIT ?", [$limit]);
+        foreach ($rows as $r) {
+            $src = $sources[$r['source_name']][0] ?? [];
+            $suggested = self::suggest($r['category'], $r['title'], (string)$r['summary'], [], $src);
+            Database::query('UPDATE stories SET suggested_category=? WHERE id=?', [$suggested, $r['id']]);
+        }
+        return count($rows);
     }
 
     /** Pick the best image reference from media:content, enclosure or media:thumbnail. */
@@ -349,9 +399,15 @@ final class NewsWire
             'trust_score' => 90 + (crc32($story['external_id']) % 7),
             'safety_score' => 99,
             'status' => 'published',
-            'verification_label' => 'Verified',
+            'verification_label' => 'Wire',
             'views' => 40 + (crc32($story['title']) % 900),
+            'suggested_category' => $story['category'],
         ]);
+        try {
+            Clusters::assign($id);
+        } catch (\Throwable $e) {
+            error_log('Clustering ' . $id . ': ' . $e->getMessage());
+        }
         return true;
     }
 

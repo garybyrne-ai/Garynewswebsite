@@ -21,6 +21,7 @@ final class Migrations
             'image_hash' => 'TEXT',
             'exif_json' => 'TEXT',
             'corroborations' => 'INTEGER NOT NULL DEFAULT 0',
+            'cluster_checked' => 'INTEGER NOT NULL DEFAULT 0',
         ],
         'confirmations' => [
             'voter_key' => 'TEXT',
@@ -65,6 +66,11 @@ final class Migrations
         $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('ads_price_cents','2500'),('ads_trial_days','7'),('ads_currency','EUR'),('plus_price_cents','399'),('plus_annual_cents','3900'),('wire_mode','clustered'),('wire_images','1')");
         // Wire stories are labelled by their source, never "Verified" (that word is reserved for reports our desk checked).
         $pdo->exec("UPDATE stories SET verification_label='Wire' WHERE kind='wire' AND verification_label='Verified'");
+        $pdo->exec("UPDATE stories SET signal_json=NULL WHERE signal_json LIKE '%clustered%'");
+        // Cluster and classify existing wire stories on the next page view (bounded, once).
+        if ((int)$pdo->query("SELECT COUNT(*) FROM stories WHERE kind='wire' AND suggested_category IS NULL")->fetchColumn() > 0) {
+            $pdo->exec("INSERT INTO settings(key,value) VALUES('wire_backfill_pending','1') ON CONFLICT(key) DO UPDATE SET value='1'");
+        }
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_stories_cluster ON stories(cluster_id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_confirmations_voter ON confirmations(story_id, voter_key)");
     }

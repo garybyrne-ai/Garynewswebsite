@@ -150,6 +150,8 @@ return static function (Router $r): void {
     $r->post('/api/admin/wire/refresh', [Admin::class, 'refreshWire']);
     $r->get('/api/admin/wire/runs', [Admin::class, 'wireRuns']);
     $r->get('/api/admin/audit', [Admin::class, 'audit']);
+    $r->get('/api/admin/section-check', [Admin::class, 'sectionCheck']);
+    $r->post('/api/admin/stories/{id:[a-f0-9]+}/refile', [Admin::class, 'refile']);
     $r->get('/api/admin/notices', [Admin::class, 'notices']);
     $r->post('/api/admin/notices/{id:[a-f0-9]+}', [Admin::class, 'noticeDecision']);
     $r->get('/api/admin/closures', [Admin::class, 'closures']);

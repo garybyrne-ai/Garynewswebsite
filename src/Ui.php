@@ -34,10 +34,11 @@ final class Ui
         return '<span class="avatar avatar--' . e($size) . '" style="--h:' . $hue . '"><span>' . e(self::initials($name)) . '</span>' . $verified . '</span>';
     }
 
+    /** Editorial label chip. Links to the how-we-check page so the label is always explained. */
     public static function label(string $label): string
     {
         $slug = slugify($label);
-        return '<span class="chip chip--label is-' . e($slug) . '"><i></i>' . e($label) . '</span>';
+        return '<a class="chip chip--label is-' . e($slug) . '" href="/about#labels" title="How we check things">' . '<i></i>' . e($label) . '</a>';
     }
 
     public static function categoryChip(string $category): string
@@ -54,13 +55,20 @@ final class Ui
             . ($img ? '<img src="' . e($img) . '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.closest(\'.card__media\').classList.add(\'is-broken\')">' : '')
             . '<span class="card__fallback">' . icon(Categories::ALL[$s['category']]['icon'] ?? 'national') . '</span>'
             . '<span class="card__corners"></span></a>';
-        $source = $s['kind'] === 'wire'
+        $isWire = $s['kind'] === 'wire';
+        $source = $isWire
             ? '<span class="card__source">' . e($s['source_name']) . '</span>'
             : '<span class="card__source card__source--community">Community report</span>';
         $place = $s['location_name'] ? '<span class="card__place">' . icon('pin') . ' ' . e($s['location_name']) . '</span>' : '';
-        $by = $s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . '</span>' : '';
+        // Wire bylines belong to the publisher's journalist, never to our desk.
+        $by = $isWire ? (!empty($s['source_author']) ? '<span class="card__by">' . e($s['source_author']) . '</span>' : '') : ($s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . '</span>' : '');
         $sig = !empty($s['signal_total']) ? '<span class="chip chip--signal" title="Signal votes">' . icon('signal') . ' ' . (int)$s['signal_total'] . '</span>' : '';
-        $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . self::label($s['verification_label']) . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
+        $cluster = $isWire && $s['cluster_count'] > 1 ? '<span class="chip chip--cluster" title="Outlets covering this story">' . icon('layers') . ' ' . (int)$s['cluster_count'] . ' outlets</span>' : '';
+        $label = $isWire ? '' : self::label($s['verification_label']);
+        $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . $label . $cluster . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
+        if ($isWire && !\MeNews\Services\Wire::images()) {
+            $media = '<a class="card__media card__media--typo" href="' . e($s['url']) . '" tabindex="-1" aria-hidden="true" style="--h:' . $hue . '"><span class="card__typo">' . e(mb_strtoupper(mb_substr($s['source_name'], 0, 2))) . '</span><span class="card__corners"></span></a>';
+        }
         $summary = $s['summary'] ? '<p class="card__summary">' . e(excerpt($s['summary'], $variant === 'feature' ? 260 : 150)) . '</p>' : '';
         $trust = $s['kind'] === 'community' ? '<div class="meter meter--sm" title="Confidence ' . (int)$s['trust_score'] . '/100"><i style="--v:' . (int)$s['trust_score'] . '"></i></div>' : '';
         $views = views_label((int)$s['views']);

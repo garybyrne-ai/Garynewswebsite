@@ -23,6 +23,10 @@ final class Stories
     {
         $sql = self::SELECT . " WHERE s.status='published'";
         $args = [];
+        if (empty($f['all_versions']) && \MeNews\Services\Wire::collapsed()) {
+            // Clustered mode: one card per story, fronted by the outlet that led.
+            $sql .= ' AND (s.cluster_id IS NULL OR s.id=(SELECT c.lead_id FROM story_clusters c WHERE c.id=s.cluster_id))';
+        }
         if (!empty($f['category'])) {
             $sql .= ' AND s.category=?';
             $args[] = $f['category'];
@@ -62,6 +66,9 @@ final class Stories
     {
         $sql = "SELECT COUNT(*) FROM stories s WHERE s.status='published'";
         $args = [];
+        if (\MeNews\Services\Wire::collapsed()) {
+            $sql .= ' AND (s.cluster_id IS NULL OR s.id=(SELECT c.lead_id FROM story_clusters c WHERE c.id=s.cluster_id))';
+        }
         if (!empty($f['category'])) {
             $sql .= ' AND s.category=?';
             $args[] = $f['category'];
@@ -262,7 +269,14 @@ final class Stories
         $s['is_featured'] = (bool)($s['is_featured'] ?? false);
         $s['category_slug'] = Categories::slug((string)$s['category']);
         $s['time'] = $s['published_at'] ?: $s['created_at'];
-        unset($s['media_original'], $s['media_public'], $s['moderation_json'], $s['title_hash'], $s['transcript']);
+        $s['cluster_count'] = (int)($s['cluster_count'] ?? 1);
+        if ($s['kind'] === 'wire' && !\MeNews\Services\Wire::images()) {
+            $s['image'] = null;
+        }
+        if ($s['kind'] === 'wire' && !\MeNews\Services\Wire::summaries()) {
+            $s['summary'] = null;
+        }
+        unset($s['media_original'], $s['media_public'], $s['moderation_json'], $s['title_hash'], $s['transcript'], $s['reporter_contact'], $s['verify_token'], $s['exif_json']);
         return \MeNews\Services\Signal::decorate($s);
     }
 }

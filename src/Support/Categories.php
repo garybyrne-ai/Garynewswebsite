@@ -23,7 +23,13 @@ final class Categories
     /** Sections shown in the primary navigation, in order. */
     public const NAV = ['National', 'Local', 'Business', 'Sport', 'Culture', 'Community', 'Traffic', 'Council', "What's On", 'World'];
 
-    public const LABELS = ['Community Report', 'Developing', 'Verified', 'Official'];
+    public const LABELS = ['Community Report', 'Developing', 'Corroborated', 'Verified', 'Official'];
+
+    /** Labels valid on any story, including the machine-set one for wire headlines. */
+    public static function validLabel(string $label): bool
+    {
+        return in_array($label, self::LABELS, true) || $label === 'Wire';
+    }
 
     public static function names(): array
     {

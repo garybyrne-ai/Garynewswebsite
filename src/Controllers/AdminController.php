@@ -32,6 +32,9 @@ final class AdminController
             'pending' => "stories WHERE status='review'", 'held' => "stories WHERE status='hold'", 'published' => "stories WHERE status='published'",
             'community' => "stories WHERE kind='community' AND status='published'", 'wire' => "stories WHERE kind='wire' AND status='published'",
             'users' => 'users', 'comments_review' => "comments WHERE status='review'", 'ads_review' => "ads WHERE status='review'", 'ads_live' => "ads WHERE status='approved' AND paused=0",
+            'notices_review' => "notices WHERE status='review' AND verified_at IS NOT NULL", 'closures_review' => "closures WHERE status='review'",
+            'section_check' => "stories WHERE kind='wire' AND status='published' AND category_locked=0 AND suggested_category IS NOT NULL AND suggested_category<>category",
+            'takedowns_open' => "takedowns WHERE status='open'",
         ] as $k => $from) {
             $out[$k] = Database::count('SELECT COUNT(*) FROM ' . $from);
         }
@@ -90,9 +93,9 @@ final class AdminController
             throw new HttpException(404, 'Story not found');
         }
         $d = $r->post('decision');
-        $label = $r->post('label', $s['verification_label'] ?: 'Verified');
+        $label = $r->post('label', $s['verification_label'] ?: ($s['kind'] === 'wire' ? 'Wire' : 'Community Report'));
         $status = ['publish' => 'published', 'hold' => 'hold', 'reject' => 'rejected', 'unpublish' => 'hold'][$d] ?? null;
-        if (!$status || !in_array($label, Categories::LABELS, true)) {
+        if (!$status || !Categories::validLabel($label)) {
             throw new HttpException(400, 'Invalid decision or label');
         }
         $public = $s['media_public'];
@@ -140,7 +143,7 @@ final class AdminController
             throw new HttpException(400, 'Invalid section');
         }
         $label = $r->post('label', $s['verification_label'], 40);
-        if (!in_array($label, Categories::LABELS, true)) {
+        if (!Categories::validLabel($label)) {
             throw new HttpException(400, 'Invalid label');
         }
         $county = $r->post('county', (string)$s['county'], 60);
@@ -148,9 +151,9 @@ final class AdminController
         if ($featured) {
             Database::query('UPDATE stories SET is_featured=0 WHERE is_featured=1');
         }
-        Database::query('UPDATE stories SET category=?,county=?,province=?,location_name=?,verification_label=?,is_featured=?,updated_at=? WHERE id=?', [
+        Database::query('UPDATE stories SET category=?,county=?,province=?,location_name=?,verification_label=?,is_featured=?,category_locked=?,suggested_category=?,updated_at=? WHERE id=?', [
             $category, $county, $county !== '' ? Locations::provinceFor($county) : null,
-            $r->post('location_name', (string)$s['location_name'], 100), $label, $featured, now(), $s['id'],
+            $r->post('location_name', (string)$s['location_name'], 100), $label, $featured, $category !== $s['category'] ? 1 : (int)$s['category_locked'], $category, now(), $s['id'],
         ]);
         Audit::log($u['id'], 'story.edit', 'story', $s['id'], "$category/$county/$label/featured=$featured");
         return Response::json(['ok' => true]);
@@ -246,6 +249,36 @@ final class AdminController
             'cron_url' => $u && $u['role'] === 'admin' && $key !== '' ? absolute_url('/cron/wire?key=' . rawurlencode($key)) : null,
             'cron_cli' => 'php ' . ME_ROOT . '/scripts/fetch-news.php --if-stale',
         ]);
+    }
+
+    /** Wire stories whose suggested section differs from the stored one (editor override queue). */
+    public static function sectionCheck(Request $r): Response
+    {
+        self::staff();
+        \MeNews\Services\NewsWire::resuggest(300);
+        $rows = Database::all("SELECT id,slug,title,category,suggested_category,source_name,county,COALESCE(published_at,created_at) AS t FROM stories WHERE kind='wire' AND status='published' AND category_locked=0 AND suggested_category IS NOT NULL AND suggested_category<>category ORDER BY t DESC LIMIT 150");
+        foreach ($rows as &$x) {
+            $x['url'] = '/story/' . $x['slug'];
+        }
+        return Response::json($rows);
+    }
+
+    /** One-click re-file: accept the suggestion (or set any section) and lock it against reclassification. */
+    public static function refile(Request $r, array $p): Response
+    {
+        $u = self::staff();
+        $s = Database::one('SELECT id,category,suggested_category FROM stories WHERE id=?', [$p['id']]);
+        if (!$s) {
+            throw new HttpException(404, 'Story not found');
+        }
+        $to = $r->post('category', '', 40) ?: (string)$s['suggested_category'];
+        if (!Categories::valid($to)) {
+            throw new HttpException(400, 'Invalid section');
+        }
+        $keep = $r->post('keep') === '1';
+        Database::query('UPDATE stories SET category=?,suggested_category=?,category_locked=1,updated_at=? WHERE id=?', [$keep ? $s['category'] : $to, $keep ? $s['category'] : $to, now(), $s['id']]);
+        Audit::log($u['id'], $keep ? 'story.keep-section' : 'story.refile', 'story', $s['id'], $s['category'] . '→' . ($keep ? $s['category'] : $to));
+        return Response::json(['ok' => true, 'category' => $keep ? $s['category'] : $to]);
     }
 
     // ------------------------------------------------------------ local layer

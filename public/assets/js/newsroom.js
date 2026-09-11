@@ -14,7 +14,7 @@
     $$('.view').forEach(v => v.classList.toggle('is-active', v.id === 'view-' + id));
     $$('.appnav button').forEach(b => b.classList.toggle('is-active', b.dataset.view === id));
     history.replaceState(null, '', '#' + id);
-    ({ stories: loadStories, comments: loadComments, users: loadUsers, ads: loadAds, wire: loadWire, audit: loadAudit, review: loadQueue })[id]?.();
+    ({ stories: loadStories, comments: loadComments, users: loadUsers, ads: loadAds, wire: loadWire, audit: loadAudit, review: loadQueue, sections: loadSections, notices: loadNotices, closures: loadClosures, trust: loadTrust, settings: loadSettings })[id]?.();
   }
   $$('.appnav button').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
 
@@ -44,6 +44,7 @@
     $('#stats').innerHTML = [['Review', s.pending, 'warn'], ['Held', s.held, 'bad'], ['Published', s.published], ['Community', s.community], ['Wire', s.wire], ['Users', s.users], ['Comments', s.comments_review], ['Ads', s.ads_review]]
       .map(([k, v, c]) => `<div class="stat"><span class="mono">${k}</span><strong class="${c ? 'is-' + c : ''}">${v}</strong></div>`).join('');
     $('#nav-review-count').textContent = s.pending; $('#nav-comments-count').textContent = s.comments_review; $('#nav-ads-count').textContent = s.ads_review;
+    $('#nav-sections-count').textContent = s.section_check; $('#nav-notices-count').textContent = s.notices_review; $('#nav-takedowns-count').textContent = s.takedowns_open;
     $('#wire-last').textContent = s.wire_last_refresh ? 'Wire updated ' + fmt(s.wire_last_refresh) + (s.wire_stale ? ' (stale)' : '') : 'Wire never refreshed';
   }
 
@@ -160,6 +161,88 @@
     const out = $('#loc-result'); out.textContent = 'Downloading official CSO / Tailte Éireann urban areas…'; e.target.disabled = true;
     try { const j = await api('/api/admin/locations/refresh', { method: 'POST' }); out.textContent = `Loaded ${j.count} official urban areas (${j.source}).`; } catch (err) { out.textContent = err.message; }
     e.target.disabled = false;
+  });
+
+  /* ---- section check (editor override queue) ---- */
+  async function loadSections() {
+    const a = await api('/api/admin/section-check');
+    $('#sections-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table sectioncheck"><thead><tr><th>Story</th><th>Filed as</th><th>Suggested</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
+      <td><b><a href="${esc(x.url)}" target="_blank">${esc(x.title)}</a></b><span class="sub">${esc(x.source_name)} · ${esc(x.county || '')} · ${fmt(x.t)}</span></td>
+      <td><span class="chip chip--cat">${esc(x.category)}</span></td>
+      <td><select data-to>${opts(CATS, x.suggested_category)}</select></td>
+      <td class="actions"><button class="btn btn--good btn--sm" data-refile>Re-file</button><button class="btn btn--ghost btn--sm" data-keep>Keep &amp; lock</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><div class="empty__glyph">—</div><h3>Every section looks right.</h3><p>New wire stories are checked as they arrive.</p></div>';
+  }
+  $('#sections-table').addEventListener('click', async e => {
+    const row = e.target.closest('tr[data-id]'); if (!row) return;
+    try {
+      if (e.target.hasAttribute('data-refile')) { await api('/api/admin/stories/' + row.dataset.id + '/refile', { method: 'POST', body: fd({ category: $('[data-to]', row).value }) }); toast('Re-filed'); }
+      else if (e.target.hasAttribute('data-keep')) { await api('/api/admin/stories/' + row.dataset.id + '/refile', { method: 'POST', body: fd({ keep: '1' }) }); toast('Kept and locked'); }
+      else return;
+      row.remove(); summary();
+    } catch (err) { toast(err.message); }
+  });
+
+  /* ---- notices ---- */
+  async function loadNotices() {
+    const a = await api('/api/admin/notices?status=' + encodeURIComponent($('#notices-status').value));
+    $('#notices-queue').innerHTML = a.length ? a.map(n => `<article class="review" data-id="${n.id}">
+      <div class="inline"><span class="status ${esc(n.status)}">${esc(n.status)}</span><span class="chip chip--cat">${esc(n.kind)}</span>${n.plan === 'promoted' ? '<span class="chip chip--plus">Promoted</span>' : ''}<span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(n.created_at)}</span></div>
+      <h3>${esc(n.title)}</h3>
+      <div class="meta">${esc(n.town || '')}${n.county ? ', Co. ' + esc(n.county) : ''} · ${esc(n.contact_org || n.contact_name || '')}${n.verified_at ? ' · <span class="is-good">email confirmed</span>' : ' · <span class="is-bad">not confirmed yet</span>'}</div>
+      ${n.funeral_at ? `<p><b>Funeral</b> ${esc(n.funeral_at)} ${esc(n.funeral_venue || '')}</p>` : ''}${n.event_at ? `<p><b>When</b> ${esc(n.event_at)} ${esc(n.venue || '')}</p>` : ''}
+      ${n.reposing ? `<p><b>Reposing</b> ${esc(n.reposing)}</p>` : ''}<p>${esc(n.body || '')}</p>${n.family_message ? `<p><i>${esc(n.family_message)}</i></p>` : ''}
+      <label class="form-label">Editor note (emailed to the sender)<textarea data-note rows="2">${esc(n.editorial_note || '')}</textarea></label>
+      <div class="actions">${n.status !== 'published' ? '<button class="btn btn--good btn--sm" data-n="publish">Publish</button>' : '<button class="btn btn--warn btn--sm" data-n="unpublish">Unpublish</button>'}<button class="btn btn--ghost btn--sm" data-n="promote">${n.plan === 'promoted' ? 'Un-promote' : 'Promote 30 days'}</button><button class="btn btn--hot btn--sm" data-n="reject">Reject</button>${n.status === 'published' ? `<a class="btn btn--dark btn--sm" href="${esc(n.url)}" target="_blank">View</a>` : ''}</div>
+    </article>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>Nothing waiting.</h3><p>Notices appear here once the sender confirms from their email.</p></div>';
+  }
+  $('#notices-status').addEventListener('change', loadNotices);
+  $('#notices-queue').addEventListener('click', async e => {
+    const d = e.target.dataset.n; if (!d) return; const card = e.target.closest('[data-id]');
+    try { await api('/api/admin/notices/' + card.dataset.id, { method: 'POST', body: fd({ decision: d, note: $('[data-note]', card).value }) }); toast('Done'); loadNotices(); summary(); } catch (err) { toast(err.message); }
+  });
+
+  /* ---- closures ---- */
+  async function loadClosures() {
+    const a = await api('/api/admin/closures');
+    $('#closures-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>School</th><th>Closed</th><th>Reason</th><th>Contact</th><th>Status</th><th></th></tr></thead><tbody>${a.map(c => `<tr data-id="${c.id}">
+      <td><b>${esc(c.school)}</b><span class="sub">${esc(c.town || '')} Co. ${esc(c.county)}</span></td><td>${esc(c.closed_on)}${c.reopens_on ? ' → ' + esc(c.reopens_on) : ''}</td><td>${esc(c.reason || '')}</td>
+      <td>${esc(c.contact_name || '')} <span class="sub">${esc(c.contact_role || '')} · ${esc(c.contact_email)}${c.verified_at ? ' · confirmed' : ' · unconfirmed'}</span></td>
+      <td><span class="status ${esc(c.status)}">${esc(c.status)}</span></td>
+      <td class="actions">${c.status !== 'published' ? '<button class="btn btn--good btn--sm" data-cl="publish">Publish</button>' : '<button class="btn btn--warn btn--sm" data-cl="unpublish">Remove</button>'}<button class="btn btn--hot btn--sm" data-cl="reject">Reject</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><div class="empty__glyph">—</div><h3>No closures submitted.</h3></div>';
+  }
+  $('#closures-table').addEventListener('click', async e => {
+    const d = e.target.dataset.cl; if (!d) return;
+    try { await api('/api/admin/closures/' + e.target.closest('tr').dataset.id, { method: 'POST', body: fd({ decision: d }) }); loadClosures(); summary(); } catch (err) { toast(err.message); }
+  });
+
+  /* ---- corrections & takedowns ---- */
+  async function loadTrust() {
+    const [t, c] = await Promise.all([api('/api/admin/takedowns'), api('/api/admin/corrections')]);
+    $('#takedowns-table').innerHTML = t.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Page</th><th>Reason</th><th>From</th><th>Status</th><th></th></tr></thead><tbody>${t.map(x => `<tr data-id="${x.id}"><td><a href="${esc(x.url)}" target="_blank">${esc(x.url)}</a><span class="sub">${fmt(x.created_at)} · ${esc(x.detail || '')}</span></td><td>${esc(x.reason)}</td><td>${esc(x.contact)}</td><td><span class="status ${esc(x.status)}">${esc(x.status)}</span>${x.note ? `<span class="sub">${esc(x.note)}</span>` : ''}</td><td class="actions"><input data-tnote placeholder="Note" style="width:140px"><button class="btn btn--good btn--sm" data-t="actioned">Actioned</button><button class="btn btn--ghost btn--sm" data-t="declined">Declined</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><div class="empty__glyph">—</div><h3>No removal requests.</h3></div>';
+    $('#corrections-table').innerHTML = c.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Date</th><th>Story</th><th>Correction</th><th>Editor</th></tr></thead><tbody>${c.map(x => `<tr><td>${fmt(x.created_at)}</td><td>${x.slug ? `<a href="/story/${esc(x.slug)}" target="_blank">${esc(x.story_title || x.title)}</a>` : esc(x.title)}</td><td>${esc(x.summary)}</td><td>${esc(x.editor || '')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="form__legal">No corrections logged.</p>';
+  }
+  $('#takedowns-table').addEventListener('click', async e => {
+    const d = e.target.dataset.t; if (!d) return; const row = e.target.closest('tr');
+    try { await api('/api/admin/takedowns/' + row.dataset.id, { method: 'POST', body: fd({ status: d, note: $('[data-tnote]', row).value }) }); loadTrust(); summary(); } catch (err) { toast(err.message); }
+  });
+  $('#correction-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    try { await api('/api/admin/corrections', { method: 'POST', body: new FormData(e.target) }); toast('Correction published'); e.target.reset(); loadTrust(); } catch (err) { toast(err.message); }
+  });
+
+  /* ---- settings ---- */
+  async function loadSettings() {
+    try {
+      const s = await api('/api/admin/settings');
+      const groups = {};
+      Object.entries(s).forEach(([k, v]) => { (groups[v.group] ??= []).push([k, v]); });
+      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}">`}</label>`;
+      $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(field).join('')}</div></details>` : items.map(field).join('')).join('');
+    } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
+  }
+  $('#settings-form').addEventListener('submit', async e => {
+    e.preventDefault(); const out = $('#settings-result');
+    try { const j = await api('/api/admin/settings', { method: 'POST', body: new FormData(e.target) }); out.textContent = 'Saved ' + j.saved.length + ' settings.'; toast('Settings saved'); } catch (err) { out.textContent = err.message; }
   });
 
   async function loadAudit() {
