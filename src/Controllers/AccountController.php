@@ -205,16 +205,43 @@ final class AccountController
 
     // -------------------------------------------------------- community reporting
 
+    /**
+     * Community report. No account needed for a first report: a guest gives a name and an
+     * email (or mobile); email contacts get a one-tap confirmation link and the report waits
+     * for that plus an editor. Photo first, then a location, then the words.
+     */
     public static function report(Request $r): Response
     {
-        $u = Auth::require();
-        RateLimiter::hit($u['id'] . '|report', 20, 3600, 'You have sent a lot of reports this hour. Please try again later.');
-        $id = uuid();
-        $title = $r->post('title', '', 180);
-        $loc = $r->post('location_name', '', 100);
-        if (mb_strlen($title) < 5) {
-            throw new HttpException(400, 'Add a clearer headline');
+        $u = Auth::user();
+        $guest = null;
+        if ($u) {
+            RateLimiter::hit($u['id'] . '|report', 20, 3600, 'You have sent a lot of reports this hour. Please try again later.');
+        } else {
+            RateLimiter::hit($r->ip() . '|report', 6, 3600, 'Too many reports from this connection this hour. Sign in to send more.');
+            $name = $r->post('reporter_name', '', 80);
+            $contact = mb_strtolower($r->post('reporter_contact', '', 120));
+            if (mb_strlen($name) < 2) {
+                throw new HttpException(400, 'Tell us your name');
+            }
+            $isEmail = filter_var($contact, FILTER_VALIDATE_EMAIL) !== false;
+            $isPhone = (bool)preg_match('/^\+?[0-9 ()-]{7,20}$/', $contact);
+            if (!$isEmail && !$isPhone) {
+                throw new HttpException(400, 'Enter an email address or a mobile number so we can confirm it is you');
+            }
+            $guest = ['name' => $name, 'contact' => $contact, 'email' => $isEmail];
         }
+        $id = uuid();
+        $body = $r->post('body', '', 6000);
+        $title = $r->post('title', '', 180);
+        if (mb_strlen(trim($body)) < 12 && mb_strlen($title) < 5) {
+            throw new HttpException(400, 'Tell us what you can see, in a line or two');
+        }
+        if (mb_strlen($title) < 5) {
+            // Headline from the first sentence of the description
+            $first = preg_split('/(?<=[.!?])\s+/u', trim($body), 2)[0] ?? $body;
+            $title = excerpt($first, 110);
+        }
+        $loc = $r->post('location_name', '', 100);
         if ($loc === '') {
             throw new HttpException(400, 'Choose or enter a location');
         }
@@ -232,46 +259,105 @@ final class AccountController
         }
         $media = null;
         $type = null;
+        $inspect = ['exif' => [], 'hash' => null];
         if ($f = $r->file('media')) {
             [$media, $type] = Media::quarantine($f, $id);
+            try {
+                $inspect = Media::inspect(Media::path($media, 'quarantine'), $type);
+            } catch (\Throwable $e) {
+                error_log('Media inspect: ' . $e->getMessage());
+            }
         }
         $county = $r->post('county', '', 80);
+        if ($county === '' && ($coords['latitude'] ?? null) !== null) {
+            $county = (string)(\MeNews\Support\Geo::nearest($coords['latitude'], $coords['longitude'])['county'] ?? '');
+        }
+        if (($coords['latitude'] ?? null) === null && !empty($inspect['exif']['gps'])) {
+            // No GPS from the browser but the photo carries one: use it, and tell editors where it came from.
+            $coords = ['latitude' => $inspect['exif']['gps']['lat'], 'longitude' => $inspect['exif']['gps']['lng']];
+            $inspect['exif']['gps_used_for_pin'] = true;
+        }
+        $token = $guest ? bin2hex(random_bytes(20)) : null;
         Database::insert('stories', array_merge([
             'id' => $id, 'slug' => Stories::makeSlug($title, $id), 'kind' => 'community',
             'created_at' => now(), 'updated_at' => now(),
-            'author_user_id' => $u['id'], 'author_name' => $u['display_name'],
-            'title' => $title, 'summary' => excerpt($r->post('body'), 220), 'body' => $r->post('body'),
+            'author_user_id' => $u['id'] ?? null, 'author_name' => $u['display_name'] ?? $guest['name'],
+            'title' => $title, 'summary' => excerpt($body, 220), 'body' => $body,
             'location_name' => $loc, 'county' => $county, 'province' => $county ? Locations::provinceFor($county) : $r->post('province', '', 80),
             'local_area' => $r->post('local_area', '', 120), 'category' => $category,
             'media_type' => $type, 'media_original' => $media,
             'status' => 'processing', 'verification_label' => 'Community Report',
+            'reporter_contact' => $guest['contact'] ?? null, 'reporter_verified_at' => $u ? now() : null, 'verify_token' => $token,
+            'image_hash' => $inspect['hash'], 'exif_json' => $inspect['exif'] ? json_encode($inspect['exif']) : null,
         ], $coords));
-        Audit::log($u['id'], 'report.submit', 'story', $id, $title);
-        return Response::json(TrustEngine::process($id));
+        if ($u) {
+            Database::query('UPDATE users SET reports_filed=reports_filed+1 WHERE id=?', [$u['id']]);
+        }
+        Audit::log($u['id'] ?? null, 'report.submit', 'story', $id, $title . ($guest ? ' (guest)' : ''));
+        $out = TrustEngine::process($id);
+        \MeNews\Services\Clusters::assignIncident($id);
+        if ($guest && $guest['email']) {
+            \MeNews\Services\Mailer::send($guest['contact'], 'Confirm your report to ME News',
+                '<p>Thanks, ' . e($guest['name']) . '. One tap to confirm this came from you:</p><p><b>' . e($title) . '</b><br><span style="color:#59685f">' . e($loc . ($county ? ', Co. ' . $county : '')) . '</span></p>'
+                . '<p><a href="' . e(absolute_url('/report/confirm/' . $token)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm my report</a></p>'
+                . '<p style="color:#59685f;font-size:13px">An editor reads every report before it appears. You’ll hear back either way at this address.</p>');
+            $out['message'] = 'Thanks — check your email for a one-tap confirmation. An editor then reads it, and you’ll hear back either way.';
+        } elseif ($guest) {
+            $out['message'] = 'Thanks — the newsroom has it. An editor may ring or text ' . $guest['contact'] . ' to confirm before it goes live.';
+        } else {
+            $out['message'] = 'Thanks — your report is with the newsroom (safety ' . (int)($out['safety_score'] ?? 0) . '/100). You’ll hear back either way in your dashboard.';
+        }
+        return Response::json($out);
     }
 
+    /** One-tap confirmation for guest reports. */
+    public static function confirmReport(Request $r, array $p): Response
+    {
+        $s = Database::one('SELECT id,title,status,reporter_contact,reporter_verified_at FROM stories WHERE verify_token=?', [$p['token']]);
+        if ($s && !$s['reporter_verified_at']) {
+            Database::query('UPDATE stories SET reporter_verified_at=?,updated_at=? WHERE id=?', [now(), now(), $s['id']]);
+            Notifier::staff('report-confirmed', 'Guest confirmed a report: ' . $s['title'], $s['id']);
+        }
+        return \MeNews\View::page('confirmed', [
+            'user' => Auth::user(), 'nav' => Categories::NAV,
+            'title' => ($s ? 'Report confirmed' : 'Link not found') . ' — ME News Ireland',
+            'heading' => $s ? 'Thanks, that’s confirmed.' : 'That link doesn’t match anything.',
+            'text' => $s ? 'An editor will read “' . $s['title'] . '” shortly. If it is published you’ll get an email with the link; if not, you’ll get a note saying why.' : 'The link may have been used already or copied incompletely.',
+            'link' => '/', 'linkText' => 'Back to ME News',
+        ]);
+    }
+
+    /**
+     * "I saw this too": independent confirmation. Signed-in members and anonymous readers
+     * (one per device via the voter cookie) both count; three earn the Corroborated label.
+     */
     public static function confirm(Request $r, array $p): Response
     {
-        $u = Auth::require();
+        $u = Auth::user();
         $s = Database::one("SELECT * FROM stories WHERE id=? AND status='published'", [$p['id']]);
         if (!$s) {
             throw new HttpException(404, 'Story not found');
         }
-        if ($s['author_user_id'] === $u['id']) {
+        if ($u && $s['author_user_id'] === $u['id']) {
             throw new HttpException(400, 'You cannot independently confirm your own report');
         }
-        Database::transaction(static function () use ($u, $s, $r): void {
-            if (Database::one('SELECT id FROM confirmations WHERE story_id=? AND user_id=?', [$s['id'], $u['id']])) {
+        RateLimiter::hit($r->ip() . '|confirm', 40, 3600, 'Too many confirmations from this connection.');
+        $key = \MeNews\Services\Signal::voterKey($u);
+        Database::transaction(static function () use ($u, $s, $r, $key): void {
+            if (Database::one('SELECT id FROM confirmations WHERE story_id=? AND (voter_key=? OR (user_id IS NOT NULL AND user_id=?))', [$s['id'], $key, $u['id'] ?? '-'])) {
                 throw new HttpException(409, 'You already confirmed this story');
             }
-            Database::insert('confirmations', ['story_id' => $s['id'], 'user_id' => $u['id'], 'created_at' => now(), 'confirmer_name' => $u['display_name'], 'note' => $r->post('note', '', 500)]);
-            Database::query('UPDATE stories SET trust_score=MIN(95,trust_score+3),updated_at=? WHERE id=?', [now(), $s['id']]);
+            Database::insert('confirmations', ['story_id' => $s['id'], 'user_id' => $u['id'] ?? null, 'voter_key' => $key, 'created_at' => now(), 'confirmer_name' => $u['display_name'] ?? 'Reader', 'note' => $r->post('note', '', 500)]);
+            $n = Stories::confirmations($s['id']);
+            $label = $s['kind'] === 'community' && $n >= 3 && $s['verification_label'] === 'Community Report' ? 'Corroborated' : $s['verification_label'];
+            Database::query('UPDATE stories SET corroborations=?,trust_score=MIN(95,trust_score+3),verification_label=?,updated_at=? WHERE id=?', [$n, $label, now(), $s['id']]);
         });
+        $n = Stories::confirmations($s['id']);
         if ($s['author_user_id']) {
-            Notifier::send($s['author_user_id'], 'confirmation', 'A community member confirmed your report', $u['display_name'], $s['id']);
+            Notifier::send($s['author_user_id'], 'confirmation', ($n >= 3 ? 'Your report is now Corroborated' : 'Someone saw this too'), $u['display_name'] ?? 'A reader', $s['id']);
         }
-        Audit::log($u['id'], 'story.confirm', 'story', $s['id']);
-        return Response::json(['ok' => true, 'confirmations' => Stories::confirmations($s['id'])]);
+        Audit::log($u['id'] ?? null, 'story.confirm', 'story', $s['id']);
+        return Response::json(['ok' => true, 'confirmations' => $n, 'corroborated' => $n >= 3]);
     }
 
     public static function comment(Request $r, array $p): Response

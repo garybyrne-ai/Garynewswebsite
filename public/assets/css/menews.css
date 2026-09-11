@@ -1290,3 +1290,8 @@ body.has-bottombar .consent{bottom:64px}
 .settingsgrid label{display:flex;flex-direction:column;gap:4px;font:600 .68rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .settingsgrid input,.settingsgrid select{background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;color:var(--ink);font:500 .9rem/1.3 var(--body);letter-spacing:0;text-transform:none}
 .settingsgrid details{grid-column:1/-1}
+.evidence{padding:12px 14px;border:1px dashed var(--line-2);border-radius:var(--r-sm);font-size:.86rem}
+.evidence ul{margin:6px 0 0;padding-left:18px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+.evidence a{color:var(--cy)}
+.grid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){.grid--2{grid-template-columns:1fr}}

@@ -95,6 +95,38 @@ final class Clusters
         return null;
     }
 
+    /**
+     * Community reports of the same incident: same category, within 6 hours and 5 km (or the
+     * same town when no GPS). Editors see one incident with N reports, not N submissions.
+     */
+    public static function assignIncident(string $storyId): ?string
+    {
+        $s = Database::one("SELECT id,title,category,county,location_name,latitude,longitude,created_at FROM stories WHERE id=? AND kind='community'", [$storyId]);
+        if (!$s) {
+            return null;
+        }
+        $from = gmdate('Y-m-d\TH:i:s', strtotime($s['created_at']) - 6 * 3600) . '+00:00';
+        $rows = Database::all("SELECT id,cluster_id,title,latitude,longitude,location_name,county FROM stories WHERE kind='community' AND id<>? AND status IN ('processing','review','hold','published') AND category=? AND created_at>? ORDER BY created_at DESC LIMIT 100", [$s['id'], $s['category'], $from]);
+        $t = self::tokens($s['title']);
+        foreach ($rows as $c) {
+            $near = false;
+            if ($s['latitude'] !== null && $c['latitude'] !== null) {
+                $near = \MeNews\Support\Geo::distanceKm((float)$s['latitude'], (float)$s['longitude'], (float)$c['latitude'], (float)$c['longitude']) <= 5;
+            } elseif ($s['location_name'] && $c['location_name']) {
+                $near = strcasecmp($s['location_name'], $c['location_name']) === 0 && strcasecmp((string)$s['county'], (string)$c['county']) === 0;
+            }
+            if ($near && (self::similar($t, self::tokens($c['title'])) || count(array_intersect_key($t['all'], self::tokens($c['title'])['all'])) >= 1)) {
+                $clusterId = $c['cluster_id'] ?: self::create($c['id']);
+                Database::query('UPDATE stories SET cluster_id=? WHERE id=?', [$clusterId, $s['id']]);
+                $n = Database::count('SELECT COUNT(*) FROM stories WHERE cluster_id=?', [$clusterId]);
+                Database::query('UPDATE story_clusters SET count=?,updated_at=?,framing=? WHERE id=?', [$n, now(), $n . ' reports of this incident', $clusterId]);
+                Database::query('UPDATE stories SET cluster_count=? WHERE cluster_id=?', [$n, $clusterId]);
+                return $clusterId;
+            }
+        }
+        return null;
+    }
+
     private static function create(string $leadId): string
     {
         $id = uuid();

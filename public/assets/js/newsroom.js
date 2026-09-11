@@ -53,8 +53,17 @@
     return `<article class="review" data-id="${x.id}">
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
       <h3>${esc(x.title)}</h3>
-      <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''} · reputation ${x.reporter_reputation ?? '—'}${x.latitude ? ' · GPS' : ''}</div>
+      <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''}${x.author_user_id ? ` · reputation ${x.reporter_reputation ?? '—'}` : (x.reporter_verified_at ? ' · <span class="is-good">guest, contact confirmed</span>' : ` · <span class="is-bad">guest, not yet confirmed</span> (${esc(x.reporter_contact || '')})`)}${x.latitude ? ' · GPS' : ''}</div>
+      ${x.incident_reports && x.incident_reports.length ? `<div class="trustnote"><b>${x.incident_reports.length + 1} reports of this incident.</b> ${x.incident_reports.map(i => `<a href="#" data-jump="${i.id}">${esc(i.author_name || 'Reporter')} · ${esc(i.location_name || '')} · ${esc(i.status)}</a>`).join(' · ')}</div>` : ''}
       ${media}
+      ${x.media_type === 'image' && x.media_url ? `<div class="evidence">
+        <span class="mono">Photo check</span>
+        <ul>
+          <li>${x.exif && x.exif.taken ? `Taken <b>${esc(x.exif.taken)}</b>` : 'No capture time in the file'}${x.exif && x.exif.device ? ` on ${esc(x.exif.device)}` : ''}${x.exif && x.exif.software ? ` · edited with ${esc(x.exif.software)}` : ''}</li>
+          <li>${x.exif && x.exif.gps ? `Photo GPS ${x.exif.gps.lat}, ${x.exif.gps.lng}${x.gps_distance_km !== null && x.gps_distance_km !== undefined ? ` · <b class="${x.gps_distance_km > 5 ? 'is-bad' : 'is-good'}">${x.gps_distance_km} km</b> from the reported position` : (x.exif.gps_used_for_pin ? ' · used as the pin (reporter gave no GPS)' : '')}` : 'No GPS in the photo'}</li>
+          <li>${x.duplicates && x.duplicates.length ? `<b class="is-bad">Same image seen ${x.duplicates.length}× before:</b> ${x.duplicates.map(d => `<a href="${esc(d.url)}" target="_blank">${esc(d.title)}</a> (${esc(d.status)})`).join(', ')}` : 'Image not seen before on ME'}</li>
+          <li>Reverse search: <a href="https://lens.google.com/uploadbyurl?url=${encodeURIComponent(x.public_media_url || '')}" target="_blank" rel="noopener">Google Lens</a> · <a href="https://tineye.com/search?url=${encodeURIComponent(x.public_media_url || '')}" target="_blank" rel="noopener">TinEye</a> · <a href="https://yandex.com/images/search?rpt=imageview&url=${encodeURIComponent(x.public_media_url || '')}" target="_blank" rel="noopener">Yandex</a> <span class="sub">(24-hour signed link to the quarantined file)</span></li>
+        </ul></div>` : ''}
       <p>${esc(x.body || x.summary || '')}</p>
       <div class="scores"><div class="score"><span class="mono">Safety</span><b class="${x.safety_score > 50 ? 'is-good' : 'is-bad'}">${x.safety_score}/100</b></div><div class="score"><span class="mono">Confidence</span><b>${x.trust_score}/100</b></div></div>
       <div class="trustnote">Confidence is an evidence signal only. It does not prove the report is true — you decide the public label.</div>

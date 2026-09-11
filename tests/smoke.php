@@ -59,14 +59,15 @@ check('dashboard redirects anonymous users', $s === 302 || $s === 200);
 echo "\nAPI\n";
 [$s, $h] = http('GET', '/api/health');
 check('health', $s === 200 && ($h['ok'] ?? false), 'version ' . ($h['version'] ?? '?') . ', ' . ($h['stories_published'] ?? 0) . ' stories');
-[$s, $feed] = http('GET', '/api/feed?limit=5');
+[$s, $feed] = http('GET', '/api/feed?limit=5&kind=wire');
 check('feed returns real stories', $s === 200 && count($feed['items'] ?? []) === 5 && ($feed['items'][0]['kind'] ?? '') === 'wire', ($feed['items'][0]['source_name'] ?? '') . ': ' . excerptTitle($feed['items'][0]['title'] ?? ''));
 function excerptTitle(string $t): string { return mb_strlen($t) > 60 ? mb_substr($t, 0, 57) . '…' : $t; }
 $first = $feed['items'][0] ?? [];
 [$s, $story] = http('GET', '/api/story/' . ($first['slug'] ?? 'x'));
 check('story by slug', $s === 200 && ($story['id'] ?? '') === ($first['id'] ?? '-'));
 [$s, $html] = http('GET', '/story/' . ($first['slug'] ?? 'x'), [], [], false);
-check('story page renders', $s === 200 && str_contains($html, 'application/ld+json') && str_contains($html, htmlspecialchars($first['source_name'] ?? '', ENT_QUOTES)));
+check('story page renders', $s === 200 && str_contains($html, htmlspecialchars($first['source_name'] ?? '', ENT_QUOTES)));
+check('wire page canonicalises to the publisher and is noindex', ($first['kind'] ?? '') !== 'wire' || (str_contains($html, 'rel="canonical" href="' . htmlspecialchars($first['source_url'] ?? '', ENT_QUOTES)) && str_contains($html, 'noindex')));
 [$s, $c] = http('GET', '/api/counties');
 check('counties', $s === 200 && count($c) === 26);
 [$s, $l] = http('GET', '/api/locations?q=bray');

@@ -69,9 +69,30 @@ final class AdminController
             $s['moderation'] = json_decode($s['moderation_json'] ?? '{}', true) ?: new \stdClass();
             $s['media_url'] = $s['media_original'] ? '/api/admin/stories/' . $s['id'] . '/preview' : null;
             $s['url'] = '/story/' . $s['slug'];
-            unset($s['moderation_json']);
+            $exif = json_decode($s['exif_json'] ?? '{}', true) ?: [];
+            $s['exif'] = $exif ?: new \stdClass();
+            if ($s['kind'] === 'community') {
+                $s['public_media_url'] = $s['media_original'] && $s['media_type'] === 'image' ? Media::signedQuarantineUrl($s['id']) : null;
+                $s['duplicates'] = $s['image_hash'] ? self::duplicates($s['id'], $s['image_hash']) : [];
+                $s['incident_reports'] = $s['cluster_id'] ? Database::all('SELECT id,title,author_name,location_name,status,created_at FROM stories WHERE cluster_id=? AND id<>? ORDER BY created_at', [$s['cluster_id'], $s['id']]) : [];
+                $s['gps_distance_km'] = (!empty($exif['gps']) && $s['latitude'] !== null && empty($exif['gps_used_for_pin'])) ? round(\MeNews\Support\Geo::distanceKm((float)$s['latitude'], (float)$s['longitude'], (float)$exif['gps']['lat'], (float)$exif['gps']['lng']), 1) : null;
+            }
+            unset($s['moderation_json'], $s['exif_json'], $s['verify_token']);
         }
         return Response::json($rows);
+    }
+
+    /** Other stories carrying the same or a near-identical image (average-hash distance ≤ 6). */
+    private static function duplicates(string $id, string $hash): array
+    {
+        $out = [];
+        foreach (Database::all("SELECT id,slug,title,status,created_at,image_hash FROM stories WHERE image_hash IS NOT NULL AND id<>? AND created_at>? LIMIT 400", [$id, gmdate('Y-m-d\TH:i:s', time() - 90 * 86400) . '+00:00']) as $o) {
+            $d = Media::hashDistance($hash, (string)$o['image_hash']);
+            if ($d <= 6) {
+                $out[] = ['id' => $o['id'], 'title' => $o['title'], 'status' => $o['status'], 'url' => '/story/' . $o['slug'], 'distance' => $d, 'created_at' => $o['created_at']];
+            }
+        }
+        return $out;
     }
 
     /** Preview quarantined media for editors. */
@@ -110,8 +131,11 @@ final class AdminController
         $note = $r->post('note', '', 2000);
         Database::query('UPDATE stories SET status=?,editorial_note=?,verification_label=?,media_public=?,published_at=?,updated_at=? WHERE id=?', [$status, $note, $label, $public, $publishedAt, now(), $s['id']]);
         Audit::log($u['id'], 'story.' . $d, 'story', $s['id'], $label);
-        if ($s['kind'] === 'community' && $s['author_user_id']) {
-            Notifier::send($s['author_user_id'], 'report-status', 'Your report is now ' . $status, $note, $s['id']);
+        if ($s['kind'] === 'community') {
+            Notifier::reportStatus($s, $status, $note);
+            if ($status === 'published' && $s['status'] !== 'published' && $s['author_user_id']) {
+                Database::query('UPDATE users SET reports_published=reports_published+1 WHERE id=?', [$s['author_user_id']]);
+            }
         }
         if ($status === 'published' && $s['status'] !== 'published') {
             Notifier::localAlerts($s);

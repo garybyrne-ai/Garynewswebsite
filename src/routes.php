@@ -122,6 +122,8 @@ return static function (Router $r): void {
 
     // ---- Community reporting & engagement
     $r->post('/api/report', [Account::class, 'report']);
+    $r->get('/report/confirm/{token:[a-f0-9]+}', [Account::class, 'confirmReport']);
+    $r->get('/media/q/{id:[a-f0-9]+}/{sig:[a-f0-9]+}', [Page::class, 'quarantineMedia']);
     $r->post('/api/story/{id:[a-f0-9]+}/confirm', [Account::class, 'confirm']);
     $r->post('/api/story/{id:[a-f0-9]+}/comment', [Account::class, 'comment']);
 

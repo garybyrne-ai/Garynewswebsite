@@ -40,7 +40,7 @@ final class TrustEngine
             $trust = min(82, 38 + ($len > 80 ? 8 : 0) + ($len > 250 ? 5 : 0) + ($s['media_original'] ? 9 : 0)
                 + ($s['latitude'] !== null && $s['longitude'] !== null ? 6 : 0) + (!empty($author['is_verified']) ? 8 : 0));
             $safety = $mod['flagged'] ? 18 : 97;
-            $status = $mod['flagged'] ? 'hold' : (Config::bool('AUTO_PUBLISH_SAFE') ? 'published' : 'review');
+            $status = $mod['flagged'] ? 'hold' : (Config::bool('AUTO_PUBLISH_SAFE') && !empty($s['reporter_verified_at']) ? 'published' : 'review');
             $public = null;
             $publishedAt = $s['published_at'];
             if ($status === 'published') {
@@ -55,6 +55,10 @@ final class TrustEngine
             Notifier::send($s['author_user_id'], 'report-status', 'Your report was safety screened', "Status: {$status}. Safety {$safety}/100. Confidence {$trust}/100.", $id);
             if ($status === 'published' && $s['status'] !== 'published') {
                 Notifier::localAlerts($s);
+                Notifier::reportStatus($s, 'published');
+                if ($s['author_user_id']) {
+                    Database::query('UPDATE users SET reports_published=reports_published+1 WHERE id=?', [$s['author_user_id']]);
+                }
             }
         } catch (Throwable $e) {
             error_log('Trust engine ' . $id . ': ' . $e->getMessage());

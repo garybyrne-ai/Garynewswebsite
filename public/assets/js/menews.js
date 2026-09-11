@@ -175,9 +175,8 @@
       const onScroll = () => { const h = document.documentElement; const max = h.scrollHeight - h.clientHeight; bar.style.width = (max > 0 ? Math.min(100, h.scrollTop / max * 100) : 0) + '%'; };
       document.addEventListener('scroll', onScroll, { passive: true }); onScroll();
     }
-    $('[data-confirm]')?.addEventListener('click', async () => {
-      if (!window.ME.user) return showAuth('signin');
-      try { const j = await api('/api/story/' + id + '/confirm', { method: 'POST', body: new FormData() }); $('#confirm-count').textContent = j.confirmations; toast('Thank you — confirmation recorded'); }
+    $('[data-confirm]')?.addEventListener('click', async e => {
+      try { const j = await api('/api/story/' + id + '/confirm', { method: 'POST', body: new FormData() }); $('#confirm-count').textContent = j.confirmations; e.currentTarget.disabled = true; toast(j.corroborated ? 'Thanks — this report is now Corroborated' : 'Thanks — confirmation recorded'); }
       catch (err) { toast(err.message); }
     });
     $('[data-share]')?.addEventListener('click', async e => {

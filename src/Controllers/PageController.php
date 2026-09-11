@@ -91,7 +91,16 @@ final class PageController
         $per = 24;
         $rows = Stories::feed(['category' => $name], $per, ($page - 1) * $per);
         $total = Stories::countPublished(['category' => $name]);
-        return View::page('listing', self::base([
+        $extra = [];
+        if ($name === 'Community') {
+            $since = gmdate('Y-m-d\TH:i:s', time() - 30 * 86400) . '+00:00';
+            $extra['leaderboard'] = [
+                'counties' => Database::all("SELECT county, COUNT(*) AS n FROM stories WHERE kind='community' AND status='published' AND county<>'' AND COALESCE(published_at,created_at)>? GROUP BY county ORDER BY n DESC LIMIT 10", [$since]),
+                'reporters' => Database::all("SELECT u.display_name,u.handle,u.home_county,u.accent,u.reports_published,u.reports_filed,(SELECT COUNT(*) FROM confirmations c JOIN stories s2 ON s2.id=c.story_id WHERE s2.author_user_id=u.id) AS confirmations FROM users u WHERE u.reports_published>0 ORDER BY u.reports_published DESC, confirmations DESC LIMIT 10"),
+                'whatsapp' => Database::setting('whatsapp_number'),
+            ];
+        }
+        return View::page('listing', self::base($extra + [
             'title' => $name . ' — ME News Ireland',
             'description' => Categories::ALL[$name]['blurb'],
             'heading' => $name,
@@ -324,6 +333,19 @@ final class PageController
             throw new HttpException(404, 'Media not found');
         }
         Media::stream($file);
+    }
+
+    /** Quarantined media via a signed, short-lived URL (for reverse image search tools). */
+    public static function quarantineMedia(Request $r, array $p): Response
+    {
+        if (!Media::verifySignature($p['id'], $p['sig'])) {
+            throw new HttpException(404, 'Media not found');
+        }
+        $row = Database::one('SELECT media_original FROM stories WHERE id=?', [$p['id']]);
+        if (!$row || !$row['media_original']) {
+            throw new HttpException(404, 'Media not found');
+        }
+        Media::stream(Media::path($row['media_original'], 'quarantine'));
     }
 
     public static function sitemap(Request $r): Response

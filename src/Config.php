@@ -72,6 +72,13 @@ final class Config
         return $path;
     }
 
+    /** Secret for signing short-lived URLs. APP_KEY, else CRON_KEY, else derived from the install path. */
+    public static function secret(): string
+    {
+        $k = self::get('APP_KEY') ?: self::get('CRON_KEY');
+        return $k !== '' ? $k : hash('sha256', 'menews|' . ME_ROOT . '|' . (self::$values['ADMIN_EMAIL'] ?? ''));
+    }
+
     public static function appName(): string
     {
         return self::get('APP_NAME', 'ME News Ireland');
