@@ -8,6 +8,10 @@ final class Migrations
 {
     /** table => column => definition */
     private const COLUMNS = [
+        'stories' => [
+            'votes_total' => 'INTEGER NOT NULL DEFAULT 0',
+            'signal_json' => 'TEXT',
+        ],
         'ads' => [
             'design_json' => 'TEXT',
             'logo_path' => 'TEXT',

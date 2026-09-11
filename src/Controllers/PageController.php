@@ -70,6 +70,8 @@ final class PageController
             'youngReaders' => \MeNews\Controllers\KidsController::youngReaders(3),
             'locality' => \MeNews\Support\Visitor::locality(8),
             'countyNames' => Locations::countyNames(),
+            'signalBoard' => \MeNews\Services\Signal::featured(8, 'today'),
+            'signalStats' => \MeNews\Services\Signal::stats(),
             'bodyClass' => 'page-home',
         ]));
     }
@@ -176,6 +178,8 @@ final class PageController
             'confirmations' => Stories::confirmations($story['id']),
             'related' => Stories::related($story, 4),
             'more' => Stories::feed(['exclude' => [$story['id']]], 5),
+            'signal' => \MeNews\Services\Signal::tally($story['id']) + ['mine' => \MeNews\Services\Signal::myVote($story['id'], Auth::user())],
+            'signalRank' => (static function () use ($story) { foreach (\MeNews\Services\Signal::leaderboard('today', 40) as $s) { if ($s['id'] === $story['id']) { return $s['signal_rank']; } } return null; })(),
             'ads' => self::ads($story['county'] ?? '', (string)($story['location_name'] ?? '')),
             'banner' => self::banner($story['county'] ?? '', (string)($story['location_name'] ?? '')),
             'bodyClass' => 'page-story',
@@ -309,7 +313,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/near', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
+        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }

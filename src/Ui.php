@@ -59,7 +59,8 @@ final class Ui
             : '<span class="card__source card__source--community">Community report</span>';
         $place = $s['location_name'] ? '<span class="card__place">◎ ' . e($s['location_name']) . '</span>' : '';
         $by = $s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . '</span>' : '';
-        $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . self::label($s['verification_label']) . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
+        $sig = !empty($s['signal_total']) ? '<span class="chip chip--signal" title="Signal votes">◉ ' . (int)$s['signal_total'] . '</span>' : '';
+        $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . self::label($s['verification_label']) . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
         $summary = $s['summary'] ? '<p class="card__summary">' . e(excerpt($s['summary'], $variant === 'feature' ? 260 : 150)) . '</p>' : '';
         $trust = $s['kind'] === 'community' ? '<div class="meter meter--sm" title="Confidence ' . (int)$s['trust_score'] . '/100"><i style="--v:' . (int)$s['trust_score'] . '"></i></div>' : '';
         $foot = '<div class="card__foot">' . $source . $by . $place . '<span class="card__views">' . e(compact_number((int)$s['views'])) . ' views</span></div>';

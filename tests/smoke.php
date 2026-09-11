@@ -47,7 +47,7 @@ function check(string $name, bool $ok, string $detail = ''): void
 }
 
 echo "ME News smoke test → {$base}\n\nPublic pages\n";
-foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
+foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/signal', '/signal?window=rising', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
     [$s, $html] = http('GET', $p, [], [], false);
     check("GET {$p}", $s === 200 && strlen($html) > 20, "HTTP {$s}");
 }
@@ -99,6 +99,23 @@ check('near-me API flags positions outside Ireland', $s === 200 && empty($far['p
 check('near-me API validates coordinates', $s === 400);
 [$s, $html] = http('GET', '/near', [], [], false);
 check('near page renders without a location', $s === 200 && str_contains($html, 'data-mode="none"'));
+[$s, $v1] = http('POST', '/api/signal/vote', ['story_id' => $first['id'] ?? 'x', 'signal' => 'matters']);
+check('anonymous vote is counted', $s === 200 && ($v1['mine'] ?? '') === 'matters' && ($v1['counts']['matters'] ?? 0) >= 1, 'total ' . ($v1['total'] ?? '?'));
+[$s, $v2] = http('POST', '/api/signal/vote', ['story_id' => $first['id'] ?? 'x', 'signal' => 'good']);
+check('changing a vote keeps one vote per reader', $s === 200 && ($v2['mine'] ?? '') === 'good' && ($v2['total'] ?? -1) === ($v1['total'] ?? -2));
+[$s, $v3] = http('POST', '/api/signal/vote', ['story_id' => $first['id'] ?? 'x', 'signal' => 'good']);
+check('voting the same signal again withdraws it', $s === 200 && array_key_exists('mine', $v3) && $v3['mine'] === null && ($v3['total'] ?? -1) === ($v1['total'] ?? 0) - 1);
+[$s] = http('POST', '/api/signal/vote', ['story_id' => $first['id'] ?? 'x', 'signal' => 'bogus']);
+check('unknown signal rejected', $s === 400);
+http('POST', '/api/signal/vote', ['story_id' => $first['id'] ?? 'x', 'signal' => 'matters']);
+[$s, $board] = http('GET', '/api/signal?window=today&limit=5');
+check('signal leaderboard ranks voted stories', $s === 200 && in_array($first['id'] ?? '-', array_column($board['items'] ?? [], 'id'), true) && ($board['items'][0]['signal_rank'] ?? 0) === 1);
+[$s, $tally] = http('GET', '/api/signal/story/' . ($first['id'] ?? 'x'));
+check('story tally endpoint', $s === 200 && ($tally['mine'] ?? '') === 'matters');
+[$s, $html] = http('GET', '/story/' . ($first['slug'] ?? 'x'), [], [], false);
+check('story page carries the vote widget', $s === 200 && str_contains($html, 'data-vote') && str_contains($html, 'votebtn'));
+[$s, $html] = http('GET', '/', [], [], false);
+check('home page shows the Signal slider', $s === 200 && str_contains($html, 'data-slider') && str_contains($html, 'sigcard'));
 [$s] = http('GET', '/cron/wire?key=wrong', [], [], false);
 check('cron endpoint rejects a bad key', $s === 403);
 [$s, $w] = http('POST', '/api/wire/refresh');

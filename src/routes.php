@@ -6,6 +6,7 @@ use MeNews\Controllers\AdminController as Admin;
 use MeNews\Controllers\AdsController as AdsC;
 use MeNews\Controllers\ApiController as Api;
 use MeNews\Controllers\KidsController as Kids;
+use MeNews\Controllers\SignalController as Sig;
 use MeNews\Controllers\PageController as Page;
 use MeNews\Http\Router;
 
@@ -18,6 +19,10 @@ return static function (Router $r): void {
     $r->get('/search', [Page::class, 'search']);
     $r->get('/map', [Page::class, 'map']);
     $r->get('/near', [Page::class, 'near']);
+    $r->get('/signal', [Sig::class, 'page']);
+    $r->get('/api/signal', [Sig::class, 'board']);
+    $r->get('/api/signal/story/{id:[a-f0-9]+}', [Sig::class, 'story']);
+    $r->post('/api/signal/vote', [Sig::class, 'vote']);
     $r->get('/kids', [Kids::class, 'hub']);
     $r->get('/kids/crossword', [Kids::class, 'crossword']);
     $r->get('/kids/crossword/{date:[0-9]+-[0-9]+-[0-9]+}', [Kids::class, 'crossword']);

@@ -86,6 +86,7 @@ $isApp = str_contains($bodyClass, 'page-app');
     <div class="container sections__in">
       <a href="/" class="<?= $path === '/' ? 'is-active' : '' ?>">Top stories</a>
       <a href="/near" class="sections__near <?= $path === '/near' ? 'is-active' : '' ?>">◎ Near me</a>
+      <a href="/signal" class="sections__signal <?= $path === '/signal' ? 'is-active' : '' ?>">◉ Signal</a>
       <?php foreach ($nav as $name): $slug = \MeNews\Support\Categories::slug($name); ?>
         <a href="/section/<?= e($slug) ?>" class="<?= str_starts_with($path, '/section/' . $slug) ? 'is-active' : '' ?>"><?= e($name) ?></a>
       <?php endforeach; ?>
@@ -114,7 +115,6 @@ $isApp = str_contains($bodyClass, 'page-app');
     <div class="footer__brand">
       <div class="brand__word brand__word--lg"><b>ME</b> News<small>Ireland</small></div>
       <p>Your Community. Your News. Live.<br>Ireland-wide reporting from established publishers, county-by-county community stories, screened by the ME Trust Engine and labelled by human editors.</p>
-      <div class="footer__meta mono">v<?= e(ME_VERSION) ?> · PHP <?= e(PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION) ?> · SQLite · <?= e(date_irish(now(), 'Y')) ?></div>
     </div>
     <div class="footer__col">
       <h4>Sections</h4>
@@ -122,6 +122,7 @@ $isApp = str_contains($bodyClass, 'page-app');
     </div>
     <div class="footer__col">
       <h4>ME News</h4>
+      <a href="/signal">The Signal · most-voted</a>
       <a href="/kids">ME Óg · Kids &amp; puzzles</a>
       <a href="/contributors">Contributors</a>
       <a href="/about">How ME works</a>
@@ -203,6 +204,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 <script src="/assets/js/menews.js?v=<?= e(ME_VERSION) ?>" defer></script>
 <script src="/assets/vendor/leaflet/leaflet.js" defer></script>
 <script src="/assets/js/map.js?v=<?= e(ME_VERSION) ?>" defer></script>
+<script src="/assets/js/signal.js?v=<?= e(ME_VERSION) ?>" defer></script>
 <?php if (str_contains($bodyClass, 'page-kids')): ?><script src="/assets/js/kids.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>
 <?php if (str_contains($bodyClass, 'page-app')): ?><script src="/assets/js/ads.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>

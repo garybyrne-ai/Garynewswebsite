@@ -65,6 +65,10 @@ Every calendar day (Irish time) the site changes: an **edition number** and mast
 
 On first visit a slim banner offers **Use my location**. With permission (phones and computers, over HTTPS) the browser sends coordinates to `/api/near`, which resolves the nearest of 227 towns and its county from `config/geo.json`, gathers every published story within 40 km (widening to 80 km when quiet) ordered by a freshness-weighted distance, and drops a **Near you · Town, Co. County** section into the home page without a reload. The choice is kept in two small cookies (`me_loc`, rounded to ~100 m, and `me_county`) for 30 days and is never attached to an account; visitors can pick a county manually instead, or tap *Forget*. `/near` is the full page with a map centred on the visitor.
 
+## The Signal (reader voting)
+
+ME's own ranking, at `/signal` and as a slider on the home page. Readers vote on *why* a story matters — ⚡ Matters, 🔥 Talking point, 💚 Good news, 🔎 Needs digging — one vote per reader per story (user id when signed in, an anonymous `me_voter` cookie otherwise; tap the same signal again to withdraw). Each vote is weighted: signal (1.4 / 1.0 / 1.1 / 1.2) × voter (signed-in 1.25) × local boost (1.5 when the reader's Near-me county matches the story). A story's score is `(Σ weights + 2×confirmations + 0.5×comments + 2×votes in the last 3 h) ÷ (hours old + 4)^1.2`, so fresh, locally backed, fast-moving stories rise and everything decays. Windows: Today, This week, Rising now; filter by county. The formula is published on the page. Votes are rate-limited (60/hour/IP); the leaderboard is cached for 30 s and invalidated on every vote. Vote widgets sit on every story page and on the slider/leaderboard cards, with live count bumps and a burst animation.
+
 ## ME Ads (advertising platform)
 
 Self-serve local advertising at `/advertise`:

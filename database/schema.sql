@@ -214,3 +214,21 @@ CREATE TABLE IF NOT EXISTS ad_payments (
   detail       TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_ad_payments_ad ON ad_payments(ad_id, created_at DESC);
+
+-- The Signal: reader voting with weighted, decayed, locality-aware ranking
+CREATE TABLE IF NOT EXISTS votes (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  story_id   TEXT NOT NULL,
+  voter_key  TEXT NOT NULL,          -- user id when signed in, otherwise an anonymous voter cookie
+  user_id    TEXT,
+  signal     TEXT NOT NULL,          -- matters | talking | good | digging
+  county     TEXT,                   -- voter's county at vote time (from Near-me cookies)
+  weight     REAL NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT,
+  UNIQUE (story_id, voter_key),
+  FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_votes_story   ON votes(story_id);
+CREATE INDEX IF NOT EXISTS idx_votes_created ON votes(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_votes_voter   ON votes(voter_key);

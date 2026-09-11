@@ -238,6 +238,6 @@ final class Stories
         $s['category_slug'] = Categories::slug((string)$s['category']);
         $s['time'] = $s['published_at'] ?: $s['created_at'];
         unset($s['media_original'], $s['media_public'], $s['moderation_json'], $s['title_hash'], $s['transcript']);
-        return $s;
+        return \MeNews\Services\Signal::decorate($s);
     }
 }

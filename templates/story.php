@@ -63,6 +63,8 @@ if ($isWire) { $jsonld['isBasedOn'] = $story['source_url']; }
         <?php if ($story['editorial_note']): ?><div class="editornote"><span class="kicker">Editor's note</span><p><?= e($story['editorial_note']) ?></p></div><?php endif; ?>
       <?php endif; ?>
 
+      <?= \MeNews\View::partial('partials/vote', ['story' => $story, 'signal' => $signal, 'signalRank' => $signalRank]) ?>
+
       <section class="trust">
         <header class="trust__head"><span class="kicker">ME Trust Engine</span><span class="mono"><?= e($story['verification_label']) ?> — editorial label</span></header>
         <div class="trust__meters">

@@ -51,6 +51,8 @@
 <div class="container layout">
   <div class="layout__main">
 
+    <?= \MeNews\View::partial('partials/signal-slider', compact('signalBoard', 'signalStats')) ?>
+
     <?= \MeNews\View::partial('partials/near', ['locality' => $locality, 'counties' => $countyNames, 'compact' => true]) ?>
 
     <?php $n = 1; foreach ($sections as $name => $rows): ?>
