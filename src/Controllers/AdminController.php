@@ -248,6 +248,106 @@ final class AdminController
         ]);
     }
 
+    // ------------------------------------------------------------ local layer
+
+    public static function notices(Request $r): Response
+    {
+        self::staff();
+        $status = $r->query('status', 'review', 20);
+        $sql = 'SELECT * FROM notices' . ($status !== 'all' ? ' WHERE status=?' : '') . ' ORDER BY created_at DESC LIMIT 200';
+        $rows = Database::all($sql, $status !== 'all' ? [$status] : []);
+        foreach ($rows as &$n) {
+            $n['url'] = '/notices/' . $n['kind'] . '/' . $n['slug'];
+            $n['extra'] = json_decode((string)($n['extra_json'] ?? '{}'), true) ?: new \stdClass();
+            unset($n['verify_token'], $n['extra_json']);
+        }
+        return Response::json($rows);
+    }
+
+    public static function noticeDecision(Request $r, array $p): Response
+    {
+        $u = self::staff();
+        return Response::json(\MeNews\Services\Notices::decide($p['id'], $r->post('decision', '', 20), $r->post('note', '', 1000) ?: null, $u['id']));
+    }
+
+    public static function closures(Request $r): Response
+    {
+        self::staff();
+        return Response::json(Database::all('SELECT id,created_at,status,school,county,town,closed_on,reopens_on,reason,contact_name,contact_role,contact_email,verified_at,published_at FROM closures ORDER BY created_at DESC LIMIT 200'));
+    }
+
+    public static function closureDecision(Request $r, array $p): Response
+    {
+        $u = self::staff();
+        $status = ['publish' => 'published', 'reject' => 'rejected', 'unpublish' => 'review'][$r->post('decision', '', 20)] ?? null;
+        if (!$status) {
+            throw new HttpException(400, 'Invalid decision');
+        }
+        Database::query('UPDATE closures SET status=?,published_at=COALESCE(published_at,?) WHERE id=?', [$status, $status === 'published' ? now() : null, $p['id']]);
+        Audit::log($u['id'], 'closure.' . $status, 'closure', $p['id']);
+        return Response::json(['ok' => true, 'status' => $status]);
+    }
+
+    /** Site settings editable by administrators (prices, WhatsApp numbers, wire mode, ownership text). */
+    public static function settings(Request $r): Response
+    {
+        Auth::require(['admin']);
+        $keys = self::settingKeys();
+        $out = [];
+        foreach ($keys as $k => $meta) {
+            $out[$k] = ['value' => Database::setting($k, (string)$meta['default']), 'label' => $meta['label'], 'group' => $meta['group'], 'type' => $meta['type'], 'options' => $meta['options'] ?? null];
+        }
+        return Response::json($out);
+    }
+
+    public static function saveSettings(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $keys = self::settingKeys();
+        $saved = [];
+        foreach ($_POST as $k => $v) {
+            if (!isset($keys[$k]) || !is_string($v)) {
+                continue;
+            }
+            $v = trim($v);
+            $meta = $keys[$k];
+            if ($meta['type'] === 'cents') {
+                $v = (string)max(0, (int)round((float)str_replace(',', '.', $v) * 100));
+            } elseif ($meta['type'] === 'int') {
+                $v = (string)max(0, (int)$v);
+            } elseif ($meta['type'] === 'select' && !in_array($v, $meta['options'], true)) {
+                continue;
+            }
+            Database::setSetting($k, mb_substr($v, 0, 500));
+            $saved[] = $k;
+        }
+        Audit::log($u['id'], 'settings.save', 'settings', '', implode(',', $saved));
+        return Response::json(['ok' => true, 'saved' => $saved]);
+    }
+
+    private static function settingKeys(): array
+    {
+        $keys = [
+            'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
+            'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'default' => '1'],
+            'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],
+            'plus_annual_cents' => ['label' => 'ME+ annual price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '3900'],
+            'ads_price_cents' => ['label' => 'Advertising monthly price (€)', 'group' => 'Advertising', 'type' => 'cents', 'default' => '2500'],
+            'ads_trial_days' => ['label' => 'Advertising free trial (days)', 'group' => 'Advertising', 'type' => 'int', 'default' => '7'],
+            'whatsapp_number' => ['label' => 'WhatsApp reporting number (national)', 'group' => 'Community', 'type' => 'text', 'default' => ''],
+            'whatsapp_channel' => ['label' => 'WhatsApp channel link (national)', 'group' => 'Community', 'type' => 'text', 'default' => ''],
+            'contact_email' => ['label' => 'Editorial contact email', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
+            'owner_name' => ['label' => 'Owner / publisher name', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Gary Byrne'],
+            'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'ME News Ireland'],
+            'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Ireland'],
+        ];
+        foreach (Locations::countyNames() as $c) {
+            $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by county', 'type' => 'text', 'default' => ''];
+            $keys['whatsapp_channel_' . slugify($c)] = ['label' => $c . ' WhatsApp channel link', 'group' => 'WhatsApp channels by county', 'type' => 'text', 'default' => ''];
+        }
+        return $keys;
+    }
+
     public static function audit(Request $r): Response
     {
         Auth::require(['admin']);

@@ -62,8 +62,10 @@ function date_irish(?string $iso, string $format = 'D j M Y, H:i'): string
         return '';
     }
     try {
-        $dt = new DateTimeImmutable($iso);
-        return $dt->setTimezone(new DateTimeZone(MeNews\Config::get('APP_TIMEZONE', 'Europe/Dublin')))->format($format);
+        $zone = new DateTimeZone(MeNews\Config::get('APP_TIMEZONE', 'Europe/Dublin'));
+        // Naive timestamps (no offset), e.g. funeral or event times typed by a person, are Irish local time.
+        $dt = new DateTimeImmutable($iso, $zone);
+        return $dt->setTimezone($zone)->format($format);
     } catch (Throwable) {
         return '';
     }

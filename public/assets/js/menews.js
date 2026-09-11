@@ -209,7 +209,7 @@
   const countyModal = $('#county-modal');
   const openCounty = () => openModal('county-modal');
   $$('[data-open-county]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); closeDrawer(); openCounty(); }));
-  if (countyModal && !window.ME.located && !dismissed() && !document.body.classList.contains('page-app') && !location.pathname.startsWith('/install')) setTimeout(openCounty, 900);
+  if (countyModal && !window.ME.located && !dismissed() && document.body.classList.contains('page-home') && !new URLSearchParams(location.search).get('county')) setTimeout(openCounty, 900);
   $$('[data-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_county', b.dataset.county, 180); delCookie('me_loc'); toast('Leading with ' + b.dataset.county); location.reload(); }));
   $('[data-county-later]')?.addEventListener('click', () => { closeModals(); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
   async function applyPosition(lat, lng) {
@@ -297,4 +297,68 @@
     setInterval(() => { wireStatus.textContent = 'Updated ' + ago(wireStatus.dataset.last); }, 60000);
   }
 
+})();
+
+/* ---------- local layer: alerts sign-up, closures, notices, poll, takedown, bulletin ---------- */
+(function () {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const api = (u, o) => window.ME.api(u, o);
+  const toast = m => window.ME.toast && window.ME.toast(m);
+  const bindForm = (sel, url, resultSel, after) => $$(sel).forEach(f => f.addEventListener('submit', async e => {
+    e.preventDefault();
+    const out = resultSel ? $(resultSel, f) || $(resultSel) : null; const btn = f.querySelector('[type=submit]');
+    if (out) { out.classList.remove('is-error'); out.textContent = 'One moment…'; }
+    if (btn) btn.disabled = true;
+    try { const j = await api(url, { method: 'POST', body: new FormData(f) }); if (out) out.textContent = j.message || 'Done.'; toast(j.message || 'Done'); if (after) after(j, f); }
+    catch (err) { if (out) { out.classList.add('is-error'); out.textContent = err.message; } else toast(err.message); }
+    if (btn) btn.disabled = false;
+  }));
+  $$('[data-subscribe]').forEach(f => { const c = $('[data-subscribe-county]', f); if (c && !c.value && window.ME.county) c.value = window.ME.county; if (c && c.tagName === 'INPUT' && !c.value) { c.value = ''; } });
+  $$('[data-subscribe]').forEach(f => f.addEventListener('submit', e => { const c = $('[data-subscribe-county]', f); if (c && !c.value) { e.preventDefault(); e.stopImmediatePropagation(); toast('Choose your county first'); window.ME.openModal && window.ME.openModal('county-modal'); } }, true));
+  bindForm('[data-subscribe]', '/api/alerts/subscribe', '[data-subscribe-result]', (j, f) => { if (j.confirmed) f.reset(); });
+  bindForm('[data-closure]', '/api/alerts/closure', '[data-closure-result]', (j, f) => f.reset());
+  bindForm('#takedown-form', '/api/takedown', '#takedown-result', (j, f) => f.reset());
+  bindForm('#notice-form', '/api/notices', '#notice-result', (j, f) => { f.reset(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  /* notice form: show the fields for the chosen kind */
+  const nf = $('#notice-form');
+  if (nf) {
+    const sync = () => {
+      const k = (nf.querySelector('[name=kind]:checked') || {}).value || 'death';
+      $$('[data-for]', nf).forEach(g => g.hidden = !g.dataset.for.split(' ').includes(k));
+      const L = (window.NOTICE_LABELS || {})[k]; if (L) { $('[data-title-label]', nf).textContent = L[0]; $('[data-body-label]', nf).textContent = L[1]; }
+      const org = nf.querySelector('[name=contact_org_job]'); if (org) org.addEventListener('input', () => { nf.querySelector('[name=contact_org]').value = org.value; });
+    };
+    $$('[name=kind]', nf).forEach(r => r.addEventListener('change', sync)); sync();
+  }
+
+  /* weekly poll */
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('.pollopt'); if (!b || b.disabled) return;
+    const w = b.closest('[data-poll]'); const fd = new FormData(); fd.append('poll_id', w.dataset.poll); fd.append('option', b.dataset.option);
+    try {
+      const p = await api('/api/poll/vote', { method: 'POST', body: fd });
+      $$('.pollopt', w).forEach(o => { const i = Number(o.dataset.option); const pct = p.results.pct[i] || 0; o.classList.add('is-result'); o.classList.toggle('is-mine', p.mine === i); $('i', o).style.setProperty('--v', pct); $('[data-pct]', o).textContent = pct + '%'; });
+      const foot = $('[data-poll-foot]', w); if (foot) foot.textContent = 'Thanks · ' + (p.results.total >= 10 ? p.results.total + ' votes so far' : 'tap another option to change') + (!window.ME.county ? ' · choose your county so it counts locally' : '');
+      toast('Vote counted' + (window.ME.county ? ' for ' + window.ME.county : ''));
+    } catch (err) { toast(err.message); }
+  });
+
+  /* 90-second spoken bulletin (Web Speech API) */
+  let bulletinEl = null;
+  $$('[data-bulletin]').forEach(b => b.addEventListener('click', async () => {
+    if (!('speechSynthesis' in window)) return toast('Your browser cannot read aloud');
+    if (bulletinEl) { speechSynthesis.cancel(); bulletinEl.remove(); bulletinEl = null; return; }
+    try {
+      const j = await api('/api/bulletin?county=' + encodeURIComponent(b.dataset.bulletin || ''));
+      bulletinEl = document.createElement('div'); bulletinEl.className = 'bulletin';
+      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'Ireland') + ' bulletin…</span><button type="button">Stop</button>';
+      document.body.appendChild(bulletinEl);
+      bulletinEl.querySelector('button').onclick = () => { speechSynthesis.cancel(); bulletinEl.remove(); bulletinEl = null; };
+      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IE/i.test(v.lang)) || voices.find(v => /en-GB/i.test(v.lang)) || null;
+      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IE'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
+    } catch (err) { toast(err.message); }
+  }));
 })();
