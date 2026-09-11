@@ -453,6 +453,29 @@ p{margin:0}
 .footer__col a{color:var(--ink-2);font-size:.92rem}
 .footer__col a:hover{color:var(--ink)}
 .footer__small{color:var(--muted);font-size:.82rem}
+/* Footer bar + "Made by Crest" credit pill */
+.footer__bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:44px;padding-top:22px;border-top:1px solid var(--line);position:relative;z-index:1}
+.footer__copy{color:var(--muted);font-size:.82rem}
+.crest{--crest-a:var(--cy);--crest-b:var(--vi);--crest-c:var(--em);position:relative;display:inline-flex;border-radius:999px;padding:1.5px;text-decoration:none;isolation:isolate;transition:transform .25s ease}
+.crest__ring{position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--crest-angle,0deg),var(--crest-a),var(--crest-b),var(--crest-c),var(--crest-a));animation:crest-spin 4s linear infinite;z-index:-1}
+.crest::after{content:"";position:absolute;inset:-6px;border-radius:inherit;background:conic-gradient(from var(--crest-angle,0deg),var(--crest-a),var(--crest-b),var(--crest-c),var(--crest-a));filter:blur(12px);opacity:.28;z-index:-2;animation:crest-spin 4s linear infinite}
+.crest__in{position:relative;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 12px;border-radius:inherit;background:color-mix(in srgb,var(--bg-2) 92%,transparent);backdrop-filter:blur(8px);color:var(--ink-2);font:500 .8rem/1 var(--body);letter-spacing:.02em;white-space:nowrap;overflow:hidden}
+.crest__in::before{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);animation:crest-sheen 5s ease-in-out infinite}
+.crest__dot{width:7px;height:7px;border-radius:50%;background:var(--crest-c);box-shadow:0 0 0 0 color-mix(in srgb,var(--crest-c) 60%,transparent);animation:crest-pulse 2.2s ease-out infinite}
+.crest__label{color:var(--muted)}
+.crest__name{font-family:var(--display);font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:linear-gradient(90deg,var(--crest-a),var(--crest-b),var(--crest-c),var(--crest-a));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:crest-hue 6s linear infinite}
+.crest__arrow{color:var(--muted);transition:transform .25s ease,color .25s ease}
+.crest:hover{transform:translateY(-2px)}
+.crest:hover .crest__ring,.crest:hover::after{animation-duration:1.2s}
+.crest:hover::after{opacity:.5}
+.crest:hover .crest__arrow{transform:translate(2px,-2px);color:var(--ink)}
+.crest:focus-visible{outline:2px solid var(--cy);outline-offset:4px}
+@property --crest-angle{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes crest-spin{to{--crest-angle:360deg}}
+@keyframes crest-sheen{0%,60%{left:-60%}100%{left:140%}}
+@keyframes crest-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--crest-c) 60%,transparent)}100%{box-shadow:0 0 0 9px transparent}}
+@keyframes crest-hue{to{background-position:300% 0}}
+.paper .crest{--crest-a:#b8321f;--crest-b:#d98b0c;--crest-c:#2e6b3a}
 .footer__watermark{position:absolute;right:-2vw;bottom:-9vw;font:800 26vw/1 var(--display);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px var(--line-2);opacity:.5;pointer-events:none;user-select:none}
 
 /* ---------- error ---------- */

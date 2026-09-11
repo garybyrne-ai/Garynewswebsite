@@ -137,6 +137,18 @@ $isApp = str_contains($bodyClass, 'page-app');
       <p class="footer__small">Wire headlines link to their original publishers, who retain all rights.</p>
     </div>
   </div>
+  <div class="container footer__bar">
+    <span class="footer__copy">&copy; <?= date('Y') ?> ME News Ireland</span>
+    <a class="crest" href="https://www.crestwebmedia.com" target="_blank" rel="noopener" aria-label="Made by Crest Web Media (opens in a new tab)">
+      <span class="crest__ring" aria-hidden="true"></span>
+      <span class="crest__in">
+        <span class="crest__dot" aria-hidden="true"></span>
+        <span class="crest__label">Made by</span>
+        <span class="crest__name">Crest</span>
+        <svg class="crest__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+  </div>
   <div class="footer__watermark" aria-hidden="true">ME</div>
 </footer>
 <?php endif; ?>
