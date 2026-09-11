@@ -8,16 +8,16 @@ final class Categories
 {
     /** @var array<string,array{slug:string,blurb:string,icon:string}> */
     public const ALL = [
-        'National'  => ['slug' => 'national',  'blurb' => 'Ireland-wide news, politics and public affairs', 'icon' => '◈'],
-        'Local'     => ['slug' => 'local',     'blurb' => 'County-by-county reporting from every corner of the island', 'icon' => '◎'],
-        'Business'  => ['slug' => 'business',  'blurb' => 'Economy, enterprise, jobs and technology', 'icon' => '◇'],
-        'Sport'     => ['slug' => 'sport',     'blurb' => 'GAA, rugby, soccer, racing and everything in between', 'icon' => '◉'],
-        'Culture'   => ['slug' => 'culture',   'blurb' => 'Arts, music, screen, books and Irish life', 'icon' => '❖'],
-        'Community' => ['slug' => 'community', 'blurb' => 'Reports from the people who live where it happens', 'icon' => '⬡'],
-        'Traffic'   => ['slug' => 'traffic',   'blurb' => 'Roads, rail, delays and transport alerts', 'icon' => '⟁'],
-        'Council'   => ['slug' => 'council',   'blurb' => 'Local authorities, planning and civic decisions', 'icon' => '▣'],
-        "What's On" => ['slug' => 'whats-on',  'blurb' => 'Events, festivals, gigs and things to do', 'icon' => '✦'],
-        'World'     => ['slug' => 'world',     'blurb' => 'The stories beyond our shores that matter at home', 'icon' => '◍'],
+        'National'  => ['slug' => 'national',  'blurb' => 'Ireland-wide news, politics and public affairs', 'icon' => 'national'],
+        'Local'     => ['slug' => 'local',     'blurb' => 'County-by-county reporting from every corner of the island', 'icon' => 'pin'],
+        'Business'  => ['slug' => 'business',  'blurb' => 'Economy, enterprise, jobs and technology', 'icon' => 'briefcase'],
+        'Sport'     => ['slug' => 'sport',     'blurb' => 'GAA, rugby, soccer, racing and everything in between', 'icon' => 'trophy'],
+        'Culture'   => ['slug' => 'culture',   'blurb' => 'Arts, music, screen, books and Irish life', 'icon' => 'culture'],
+        'Community' => ['slug' => 'community', 'blurb' => 'Reports from the people who live where it happens', 'icon' => 'community'],
+        'Traffic'   => ['slug' => 'traffic',   'blurb' => 'Roads, rail, delays and transport alerts', 'icon' => 'traffic'],
+        'Council'   => ['slug' => 'council',   'blurb' => 'Local authorities, planning and civic decisions', 'icon' => 'council'],
+        "What's On" => ['slug' => 'whats-on',  'blurb' => 'Events, festivals, gigs and things to do', 'icon' => 'calendar'],
+        'World'     => ['slug' => 'world',     'blurb' => 'The stories beyond our shores that matter at home', 'icon' => 'world'],
     ];
 
     /** Sections shown in the primary navigation, in order. */

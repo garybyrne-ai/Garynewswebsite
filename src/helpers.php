@@ -106,3 +106,33 @@ function compact_number(int|float $n): string
     }
     return (string)$n;
 }
+
+/** Inline SVG icon (see Support\Icons). Decorative unless $label is given. */
+function icon(string $name, string $class = '', string $label = ''): string
+{
+    return MeNews\Support\Icons::svg($name, $class, $label);
+}
+
+/**
+ * Reader-facing view count: never a suspiciously exact number. Below the threshold nothing
+ * is shown at all (no number beats a small number); above it the count is bucketed ("900+").
+ */
+function views_label(int $views, int $threshold = 100): string
+{
+    if ($views < $threshold) {
+        return '';
+    }
+    if ($views >= 10000) {
+        return compact_number((int)floor($views / 1000) * 1000) . '+';
+    }
+    if ($views >= 1000) {
+        return rtrim(rtrim(number_format(floor($views / 100) / 10, 1), '0'), '.') . 'k+';
+    }
+    return (string)((int)floor($views / 100) * 100) . '+';
+}
+
+/** Possessive form for county names ("Dublin's", "Laois'"). */
+function possessive(string $name): string
+{
+    return $name . (str_ends_with($name, 's') ? '’' : '’s');
+}

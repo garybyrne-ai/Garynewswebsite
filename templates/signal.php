@@ -1,7 +1,7 @@
 <?php use MeNews\Services\Signal; use MeNews\Ui; $S = Signal::SIGNALS; $top3 = array_slice($board, 0, 3); $rest = array_slice($board, 3); $st = $stats; ?>
 <section class="container pagehead">
   <span class="kicker">The Signal</span>
-  <h1 class="pagehead__title"><span class="pagehead__icon" aria-hidden="true">◉</span>What Ireland <em>voted for.</em></h1>
+  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon('signal') ?></span>What Ireland <em>voted for.</em></h1>
   <p class="pagehead__blurb">Not likes. Not clicks. Readers say why a story matters — and the Signal ranks the answer with an algorithm you can read, below.</p>
   <div class="signal__stats mono"><span><b><?= (int)$st['votes_today'] ?></b> votes today</span><span><b><?= (int)$st['voters_today'] ?></b> readers</span><span><b><?= (int)$st['stories_today'] ?></b> stories</span><span><b><?= (int)$st['votes_all'] ?></b> all time</span></div>
 </section>
@@ -17,7 +17,7 @@
   <?php if ($top3): ?>
     <div class="podium">
       <?php foreach ($top3 as $i => $s): $top = $s['signal_top'] ? $S[$s['signal_top']] : null; ?>
-        <article class="podium__card podium__card--<?= $i + 1 ?> reveal" style="--i:<?= $i ?>;--c:<?= e($top['colour'] ?? '#47d5ff') ?>;--h:<?= Ui::hue($s['title']) ?>">
+        <article class="podium__card podium__card--<?= $i + 1 ?> reveal" style="--i:<?= $i ?>;--c:<?= e($top['colour'] ?? '#139a5c') ?>;--h:<?= Ui::hue($s['title']) ?>">
           <a class="podium__media" href="<?= e($s['url']) ?>"><?php if ($s['image']): ?><img src="<?= e($s['image']) ?>" alt="" referrerpolicy="no-referrer" onerror="this.remove()"><?php endif; ?><span class="podium__rank mono">#<?= (int)$s['signal_rank'] ?></span></a>
           <div class="podium__body">
             <div class="card__meta"><?= Ui::categoryChip($s['category']) ?><?php if ($top): ?><span class="chip" style="color:var(--c)"><?= e($top['icon']) ?> <?= e($top['label']) ?></span><?php endif; ?><span class="mono" style="margin-left:auto;color:var(--muted)">score <?= e(number_format((float)$s['signal_score'], 1)) ?></span></div>
@@ -34,7 +34,7 @@
   <?php if ($rest): ?>
     <ol class="sigboard">
       <?php foreach ($rest as $s): $top = $s['signal_top'] ? $S[$s['signal_top']] : null; ?>
-        <li class="sigrow reveal" style="--c:<?= e($top['colour'] ?? '#47d5ff') ?>">
+        <li class="sigrow reveal" style="--c:<?= e($top['colour'] ?? '#139a5c') ?>">
           <span class="sigrow__rank mono">#<?= (int)$s['signal_rank'] ?></span>
           <div class="sigrow__body">
             <div class="card__meta"><?= Ui::categoryChip($s['category']) ?><?php if ($top): ?><span class="chip" style="color:var(--c)"><?= e($top['icon']) ?> <?= e($top['label']) ?></span><?php endif; ?><span class="mono" style="color:var(--muted)"><?= e($s['location_name'] ?: 'Ireland') ?> · <?= e(time_ago($s['time'])) ?></span></div>
@@ -51,12 +51,12 @@
   <?php endif; ?>
 
   <?php if (!$board): ?>
-    <div class="empty"><div class="empty__glyph" aria-hidden="true">◉</div><h3>No votes <?= $window === 'today' ? 'yet today' : 'in this window' ?><?= $county ? ' from Co. ' . e($county) : '' ?>.</h3><p>Be the first: open any story and tap a signal, or vote straight from the cards below.</p></div>
+    <div class="empty"><div class="empty__glyph"><?= icon('signal') ?></div><h3>No votes <?= $window === 'today' ? 'yet today' : 'in this window' ?><?= $county ? ' from Co. ' . e($county) : '' ?>.</h3><p>Be the first: open any story and tap a signal, or vote straight from the cards below.</p></div>
   <?php endif; ?>
 
   <?php if ($warmup): ?>
     <section class="block reveal" style="margin-top:36px">
-      <header class="block__head"><span class="block__index mono">◌</span><h2 class="block__title">Warming up · vote on these</h2><p class="block__blurb">The most-read stories right now. Your vote puts them on the board.</p></header>
+      <header class="block__head"><span class="block__index mono"><?= icon('sparkle') ?></span><h2 class="block__title">Warming up · vote on these</h2><p class="block__blurb">The most-read stories right now. Your vote puts them on the board.</p></header>
       <div class="grid grid--4">
         <?php foreach ($warmup as $i => $s): ?>
           <article class="card card--compact" style="--i:<?= $i ?>">

@@ -15,8 +15,8 @@ final class Geo
 
     /** Category → accent colour used for map pins and legends. */
     public const COLOURS = [
-        'National' => '#47d5ff', 'Local' => '#2ef2a8', 'Business' => '#f1c76b', 'Sport' => '#9b8cff', 'Culture' => '#ff8ad4',
-        'Community' => '#ffb547', 'Traffic' => '#ff4d6d', 'Council' => '#7cc4ff', "What's On" => '#c8ff5a', 'World' => '#9aa6b8',
+        'National' => '#139a5c', 'Local' => '#26c072', 'Business' => '#d9a21b', 'Sport' => '#7c6cf0', 'Culture' => '#e0559f',
+        'Community' => '#f0932b', 'Traffic' => '#e23d5c', 'Council' => '#2a8fd6', "What's On" => '#8fd84a', 'World' => '#7f8c99',
     ];
 
     private static function data(): array
@@ -138,6 +138,6 @@ final class Geo
 
     public static function colour(string $category): string
     {
-        return self::COLOURS[$category] ?? '#47d5ff';
+        return self::COLOURS[$category] ?? '#139a5c';
     }
 }

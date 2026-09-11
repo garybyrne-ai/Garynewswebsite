@@ -1,7 +1,7 @@
 <?php $loc = $locality; ?>
 <section class="container pagehead">
   <span class="kicker">Around me</span>
-  <h1 class="pagehead__title"><span class="pagehead__icon" aria-hidden="true">◎</span><?= $loc['mode'] === 'none' ? 'Stories near you' : e($loc['title']) ?></h1>
+  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon('pin') ?></span><?= $loc['mode'] === 'none' ? 'Stories near you' : e($loc['title']) ?></h1>
   <p class="pagehead__blurb"><?= $loc['mode'] === 'gps' ? 'Local news chosen by your position: the nearest town, the county around it and everything happening within ' . (int)$loc['radius'] . ' km.' : 'Allow location access and ME turns into your local paper: the nearest town, your county, and stories sorted by distance.' ?></p>
 </section>
 <div class="container layout">

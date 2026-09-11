@@ -52,14 +52,14 @@ final class Ui
         $img = $s['image'] ?? null;
         $media = '<a class="card__media" href="' . e($s['url']) . '" tabindex="-1" aria-hidden="true" style="--h:' . $hue . '">'
             . ($img ? '<img src="' . e($img) . '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.closest(\'.card__media\').classList.add(\'is-broken\')">' : '')
-            . '<span class="card__fallback"><b>' . e(Categories::ALL[$s['category']]['icon'] ?? '◈') . '</b></span>'
+            . '<span class="card__fallback">' . icon(Categories::ALL[$s['category']]['icon'] ?? 'national') . '</span>'
             . '<span class="card__corners"></span></a>';
         $source = $s['kind'] === 'wire'
             ? '<span class="card__source">' . e($s['source_name']) . '</span>'
             : '<span class="card__source card__source--community">Community report</span>';
-        $place = $s['location_name'] ? '<span class="card__place">◎ ' . e($s['location_name']) . '</span>' : '';
+        $place = $s['location_name'] ? '<span class="card__place">' . icon('pin') . ' ' . e($s['location_name']) . '</span>' : '';
         $by = $s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . '</span>' : '';
-        $sig = !empty($s['signal_total']) ? '<span class="chip chip--signal" title="Signal votes">◉ ' . (int)$s['signal_total'] . '</span>' : '';
+        $sig = !empty($s['signal_total']) ? '<span class="chip chip--signal" title="Signal votes">' . icon('signal') . ' ' . (int)$s['signal_total'] . '</span>' : '';
         $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . self::label($s['verification_label']) . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
         $summary = $s['summary'] ? '<p class="card__summary">' . e(excerpt($s['summary'], $variant === 'feature' ? 260 : 150)) . '</p>' : '';
         $trust = $s['kind'] === 'community' ? '<div class="meter meter--sm" title="Confidence ' . (int)$s['trust_score'] . '/100"><i style="--v:' . (int)$s['trust_score'] . '"></i></div>' : '';

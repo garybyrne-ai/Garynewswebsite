@@ -23,7 +23,7 @@ final class Ads
         'aurora' => ['label' => 'Aurora', 'bg1' => '#0b2a3a', 'bg2' => '#12604f', 'fg' => '#eef7f4', 'ac' => '#2ef2a8'],
         'bold' => ['label' => 'Bold', 'bg1' => '#ff6a1f', 'bg2' => '#c8102e', 'fg' => '#ffffff', 'ac' => '#111111'],
         'clean' => ['label' => 'Clean', 'bg1' => '#ffffff', 'bg2' => '#f2f5fa', 'fg' => '#0a1a33', 'ac' => '#0b4fd1'],
-        'night' => ['label' => 'Night', 'bg1' => '#0a0e18', 'bg2' => '#1b2340', 'fg' => '#f2f4fa', 'ac' => '#47d5ff'],
+        'night' => ['label' => 'Night', 'bg1' => '#0a0e18', 'bg2' => '#1b2340', 'fg' => '#f2f4fa', 'ac' => '#3ddc84'],
         'paper' => ['label' => 'Paper', 'bg1' => '#f7f1e3', 'bg2' => '#efe6d2', 'fg' => '#1c1813', 'ac' => '#b8321f'],
         'photo' => ['label' => 'Photo', 'bg1' => '#05070d', 'bg2' => '#05070d', 'fg' => '#ffffff', 'ac' => '#ffb547'],
     ];

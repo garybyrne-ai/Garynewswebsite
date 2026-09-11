@@ -52,7 +52,7 @@
     return `<article class="review" data-id="${x.id}">
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
       <h3>${esc(x.title)}</h3>
-      <div class="meta">◎ ${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''} · reputation ${x.reporter_reputation ?? '—'}${x.latitude ? ' · GPS' : ''}</div>
+      <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''} · reputation ${x.reporter_reputation ?? '—'}${x.latitude ? ' · GPS' : ''}</div>
       ${media}
       <p>${esc(x.body || x.summary || '')}</p>
       <div class="scores"><div class="score"><span class="mono">Safety</span><b class="${x.safety_score > 50 ? 'is-good' : 'is-bad'}">${x.safety_score}/100</b></div><div class="score"><span class="mono">Confidence</span><b>${x.trust_score}/100</b></div></div>
@@ -66,7 +66,7 @@
   async function loadQueue() {
     const status = $('#queue-status').value;
     const a = await api('/api/admin/stories?kind=community&status=' + encodeURIComponent(status));
-    $('#queue').innerHTML = a.length ? a.map(reviewCard).join('') : '<div class="empty"><div class="empty__glyph">◌</div><h3>Nothing waiting.</h3><p>Community reports appear here after the Trust Engine screens them.</p></div>';
+    $('#queue').innerHTML = a.length ? a.map(reviewCard).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>Nothing waiting.</h3><p>Community reports appear here after the Trust Engine screens them.</p></div>';
   }
   $('#queue-status').addEventListener('change', loadQueue);
   $('#queue').addEventListener('click', async e => {
@@ -114,7 +114,7 @@
 
   async function loadComments() {
     const a = await api('/api/admin/comments');
-    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">◌</div><h3>No flagged comments.</h3></div>';
+    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
   }
   $('#comments-list').addEventListener('click', async e => {
     const d = e.target.dataset.c; if (!d) return;

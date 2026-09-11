@@ -30,9 +30,9 @@ use MeNews\Stories;
 final class Signal
 {
     public const SIGNALS = [
-        'matters' => ['label' => 'Matters', 'icon' => '⚡', 'weight' => 1.4, 'colour' => '#47d5ff', 'blurb' => 'Important for Ireland'],
+        'matters' => ['label' => 'Matters', 'icon' => '⚡', 'weight' => 1.4, 'colour' => '#139a5c', 'blurb' => 'Important for Ireland'],
         'talking' => ['label' => 'Talking point', 'icon' => '🔥', 'weight' => 1.0, 'colour' => '#ff4d6d', 'blurb' => 'Everyone will be discussing this'],
-        'good' => ['label' => 'Good news', 'icon' => '💚', 'weight' => 1.1, 'colour' => '#2ef2a8', 'blurb' => 'A story that lifts the day'],
+        'good' => ['label' => 'Good news', 'icon' => '💚', 'weight' => 1.1, 'colour' => '#26c072', 'blurb' => 'A story that lifts the day'],
         'digging' => ['label' => 'Needs digging', 'icon' => '🔎', 'weight' => 1.2, 'colour' => '#ffb547', 'blurb' => 'Reporters should look closer'],
     ];
     public const VOTER_SIGNED_IN = 1.25;

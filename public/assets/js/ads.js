@@ -88,7 +88,7 @@
           ${ad.status === 'approved' ? `<button class="btn btn--ghost btn--sm" data-act="pause">${ad.paused ? 'Resume' : 'Pause'}</button>` : ''}
           ${!['active', 'past_due'].includes(ad.plan_status) ? `<button class="btn btn--ghost btn--sm" data-act="delete">Delete</button>` : ''}
         </div>
-      </div></article>`).join('') : `<div class="empty"><div class="empty__glyph">◈</div><h3>No adverts yet.</h3><p>Design one in a few minutes. It runs free for ${pricing.trial_days} days after approval, then ${esc(pricing.price_label)}.</p></div>`;
+      </div></article>`).join('') : `<div class="empty"><div class="empty__glyph">—</div><h3>No adverts yet.</h3><p>Design one in a few minutes. It runs free for ${pricing.trial_days} days after approval, then ${esc(pricing.price_label)}.</p></div>`;
     mine._ads = j.ads;
   }
   mine?.addEventListener('click', async e => {
@@ -139,7 +139,7 @@
           <button class="btn btn--ghost btn--sm" data-act="edit">Edit</button>
           ${isAdmin ? `<button class="btn btn--ghost btn--sm" data-act="delete">Delete</button>` : ''}
         </div>
-      </div></article>`).join('') : '<div class="empty"><div class="empty__glyph">◈</div><h3>No adverts match.</h3></div>';
+      </div></article>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No adverts match.</h3></div>';
     list._ads = j.ads;
   }
   $('#ads-status')?.addEventListener('change', loadAdmin);

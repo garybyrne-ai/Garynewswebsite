@@ -10,7 +10,7 @@ foreach ($counties as $c) {
 ?>
 <section class="block block--near reveal" id="near" data-near data-mode="<?= e($loc['mode']) ?>">
   <header class="block__head">
-    <span class="block__index mono">◎</span>
+    <span class="block__index mono"><?= icon('pin') ?></span>
     <h2 class="block__title">
       <?php if ($loc['mode'] === 'none'): ?>Stories near you<?php elseif ($loc['mode'] === 'abroad'): ?>You're outside Ireland<?php else: ?>Near you · <a href="/county/<?= e(slugify((string)$loc['county'])) ?>"><?= e($loc['title']) ?></a><?php endif; ?>
     </h2>
@@ -21,7 +21,7 @@ foreach ($counties as $c) {
       <?php else: ?>Allow location access on your phone or computer and ME builds a local section for your town and county. Your position stays in a cookie on this device and is never saved to an account.<?php endif; ?>
     </p>
     <div class="near__controls">
-      <button class="btn btn--primary btn--sm" type="button" data-locate-me><?= $loc['mode'] === 'gps' ? '◎ Update location' : '◎ Use my location' ?></button>
+      <button class="btn btn--primary btn--sm" type="button" data-locate-me><?= icon('gps') ?> <?= $loc['mode'] === 'gps' ? 'Update location' : 'Use my location' ?></button>
       <label class="near__county"><span class="mono">or county</span><select data-county-pick><option value="">Choose…</option><?= $countyOptions ?></select></label>
       <?php if ($loc['mode'] !== 'none'): ?><button class="btn btn--ghost btn--sm" type="button" data-forget-location>Forget</button><?php endif; ?>
     </div>
@@ -43,8 +43,8 @@ foreach ($counties as $c) {
       </div>
     </div>
   <?php elseif ($loc['mode'] === 'abroad'): ?>
-    <div class="empty"><div class="empty__glyph" aria-hidden="true">◎</div><h3>Nothing near <?= e(number_format((float)$loc['place']['county_km'])) ?> km from the nearest Irish county.</h3><p>Choose a county above and we'll keep it as your local section.</p></div>
+    <div class="empty"><div class="empty__glyph"><?= icon('world') ?></div><h3>Nothing near <?= e(number_format((float)$loc['place']['county_km'])) ?> km from the nearest Irish county.</h3><p>Choose a county above and we'll keep it as your local section.</p></div>
   <?php else: ?>
-    <div class="empty"><div class="empty__glyph" aria-hidden="true">◌</div><h3>Nothing published from here yet.</h3><p>The wire refreshes every few minutes. Try a wider county or report something yourself.</p></div>
+    <div class="empty"><div class="empty__glyph"><?= icon('clock') ?></div><h3>Nothing published from here yet.</h3><p>The wire refreshes every few minutes. Try a wider county or report something yourself.</p></div>
   <?php endif; ?>
 </section>

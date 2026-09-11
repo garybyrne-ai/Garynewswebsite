@@ -1,7 +1,7 @@
 <?php use MeNews\Ui; ?>
 <section class="container pagehead">
   <span class="kicker"><?= e($kicker) ?></span>
-  <h1 class="pagehead__title"><span class="pagehead__icon" aria-hidden="true"><?= e($icon) ?></span><?= e($heading) ?></h1>
+  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon($icon) ?></span><?= e($heading) ?></h1>
   <p class="pagehead__blurb"><?= e($blurb) ?></p>
   <?php if (isset($q)): ?>
     <form class="search search--big" action="/search" role="search"><input type="search" name="q" value="<?= e($q) ?>" placeholder="Search stories, towns, counties…" aria-label="Search" autofocus><button type="submit">Search</button></form>
@@ -17,7 +17,7 @@
       </div>
       <?= Ui::pagination($page, $pages, $basePath, isset($q) ? '&q=' . rawurlencode($q) : '') ?>
     <?php else: ?>
-      <div class="empty"><div class="empty__glyph" aria-hidden="true">◌</div><h3>Nothing published here yet.</h3><p>The wire refreshes every few minutes. Try another section or county, or search for a town.</p></div>
+      <div class="empty"><div class="empty__glyph"><?= icon('clock') ?></div><h3>Nothing published here yet.</h3><p>The wire refreshes every few minutes. Try another section or county, or search for a town.</p></div>
     <?php endif; ?>
   </div>
   <?= \MeNews\View::partial('partials/sidebar', ['trending' => $trending ?? [], 'ads' => $ads ?? []]) ?>

@@ -1,7 +1,7 @@
 <?php /** Home slider. Expects $signalBoard, $signalStats */ use MeNews\Services\Signal; use MeNews\Ui; ?>
 <section class="block block--signal reveal" id="signal">
   <header class="block__head">
-    <span class="block__index mono">◉</span>
+    <span class="block__index mono"><?= icon('signal') ?></span>
     <h2 class="block__title"><a href="/signal">The Signal · Ireland's most-voted stories</a></h2>
     <p class="block__blurb">Readers vote on <em>why</em> a story matters. Local votes weigh more, fresh stories rise, everything decays. <a href="/signal#how">How it works →</a></p>
     <div class="signal__stats mono"><span><b><?= (int)$signalStats['votes_today'] ?></b> votes today</span><span><b><?= (int)$signalStats['stories_today'] ?></b> stories</span><a class="block__more" href="/signal">Full leaderboard →</a></div>
@@ -10,10 +10,10 @@
     <button type="button" class="slider__arrow slider__arrow--prev" data-slide="-1" aria-label="Previous">‹</button>
     <div class="slider__track" data-track>
       <?php foreach ($signalBoard as $i => $s): $hue = Ui::hue($s['title']); $top = $s['signal_top'] ? Signal::SIGNALS[$s['signal_top']] : null; ?>
-        <article class="sigcard <?= !empty($s['signal_warmup']) ? 'sigcard--warmup' : '' ?>" style="--h:<?= $hue ?>;--c:<?= e($top['colour'] ?? '#47d5ff') ?>" data-story="<?= e($s['id']) ?>">
+        <article class="sigcard <?= !empty($s['signal_warmup']) ? 'sigcard--warmup' : '' ?>" style="--h:<?= $hue ?>;--c:<?= e($top['colour'] ?? '#139a5c') ?>" data-story="<?= e($s['id']) ?>">
           <a class="sigcard__media" href="<?= e($s['url']) ?>" tabindex="-1" aria-hidden="true">
             <?php if ($s['image']): ?><img src="<?= e($s['image']) ?>" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><?php endif; ?>
-            <span class="sigcard__rank mono"><?= !empty($s['signal_warmup']) ? '◌' : '#' . (int)$s['signal_rank'] ?></span>
+            <span class="sigcard__rank mono"><?= !empty($s['signal_warmup']) ? icon('sparkle') : '#' . (int)$s['signal_rank'] ?></span>
             <span class="sigcard__ring" style="--pct:<?= min(100, (int)$s['signal_total'] * 8) ?>"><b><?= (int)$s['signal_total'] ?></b><small>votes</small></span>
           </a>
           <div class="sigcard__body">

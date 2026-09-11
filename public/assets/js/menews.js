@@ -36,6 +36,20 @@
     try { localStorage.setItem('me_theme', next); } catch (e) { }
   });
 
+  /* ---------- text size (stored per device) ---------- */
+  const sizeBtns = $$('[data-textsize]');
+  if (sizeBtns.length) {
+    const cur = () => document.documentElement.getAttribute('data-textsize') || '';
+    const paint = () => sizeBtns.forEach(b => b.classList.toggle('is-active', b.dataset.textsize === cur()));
+    sizeBtns.forEach(b => b.addEventListener('click', () => {
+      const v = b.dataset.textsize;
+      if (v) document.documentElement.setAttribute('data-textsize', v); else document.documentElement.removeAttribute('data-textsize');
+      try { if (v) localStorage.setItem('me_textsize', v); else localStorage.removeItem('me_textsize'); } catch (e) { }
+      paint();
+    }));
+    paint();
+  }
+
   /* ---------- HUD clock (Irish time) ---------- */
   const clock = $('#hud-clock'), dateEl = $('#hud-date');
   if (clock) {
@@ -214,7 +228,7 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Locating…'; }
     navigator.geolocation.getCurrentPosition(
       pos => { if (locbar) locbar.hidden = true; applyPosition(pos.coords.latitude, pos.coords.longitude); },
-      err => { if (btn) { btn.disabled = false; btn.textContent = '◎ Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a county instead' : 'Could not get your location'); },
+      err => { if (btn) { btn.disabled = false; btn.textContent = 'Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a county instead' : 'Could not get your location'); },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 }
     );
   }
@@ -235,7 +249,7 @@
         const j = await api('/api/wire/refresh', { method: 'POST' });
         wireStatus.dataset.last = j.last_refresh || wireStatus.dataset.last;
         wireStatus.textContent = 'Updated ' + ago(wireStatus.dataset.last);
-        if (j.inserted > 0) { const pill = $('#new-stories'); pill.hidden = false; pill.querySelector('button').textContent = `◌ ${j.inserted} new stor${j.inserted === 1 ? 'y' : 'ies'} on the wire — refresh`; pill.querySelector('button').onclick = () => location.reload(); }
+        if (j.inserted > 0) { const pill = $('#new-stories'); pill.hidden = false; pill.querySelector('button').textContent = `${j.inserted} new stor${j.inserted === 1 ? 'y' : 'ies'} on the wire — refresh`; pill.querySelector('button').onclick = () => location.reload(); }
       } catch (e) { wireStatus.textContent = 'Updated ' + ago(wireStatus.dataset.last); }
     }, 2500);
     setInterval(() => { wireStatus.textContent = 'Updated ' + ago(wireStatus.dataset.last); }, 60000);

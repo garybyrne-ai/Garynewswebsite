@@ -12,7 +12,7 @@
     <span class="masthead__ed">Edition No. <?= (int)$edition ?></span>
     <span class="masthead__date"><?= e($longDate) ?></span>
     <?php if ($weather): ?>
-      <span class="masthead__sun">☀ <?= e($weather['sunrise']) ?> · ☾ <?= e($weather['sunset']) ?></span>
+      <span class="masthead__sun"><?= icon('sun') ?> <?= e($weather['sunrise']) ?> · <?= icon('moon') ?> <?= e($weather['sunset']) ?></span>
       <span class="masthead__wx"><?php foreach (array_slice($weather['cities'], 0, 5) as $c): ?><span><?= e($c['icon']) ?> <?= e($c['name']) ?> <b><?= (int)$c['temp'] ?>°</b></span><?php endforeach; ?></span>
     <?php endif; ?>
     <span class="masthead__focal">Focal an lae: <b><?= e($focal['irish']) ?></b> — <?= e($focal['english']) ?></span>
@@ -71,7 +71,7 @@
 
     <section class="block block--community reveal" id="community">
       <header class="block__head">
-        <span class="block__index mono">⬡</span>
+        <span class="block__index mono"><?= icon('community') ?></span>
         <h2 class="block__title"><a href="/section/community">From the ground</a></h2>
         <p class="block__blurb">Community reports go through private quarantine, safety screening and an editor before they appear here.</p>
         <button class="btn btn--hot" type="button" data-open-report><span class="livedot livedot--white"></span> Report a story</button>
@@ -82,7 +82,7 @@
         </div>
       <?php else: ?>
         <div class="empty">
-          <div class="empty__glyph" aria-hidden="true">⬡</div>
+          <div class="empty__glyph"><?= icon('community') ?></div>
           <h3>No community reports published yet.</h3>
           <p>Be the first: sign in, tap <b>Report</b>, and tell the newsroom what you can see. Every submission is screened before an editor decides.</p>
         </div>
@@ -93,7 +93,7 @@
 
     <section class="block reveal">
       <header class="block__head">
-        <span class="block__index mono">◈</span>
+        <span class="block__index mono"><?= icon('users') ?></span>
         <h2 class="block__title">Meet the desk</h2>
         <p class="block__blurb">Five editors, five desks, one island. Every story on ME has a named person responsible for it.</p>
         <a class="block__more mono" href="/contributors">All contributors →</a>

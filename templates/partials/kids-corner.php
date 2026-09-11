@@ -1,7 +1,7 @@
 <?php /** Home page kids block. Expects $crossword, $quiz, $focal, $edition, $longDate, $youngReaders */ $q = $quiz['questions'][0] ?? null; ?>
 <section class="block reveal" id="kids">
   <header class="block__head">
-    <span class="block__index mono">✦</span>
+    <span class="block__index mono"><?= icon('kids') ?></span>
     <h2 class="block__title"><a href="/kids">ME Óg · The Junior Post</a></h2>
     <p class="block__blurb">Old-school newspaper fun, printed fresh every day: a crossword, a word search, a quiz, the Irish word of the day and free things to do.</p>
     <a class="block__more mono" href="/kids">Open today's edition →</a>

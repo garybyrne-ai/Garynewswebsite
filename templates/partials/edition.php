@@ -3,7 +3,7 @@
   <header class="panel__head"><span class="kicker">Today's edition</span><span class="mono panel__hint">No. <?= (int)$edition ?></span></header>
   <div class="edition__date"><?= e($greeting) ?>. <b><?= e($longDate) ?></b></div>
   <?php if ($weather): ?>
-    <div class="edition__sun mono"><span>☀ Sunrise <?= e($weather['sunrise']) ?></span><span>☾ Sunset <?= e($weather['sunset']) ?></span></div>
+    <div class="edition__sun mono"><span><?= icon('sun') ?> Sunrise <?= e($weather['sunrise']) ?></span><span><?= icon('moon') ?> Sunset <?= e($weather['sunset']) ?></span></div>
     <ul class="wx">
       <?php foreach ($weather['cities'] as $c): ?>
         <li title="<?= e($c['label']) ?>, wind <?= (int)$c['wind'] ?> km/h"><span class="wx__icon" aria-hidden="true"><?= e($c['icon']) ?></span><span class="wx__name"><?= e($c['name']) ?></span><b class="wx__temp"><?= (int)$c['temp'] ?>°</b><span class="wx__range mono"><?= (int)$c['min'] ?>–<?= (int)$c['max'] ?>°</span></li>

@@ -35,7 +35,7 @@
       ['Reports', a.length], ['Published', published], ['Reputation', me.reputation + '/100'], ['Plan', me.plan === 'ME+' ? 'ME+' : 'Free'],
     ].map(([k, v]) => `<div class="stat"><span class="mono">${k}</span><strong>${v}</strong></div>`).join('');
     $('#report-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Report</th><th>Area</th><th>Status</th><th>Safety</th><th>Confidence</th><th>Views</th></tr></thead><tbody>${a.map(x => `<tr><td><b>${x.status === 'published' ? `<a href="/story/${esc(x.slug)}">${esc(x.title)}</a>` : esc(x.title)}</b><span class="sub">${fmt(x.created_at)} · ${esc(x.category)}</span>${x.editorial_note ? `<span class="sub is-warn">Editor: ${esc(x.editorial_note)}</span>` : ''}</td><td>${esc(x.location_name || '')}<span class="sub">${esc(x.county || '')}</span></td><td><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="sub">${esc(x.verification_label)}</span></td><td>${x.safety_score}/100</td><td>${x.trust_score}/100</td><td>${x.views || 0}</td></tr>`).join('')}</tbody></table></div>`
-      : '<div class="empty"><div class="empty__glyph">⬡</div><h3>You have not submitted a report yet.</h3><p>Tap <b>Report</b> in the header when you see something happening near you.</p></div>';
+      : '<div class="empty"><div class="empty__glyph">—</div><h3>You have not submitted a report yet.</h3><p>Tap <b>Report</b> in the header when you see something happening near you.</p></div>';
     $('#nav-reports-count').textContent = a.length;
   }
 

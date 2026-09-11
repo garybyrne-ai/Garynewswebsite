@@ -25,11 +25,12 @@ if ($isWire) { $jsonld['isBasedOn'] = $story['source_url']; }
       <?php else: ?>
         <span class="byline"><?= Ui::avatar(null, 'md', $story['author_name'] ?: 'ME') ?><span><b><?= e($story['author_name'] ?: 'Community reporter') ?></b></span></span>
       <?php endif; ?>
+      <div class="textsize" role="group" aria-label="Text size"><button type="button" data-textsize="" aria-label="Normal text">A</button><button type="button" data-textsize="lg" aria-label="Larger text">A</button><button type="button" data-textsize="xl" aria-label="Largest text">A</button></div>
       <div class="article__time mono">
         <time datetime="<?= e($story['time']) ?>"><?= e(date_irish($story['time'])) ?></time>
         <span>·</span><span><?= e(time_ago($story['time'])) ?></span>
         <span>·</span><span><?= e(compact_number((int)$story['views'])) ?> views</span>
-        <?php if ($story['location_name']): ?><span>·</span><span>◎ <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', Co. ' . e($story['county']) : '' ?></span><?php endif; ?>
+        <?php if ($story['location_name']): ?><span>·</span><span><?= icon('pin') ?> <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', Co. ' . e($story['county']) : '' ?></span><?php endif; ?>
       </div>
     </div>
   </header>

@@ -31,7 +31,7 @@
       pts.forEach((p, i) => L.marker([p.latitude, p.longitude], { icon: pinIcon(p, i), riseOnHover: true }).bindPopup(popup(p), { maxWidth: 300, className: 'me-popup' }).addTo(pinLayer));
       if (!filter.category && !filter.kind) {
         const max = Math.max(1, ...counties.map(c => c.n));
-        counties.forEach(c => L.circleMarker([c.latitude, c.longitude], { radius: 10 + Math.sqrt(c.n / max) * 26, color: 'rgba(71,213,255,.35)', weight: 1, fillColor: '#47d5ff', fillOpacity: .07, interactive: true })
+        counties.forEach(c => L.circleMarker([c.latitude, c.longitude], { radius: 10 + Math.sqrt(c.n / max) * 26, color: 'rgba(38,192,114,.35)', weight: 1, fillColor: '#47d5ff', fillOpacity: .07, interactive: true })
           .bindTooltip(`<b>Co. ${esc(c.county)}</b> · ${c.n} stories this week`, { className: 'me-tip', direction: 'top' })
           .on('click', () => location.href = c.url).addTo(countyLayer));
       }

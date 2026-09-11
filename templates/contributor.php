@@ -7,7 +7,7 @@
     <p class="profile__title"><?= e($c['title']) ?></p>
     <p class="pagehead__blurb"><?= e($c['bio']) ?></p>
     <div class="profile__meta mono">
-      <?php if ($c['home_town']): ?><span>◎ <?= e($c['home_town']) ?>, Co. <?= e($c['home_county']) ?></span><?php endif; ?>
+      <?php if ($c['home_town']): ?><span><?= icon('pin') ?> <?= e($c['home_town']) ?>, Co. <?= e($c['home_county']) ?></span><?php endif; ?>
       <span><?= (int)$total ?> stories</span>
       <span>Reputation <?= (int)$c['reputation'] ?>/100</span>
       <span>Joined <?= e(date_irish($c['created_at'], 'M Y')) ?></span>
@@ -19,6 +19,6 @@
     <div class="grid grid--3"><?php foreach ($rows as $i => $s): ?><?= Ui::card($s, 'standard', $i) ?><?php endforeach; ?></div>
     <?= Ui::pagination($page, $pages, $basePath) ?>
   <?php else: ?>
-    <div class="empty"><div class="empty__glyph" aria-hidden="true">◌</div><h3>No stories filed yet.</h3></div>
+    <div class="empty"><div class="empty__glyph"><?= icon('clock') ?></div><h3>No stories filed yet.</h3></div>
   <?php endif; ?>
 </div>

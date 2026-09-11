@@ -10,13 +10,13 @@ $path = $_SERVER['REQUEST_URI'] ?? '/';
 $isStaff = \MeNews\Auth::isStaff($user);
 $isApp = str_contains($bodyClass, 'page-app');
 ?><!doctype html>
-<html lang="en-IE" data-theme="dark" style="--day-shift:<?= \MeNews\Support\Daily::hueShift() ?>deg">
+<html lang="en-IE" data-theme="light" style="--day-shift:<?= \MeNews\Support\Daily::hueShift() ?>deg">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title><?= e($title) ?></title>
 <meta name="description" content="<?= e($description) ?>">
-<meta name="theme-color" content="#05070d">
+<meta name="theme-color" content="#139a5c">
 <meta property="og:site_name" content="ME News Ireland">
 <meta property="og:title" content="<?= e($title) ?>">
 <meta property="og:description" content="<?= e($description) ?>">
@@ -31,7 +31,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 <?php if (str_contains($bodyClass, 'page-kids') || str_contains($bodyClass, 'page-home')): ?><link rel="preload" href="/assets/fonts/Fraunces.woff2" as="font" type="font/woff2" crossorigin><?php endif; ?>
 <link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_VERSION) ?>">
-<script>try{var t=localStorage.getItem('me_theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>try{var t=localStorage.getItem('me_theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var ts=localStorage.getItem('me_textsize');if(ts)document.documentElement.setAttribute('data-textsize',ts)}catch(e){}</script>
 </head>
 <body class="<?= e($bodyClass) ?>">
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -55,15 +55,15 @@ $isApp = str_contains($bodyClass, 'page-app');
 <header class="topbar">
   <div class="container topbar__in">
     <a class="brand" href="/" aria-label="ME News Ireland home">
-      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2ef2a8"/><stop offset=".55" stop-color="#47d5ff"/><stop offset="1" stop-color="#9b8cff"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg>
+      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg>
       <span class="brand__word"><b>ME</b> News<small>Ireland</small></span>
     </a>
     <form class="search" action="/search" role="search">
       <input type="search" name="q" placeholder="Search stories, towns, counties…" value="<?= e($q ?? '') ?>" aria-label="Search">
-      <button type="submit" aria-label="Search">⌕</button>
+      <button type="submit" aria-label="Search"><?= icon('search') ?></button>
     </form>
     <div class="topbar__actions">
-      <button class="iconbtn" id="theme-toggle" type="button" aria-label="Toggle light and dark theme"><span class="sun">☼</span><span class="moon">☾</span></button>
+      <button class="iconbtn" id="theme-toggle" type="button" aria-label="Toggle light and dark theme"><span class="sun"><?= icon('sun') ?></span><span class="moon"><?= icon('moon') ?></span></button>
       <button class="btn btn--hot" type="button" data-open-report><span class="livedot livedot--white"></span> Report</button>
       <?php if ($user): ?>
         <div class="account">
@@ -85,8 +85,8 @@ $isApp = str_contains($bodyClass, 'page-app');
   <nav class="sections" aria-label="Sections">
     <div class="container sections__in">
       <a href="/" class="<?= $path === '/' ? 'is-active' : '' ?>">Top stories</a>
-      <a href="/near" class="sections__near <?= $path === '/near' ? 'is-active' : '' ?>">◎ Near me</a>
-      <a href="/signal" class="sections__signal <?= $path === '/signal' ? 'is-active' : '' ?>">◉ Signal</a>
+      <a href="/near" class="sections__near <?= $path === '/near' ? 'is-active' : '' ?>"><?= icon('pin') ?> Near me</a>
+      <a href="/signal" class="sections__signal <?= $path === '/signal' ? 'is-active' : '' ?>"><?= icon('signal') ?> Signal</a>
       <?php foreach ($nav as $name): $slug = \MeNews\Support\Categories::slug($name); ?>
         <a href="/section/<?= e($slug) ?>" class="<?= str_starts_with($path, '/section/' . $slug) ? 'is-active' : '' ?>"><?= e($name) ?></a>
       <?php endforeach; ?>
@@ -101,7 +101,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 <div class="locbar" id="locbar" hidden>
   <div class="container locbar__in">
     <span class="locbar__text"><b>Local stories for your area.</b> Allow location on your phone or computer and ME adds a section for your town and county.</span>
-    <span class="locbar__actions"><button class="btn btn--primary btn--sm" type="button" data-locate-me>◎ Use my location</button><button class="btn btn--ghost btn--sm" type="button" data-locbar-dismiss>Not now</button></span>
+    <span class="locbar__actions"><button class="btn btn--primary btn--sm" type="button" data-locate-me><?= icon('gps') ?> Use my location</button><button class="btn btn--ghost btn--sm" type="button" data-locbar-dismiss>Not now</button></span>
   </div>
 </div>
 
@@ -199,7 +199,7 @@ $isApp = str_contains($bodyClass, 'page-app');
         <label>Photo or video (optional)<input name="media" type="file" accept="image/*,video/*"></label>
         <input type="hidden" name="latitude" id="report-lat"><input type="hidden" name="longitude" id="report-lng"><input type="hidden" name="province" id="report-province">
         <div class="form__actions">
-          <button type="button" class="btn btn--ghost" data-gps>◎ Add my GPS</button>
+          <button type="button" class="btn btn--ghost" data-gps><?= icon('gps') ?> Add my GPS</button>
           <button class="btn btn--hot" type="submit">Send to newsroom</button>
         </div>
       </form>
@@ -210,7 +210,7 @@ $isApp = str_contains($bodyClass, 'page-app');
 </div>
 <datalist id="all-locations"></datalist>
 <div class="toast mono" id="toast" role="status" aria-live="polite"></div>
-<div class="newpill mono" id="new-stories" hidden><button type="button">◌ New stories on the wire — refresh</button></div>
+<div class="newpill mono" id="new-stories" hidden><button type="button"><?= icon('refresh') ?> New stories on the wire — refresh</button></div>
 
 <script>window.ME={located:<?= (\MeNews\Support\Visitor::position() || \MeNews\Support\Visitor::county()) ? 'true' : 'false' ?>,user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
 <script src="/assets/js/menews.js?v=<?= e(ME_VERSION) ?>" defer></script>

@@ -15,7 +15,7 @@
           <p class="profile__title"><?= e($c['title']) ?></p>
           <p><?= e($c['bio']) ?></p>
           <div class="profile__meta mono">
-            <span>◎ <?= e($c['home_town']) ?>, Co. <?= e($c['home_county']) ?></span>
+            <span><?= icon('pin') ?> <?= e($c['home_town']) ?>, Co. <?= e($c['home_county']) ?></span>
             <span><?= (int)$c['stories'] ?> stories</span>
             <span>Reputation <?= (int)$c['reputation'] ?>/100</span>
             <?php if ($c['latest']): ?><span>Last filed <?= e(time_ago($c['latest'])) ?></span><?php endif; ?>

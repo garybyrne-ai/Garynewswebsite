@@ -4,7 +4,7 @@
   "description": "Your Community. Your News. Live.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#05070d",
-  "theme_color": "#05070d",
+  "background_color": "#139a5c",
+  "theme_color": "#139a5c",
   "icons": [{ "src": "/assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }
