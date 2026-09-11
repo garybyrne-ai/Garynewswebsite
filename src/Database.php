@@ -14,6 +14,9 @@ use RuntimeException;
  */
 final class Database
 {
+    /** Bump whenever database/schema.sql or Migrations gains something an existing install needs. */
+    public const SCHEMA_VERSION = 3;
+
     private static ?PDO $pdo = null;
 
     public static function path(): string
@@ -35,7 +38,49 @@ final class Database
             throw new RuntimeException('Database is not installed. Run: php scripts/setup.php');
         }
         self::$pdo = self::open(self::path());
+        self::upgrade(self::$pdo);
         return self::$pdo;
+    }
+
+    /**
+     * Bring an existing database up to date after a deploy. Runs the idempotent schema
+     * and additive migrations once per SCHEMA_VERSION bump, so pulling new code on a
+     * host (e.g. Cloudways) never leaves the app querying tables/columns that don't exist.
+     */
+    public static function upgrade(PDO $pdo): void
+    {
+        try {
+            $current = (int)($pdo->query("SELECT value FROM settings WHERE key='schema_version'")->fetchColumn() ?: 0);
+        } catch (\Throwable) {
+            $current = 0; // settings table missing: schema.sql will create it
+        }
+        if ($current >= self::SCHEMA_VERSION) {
+            return;
+        }
+        $lockDir = Config::storage() . '/cache';
+        if (!is_dir($lockDir)) {
+            @mkdir($lockDir, 0775, true);
+        }
+        $lock = @fopen($lockDir . '/schema.lock', 'c');
+        if ($lock !== false) {
+            flock($lock, LOCK_EX);
+        }
+        try {
+            // Re-check under the lock: another request may have upgraded meanwhile.
+            try {
+                $current = (int)($pdo->query("SELECT value FROM settings WHERE key='schema_version'")->fetchColumn() ?: 0);
+            } catch (\Throwable) {
+                $current = 0;
+            }
+            if ($current < self::SCHEMA_VERSION) {
+                self::migrate($pdo);
+            }
+        } finally {
+            if ($lock !== false) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+            }
+        }
     }
 
     public static function open(string $path): PDO
@@ -54,6 +99,7 @@ final class Database
         $pdo ??= self::pdo();
         $pdo->exec(file_get_contents(ME_ROOT . '/database/schema.sql'));
         Migrations::run($pdo);
+        $pdo->exec("INSERT INTO settings(key,value) VALUES('schema_version','" . self::SCHEMA_VERSION . "') ON CONFLICT(key) DO UPDATE SET value=excluded.value");
     }
 
     public static function query(string $sql, array $args = []): PDOStatement
