@@ -3,6 +3,8 @@
 use MeNews\Ui;
 $loc = $locality;
 $compact = $compact ?? false;
+$notices = $notices ?? [];
+$first = $first ?? false;
 $countyOptions = '';
 foreach ($counties as $c) {
     $countyOptions .= '<option value="' . e($c) . '"' . ($loc['county'] === $c ? ' selected' : '') . '>' . e($c) . '</option>';
@@ -12,17 +14,18 @@ foreach ($counties as $c) {
   <header class="block__head">
     <span class="block__index mono"><?= icon('pin') ?></span>
     <h2 class="block__title">
-      <?php if ($loc['mode'] === 'none'): ?>Stories near you<?php elseif ($loc['mode'] === 'abroad'): ?>You're outside Ireland<?php else: ?>Near you · <a href="/county/<?= e(slugify((string)$loc['county'])) ?>"><?= e($loc['title']) ?></a><?php endif; ?>
+      <?php if ($loc['mode'] === 'none'): ?>Your county, first<?php elseif ($loc['mode'] === 'abroad'): ?>You're outside Ireland<?php else: ?><a href="/county/<?= e(slugify((string)$loc['county'])) ?>"><?= e($loc['title']) ?></a><?php endif; ?>
     </h2>
     <p class="block__blurb">
       <?php if ($loc['mode'] === 'gps'): ?>Stories within <?= (int)$loc['radius'] ?> km of you<?= $loc['place']['town'] ? ', nearest town ' . e($loc['place']['town']) : '' ?>, freshest and closest first.
       <?php elseif ($loc['mode'] === 'county'): ?>Everything published from County <?= e($loc['county']) ?>. Allow location for stories by distance.
       <?php elseif ($loc['mode'] === 'abroad'): ?>We can't find an Irish county near your position — pick the county you care about instead.
-      <?php else: ?>Allow location access on your phone or computer and ME builds a local section for your town and county. Your position stays in a cookie on this device and is never saved to an account.<?php endif; ?>
+      <?php else: ?>Pick your county once and ME leads with it: local stories, deaths and notices, school closures and weather warnings. Stored only on this device.<?php endif; ?>
     </p>
     <div class="near__controls">
-      <button class="btn btn--primary btn--sm" type="button" data-locate-me><?= icon('gps') ?> <?= $loc['mode'] === 'gps' ? 'Update location' : 'Use my location' ?></button>
-      <label class="near__county"><span class="mono">or county</span><select data-county-pick><option value="">Choose…</option><?= $countyOptions ?></select></label>
+      <?php if ($loc['mode'] === 'none'): ?><button class="btn btn--primary btn--sm" type="button" data-open-county><?= icon('pin') ?> Choose my county</button><?php endif; ?>
+      <button class="btn btn--ghost btn--sm" type="button" data-locate-me><?= icon('gps') ?> <?= $loc['mode'] === 'gps' ? 'Update location' : 'Use my location' ?></button>
+      <label class="near__county"><span class="mono">county</span><select data-county-pick><option value="">Choose…</option><?= $countyOptions ?></select></label>
       <?php if ($loc['mode'] !== 'none'): ?><button class="btn btn--ghost btn--sm" type="button" data-forget-location>Forget</button><?php endif; ?>
     </div>
   </header>
@@ -33,13 +36,19 @@ foreach ($counties as $c) {
         <?= ($s['distance_km'] ?? null) !== null ? str_replace('<div class="card__foot">', '<div class="card__foot"><span class="card__km">' . e(number_format((float)$s['distance_km'], $s['distance_km'] < 10 ? 1 : 0)) . ' km</span>', $card) : $card ?>
       <?php endforeach; ?>
     </div>
-    <?php if ($loc['mode'] === 'gps' && $compact): ?><p class="near__more"><a class="mono" href="/near">All stories near you →</a><span class="mono">·</span><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>">Co. <?= e($loc['county']) ?> →</a></p><?php endif; ?>
+    <?php if ($compact && $loc['county']): ?><p class="near__more"><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>">All of Co. <?= e($loc['county']) ?> →</a><span class="mono">·</span><a class="mono" href="/notices?county=<?= rawurlencode((string)$loc['county']) ?>">Deaths &amp; notices →</a><span class="mono">·</span><a class="mono" href="/alerts?county=<?= rawurlencode((string)$loc['county']) ?>">Alerts →</a><span class="mono">·</span><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>/map">Map →</a></p><?php endif; ?>
+    <?php if ($notices): ?>
+      <div class="near__notices">
+        <span class="kicker"><?= icon('candle') ?> Recent deaths · Co. <?= e($loc['county']) ?></span>
+        <ul class="noticelist noticelist--row"><?php foreach ($notices as $n): ?><li><a href="<?= e($n['url']) ?>"><b><?= e($n['title']) ?></b><small><?= e($n['town'] ?: 'Co. ' . $n['county']) ?><?= $n['funeral_at'] ? ' · ' . e(date_irish($n['funeral_at'], 'D H:i')) : '' ?></small></a></li><?php endforeach; ?></ul>
+      </div>
+    <?php endif; ?>
   <?php elseif ($loc['mode'] === 'none'): ?>
     <div class="near__empty">
       <div class="near__radar" aria-hidden="true"><i></i><i></i><i></i></div>
       <div>
-        <h3>Your town. Your county. Your section.</h3>
-        <p>Tap <b>Use my location</b> and we'll find the nearest of 227 Irish towns, then gather every story within 40 km — wire reports and community posts alike. Works on phones and computers.</p>
+        <h3>Your town. Your county. Your front page.</h3>
+        <p>Choose a county and it moves to the top of ME: local stories, deaths and funeral arrangements, school closures, weather warnings and what's on. Or share your location and we find the nearest of 227 Irish towns.</p>
       </div>
     </div>
   <?php elseif ($loc['mode'] === 'abroad'): ?>

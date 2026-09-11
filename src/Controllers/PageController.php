@@ -29,12 +29,14 @@ final class PageController
 
     public static function home(Request $r): Response
     {
-        $hero = Stories::hero();
+        $locality = \MeNews\Support\Visitor::locality(8);
+        $county = $locality['county'] ?? null;
+        $hero = Stories::hero($county);
         $exclude = $hero ? [$hero['id']] : [];
         $latest = Stories::feed(['exclude' => $exclude], 9);
         $exclude = array_merge($exclude, array_column($latest, 'id'));
         $sections = [];
-        foreach (['National', 'Local', 'Sport', 'Business', 'Culture'] as $cat) {
+        foreach (['National', 'Local', 'Sport', 'Business', 'Culture', 'World'] as $cat) {
             $rows = Stories::feed(['category' => $cat, 'exclude' => $exclude], 4);
             if ($rows) {
                 $sections[$cat] = $rows;
@@ -42,25 +44,24 @@ final class PageController
             }
         }
         $community = Stories::feed(['kind' => 'community'], 4);
-        $contributors = self::contributors();
+        $leadKicker = $hero && $county && $hero['county'] === $county ? 'Lead story · Co. ' . e($county) : ($hero && $hero['is_featured'] ? 'Editor\'s pick' : 'Lead story · Ireland');
         return View::page('home', self::base([
-            'title' => 'ME News Ireland — Your Community. Your News. Live.',
-            'description' => 'Ireland-wide news, county-by-county reporting and community stories, screened by the ME Trust Engine and labelled by human editors.',
+            'title' => ($county ? $county . ' news today — ' : '') . 'ME News Ireland — Your Community. Your News. Live.',
+            'description' => ($county ? 'Local news, deaths and notices, school closures and weather warnings for County ' . $county . ', plus ' : 'Ireland-wide news, county-by-county reporting and community stories, ') . 'the stories Ireland is voting for on the Signal.',
             'hero' => $hero,
+            'leadKicker' => $leadKicker,
             'latest' => $latest,
+            'ticker' => Stories::ticker(16),
             'sections' => $sections,
             'community' => $community,
             'trending' => Stories::trending(6),
-            'pulse' => Stories::pulse(),
             'counties' => Stories::countyActivity(8),
-            'contributors' => $contributors,
-            'counts' => Stories::categoryCounts(),
             'mapPoints' => Stories::mapPoints(120),
             'mapCounties' => Stories::countyPoints(),
-            'ads' => self::ads((string)(\MeNews\Support\Visitor::locality(1)['county'] ?? '')),
-            'banner' => self::banner((string)(\MeNews\Support\Visitor::locality(1)['county'] ?? '')),
-            'totalPublished' => Stories::countPublished(),
+            'ads' => self::ads((string)$county),
+            'banner' => self::banner((string)$county),
             'weather' => \MeNews\Services\Weather::today(),
+            'warnings' => \MeNews\Services\Alerts::headline($county),
             'edition' => \MeNews\Support\Daily::edition(),
             'longDate' => \MeNews\Support\Daily::longDate(),
             'focal' => \MeNews\Support\Daily::focal(),
@@ -68,11 +69,15 @@ final class PageController
             'crossword' => \MeNews\Services\Puzzles::crossword(\MeNews\Support\Daily::date(), 'junior'),
             'quiz' => \MeNews\Services\Puzzles::quiz(\MeNews\Support\Daily::date()),
             'youngReaders' => \MeNews\Controllers\KidsController::youngReaders(3),
-            'locality' => \MeNews\Support\Visitor::locality(8),
+            'locality' => $locality,
             'countyNames' => Locations::countyNames(),
+            'countyNotices' => $county ? \MeNews\Services\Notices::recent(['county' => $county, 'kind' => 'death'], 4) : [],
+            'latestNotices' => \MeNews\Services\Notices::recent($county ? ['county' => $county] : [], 5),
+            'whatsapp' => Database::setting('whatsapp_' . slugify((string)$county)) ?: Database::setting('whatsapp_number'),
+            'poll' => \MeNews\Services\Polls::current($county),
             'signalBoard' => \MeNews\Services\Signal::featured(8, 'today'),
             'signalStats' => \MeNews\Services\Signal::stats(),
-            'bodyClass' => 'page-home',
+            'bodyClass' => 'page-home' . ($county ? ' has-county' : ''),
         ]));
     }
 

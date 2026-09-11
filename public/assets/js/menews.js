@@ -148,8 +148,7 @@
 
   /* ---------- report ---------- */
   $$('[data-open-report]').forEach(b => b.addEventListener('click', () => {
-    if (!window.ME.user) { showAuth('signin'); toast('Sign in before reporting'); return; }
-    loadCounties(); loadLocations(''); openModal('report-modal');
+    closeDrawer(); loadCounties(); loadLocations(''); openModal('report-modal');
   }));
   $('[data-gps]')?.addEventListener('click', () => {
     if (!navigator.geolocation) return toast('Location is unavailable');
@@ -161,8 +160,8 @@
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
       const j = await api('/api/report', { method: 'POST', body: new FormData(e.target) });
-      out.textContent = `Submitted. Status: ${j.status}. Safety ${j.safety_score}/100 · confidence ${j.trust_score}/100. The newsroom can now review it.`;
-      e.target.reset(); setTimeout(closeModals, 2600);
+      out.textContent = j.message || `Thanks — your report is with the newsroom (safety ${j.safety_score}/100, confidence ${j.trust_score}/100). You'll hear back either way.`;
+      e.target.reset(); const pv = $('.dropzone__preview'); if (pv) { pv.hidden = true; pv.innerHTML = ''; } setTimeout(closeModals, j.message ? 6000 : 3200);
     } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
     btn.disabled = false;
   });
@@ -205,9 +204,14 @@
   const setCookie = (k, v, days) => { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=' + (days * 86400) + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : ''); };
   const delCookie = k => { document.cookie = k + '=;path=/;max-age=0;SameSite=Lax'; };
   const dismissed = () => { try { return (Number(localStorage.getItem('me_loc_dismissed') || 0)) > Date.now(); } catch (e) { return false; } };
-  const locbar = $('#locbar');
-  if (locbar && !window.ME.located && !dismissed() && !document.body.classList.contains('page-app') && 'geolocation' in navigator) locbar.hidden = false;
-  $('[data-locbar-dismiss]')?.addEventListener('click', () => { locbar.hidden = true; try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
+  const locbar = null;
+  /* county picker: one tap on first visit, no permission needed */
+  const countyModal = $('#county-modal');
+  const openCounty = () => openModal('county-modal');
+  $$('[data-open-county]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); closeDrawer(); openCounty(); }));
+  if (countyModal && !window.ME.located && !dismissed() && !document.body.classList.contains('page-app') && !location.pathname.startsWith('/install')) setTimeout(openCounty, 900);
+  $$('[data-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_county', b.dataset.county, 180); delCookie('me_loc'); toast('Leading with ' + b.dataset.county); location.reload(); }));
+  $('[data-county-later]')?.addEventListener('click', () => { closeModals(); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
   async function applyPosition(lat, lng) {
     setCookie('me_loc', lat.toFixed(3) + ',' + lng.toFixed(3), 30); delCookie('me_county');
     const near = $('[data-near]');
@@ -227,17 +231,55 @@
     if (location.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(location.hostname)) return toast('Location needs a secure (https) connection');
     if (btn) { btn.disabled = true; btn.textContent = 'Locating…'; }
     navigator.geolocation.getCurrentPosition(
-      pos => { if (locbar) locbar.hidden = true; applyPosition(pos.coords.latitude, pos.coords.longitude); },
+      pos => { closeModals(); applyPosition(pos.coords.latitude, pos.coords.longitude); },
       err => { if (btn) { btn.disabled = false; btn.textContent = 'Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a county instead' : 'Could not get your location'); },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 }
     );
   }
   function bindNear() {
     $$('[data-locate-me]').forEach(b => { if (b.dataset.bound) return; b.dataset.bound = '1'; b.addEventListener('click', () => locateMe(b)); });
-    $$('[data-county-pick]').forEach(sel => { if (sel.dataset.bound) return; sel.dataset.bound = '1'; sel.addEventListener('change', () => { if (!sel.value) return; setCookie('me_county', sel.value, 30); delCookie('me_loc'); if (locbar) locbar.hidden = true; location.reload(); }); });
+    $$('[data-county-pick]').forEach(sel => { if (sel.dataset.bound) return; sel.dataset.bound = '1'; sel.addEventListener('change', () => { if (!sel.value) return; setCookie('me_county', sel.value, 180); delCookie('me_loc'); location.reload(); }); });
     $$('[data-forget-location]').forEach(b => { if (b.dataset.bound) return; b.dataset.bound = '1'; b.addEventListener('click', () => { delCookie('me_loc'); delCookie('me_county'); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } toast('Location forgotten'); location.reload(); }); });
   }
   bindNear();
+
+  /* ---------- drawer, More menu, consent ---------- */
+  const drawer = $('#drawer');
+  function closeDrawer() { if (drawer) { drawer.hidden = true; document.body.style.overflow = ''; } }
+  $$('[data-open-drawer]').forEach(b => b.addEventListener('click', () => { drawer.hidden = false; document.body.style.overflow = 'hidden'; }));
+  $$('[data-close-drawer]').forEach(b => b.addEventListener('click', closeDrawer));
+  drawer?.addEventListener('click', e => { if (e.target === drawer) closeDrawer(); });
+  const more = $('[data-more]');
+  if (more) {
+    const btn = $('.moremenu__btn', more), panel = $('.moremenu__panel', more);
+    const set = open => { panel.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    btn.addEventListener('click', e => { e.stopPropagation(); set(panel.hidden); });
+    document.addEventListener('click', e => { if (!more.contains(e.target)) set(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+  }
+  const consent = $('#consent');
+  if (consent) {
+    let seen = false; try { seen = !!localStorage.getItem('me_consent'); } catch (e) { }
+    if (!seen && !document.body.classList.contains('page-app')) consent.hidden = false;
+    $$('[data-consent]').forEach(b => b.addEventListener('click', () => { try { localStorage.setItem('me_consent', b.dataset.consent); } catch (e) { } consent.hidden = true; }));
+  }
+  if (window.innerWidth < 761) document.body.classList.add('has-bottombar');
+
+  /* ---------- photo-first report form ---------- */
+  const dz = $('[data-dropzone]');
+  if (dz) {
+    const input = $('input[type=file]', dz), prev = $('.dropzone__preview', dz), intro = $('.dropzone__in', dz);
+    const show = f => {
+      if (!f) return; prev.hidden = false; prev.innerHTML = '';
+      const url = URL.createObjectURL(f);
+      const el = document.createElement(f.type.startsWith('video') ? 'video' : 'img'); el.src = url; if (el.tagName === 'VIDEO') el.controls = true;
+      prev.appendChild(el); $('b', intro).textContent = f.name; $('small', intro).textContent = 'Tap to change';
+    };
+    input.addEventListener('change', () => show(input.files[0]));
+    ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('is-over'); }));
+    ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('is-over'); }));
+    dz.addEventListener('drop', e => { if (e.dataTransfer.files[0]) { input.files = e.dataTransfer.files; show(e.dataTransfer.files[0]); } });
+  }
 
   /* ---------- live wire refresh ---------- */
   const wireStatus = $('#wire-status');

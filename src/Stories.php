@@ -99,14 +99,39 @@ final class Stories
         return $rows;
     }
 
-    /** Featured hero: editor-featured first, otherwise the freshest story with an image. */
-    public static function hero(): ?array
+    /**
+     * The lead story. Editor-featured first; then, when the reader has a county, the freshest
+     * story from that county (last 36 h, with an image); otherwise the freshest national story.
+     */
+    public static function hero(?string $county = null): ?array
     {
         $row = Database::one(self::SELECT . " WHERE s.status='published' AND s.is_featured=1 ORDER BY COALESCE(s.published_at,s.created_at) DESC LIMIT 1");
+        if (!$row && $county) {
+            $since = gmdate('Y-m-d\TH:i:s', time() - 36 * 3600) . '+00:00';
+            $row = Database::one(self::SELECT . " WHERE s.status='published' AND s.county=? AND COALESCE(s.published_at,s.created_at)>? AND (s.image_url IS NOT NULL OR s.media_public IS NOT NULL) ORDER BY (s.kind='community') DESC, COALESCE(s.published_at,s.created_at) DESC LIMIT 1", [$county, $since]);
+        }
         if (!$row) {
             $row = Database::one(self::SELECT . " WHERE s.status='published' AND s.category IN ('National','Local') AND (s.image_url IS NOT NULL OR s.media_public IS NOT NULL) ORDER BY COALESCE(s.published_at,s.created_at) DESC LIMIT 1");
         }
         return $row ? self::present($row) : null;
+    }
+
+    /** Headlines for the ticker: the freshest story from each section, then the newest overall, deduplicated. */
+    public static function ticker(int $limit = 16, array $exclude = []): array
+    {
+        $out = [];
+        $seen = $exclude;
+        foreach (Categories::names() as $cat) {
+            $rows = self::feed(['category' => $cat, 'exclude' => $seen ?: ['-']], 1);
+            if ($rows) {
+                $out[] = $rows[0];
+                $seen[] = $rows[0]['id'];
+            }
+        }
+        foreach (self::feed(['exclude' => $seen ?: ['-']], max(0, $limit - count($out))) as $r) {
+            $out[] = $r;
+        }
+        return array_slice($out, 0, $limit);
     }
 
     public static function trending(int $limit = 6): array

@@ -1,0 +1,18 @@
+[
+  {"question": "Should your county council spend more on footpaths and cycle lanes or on roads for cars?", "options": ["Footpaths and cycle lanes", "Roads for cars", "Split it evenly", "Neither — fix public transport"]},
+  {"question": "Would you support a directly elected mayor for your county?", "options": ["Yes", "No", "Only for the cities", "Not sure"]},
+  {"question": "How often do you use public transport in your county?", "options": ["Most days", "A few times a week", "Rarely", "There isn't any worth using"]},
+  {"question": "Is your town centre better or worse than five years ago?", "options": ["Better", "Worse", "About the same", "I've moved away"]},
+  {"question": "Should local GAA and soccer clubs get council funding for floodlights and all-weather pitches?", "options": ["Yes, it's essential", "Only for shared facilities", "No, clubs should fundraise", "Not sure"]},
+  {"question": "What matters most to you in the next local election?", "options": ["Housing", "Roads and transport", "Health services", "Planning and the environment"]},
+  {"question": "Have you noticed more or fewer Garda patrols where you live this year?", "options": ["More", "Fewer", "No change", "I never see any"]},
+  {"question": "Should your county have its own local radio news at 7am?", "options": ["Yes, every day", "Weekdays only", "No, I get news online", "Don't mind"]},
+  {"question": "Is it harder to see a GP in your area than it was two years ago?", "options": ["Much harder", "A little harder", "About the same", "Easier"]},
+  {"question": "Would you pay for parking in your town centre if it funded free park-and-ride?", "options": ["Yes", "No", "Only at weekends", "We already do"]},
+  {"question": "Should your county keep its bonfires and fireworks for Halloween or ban them?", "options": ["Keep them", "Ban them", "Council-run displays only", "Don't mind"]},
+  {"question": "Do you know who your local councillors are?", "options": ["All of them", "One or two", "None", "I know a face but not a name"]},
+  {"question": "Should new housing in your area be mostly apartments or houses?", "options": ["Houses", "Apartments near transport", "A mix", "No new building"]},
+  {"question": "How would you rate broadband where you live?", "options": ["Excellent", "Fine", "Poor", "Still waiting for fibre"]},
+  {"question": "Would you use a night bus or late train service if your county had one?", "options": ["Every weekend", "Occasionally", "No", "There is one and I use it"]},
+  {"question": "Should the Leaving Cert be spread across the year rather than a single exam sitting?", "options": ["Yes", "No", "Partly", "Not sure"]}
+]

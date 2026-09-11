@@ -232,3 +232,133 @@ CREATE TABLE IF NOT EXISTS votes (
 CREATE INDEX IF NOT EXISTS idx_votes_story   ON votes(story_id);
 CREATE INDEX IF NOT EXISTS idx_votes_created ON votes(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_votes_voter   ON votes(voter_key);
+
+-- ---------------------------------------------------------------------------
+-- The local layer: notices, alerts, closures, polls, corrections, takedowns
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS notices (
+  id               TEXT PRIMARY KEY,
+  slug             TEXT UNIQUE,
+  kind             TEXT NOT NULL,                   -- death | memoriam | event | job | planning | pet | result
+  status           TEXT NOT NULL DEFAULT 'review',  -- review | published | rejected | expired
+  created_at       TEXT NOT NULL,
+  updated_at       TEXT,
+  published_at     TEXT,
+  expires_at       TEXT,
+  title            TEXT NOT NULL,                   -- deceased's name, event title, job title, pet name…
+  body             TEXT,
+  county           TEXT,
+  town             TEXT,
+  address          TEXT,
+  date_of_death    TEXT,
+  reposing         TEXT,
+  funeral_at       TEXT,
+  funeral_venue    TEXT,
+  burial           TEXT,
+  family_message   TEXT,
+  event_at         TEXT,
+  event_end        TEXT,
+  venue            TEXT,
+  price            TEXT,
+  url              TEXT,
+  contact_name     TEXT,
+  contact_org      TEXT,                            -- funeral director, promoter, employer, planning agent
+  contact_email    TEXT,
+  contact_phone    TEXT,
+  submitted_by     TEXT,                            -- user id when signed in
+  verify_token     TEXT,
+  verified_at      TEXT,
+  image_path       TEXT,
+  plan             TEXT NOT NULL DEFAULT 'free',    -- free | promoted
+  promoted_until   TEXT,
+  views            INTEGER NOT NULL DEFAULT 0,
+  extra_json       TEXT,
+  editorial_note   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_notices_kind_status ON notices(kind, status, published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notices_county      ON notices(county, kind);
+
+CREATE TABLE IF NOT EXISTS alert_subscriptions (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  email           TEXT NOT NULL,
+  county          TEXT NOT NULL,
+  town            TEXT,
+  kinds           TEXT NOT NULL DEFAULT 'daily',     -- comma list: daily,deaths,warnings,closures,planning
+  token           TEXT UNIQUE NOT NULL,
+  user_id         TEXT,
+  created_at      TEXT NOT NULL,
+  confirmed_at    TEXT,
+  unsubscribed_at TEXT,
+  last_daily_at   TEXT,
+  UNIQUE (email, county)
+);
+
+CREATE TABLE IF NOT EXISTS closures (
+  id            TEXT PRIMARY KEY,
+  created_at    TEXT NOT NULL,
+  status        TEXT NOT NULL DEFAULT 'review',      -- review | published | rejected
+  school        TEXT NOT NULL,
+  county        TEXT NOT NULL,
+  town          TEXT,
+  closed_on     TEXT NOT NULL,                       -- YYYY-MM-DD
+  reopens_on    TEXT,
+  reason        TEXT,
+  contact_name  TEXT,
+  contact_role  TEXT,
+  contact_email TEXT,
+  verify_token  TEXT,
+  verified_at   TEXT,
+  published_at  TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_closures_day ON closures(closed_on, status);
+
+CREATE TABLE IF NOT EXISTS polls (
+  id           TEXT PRIMARY KEY,
+  week         TEXT NOT NULL,                        -- ISO week, e.g. 2026-W37
+  question     TEXT NOT NULL,
+  options_json TEXT NOT NULL,
+  created_at   TEXT NOT NULL,
+  closes_at    TEXT NOT NULL,
+  status       TEXT NOT NULL DEFAULT 'open',
+  UNIQUE (week)
+);
+CREATE TABLE IF NOT EXISTS poll_votes (
+  poll_id    TEXT NOT NULL,
+  voter_key  TEXT NOT NULL,
+  option_idx INTEGER NOT NULL,
+  county     TEXT,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (poll_id, voter_key)
+);
+
+CREATE TABLE IF NOT EXISTS corrections (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT NOT NULL,
+  story_id   TEXT,
+  title      TEXT NOT NULL,
+  summary    TEXT NOT NULL,
+  detail     TEXT,
+  editor_id  TEXT
+);
+
+CREATE TABLE IF NOT EXISTS takedowns (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT NOT NULL,
+  url        TEXT NOT NULL,
+  reason     TEXT NOT NULL,
+  detail     TEXT,
+  contact    TEXT NOT NULL,
+  status     TEXT NOT NULL DEFAULT 'open',           -- open | actioned | declined
+  note       TEXT,
+  handled_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS story_clusters (
+  id           TEXT PRIMARY KEY,
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT,
+  lead_id      TEXT,
+  count        INTEGER NOT NULL DEFAULT 1,
+  outlets_json TEXT,
+  framing      TEXT
+);

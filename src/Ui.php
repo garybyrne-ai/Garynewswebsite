@@ -63,7 +63,8 @@ final class Ui
         $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . self::label($s['verification_label']) . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
         $summary = $s['summary'] ? '<p class="card__summary">' . e(excerpt($s['summary'], $variant === 'feature' ? 260 : 150)) . '</p>' : '';
         $trust = $s['kind'] === 'community' ? '<div class="meter meter--sm" title="Confidence ' . (int)$s['trust_score'] . '/100"><i style="--v:' . (int)$s['trust_score'] . '"></i></div>' : '';
-        $foot = '<div class="card__foot">' . $source . $by . $place . '<span class="card__views">' . e(compact_number((int)$s['views'])) . ' views</span></div>';
+        $views = views_label((int)$s['views']);
+        $foot = '<div class="card__foot">' . $source . $by . $place . ($views !== '' ? '<span class="card__views">' . e($views) . ' reads</span>' : '') . '</div>';
         $title = '<h3 class="card__title"><a href="' . e($s['url']) . '">' . e($s['title']) . '</a></h3>';
 
         return match ($variant) {
