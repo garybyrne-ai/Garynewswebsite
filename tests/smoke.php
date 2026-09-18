@@ -37,6 +37,16 @@ function http(string $method, string $path, array $body = [], array $headers = [
     curl_close($ch);
     return [$status, $json ? (json_decode($raw, true) ?? []) : $raw];
 }
+/** Sign in without touching the shared cookie jar and return a bearer token. */
+function bearerToken(string $email, string $password): string
+{
+    global $base;
+    $ch = curl_init($base . '/api/auth/login');
+    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => ['email' => $email, 'password' => $password], CURLOPT_HTTPHEADER => ['X-Requested-With: MENews'], CURLOPT_TIMEOUT => 30]);
+    $j = json_decode((string)curl_exec($ch), true) ?: [];
+    curl_close($ch);
+    return (string)($j['token'] ?? '');
+}
 function check(string $name, bool $ok, string $detail = ''): void
 {
     global $failures;
@@ -169,13 +179,21 @@ check('vote in the weekly poll', $s === 200 && ($pv['mine'] ?? null) === 0 && ($
 check('takedown request accepted', $s === 200 && !empty($td['ok']));
 [$s, $pv] = http('POST', '/api/ads/preview', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'template' => 'paper']);
 check('ad designer preview renders', $s === 200 && str_contains($pv['sidebar'] ?? '', 'ad--sidebar') && str_contains($pv['banner'] ?? '', 'ad--banner'));
-[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'body' => 'Baked daily.', 'cta' => 'Find us', 'url' => 'https://example.ie', 'target_county' => 'Wicklow', 'template' => 'paper', 'submit' => '1']);
-$ad = $adRes['ad'] ?? [];
-check('design + submit advert', $s === 200 && ($ad['status'] ?? '') === 'review', $ad['state_label'] ?? ($adRes['detail'] ?? '?'));
-[$s] = http('POST', '/api/me/ads', ['business_name' => 'Bad', 'title' => 'Nope', 'url' => 'not-a-url']);
-check('advert validation rejects a bad landing URL', $s === 400);
-[$s] = http('POST', '/api/me/ads/' . ($ad['id'] ?? 'x') . '/checkout/stripe', []);
-check('checkout blocked before approval', $s === 409 || $s === 503);
+[$s, $pk] = http('GET', '/api/ads/packages');
+$packages = $pk['packages'] ?? [];
+check('ad packages are public', $s === 200 && count($packages) >= 3 && ($packages[0]['price_label'] ?? '') === '€6' && (int)($packages[0]['impressions'] ?? 0) === 1000, implode(' · ', array_map(static fn($p) => $p['name'] . ' ' . $p['price_label'] . '/' . $p['impressions'], $packages)));
+[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'url' => 'https://example.ie', 'submit' => '1']);
+check('designer is locked until a package is bought', $s === 402, $adRes['detail'] ?? '');
+[$s, $co] = http('POST', '/api/ads/packages/' . ($packages[0]['id'] ?? 'x') . '/checkout', ['gateway' => 'stripe']);
+check('checkout needs a configured gateway or a valid package', in_array($s, [200, 503], true), "HTTP {$s}");
+[$s] = http('GET', '/api/admin/ads/packages');
+check('member cannot read package admin', $s === 403);
+[$s] = http('POST', '/api/admin/ads/orders', ['action' => 'grant', 'email' => $email, 'package_id' => $packages[0]['id'] ?? 'x']);
+check('member cannot grant themselves a package', $s === 403);
+[$s, $al] = http('POST', '/api/me/alerts', ['county' => 'Kerry', 'kinds' => ['deaths']]);
+check('free plan alerts limited to one county', $s === 403, $al['detail'] ?? '');
+[$s, $al] = http('GET', '/api/me/alerts');
+check('member lists their alert subscriptions', $s === 200 && count($al['subscriptions'] ?? []) === 1 && ($al['limit'] ?? 0) === 1);
 [$s] = http('GET', '/api/admin/summary');
 check('member cannot access newsroom', $s === 403);
 http('POST', '/api/auth/logout');
@@ -238,19 +256,41 @@ check('feature a story', $s === 200);
 check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
 [$s] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
 check('reject (cleanup)', $s === 200);
+echo "\nAdvertising packages\n";
+$premium = $packages[2] ?? ['id' => 'x'];
+$member = ['Authorization: Bearer ' . bearerToken($email, 'smoke-test-123')];
+[$s, $gr] = http('POST', '/api/admin/ads/orders', ['action' => 'grant', 'email' => $email, 'package_id' => $premium['id'], 'note' => 'smoke']);
+check('admin grants a paid package', $s === 200 && ($gr['order']['status'] ?? '') === 'paid' && ($gr['order']['tier'] ?? '') === 'premium', $gr['detail'] ?? '');
+[$s, $mineAds] = http('GET', '/api/me/ads', [], $member);
+check('paid package appears as a credit', $s === 200 && count($mineAds['credits'] ?? []) === 1);
+[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'body' => 'Baked daily.', 'cta' => 'Find us', 'url' => 'https://example.ie', 'target_county' => 'Wicklow', 'template' => 'paper', 'submit' => '1', 'order_id' => $mineAds['credits'][0]['id'] ?? ''], $member);
+$ad = $adRes['ad'] ?? [];
+check('design + submit advert with the credit', $s === 200 && ($ad['status'] ?? '') === 'review' && ($ad['tier'] ?? '') === 'premium', $ad['state_label'] ?? ($adRes['detail'] ?? '?'));
+[$s] = http('POST', '/api/me/ads', ['business_name' => 'Bad', 'title' => 'Nope', 'url' => 'not-a-url'], $member);
+check('credit is consumed: a second advert is locked', $s === 402);
 [$s, $ads] = http('GET', '/api/admin/ads?status=review');
-check('ads review queue', $s === 200 && in_array($ad['id'] ?? '-', array_column($ads['ads'] ?? [], 'id'), true), count($ads['ads'] ?? []) . ' waiting · ' . ($ads['pricing']['price_label'] ?? '?'));
+check('ads review queue', $s === 200 && in_array($ad['id'] ?? '-', array_column($ads['ads'] ?? [], 'id'), true), count($ads['ads'] ?? []) . ' waiting');
 [$s, $dec] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'approve']);
-check('approve advert starts the free trial', $s === 200 && ($dec['ad']['plan_status'] ?? '') === 'trial' && !empty($dec['ad']['live']), $dec['ad']['state_label'] ?? '');
-[$s, $served] = http('GET', '/api/ads?county=Wicklow&limit=4');
-check('approved advert is served in its county', $s === 200 && in_array('Smoke Bakery', array_column($served, 'business_name'), true));
-[$s, $servedElse] = http('GET', '/api/ads?county=Kerry&limit=4');
+check('approve advert starts the impressions', $s === 200 && ($dec['ad']['plan_status'] ?? '') === 'credits' && !empty($dec['ad']['live']) && (int)($dec['ad']['impressions_left'] ?? 0) === (int)$premium['impressions'], $dec['ad']['state_label'] ?? '');
+[$s, $plusAds] = http('GET', '/api/ads?county=Wicklow&limit=4&page=home');
+check('ME+ readers (the admin account) get no adverts', $s === 200 && $plusAds === []);
+$anon = ['Authorization: Bearer not-a-session'];
+[$s, $served] = http('GET', '/api/ads?county=Wicklow&limit=4&page=home', [], $anon);
+check('approved premium advert is served on the home page in its county', $s === 200 && in_array('Smoke Bakery', array_column($served, 'business_name'), true));
+[$s, $servedElse] = http('GET', '/api/ads?county=Kerry&limit=4', [], $anon);
 check('county-targeted advert is not served elsewhere', $s === 200 && !in_array('Smoke Bakery', array_column($servedElse, 'business_name'), true));
-[$s, $act] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'activate', 'months' => '1', 'paid' => '1']);
-check('manual activation records a paid period', $s === 200 && ($act['ad']['plan_status'] ?? '') === 'active' && ($act['ad']['gateway'] ?? '') === 'manual');
-[$s, $set] = http('POST', '/api/admin/ads/settings', ['price' => '30', 'trial_days' => '10', 'currency' => 'EUR']);
-check('price and trial editable from the newsroom', $s === 200 && ($set['pricing']['price_cents'] ?? 0) === 3000 && ($set['pricing']['trial_days'] ?? 0) === 10);
-http('POST', '/api/admin/ads/settings', ['price' => '25', 'trial_days' => '7', 'currency' => 'EUR']);
+[$s, $mineAds] = http('GET', '/api/me/ads', [], $member);
+check('impressions are counted down per serve', $s === 200 && (int)($mineAds['ads'][0]['impressions_left'] ?? 0) < (int)$premium['impressions'] && ($mineAds['orders'][0]['status'] ?? '') === 'running', ($mineAds['ads'][0]['impressions_left'] ?? '?') . ' left');
+[$s, $newPk] = http('POST', '/api/admin/ads/packages', ['name' => 'Smoke Weekend', 'price' => '4.50', 'impressions' => '500', 'tier' => 'sidebar', 'features' => "500 impressions\nSidebar"]);
+check('admin creates a package with its own price and impressions', $s === 200 && ($newPk['package']['price_cents'] ?? 0) === 450 && ($newPk['package']['impressions'] ?? 0) === 500);
+[$s] = http('POST', '/api/admin/ads/packages', ['name' => 'Bad', 'price' => '0.50', 'impressions' => '10']);
+check('package validation', $s === 400);
+[$s] = http('POST', '/api/admin/ads/packages/' . ($newPk['package']['id'] ?? 'x') . '/delete');
+check('admin deletes a package', $s === 200);
+[$s, $orders] = http('GET', '/api/admin/ads/orders');
+check('admin order ledger', $s === 200 && in_array($gr['order']['id'] ?? '-', array_column($orders['orders'] ?? [], 'id'), true));
+[$s, $set] = http('POST', '/api/admin/ads/settings', ['currency' => 'EUR']);
+check('currency editable from the newsroom', $s === 200 && ($set['pricing']['currency'] ?? '') === 'EUR');
 [$s] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'delete']);
 check('delete advert (cleanup)', $s === 200);
 [$s, $html] = http('GET', '/kids', [], [], false);

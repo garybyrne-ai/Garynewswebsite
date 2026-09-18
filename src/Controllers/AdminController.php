@@ -185,14 +185,21 @@ final class AdminController
 
     public static function users(Request $r): Response
     {
-        self::staff();
+        $u = self::staff();
         $sql = 'SELECT id,email,display_name,handle,role,is_verified,plan,title,desk,home_town,home_county,reputation,created_at,last_seen_at FROM users';
         $args = [];
         if ($v = $r->query('q', '', 120)) {
             $sql .= ' WHERE email LIKE ? OR display_name LIKE ?';
             $args = ["%$v%", "%$v%"];
         }
-        return Response::json(Database::all($sql . ' ORDER BY created_at DESC LIMIT 300', $args));
+        $rows = Database::all($sql . ' ORDER BY created_at DESC LIMIT 300', $args);
+        if ($u['role'] !== 'admin') {
+            // Editors moderate people, admins manage accounts: only admins see full email addresses.
+            foreach ($rows as &$row) {
+                $row['email'] = preg_replace_callback('/^(.).*?(.?)@/', static fn($m) => $m[1] . '•••' . $m[2] . '@', (string)$row['email']);
+            }
+        }
+        return Response::json($rows);
     }
 
     public static function updateUser(Request $r, array $p): Response

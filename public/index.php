@@ -18,9 +18,16 @@ use MeNews\View;
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 header('X-Frame-Options: SAMEORIGIN');
-header('Permissions-Policy: camera=(), microphone=(), geolocation=(self)');
+header('Permissions-Policy: camera=(), microphone=(), geolocation=(self), payment=()');
+header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
+// Templates carry inline scripts and styles, so the policy locks down the vectors that matter most:
+// no framing by other sites, no <base> hijack, no plugins, and forms only post to us or the payment gateways.
+header("Content-Security-Policy: frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https://checkout.stripe.com https://www.paypal.com https://www.sandbox.paypal.com");
 
 $request = new Request();
+if ($request->isSecure()) {
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+}
 Auth::boot($request);
 
 try {

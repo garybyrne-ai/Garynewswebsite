@@ -108,6 +108,13 @@ final class Auth
         return $token;
     }
 
+    /** After a password change, every other session for the account is signed out. */
+    public static function revokeOtherSessions(string $userId): void
+    {
+        $token = self::token();
+        Database::query('DELETE FROM sessions WHERE user_id=? AND token_hash<>?', [$userId, $token !== '' ? hash('sha256', $token) : '']);
+    }
+
     public static function logout(): void
     {
         $token = self::token();
