@@ -88,6 +88,36 @@ final class Stripe
         return (string)$session['url'];
     }
 
+    /** One-time Stripe Checkout for an ad package order. */
+    public static function orderCheckoutUrl(array $user, array $order): string
+    {
+        if (Config::get('STRIPE_SECRET_KEY') === '') {
+            throw new HttpException(503, 'Card payments are not configured yet');
+        }
+        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
+            throw new HttpException(503, 'Configure the public HTTPS URL');
+        }
+        $session = Remote::json('https://api.stripe.com/v1/checkout/sessions', [
+            'mode' => 'payment',
+            'line_items' => [[
+                'quantity' => 1,
+                'price_data' => [
+                    'currency' => strtolower($order['currency']), 'unit_amount' => (int)$order['price_cents'],
+                    'product_data' => ['name' => Config::appName() . ' advertising — ' . $order['package_name'], 'description' => number_format((int)$order['impressions']) . ' impressions · ' . (AdPackages::TIERS[$order['tier']]['blurb'] ?? '')],
+                ],
+            ]],
+            'success_url' => $base . '/billing/ads/return?order=' . $order['id'] . '&gateway=stripe&session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => $base . '/advertise?cancelled=1',
+            'customer_email' => $user['email'],
+            'client_reference_id' => $order['id'],
+            'metadata' => ['kind' => 'ad_order', 'order_id' => $order['id'], 'user_id' => $user['id']],
+            'payment_intent_data' => ['metadata' => ['kind' => 'ad_order', 'order_id' => $order['id']]],
+        ], ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY'), 'Idempotency-Key: order-' . $order['id']], 'form');
+        AdOrders::setGatewayRef($order['id'], (string)$session['id']);
+        return (string)$session['url'];
+    }
+
     public static function webhook(string $payload, string $signature): array
     {
         $secret = Config::get('STRIPE_WEBHOOK_SECRET');
@@ -115,6 +145,17 @@ final class Stripe
         $obj = $event['data']['object'];
         Database::transaction(static function () use ($event, $obj): void {
             Database::insert('stripe_events', ['id' => $event['id'], 'created_at' => now()]);
+            // ---- Advertising package orders (one-time payments)
+            if (($obj['metadata']['kind'] ?? '') === 'ad_order' && !empty($obj['metadata']['order_id'])) {
+                if ($event['type'] === 'checkout.session.completed' && ($obj['payment_status'] ?? '') === 'paid') {
+                    AdOrders::markPaid((string)$obj['metadata']['order_id'], 'stripe', (string)($obj['payment_intent'] ?? $obj['id']), (int)($obj['amount_total'] ?? 0), (string)($obj['currency'] ?? ''));
+                } elseif ($event['type'] === 'payment_intent.succeeded') {
+                    AdOrders::markPaid((string)$obj['metadata']['order_id'], 'stripe', (string)$obj['id'], (int)($obj['amount_received'] ?? 0), (string)($obj['currency'] ?? ''));
+                } elseif ($event['type'] === 'charge.refunded') {
+                    Database::query("UPDATE ad_orders SET status='refunded',note='Refunded via Stripe',completed_at=? WHERE id=? AND status<>'refunded'", [now(), (string)$obj['metadata']['order_id']]);
+                }
+                return;
+            }
             // ---- Advertising subscriptions (metadata.kind = ad)
             if (($obj['metadata']['kind'] ?? '') === 'ad' && !empty($obj['metadata']['ad_id'])) {
                 $adId = (string)$obj['metadata']['ad_id'];

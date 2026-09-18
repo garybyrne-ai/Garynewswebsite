@@ -53,6 +53,8 @@
           <button class="btn btn--primary" type="button" data-ad-new>+ House ad</button>
         </div>
         <div class="panel" id="ads-settings"></div>
+        <div class="panel" id="ads-packages"></div>
+        <div class="panel" id="ads-orders"></div>
         <div class="filters"><select id="ads-status"><option value="">All adverts</option><option value="review">Awaiting review</option><option value="approved">Approved</option><option value="draft">Drafts</option><option value="rejected">Rejected</option></select></div>
         <div id="ads-list"></div>
         <?= \MeNews\View::partial('partials/ad-designer', ['counties' => $counties, 'formId' => 'ad-form', 'admin' => true]) ?>

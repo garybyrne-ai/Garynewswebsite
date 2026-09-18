@@ -47,6 +47,17 @@
         <div class="form__actions"><button class="btn btn--primary" type="submit">Follow area</button></div>
       </form>
       <div class="panel" id="follow-list"></div>
+      <h2 style="margin-top:28px">Email alerts by county</h2>
+      <p class="pagehead__blurb">Death notices, school closures, Met Éireann warnings and the 7am morning email, sent to <b><?= e($user['email']) ?></b>. <span class="mono" id="alerts-hint"></span></p>
+      <form id="alerts-form" class="form panel">
+        <div class="form__row">
+          <label>County<select name="county" data-county-select required><option value="">Choose a county</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+          <label>Town (optional)<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Bray"></label>
+        </div>
+        <div class="checks"><?php foreach (\MeNews\Services\Alerts::KINDS as $k => $label): ?><label class="check"><input type="checkbox" name="kinds[]" value="<?= e($k) ?>" <?= in_array($k, ['deaths', 'closures', 'warnings', 'daily'], true) ? 'checked' : '' ?>><span><?= e($label) ?></span></label><?php endforeach; ?></div>
+        <div class="form__actions"><button class="btn btn--primary" type="submit">Add county alerts</button></div>
+      </form>
+      <div class="panel" id="alerts-list"></div>
     </div>
 
     <div id="view-membership" class="view">
@@ -63,10 +74,12 @@
 
     <div id="view-advertising" class="view">
       <div class="inline" style="justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
-        <div><h1>Advertising</h1><p class="pagehead__blurb">Design an ad, get it approved, run it free for <span data-trial-days>7</span> days, then <span data-price-label>€25/month</span>. It appears in sidebars and as a banner across ME News. <a href="/advertise">How it works →</a></p></div>
-        <button class="btn btn--primary" type="button" data-ad-new>+ New advert</button>
+        <div><h1>Advertising</h1><p class="pagehead__blurb">Buy a package of impressions, design your advert, submit it for review, and watch it run. <a href="/advertise">Packages and how it works →</a></p></div>
+        <div class="inline"><a class="btn btn--ghost" href="/advertise"><?= icon('plus') ?> Buy a package</a><button class="btn btn--primary" type="button" data-ad-new hidden>+ New advert</button></div>
       </div>
+      <div id="my-credits"></div>
       <div id="my-ads"></div>
+      <div id="my-orders"></div>
       <?= \MeNews\View::partial('partials/ad-designer', ['counties' => $counties, 'formId' => 'ad-form', 'admin' => false]) ?>
     </div>
 

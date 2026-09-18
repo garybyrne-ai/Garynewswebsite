@@ -58,8 +58,8 @@ final class PageController
             'counties' => Stories::countyActivity(8),
             'mapPoints' => Stories::mapPoints(120),
             'mapCounties' => Stories::countyPoints(),
-            'ads' => self::ads((string)$county),
-            'banner' => self::banner((string)$county),
+            'ads' => self::ads((string)$county, '', 2, 'home'),
+            'banner' => self::banner((string)$county, '', 'home'),
             'weather' => \MeNews\Services\Weather::today(),
             'warnings' => \MeNews\Services\Alerts::headline($county),
             'edition' => \MeNews\Support\Daily::edition(),
@@ -91,8 +91,10 @@ final class PageController
         }
         $page = $r->int('page', 1, 1, 200);
         $per = 24;
-        $rows = Stories::feed(['category' => $name], $per, ($page - 1) * $per);
-        $total = Stories::countPublished(['category' => $name]);
+        $cutoff = \MeNews\Services\Membership::archiveCutoff(Auth::user());
+        $rows = Stories::feed(['category' => $name, 'since' => $cutoff], $per, ($page - 1) * $per);
+        $total = Stories::countPublished(['category' => $name, 'since' => $cutoff]);
+
         $extra = [];
         if ($name === 'Sport') {
             $extra['clubResults'] = \MeNews\Services\Notices::recent(['kind' => 'result'], 6);
@@ -110,7 +112,7 @@ final class PageController
             'description' => Categories::ALL[$name]['blurb'],
             'heading' => $name,
             'kicker' => 'Section',
-            'blurb' => Categories::ALL[$name]['blurb'],
+            'blurb' => Categories::ALL[$name]['blurb'] . ($cutoff ? ' Showing the last ' . \MeNews\Services\Membership::archiveDays() . ' days; ME+ members read the full archive.' : ''),
             'icon' => Categories::ALL[$name]['icon'],
             'rows' => $rows,
             'page' => $page,
@@ -118,8 +120,8 @@ final class PageController
             'total' => $total,
             'basePath' => '/section/' . $p['slug'],
             'trending' => Stories::trending(5),
-            'ads' => self::ads(),
-            'banner' => self::banner(),
+            'ads' => self::ads('', '', 2, 'section'),
+            'banner' => self::banner('', '', 'section'),
         ]));
     }
 
@@ -163,24 +165,39 @@ final class PageController
             'total' => $total,
             'basePath' => '/county/' . $p['slug'],
             'trending' => Stories::trending(5),
-            'ads' => self::ads($county),
-            'banner' => self::banner($county),
+            'ads' => self::ads($county, '', 2, 'county'),
+            'banner' => self::banner($county, '', 'county'),
             'county' => $county,
             'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
             'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => 'County ' . $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => 'County ' . $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'Ireland']]],
         ]));
     }
 
+    /** RFC 9116 contact for security researchers. */
+    public static function securityTxt(Request $r): Response
+    {
+        $contact = Database::setting('security_contact') ?: Database::setting('contact_email') ?: \MeNews\Config::get('MAIL_FROM', 'security@menews.ie');
+        $lines = [
+            'Contact: mailto:' . $contact,
+            'Expires: ' . gmdate('Y-m-d\TH:i:s\Z', strtotime('+1 year')),
+            'Preferred-Languages: en, ga',
+            'Canonical: ' . absolute_url('/.well-known/security.txt'),
+            'Policy: ' . absolute_url('/privacy'),
+        ];
+        return Response::text(implode("\n", $lines) . "\n");
+    }
+
     public static function search(Request $r): Response
     {
         $q = $r->query('q', '', 120);
-        $rows = $q !== '' ? Stories::feed(['q' => $q], 40) : [];
+        $cutoff = \MeNews\Services\Membership::archiveCutoff(Auth::user());
+        $rows = $q !== '' ? Stories::feed(['q' => $q, 'since' => $cutoff], 40) : [];
         return View::page('listing', self::base([
             'title' => ($q !== '' ? '“' . $q . '” — ' : '') . 'Search — ME News Ireland',
             'description' => 'Search every published story on ME News Ireland.',
             'heading' => $q !== '' ? '“' . $q . '”' : 'Search',
             'kicker' => 'Search',
-            'blurb' => $q !== '' ? count($rows) . ' result' . (count($rows) === 1 ? '' : 's') . ' across the wire and community desk' : 'Search stories, towns and counties.',
+            'blurb' => $q !== '' ? count($rows) . ' result' . (count($rows) === 1 ? '' : 's') . ' across the wire and community desk' . ($cutoff ? ' from the last ' . \MeNews\Services\Membership::archiveDays() . ' days — ME+ members search the full archive' : '') : 'Search stories, towns and counties.',
             'icon' => 'search',
             'rows' => $rows,
             'page' => 1,
@@ -201,8 +218,10 @@ final class PageController
         }
         Database::query('UPDATE stories SET views=views+1 WHERE id=?', [$story['id']]);
         $story['views']++;
-        $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role,reports_published FROM users WHERE id=?', [$story['author_user_id']]) : null;
+        $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role,reports_published,plan FROM users WHERE id=?', [$story['author_user_id']]) : null;
         $isWire = $story['kind'] === 'wire';
+        // Members' archive: community reports older than the archive window are summarised for non-members.
+        $archived = !$isWire && \MeNews\Services\Membership::isArchived($story, Auth::user());
         return View::page('story', self::base([
             // Wire pages canonicalise to the publisher and stay out of the index: the original is the article.
             'canonical' => $isWire ? $story['source_url'] : absolute_url($story['url']),
@@ -214,14 +233,16 @@ final class PageController
             'ogImage' => $story['image'],
             'story' => $story,
             'author' => $author,
+            'archived' => $archived,
+            'robots' => $isWire ? 'noindex,follow' : ($archived ? 'noindex,follow' : null),
             'comments' => Stories::comments($story['id']),
             'confirmations' => Stories::confirmations($story['id']),
             'related' => Stories::related($story, 4),
             'more' => Stories::feed(['exclude' => [$story['id']]], 5),
             'signal' => \MeNews\Services\Signal::tally($story['id']) + ['mine' => \MeNews\Services\Signal::myVote($story['id'], Auth::user())],
             'signalRank' => (static function () use ($story) { foreach (\MeNews\Services\Signal::leaderboard('today', 40) as $s) { if ($s['id'] === $story['id']) { return $s['signal_rank']; } } return null; })(),
-            'ads' => self::ads($story['county'] ?? '', (string)($story['location_name'] ?? '')),
-            'banner' => self::banner($story['county'] ?? '', (string)($story['location_name'] ?? '')),
+            'ads' => self::ads($story['county'] ?? '', (string)($story['location_name'] ?? ''), 2, 'story'),
+            'banner' => self::banner($story['county'] ?? '', (string)($story['location_name'] ?? ''), 'story'),
             'bodyClass' => 'page-story',
         ]));
     }
@@ -454,20 +475,20 @@ final class PageController
         return Response::text($xml . '</channel></rss>', 'application/rss+xml; charset=utf-8');
     }
 
-    private static function ads(string $county = '', string $town = '', int $limit = 2): array
+    private static function ads(string $county = '', string $town = '', int $limit = 2, string $page = 'other'): array
     {
         if (\MeNews\Services\Membership::isPlus(Auth::user())) {
             return [];
         }
-        return \MeNews\Services\Ads::pick('sidebar', $county, $town, $limit);
+        return \MeNews\Services\Ads::pick('sidebar', $county, $town, $limit, [], $page);
     }
 
-    private static function banner(string $county = '', string $town = ''): ?array
+    private static function banner(string $county = '', string $town = '', string $page = 'other'): ?array
     {
         if (\MeNews\Services\Membership::isPlus(Auth::user())) {
             return null;
         }
-        $rows = \MeNews\Services\Ads::pick('banner', $county, $town, 1);
+        $rows = \MeNews\Services\Ads::pick('banner', $county, $town, 1, [], $page);
         return $rows[0] ?? null;
     }
 }

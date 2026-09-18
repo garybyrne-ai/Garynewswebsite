@@ -6,6 +6,7 @@
       <input type="hidden" name="id" value="">
       <input type="hidden" name="template" value="aurora">
       <input type="hidden" name="submit" value="0">
+      <?php if (!$admin): ?><div class="designer__credit" data-credit-box hidden><span class="kicker">Package for this advert</span><select name="order_id" data-credit-select></select><p class="form__hint">Placement is decided by the package tier; buy a bigger package any time to reach more pages.</p></div><?php endif; ?>
       <div class="form__row">
         <label>Business name<input name="business_name" required maxlength="60" placeholder="e.g. Gary's Tech Hub"></label>
         <label>Landing page<input name="url" type="url" required placeholder="https://"></label>
@@ -37,10 +38,10 @@
         <label>Target county<select name="target_county" data-county-select><option value="">All of Ireland</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
         <label>Target town (optional)<input name="target_town" list="all-locations" autocomplete="off" placeholder="Any town"></label>
       </div>
-      <label>Placement<select name="placement"><option value="both">Sidebar card + banner (recommended)</option><option value="sidebar">Sidebar card only</option><option value="banner">Banner only</option></select></label>
+      <?php if ($admin): ?><label>Placement<select name="placement"><option value="both">Sidebar card + banner (recommended)</option><option value="sidebar">Sidebar card only</option><option value="banner">Banner only</option></select></label><?php endif; ?>
       <div class="form__actions" style="justify-content:flex-start">
         <button class="btn btn--ghost" type="submit" data-action="save"><?= $admin ? 'Save' : 'Save draft' ?></button>
-        <?php if (!$admin): ?><button class="btn btn--primary" type="submit" data-action="submit">Submit for review → free trial</button><?php else: ?><button class="btn btn--primary" type="submit" data-action="house">Save &amp; run as house ad</button><?php endif; ?>
+        <?php if (!$admin): ?><button class="btn btn--primary" type="submit" data-action="submit">Submit for review</button><?php else: ?><button class="btn btn--primary" type="submit" data-action="house">Save &amp; run as house ad</button><?php endif; ?>
       </div>
       <p class="form__result" data-designer-result role="status"></p>
     </form>

@@ -148,7 +148,11 @@ final class ApiController
 
     public static function ads(Request $r): Response
     {
-        $rows = \MeNews\Services\Ads::pick($r->query('placement', 'sidebar') === 'banner' ? 'banner' : 'sidebar', $r->query('county', '', 60), $r->query('town', '', 80), $r->int('limit', 2, 1, 4));
+        if (\MeNews\Services\Membership::isPlus(\MeNews\Auth::user())) {
+            return Response::json([]); // ME+ is ad-free everywhere, including client-side slots
+        }
+        $page = in_array($r->query('page', 'other', 12), ['home', 'section', 'story', 'county', 'notices', 'other'], true) ? $r->query('page', 'other', 12) : 'other';
+        $rows = \MeNews\Services\Ads::pick($r->query('placement', 'sidebar') === 'banner' ? 'banner' : 'sidebar', $r->query('county', '', 60), $r->query('town', '', 80), $r->int('limit', 2, 1, 4), [], $page);
         foreach ($rows as &$ad) {
             $ad = ['id' => $ad['id'], 'business_name' => $ad['business_name'], 'title' => $ad['title'], 'html' => \MeNews\Services\Ads::render($ad, $r->query('placement', 'sidebar') === 'banner' ? 'banner' : 'sidebar')];
         }
@@ -164,6 +168,7 @@ final class ApiController
         if (!NewsWire::isStale()) {
             return Response::json(['ran' => false, 'reason' => 'fresh', 'last_refresh' => NewsWire::lastRefresh()]);
         }
+        \MeNews\Services\RateLimiter::hit($r->ip() . '|wire', 6, 600, 'The wire is refreshing already. Try again in a few minutes.');
         set_time_limit(180);
         $summary = NewsWire::refresh(false);
         $summary['last_refresh'] = NewsWire::lastRefresh();

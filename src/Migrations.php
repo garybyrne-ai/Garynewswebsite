@@ -29,6 +29,9 @@ final class Migrations
         'users' => [
             'reports_filed' => 'INTEGER NOT NULL DEFAULT 0',
             'reports_published' => 'INTEGER NOT NULL DEFAULT 0',
+            'last_monthly_at' => 'TEXT',
+            'failed_logins' => 'INTEGER NOT NULL DEFAULT 0',
+            'locked_until' => 'TEXT',
         ],
         'ads' => [
             'design_json' => 'TEXT',
@@ -49,6 +52,8 @@ final class Migrations
             'paused' => 'INTEGER NOT NULL DEFAULT 0',
             'weight' => 'INTEGER NOT NULL DEFAULT 1',
             'notes' => 'TEXT',
+            'tier' => "TEXT NOT NULL DEFAULT 'sidebar'",
+            'order_id' => 'TEXT',
         ],
     ];
 
@@ -72,6 +77,9 @@ final class Migrations
             $pdo->exec("INSERT INTO settings(key,value) VALUES('wire_backfill_pending','1') ON CONFLICT(key) DO UPDATE SET value='1'");
         }
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_stories_cluster ON stories(cluster_id)");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('archive_days','14')");
+        \MeNews\Services\AdPackages::seedDefaults($pdo);
+        $pdo->exec("UPDATE ads SET tier='premium' WHERE is_house=1 AND tier<>'premium'");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_confirmations_voter ON confirmations(story_id, voter_key)");
     }
 }

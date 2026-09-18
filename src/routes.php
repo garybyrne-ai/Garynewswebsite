@@ -79,6 +79,7 @@ return static function (Router $r): void {
     $r->get('/feed.xml', [Page::class, 'rss']);
 
     // ---- Public API
+    $r->get('/.well-known/security.txt', [Page::class, 'securityTxt']);
     $r->get('/api/health', [Api::class, 'health']);
     $r->get('/api/counties', [Api::class, 'counties']);
     $r->get('/api/locations', [Api::class, 'locations']);
@@ -92,6 +93,14 @@ return static function (Router $r): void {
     $r->get('/advertise', [AdsC::class, 'advertisePage']);
     $r->get('/api/ads', [Api::class, 'ads']);
     $r->get('/api/ads/pricing', [AdsC::class, 'pricing']);
+    $r->get('/api/ads/packages', [AdsC::class, 'packages']);
+    $r->post('/api/ads/packages/{id:[a-f0-9]+}/checkout', [AdsC::class, 'checkout']);
+    $r->get('/billing/ads/return', [AdsC::class, 'orderReturn']);
+    $r->get('/api/admin/ads/packages', [AdsC::class, 'adminPackages']);
+    $r->post('/api/admin/ads/packages', [AdsC::class, 'adminPackageSave']);
+    $r->post('/api/admin/ads/packages/{id:[a-f0-9]+}/delete', [AdsC::class, 'adminPackageDelete']);
+    $r->get('/api/admin/ads/orders', [AdsC::class, 'adminOrders']);
+    $r->post('/api/admin/ads/orders', [AdsC::class, 'adminOrderAction']);
     $r->post('/api/ads/preview', [AdsC::class, 'preview']);
     $r->get('/ads/{id:[a-f0-9]+}/go', [AdsC::class, 'go']);
     $r->get('/media/ad/{id:[a-f0-9]+}/{kind:logo|image}', [AdsC::class, 'media']);
@@ -107,6 +116,9 @@ return static function (Router $r): void {
     $r->get('/api/me', [Account::class, 'me']);
     $r->post('/api/me/profile', [Account::class, 'profile']);
     $r->post('/api/me/password', [Account::class, 'password']);
+    $r->get('/api/me/alerts', [Account::class, 'alerts']);
+    $r->post('/api/me/alerts', [Account::class, 'alertsAdd']);
+    $r->delete('/api/me/alerts/{id:[0-9]+}', [Account::class, 'alertsRemove']);
     $r->get('/api/me/reports', [Account::class, 'myReports']);
     $r->get('/api/me/notifications', [Account::class, 'notifications']);
     $r->post('/api/me/notifications/read', [Account::class, 'notificationsRead']);
@@ -116,6 +128,7 @@ return static function (Router $r): void {
     $r->get('/api/me/ads', [AdsC::class, 'mine']);
     $r->post('/api/me/ads', [AdsC::class, 'save']);
     $r->post('/api/me/ads/{id:[a-f0-9]+}/submit', [AdsC::class, 'submit']);
+    $r->post('/api/me/ads/{id:[a-f0-9]+}/attach', [AdsC::class, 'attach']);
     $r->post('/api/me/ads/{id:[a-f0-9]+}/pause', [AdsC::class, 'pause']);
     $r->post('/api/me/ads/{id:[a-f0-9]+}/delete', [AdsC::class, 'delete']);
     $r->post('/api/me/ads/{id:[a-f0-9]+}/checkout/stripe', [AdsC::class, 'checkoutStripe']);

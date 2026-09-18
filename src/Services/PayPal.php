@@ -122,6 +122,63 @@ final class PayPal
         throw new HttpException(502, 'PayPal did not return an approval link');
     }
 
+    /** One-time PayPal order for an ad package: create, return the approval link. */
+    public static function orderUrl(array $user, array $order): string
+    {
+        if (!self::configured()) {
+            throw new HttpException(503, 'PayPal is not configured yet');
+        }
+        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        if (!filter_var($base, FILTER_VALIDATE_URL)) {
+            throw new HttpException(503, 'Configure PUBLIC_BASE_URL first');
+        }
+        $res = self::call('POST', '/v2/checkout/orders', [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [[
+                'reference_id' => $order['id'], 'custom_id' => $order['id'],
+                'description' => mb_substr(Config::appName() . ' advertising: ' . $order['package_name'] . ' (' . number_format((int)$order['impressions']) . ' impressions)', 0, 127),
+                'amount' => ['currency_code' => $order['currency'], 'value' => number_format((int)$order['price_cents'] / 100, 2, '.', '')],
+            ]],
+            'payment_source' => ['paypal' => ['experience_context' => [
+                'brand_name' => Config::appName(), 'user_action' => 'PAY_NOW', 'shipping_preference' => 'NO_SHIPPING',
+                'return_url' => $base . '/billing/ads/return?order=' . $order['id'] . '&gateway=paypal', 'cancel_url' => $base . '/advertise?cancelled=1',
+            ]]],
+        ], ['PayPal-Request-Id: order-' . $order['id']]);
+        $id = (string)($res['id'] ?? '');
+        if ($id === '') {
+            throw new HttpException(502, 'PayPal did not create the order');
+        }
+        AdOrders::setGatewayRef($order['id'], $id);
+        foreach ($res['links'] ?? [] as $link) {
+            if (in_array($link['rel'] ?? '', ['payer-action', 'approve'], true)) {
+                return (string)$link['href'];
+            }
+        }
+        throw new HttpException(502, 'PayPal did not return an approval link');
+    }
+
+    /** Capture after the buyer returns; the capture response is the proof of payment. */
+    public static function captureOrder(string $orderId, array $user): array
+    {
+        $o = Database::one('SELECT * FROM ad_orders WHERE id=? AND user_id=?', [$orderId, $user['id']]);
+        if (!$o) {
+            throw new HttpException(404, 'Order not found');
+        }
+        if ($o['status'] !== 'pending') {
+            return AdOrders::present($o);
+        }
+        if (!$o['gateway_ref']) {
+            throw new HttpException(400, 'No PayPal order to capture');
+        }
+        $res = self::call('POST', '/v2/checkout/orders/' . rawurlencode((string)$o['gateway_ref']) . '/capture', [], ['PayPal-Request-Id: capture-' . $orderId]);
+        $capture = $res['purchase_units'][0]['payments']['captures'][0] ?? null;
+        if (($res['status'] ?? '') === 'COMPLETED' && $capture && ($capture['status'] ?? '') === 'COMPLETED') {
+            $amount = (int)round((float)($capture['amount']['value'] ?? 0) * 100);
+            return AdOrders::markPaid($orderId, 'paypal', (string)$capture['id'], $amount, (string)($capture['amount']['currency_code'] ?? '')) ?? AdOrders::present($o);
+        }
+        return AdOrders::present($o);
+    }
+
     /** After the buyer returns: read the subscription and activate the ad if PayPal says so. */
     public static function confirm(string $subscriptionId, string $adId): array
     {
@@ -165,6 +222,15 @@ final class PayPal
         }
         $res = $event['resource'] ?? [];
         $type = (string)$event['event_type'];
+        // One-time package orders
+        if ($type === 'PAYMENT.CAPTURE.COMPLETED' && !empty($res['custom_id']) && Database::one('SELECT id FROM ad_orders WHERE id=?', [(string)$res['custom_id']])) {
+            AdOrders::markPaid((string)$res['custom_id'], 'paypal', (string)($res['id'] ?? uuid()), (int)round((float)($res['amount']['value'] ?? 0) * 100), (string)($res['amount']['currency_code'] ?? ''));
+            return ['received' => true];
+        }
+        if ($type === 'PAYMENT.CAPTURE.REFUNDED' && !empty($res['custom_id'])) {
+            Database::query("UPDATE ad_orders SET status='refunded',note='Refunded via PayPal',completed_at=? WHERE id=? AND status<>'refunded'", [now(), (string)$res['custom_id']]);
+            return ['received' => true];
+        }
         $subId = (string)($res['billing_agreement_id'] ?? $res['id'] ?? '');
         $ad = $subId ? Ads::findBySubscription($subId) : null;
         if (!$ad && !empty($res['custom_id'])) {

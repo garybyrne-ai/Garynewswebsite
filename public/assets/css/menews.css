@@ -1309,3 +1309,41 @@ body.has-bottombar .consent{bottom:64px}
 .countystrip__item b{display:block;font-size:.9rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .countystrip__item small{color:var(--muted);font-size:.74rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .countystrip__item span{min-width:0}
+/* ad packages */
+.packages{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin:10px 0 34px}
+.package{position:relative;display:flex;flex-direction:column;gap:10px;padding:26px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);transition:.25s}
+.package:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:var(--shadow)}
+.package--featured{border-color:color-mix(in srgb,var(--cy) 50%,transparent)}
+.package--premium{border-color:color-mix(in srgb,var(--gold) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 12%,transparent),transparent 60%),var(--surface)}
+.package__badge{position:absolute;top:-12px;right:18px;background:var(--aurora);color:var(--on-accent);font:700 .64rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.package--premium .package__badge{background:linear-gradient(120deg,var(--gold),#ffe6a3);color:#2b1d00}
+.package h2{font-size:1.5rem;letter-spacing:-.03em}
+.package__tag{color:var(--muted);font-size:.9rem}
+.package .price{margin:6px 0 0}
+.package .price b{font-size:2.2rem}
+.package__imp{font-size:.95rem;color:var(--ink-2)}
+.package__imp b{color:var(--ink);font-family:var(--display);font-size:1.15rem}
+.package ul{list-style:none;margin:6px 0;padding:0;display:flex;flex-direction:column;gap:6px;color:var(--ink-2);font-size:.9rem}
+.package li::before{content:"◆ ";color:var(--em);font-size:.7em}
+.package__buy{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:8px}
+.designer__credit{padding:12px 14px;border:1px solid color-mix(in srgb,var(--cy) 40%,transparent);border-radius:var(--r-sm);background:color-mix(in srgb,var(--cy) 7%,transparent);display:flex;flex-direction:column;gap:6px}
+.designer__credit select{background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;color:var(--ink)}
+.creditcard{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--em) 45%,transparent);border-radius:var(--r-sm);background:color-mix(in srgb,var(--em) 8%,transparent);margin-bottom:10px;flex-wrap:wrap}
+.creditcard b{font-family:var(--display)}
+.creditcard small{color:var(--muted);display:block}
+.orderbar{height:6px;border-radius:99px;background:var(--surface-3);overflow:hidden;margin:6px 0}
+.orderbar i{display:block;height:100%;width:calc(var(--v) * 1%);background:var(--aurora)}
+.pkgrow{display:grid;grid-template-columns:1.2fr .7fr .8fr .8fr 1.6fr auto;gap:8px;align-items:end;padding:10px 0;border-bottom:1px solid var(--line)}
+.pkgrow label{display:flex;flex-direction:column;gap:4px;font:600 .62rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pkgrow input,.pkgrow select,.pkgrow textarea{background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:7px 9px;color:var(--ink);font:500 .88rem/1.3 var(--body);letter-spacing:0;text-transform:none;width:100%}
+.pkgrow__actions{display:flex;gap:6px}
+@media (max-width:1024px){.pkgrow{grid-template-columns:1fr 1fr}}
+
+/* ME+ badges and the members' archive gate */
+.chip--xs{font-size:.58rem;padding:2px 7px;vertical-align:middle;margin-left:4px}
+.article__body--locked{position:relative;max-height:220px;overflow:hidden}
+.article__body--locked::after{content:"";position:absolute;inset:auto 0 0 0;height:140px;background:linear-gradient(to bottom,transparent,var(--bg))}
+.archivegate{margin:18px 0 28px;padding:26px 28px;border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:var(--r);background:color-mix(in srgb,var(--gold) 9%,var(--surface));text-align:center}
+.archivegate h2{font-family:var(--display);font-size:1.5rem;margin:10px 0 8px;letter-spacing:-.02em}
+.archivegate p{color:var(--muted);max-width:58ch;margin:0 auto 16px}
+.archivegate .inline{justify-content:center}

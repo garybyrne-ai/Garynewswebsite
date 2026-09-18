@@ -151,7 +151,7 @@ final class Installer
                 'id' => uuid(), 'user_id' => $ownerId, 'created_at' => now(), 'updated_at' => now(),
                 'business_name' => $ad['business_name'], 'title' => $ad['title'], 'body' => $ad['body'] ?? '', 'cta' => $ad['cta'] ?? 'Learn more', 'badge' => $ad['badge'] ?? '',
                 'url' => $ad['url'], 'target_county' => $ad['target_county'] ?? '', 'target_town' => $ad['target_town'] ?? '', 'placement' => $ad['placement'] ?? 'both',
-                'status' => 'approved', 'approved_at' => now(), 'is_house' => 1, 'plan_status' => 'none', 'weight' => (int)($ad['weight'] ?? 1),
+                'status' => 'approved', 'approved_at' => now(), 'is_house' => 1, 'plan_status' => 'none', 'weight' => (int)($ad['weight'] ?? 1), 'tier' => 'premium',
                 'design_json' => json_encode($design, JSON_UNESCAPED_UNICODE),
             ]);
             $n++;

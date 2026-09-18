@@ -58,8 +58,9 @@ final class Ads
     {
         return [
             'price_cents' => self::price(), 'price_label' => self::priceLabel(), 'currency' => self::currency(),
-            'trial_days' => self::trialDays(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured(),
+            'trial_days' => self::trialDays(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured(), 'paypal_mode' => Config::get('PAYPAL_MODE', 'sandbox'),
             'templates' => self::TEMPLATES, 'limits' => self::LIMITS,
+            'packages' => AdPackages::all(), 'tiers' => AdPackages::TIERS,
         ];
     }
 
@@ -95,7 +96,7 @@ final class Ads
 
     // ------------------------------------------------------------- lifecycle
 
-    /** True when the ad may be shown right now. */
+    /** True when the ad may be shown right now: approved, not paused, and (unless house) with impressions left. */
     public static function isLive(array $ad): bool
     {
         if ($ad['status'] !== 'approved' || (int)$ad['paused'] === 1) {
@@ -104,6 +105,10 @@ final class Ads
         if ((int)$ad['is_house'] === 1) {
             return true;
         }
+        if (($ad['plan_status'] ?? '') === 'credits') {
+            return AdOrders::remaining($ad['id']) > 0;
+        }
+        // Legacy subscription/trial adverts keep running until their period ends.
         $now = now();
         return match ($ad['plan_status']) {
             'trial' => ($ad['trial_ends_at'] ?? '') > $now,
@@ -130,6 +135,14 @@ final class Ads
         if ((int)$ad['is_house'] === 1) {
             return ['Live · house ad', 'good'];
         }
+        if (($ad['plan_status'] ?? '') === 'credits') {
+            $left = AdOrders::remaining($ad['id']);
+            if ($left > 0) {
+                return ['Live · ' . number_format($left) . ' impressions left', 'good'];
+            }
+            $paid = Database::count("SELECT COUNT(*) FROM ad_orders WHERE ad_id=? AND status='paid'", [$ad['id']]);
+            return $paid ? ['Approved · impressions ready', 'good'] : ['Finished · buy more impressions to resume', 'bad'];
+        }
         $now = now();
         switch ($ad['plan_status']) {
             case 'trial':
@@ -147,7 +160,7 @@ final class Ads
             case 'cancelled':
                 return [($ad['current_period_end'] ?? '') > $now ? 'Cancelled · runs until ' . date_irish($ad['current_period_end'], 'j M') : 'Cancelled', 'muted'];
             default:
-                return ['Approved · start your free trial', 'warn'];
+                return ['Approved · attach a package to go live', 'warn'];
         }
     }
 
@@ -163,7 +176,11 @@ final class Ads
         $ad['ctr'] = $ad['impressions'] > 0 ? round($ad['clicks'] / $ad['impressions'] * 100, 2) : 0.0;
         $ad['is_house'] = (bool)$ad['is_house'];
         $ad['paused'] = (bool)$ad['paused'];
-        $ad['can_subscribe'] = !$ad['is_house'] && $ad['status'] === 'approved' && !in_array($ad['plan_status'], ['active', 'comped'], true);
+        $ad['can_subscribe'] = false;
+        $ad['tier'] = $ad['tier'] ?? 'sidebar';
+        $ad['tier_label'] = AdPackages::TIERS[$ad['tier']]['label'] ?? $ad['tier'];
+        $ad['impressions_left'] = $ad['is_house'] ? null : AdOrders::remaining($ad['id']);
+        $ad['orders'] = $ad['is_house'] ? [] : array_map([AdOrders::class, 'present'], Database::all("SELECT * FROM ad_orders WHERE ad_id=? AND status IN ('paid','running','completed') ORDER BY created_at DESC LIMIT 20", [$ad['id']]));
         unset($ad['design_json']);
         return $ad;
     }
@@ -177,6 +194,24 @@ final class Ads
         }
         if ($existing && !$house && ($existing['user_id'] !== ($user['id'] ?? null))) {
             throw new HttpException(403, 'This advert belongs to another account');
+        }
+        if ($existing && !$house && (int)$existing['is_house'] === 1) {
+            throw new HttpException(403, 'House adverts are managed by the newsroom');
+        }
+        // The designer unlocks with a paid package: a new advert must be backed by an unused order.
+        $order = null;
+        if (!$house && !$existing) {
+            $orderId = (string)($post['order_id'] ?? '');
+            $credits = AdOrders::credits((string)($user['id'] ?? ''));
+            foreach ($credits as $c) {
+                if ($orderId === '' || $c['id'] === $orderId) {
+                    $order = $c;
+                    break;
+                }
+            }
+            if (!$order) {
+                throw new HttpException(402, 'Buy an advertising package first — it unlocks the designer.');
+            }
         }
         $get = static fn(string $k, int $max) => mb_substr(trim((string)($post[$k] ?? '')), 0, $max);
         $business = $get('business_name', self::LIMITS['business_name']);
@@ -195,6 +230,10 @@ final class Ads
             throw new HttpException(400, 'Enter the full web address people should land on (https://…)');
         }
         $placement = in_array($post['placement'] ?? '', self::PLACEMENTS, true) ? $post['placement'] : 'both';
+        if (!$house) {
+            // Placement is decided by the package tier, never by the advertiser's form.
+            $placement = 'both';
+        }
         $county = $get('target_county', 60);
         if ($county !== '' && !in_array($county, Locations::countyNames(), true)) {
             $county = '';
@@ -217,7 +256,11 @@ final class Ads
             Database::insert('ads', $row + [
                 'id' => $id, 'user_id' => $user['id'] ?? null, 'created_at' => $now,
                 'status' => $house ? 'approved' : 'draft', 'is_house' => $house ? 1 : 0, 'approved_at' => $house ? $now : null,
+                'plan_status' => $house ? 'none' : 'credits', 'tier' => $house ? 'premium' : $order['tier'],
             ]);
+            if ($order) {
+                AdOrders::attach($order['id'], $id);
+            }
         }
         foreach (['logo', 'image'] as $kind) {
             if (isset($files[$kind]) && ($files[$kind]['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
@@ -262,11 +305,31 @@ final class Ads
         if (!is_dir($dir)) {
             mkdir($dir, 0750, true);
         }
-        $name = $adId . '-' . $kind . '.' . $ext;
         foreach (glob($dir . '/' . $adId . '-' . $kind . '.*') ?: [] as $old) {
             @unlink($old);
         }
-        if (!move_uploaded_file($f['tmp_name'], $dir . '/' . $name)) {
+        // Re-encode through GD: strips metadata and guarantees the stored file is a plain image.
+        $im = @imagecreatefromstring((string)file_get_contents($f['tmp_name']));
+        if (!$im) {
+            throw new HttpException(400, 'That image could not be read');
+        }
+        $w = imagesx($im);
+        $h = imagesy($im);
+        $max = $kind === 'logo' ? 512 : 1600;
+        if ($w > $max || $h > $max) {
+            $scale = $max / max($w, $h);
+            $resized = imagecreatetruecolor((int)round($w * $scale), (int)round($h * $scale));
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            imagecopyresampled($resized, $im, 0, 0, 0, 0, imagesx($resized), imagesy($resized), $w, $h);
+            imagedestroy($im);
+            $im = $resized;
+        }
+        $ext = $ext === 'jpg' ? 'jpg' : 'png';
+        $name = $adId . '-' . $kind . '.' . $ext;
+        $ok = $ext === 'jpg' ? imagejpeg($im, $dir . '/' . $name, 88) : imagepng($im, $dir . '/' . $name, 7);
+        imagedestroy($im);
+        if (!$ok) {
             throw new HttpException(500, 'Unable to save image');
         }
         return $name;
@@ -293,16 +356,19 @@ final class Ads
     public static function approve(array $ad, string $adminId, string $note = ''): void
     {
         $now = now();
-        $row = ['status' => 'approved', 'approved_at' => $ad['approved_at'] ?: $now, 'updated_at' => $now, 'notes' => $note ?: $ad['notes']];
-        if (!(int)$ad['is_house'] && $ad['plan_status'] === 'none' && self::trialDays() > 0) {
-            $row['plan_status'] = 'trial';
-            $row['trial_ends_at'] = gmdate('Y-m-d\TH:i:s', time() + self::trialDays() * 86400) . '+00:00';
-        }
+        $row = ['status' => 'approved', 'approved_at' => $ad['approved_at'] ?: $now, 'updated_at' => $now, 'notes' => $note ?: $ad['notes'], 'paused' => 0];
         Database::update('ads', $row, 'id=?', [$ad['id']]);
+        if (!(int)$ad['is_house']) {
+            AdOrders::startForAd($ad['id']);
+        }
         Audit::log($adminId, 'ad.approve', 'ad', $ad['id']);
         if ($ad['user_id']) {
-            $msg = isset($row['trial_ends_at']) ? 'Your advert is live. Your free trial runs until ' . date_irish($row['trial_ends_at'], 'j M') . ' — subscribe from your dashboard to keep it running.' : 'Your advert has been approved.';
-            Notifier::send($ad['user_id'], 'ad', 'Advert approved: ' . $ad['title'], $msg);
+            $left = AdOrders::remaining($ad['id']);
+            Notifier::send($ad['user_id'], 'ad', 'Advert approved: ' . $ad['title'], $left > 0 ? 'Your advert is live with ' . number_format($left) . ' impressions to deliver.' : 'Your advert is approved; buy a package to start it running.');
+            $email = Database::value('SELECT email FROM users WHERE id=?', [$ad['user_id']]);
+            if ($email) {
+                Mailer::send((string)$email, 'Your advert is live · ME News', '<p><b>' . e($ad['title']) . '</b> has been approved' . ($left > 0 ? ' and is now running with ' . number_format($left) . ' impressions to deliver.' : '.') . '</p><p>Watch impressions and clicks in your <a href="' . e(absolute_url('/dashboard#advertising')) . '">dashboard</a>.</p>');
+            }
         }
     }
 
@@ -381,8 +447,17 @@ final class Ads
 
     // ------------------------------------------------------------- serving
 
-    /** Pick live ads for a placement, local ones first, weighted random, and count impressions. */
-    public static function pick(string $placement, string $county = '', string $town = '', int $limit = 1, array $exclude = []): array
+    /**
+     * Pick live ads for a placement on a page, weighted, and count impressions.
+     *
+     * $page: home | section | story | county | notices | other. The package tier decides
+     * eligibility: only 'premium' runs on the home page; banners need 'site' or 'premium';
+     * sidebars accept every tier. Score = tier weight × local match × pacing × jitter, where
+     * pacing nudges an advert that is behind its 30-day delivery schedule upwards and one
+     * that is ahead downwards, so a 10,000-impression package is spread over its run rather
+     * than burnt in a day. House ads fill whatever is left.
+     */
+    public static function pick(string $placement, string $county = '', string $town = '', int $limit = 1, array $exclude = [], string $page = 'other'): array
     {
         if (!Database::installed()) {
             return [];
@@ -392,6 +467,16 @@ final class Ads
         foreach ($rows as $ad) {
             if (in_array($ad['id'], $exclude, true) || !self::isLive($ad)) {
                 continue;
+            }
+            $house = (int)$ad['is_house'] === 1;
+            $tier = AdPackages::TIERS[$ad['tier'] ?? 'sidebar'] ?? AdPackages::TIERS['sidebar'];
+            if (!$house) {
+                if ($page === 'home' && !$tier['home']) {
+                    continue;
+                }
+                if ($placement === 'banner' && !$tier['banner']) {
+                    continue;
+                }
             }
             $local = 0;
             if ($ad['target_county'] !== '' && $ad['target_county'] !== null) {
@@ -403,7 +488,19 @@ final class Ads
                     $local = 2;
                 }
             }
-            $ad['_score'] = $local * 10 + max(1, (int)$ad['weight']) * (mt_rand(50, 100) / 100);
+            $pacing = 1.0;
+            if (!$house) {
+                $o = AdOrders::active($ad['id']);
+                if ($o) {
+                    $days = 30;
+                    $elapsed = max(0, time() - (int)strtotime($o['started_at'] ?: $o['paid_at'] ?: $o['created_at'])) / 86400;
+                    $expected = min(1.0, $elapsed / $days);
+                    $actual = (int)$o['impressions'] > 0 ? (int)$o['impressions_used'] / (int)$o['impressions'] : 0;
+                    $pacing = $actual < $expected ? 1.6 : ($actual > $expected + 0.15 ? 0.6 : 1.0);
+                }
+            }
+            $base = $house ? 0.4 : (float)$tier['weight'] * max(1, (int)$ad['weight']);
+            $ad['_score'] = $base * (1 + $local * 1.5) * $pacing * (mt_rand(60, 100) / 100);
             $pool[] = $ad;
         }
         usort($pool, static fn($a, $b) => $b['_score'] <=> $a['_score']);
@@ -413,6 +510,9 @@ final class Ads
             unset($ad['_score']);
             Database::query('UPDATE ads SET impressions=impressions+1 WHERE id=?', [$ad['id']]);
             Database::query('INSERT INTO ad_stats(ad_id,day,impressions,clicks) VALUES(?,?,1,0) ON CONFLICT(ad_id,day) DO UPDATE SET impressions=impressions+1', [$ad['id'], $day]);
+            if ((int)$ad['is_house'] !== 1 && ($ad['plan_status'] ?? '') === 'credits') {
+                AdOrders::consume($ad['id']);
+            }
             $ad = self::present($ad);
         }
         return $picked;

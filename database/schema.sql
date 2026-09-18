@@ -362,3 +362,48 @@ CREATE TABLE IF NOT EXISTS story_clusters (
   outlets_json TEXT,
   framing      TEXT
 );
+
+-- ---------------------------------------------------------------------------
+-- ME Ads packages: impression bundles bought up front, served until exhausted
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ad_packages (
+  id           TEXT PRIMARY KEY,
+  slug         TEXT UNIQUE NOT NULL,
+  name         TEXT NOT NULL,
+  tagline      TEXT,
+  price_cents  INTEGER NOT NULL,
+  impressions  INTEGER NOT NULL,
+  tier         TEXT NOT NULL DEFAULT 'sidebar',   -- sidebar | site | premium
+  features_json TEXT,
+  badge        TEXT,
+  sort         INTEGER NOT NULL DEFAULT 0,
+  active       INTEGER NOT NULL DEFAULT 1,
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT
+);
+
+CREATE TABLE IF NOT EXISTS ad_orders (
+  id               TEXT PRIMARY KEY,
+  user_id          TEXT NOT NULL,
+  package_id       TEXT,
+  package_name     TEXT NOT NULL,
+  tier             TEXT NOT NULL,
+  ad_id            TEXT,
+  impressions      INTEGER NOT NULL,
+  impressions_used INTEGER NOT NULL DEFAULT 0,
+  price_cents      INTEGER NOT NULL,
+  currency         TEXT NOT NULL DEFAULT 'EUR',
+  gateway          TEXT,                            -- stripe | paypal | manual
+  gateway_ref      TEXT,                            -- checkout session / PayPal order id
+  payment_ref      TEXT,                            -- payment intent / capture id
+  status           TEXT NOT NULL DEFAULT 'pending', -- pending | paid | running | completed | refunded | cancelled
+  created_at       TEXT NOT NULL,
+  paid_at          TEXT,
+  started_at       TEXT,
+  completed_at     TEXT,
+  note             TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_ad_orders_user   ON ad_orders(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ad_orders_ad     ON ad_orders(ad_id, status);
+CREATE INDEX IF NOT EXISTS idx_ad_orders_ref    ON ad_orders(gateway_ref);

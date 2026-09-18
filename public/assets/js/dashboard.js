@@ -5,6 +5,7 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   let me = null;
+  const qs = new URLSearchParams(location.search);
   const fmt = iso => new Date(iso).toLocaleString('en-IE', { dateStyle: 'medium', timeStyle: 'short' });
 
   function show(id) {
@@ -19,13 +20,14 @@
     $('#hello').textContent = 'Hello, ' + me.display_name.split(' ')[0];
     $('#p-name').value = me.display_name; $('#p-town').value = me.home_town || ''; $('#p-county').value = me.home_county || ''; $('#p-bio').value = me.bio || '';
     window.ME.loadCounties().then(() => { $('#p-county').value = me.home_county || ''; });
-    await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAds()]);
+    await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAlerts(), loadAds()]);
     const hash = location.hash.replace('#', '');
     if (hash && $('#view-' + hash)) show(hash);
-    const qs = new URLSearchParams(location.search);
     if (qs.get('billing') === 'success') toast('Thank you — ME+ will activate as soon as Stripe confirms payment.');
     if (qs.get('ad') === 'success' || qs.get('ad') === 'paypal-success') { toast('Thank you — your advertising subscription is being confirmed.'); show('advertising'); }
     if (qs.get('ad') === 'paypal-pending') { toast('PayPal is still confirming your subscription — check back in a minute.'); show('advertising'); }
+    if (qs.get('order') === 'paid') { toast('Payment received — your package is ready. Design your advert below.'); show('advertising'); }
+    if (qs.get('order') === 'pending') { toast('Payment is still being confirmed — your package will appear here in a minute.'); show('advertising'); }
   }
 
   async function loadReports() {
@@ -48,6 +50,19 @@
   $('#follow-form').addEventListener('submit', async e => {
     e.preventDefault();
     try { await api('/api/me/follows', { method: 'POST', body: new FormData(e.target) }); toast('Area followed'); e.target.reset(); loadFollows(); }
+    catch (err) { toast(err.message); }
+  });
+
+  async function loadAlerts() {
+    const j = await api('/api/me/alerts');
+    const a = j.subscriptions || [];
+    $('#alerts-list').innerHTML = a.length ? a.map(x => `<div class="notif inline"><b style="flex:1">Co. ${esc(x.county)}${x.town ? ' · ' + esc(x.town) : ''} <span class="mono">${esc(x.kind_labels.join(', '))}${x.confirmed ? '' : ' · unconfirmed — check your inbox'}</span></b><button class="btn btn--ghost btn--sm" data-unalert="${x.id}">Remove</button></div>`).join('') : '<p class="panel__note">No county alerts yet.</p>';
+    $$('[data-unalert]').forEach(b => b.addEventListener('click', async () => { try { await api('/api/me/alerts/' + b.dataset.unalert, { method: 'DELETE' }); loadAlerts(); } catch (e) { toast(e.message); } }));
+    $('#alerts-hint').textContent = j.plan === 'ME+' ? `${a.length} of ${j.limit} areas used` : `${a.length} of ${j.limit} area used — ME+ allows 10`;
+  }
+  $('#alerts-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    try { const j = await api('/api/me/alerts', { method: 'POST', body: new FormData(e.target) }); toast(j.message || 'Alerts added'); e.target.reset(); loadAlerts(); }
     catch (err) { toast(err.message); }
   });
 

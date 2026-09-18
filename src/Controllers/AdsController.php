@@ -8,6 +8,8 @@ use MeNews\Database;
 use MeNews\Http\HttpException;
 use MeNews\Http\Request;
 use MeNews\Http\Response;
+use MeNews\Services\AdOrders;
+use MeNews\Services\AdPackages;
 use MeNews\Services\Ads;
 use MeNews\Services\Audit;
 use MeNews\Services\PayPal;
@@ -28,11 +30,20 @@ final class AdsController
             'cta' => 'Start free trial', 'badge' => '7-day trial', 'url' => 'https://example.ie', 'logo_path' => null, 'image_path' => null,
             'design' => ['template' => 'aurora'] + Ads::TEMPLATES['aurora'] + ['shape' => 'orb', 'align' => 'left'],
         ];
+        $packages = AdPackages::all();
+        $cheapest = $packages ? $packages[0]['price_label'] : '';
+        $demo['cta'] = 'Buy impressions';
+        $demo['badge'] = $cheapest ? 'From ' . $cheapest : '';
         return View::page('advertise', [
             'user' => Auth::user(), 'nav' => Categories::NAV,
-            'title' => 'Advertise on ME News Ireland — ' . Ads::priceLabel() . ', ' . Ads::trialDays() . '-day free trial',
-            'description' => 'Reach readers across Ireland with a designed ad in sidebars and banners. ' . Ads::priceLabel() . ' after a ' . Ads::trialDays() . '-day free trial.',
+            'title' => 'Advertise on ME News Ireland — impression packages from ' . $cheapest,
+            'description' => 'Buy a package of impressions, design your ad in minutes, and run it in sidebars and banners across ME News Ireland. From ' . $cheapest . '.',
             'pricing' => Ads::pricing(),
+            'packages' => $packages,
+            'tiers' => AdPackages::TIERS,
+            'credits' => Auth::user() ? AdOrders::credits(Auth::user()['id']) : [],
+            'cancelled' => $r->query('cancelled') === '1',
+            'topup' => self::topupTarget($r),
             'demo' => $demo,
             'liveCount' => Database::installed() ? count(array_filter(Database::all("SELECT * FROM ads WHERE status='approved'"), [Ads::class, 'isLive'])) : 0,
             'bodyClass' => 'page-advertise',
@@ -100,7 +111,50 @@ final class AdsController
             $ad['stats'] = Ads::stats($ad['id'], 14);
             $ad['preview'] = Ads::render($ad, 'sidebar', true);
         }
-        return Response::json(['ads' => $ads, 'pricing' => Ads::pricing()]);
+        return Response::json(['ads' => $ads, 'pricing' => Ads::pricing(), 'credits' => AdOrders::credits($u['id']), 'orders' => AdOrders::forUser($u['id'])]);
+    }
+
+    /** Start a checkout for a package (optionally topping up an existing advert). */
+    public static function checkout(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        $package = AdPackages::find($p['id']);
+        if (!$package || !$package['active']) {
+            throw new HttpException(404, 'Package not found');
+        }
+        $gateway = $r->post('gateway', 'stripe', 10);
+        $adId = $r->post('ad_id', '', 40) ?: null;
+        $order = AdOrders::create($u, $package, $gateway, $adId);
+        try {
+            $url = $gateway === 'paypal' ? PayPal::orderUrl($u, $order) : Stripe::orderCheckoutUrl($u, $order);
+        } catch (\Throwable $e) {
+            // No checkout session was opened, so do not leave a dangling pending order behind.
+            AdOrders::discard($order['id']);
+            throw $e;
+        }
+        Audit::log($u['id'], 'ad.order.start', 'ad_order', $order['id'], $package['name'] . ' via ' . $gateway);
+        return Response::json(['url' => $url, 'order' => $order['id']]);
+    }
+
+    /** Return from the gateway: confirm server-side, then send the buyer to the designer. */
+    public static function orderReturn(Request $r): Response
+    {
+        $u = Auth::user();
+        if (!$u) {
+            return Response::redirect('/?auth=signin&next=' . rawurlencode('/dashboard#advertising'));
+        }
+        $orderId = $r->query('order', '', 40);
+        $gateway = $r->query('gateway', '', 10);
+        try {
+            $order = $gateway === 'paypal'
+                ? PayPal::captureOrder($orderId, $u)
+                : AdOrders::confirmStripe($orderId, $r->query('session_id', '', 120), $u);
+            $state = in_array($order['status'], ['paid', 'running'], true) ? 'paid' : 'pending';
+        } catch (\Throwable $e) {
+            error_log('Ad order return: ' . $e->getMessage());
+            $state = 'pending';
+        }
+        return Response::redirect('/dashboard?order=' . $state . '#advertising');
     }
 
     public static function save(Request $r): Response
@@ -113,10 +167,22 @@ final class AdsController
             Ads::submitForReview($ad);
             $ad = Ads::find($ad['id']);
             Audit::log($u['id'], 'ad.submit', 'ad', $ad['id']);
+            \MeNews\Services\Notifier::staff('ad-review', 'Advert awaiting review: ' . $ad['business_name']);
         }
         return Response::json(['ok' => true, 'ad' => Ads::present($ad)]);
     }
 
+    /** The member's own advert named by ?ad=, so a purchase tops it up instead of starting a new one. */
+    private static function topupTarget(Request $r): ?array
+    {
+        $u = Auth::user();
+        $id = $r->query('ad', '', 40);
+        if (!$u || $id === '' || !preg_match('/^[a-f0-9]+$/', $id)) {
+            return null;
+        }
+        $ad = Ads::find($id);
+        return $ad && $ad['user_id'] === $u['id'] && (int)$ad['is_house'] === 0 ? $ad : null;
+    }
     private static function own(Request $r, array $p): array
     {
         $u = Auth::require();
@@ -127,6 +193,19 @@ final class AdsController
         return [$u, $ad];
     }
 
+    /** Attach a paid, unused package to one of the member's own adverts (top-up). */
+    public static function attach(Request $r, array $p): Response
+    {
+        [$u, $ad] = self::own($r, $p);
+        $orderId = $r->post('order_id', '', 40);
+        $order = AdOrders::find($orderId);
+        if (!$order || $order['user_id'] !== $u['id'] || $order['status'] !== 'paid' || $order['ad_id']) {
+            throw new HttpException(404, 'That package is not available to attach');
+        }
+        AdOrders::attach($orderId, $ad['id']);
+        Audit::log($u['id'], 'ad.order.attach', 'ad_order', $orderId, $ad['business_name']);
+        return Response::json(['ok' => true, 'ad' => Ads::present(Ads::find($ad['id']))]);
+    }
     public static function submit(Request $r, array $p): Response
     {
         [$u, $ad] = self::own($r, $p);
@@ -148,28 +227,23 @@ final class AdsController
         if (in_array($ad['plan_status'], ['active', 'past_due'], true)) {
             throw new HttpException(409, 'Cancel the subscription with your payment provider before deleting a paid advert.');
         }
+        AdOrders::release($ad['id']);
         Database::query('DELETE FROM ads WHERE id=?', [$ad['id']]);
         Database::query('DELETE FROM ad_stats WHERE ad_id=?', [$ad['id']]);
         Audit::log($u['id'], 'ad.delete', 'ad', $ad['id']);
         return Response::json(['ok' => true]);
     }
 
+    /** Legacy subscription checkout: advertising is sold as impression packages now. */
     public static function checkoutStripe(Request $r, array $p): Response
     {
-        [$u, $ad] = self::own($r, $p);
-        if ($ad['status'] !== 'approved') {
-            throw new HttpException(409, 'Your advert needs newsroom approval before you subscribe.');
-        }
-        return Response::json(['url' => Stripe::adCheckoutUrl($u, $ad)]);
+        self::own($r, $p);
+        throw new HttpException(410, 'Advertising is sold as impression packages now. Choose a package on the Advertise page.');
     }
 
     public static function checkoutPaypal(Request $r, array $p): Response
     {
-        [$u, $ad] = self::own($r, $p);
-        if ($ad['status'] !== 'approved') {
-            throw new HttpException(409, 'Your advert needs newsroom approval before you subscribe.');
-        }
-        return Response::json(['url' => PayPal::subscribeUrl($u, $ad)]);
+        return self::checkoutStripe($r, $p);
     }
 
     public static function paypalReturn(Request $r): Response
@@ -266,6 +340,7 @@ final class AdsController
                 break;
             case 'delete':
                 Auth::require(['admin']);
+                AdOrders::release($ad['id']);
                 Database::query('DELETE FROM ads WHERE id=?', [$ad['id']]);
                 Database::query('DELETE FROM ad_stats WHERE ad_id=?', [$ad['id']]);
                 Audit::log($u['id'], 'ad.delete', 'ad', $ad['id']);
@@ -279,19 +354,81 @@ final class AdsController
     public static function adminSettings(Request $r): Response
     {
         $u = Auth::require(['admin']);
-        $price = (float)str_replace(',', '.', $r->post('price', '25', 12));
-        Ads::updateSettings((int)round($price * 100), (int)$r->post('trial_days', '7', 4), strtoupper($r->post('currency', 'EUR', 3)));
-        Audit::log($u['id'], 'ads.settings', 'settings', 'ads', Ads::priceLabel() . ' / ' . Ads::trialDays() . 'd');
+        $price = (float)str_replace(',', '.', $r->post('price', (string)(Ads::price() / 100), 12));
+        Ads::updateSettings((int)round($price * 100), (int)$r->post('trial_days', (string)Ads::trialDays(), 4), strtoupper($r->post('currency', 'EUR', 3)));
+        Audit::log($u['id'], 'ads.settings', 'settings', 'ads', Ads::currency());
         return Response::json(['ok' => true, 'pricing' => Ads::pricing()]);
     }
 
     public static function adminStats(Request $r, array $p): Response
     {
-        self::staff();
+        $u = self::staff();
         $ad = Ads::find($p['id']);
         if (!$ad) {
             throw new HttpException(404, 'Advert not found');
         }
-        return Response::json(['ad' => Ads::present($ad), 'stats' => Ads::stats($ad['id'], 30), 'payments' => Database::all('SELECT * FROM ad_payments WHERE ad_id=? ORDER BY created_at DESC LIMIT 50', [$ad['id']])]);
+        // Money is administrators' business; editors see delivery only.
+        $payments = $u['role'] === 'admin' ? Database::all('SELECT * FROM ad_payments WHERE ad_id=? ORDER BY created_at DESC LIMIT 50', [$ad['id']]) : [];
+        return Response::json(['ad' => Ads::present($ad), 'stats' => Ads::stats($ad['id'], 30), 'payments' => $payments]);
+    }
+
+    // ------------------------------------------------------------ packages & orders (admin)
+
+    public static function packages(Request $r): Response
+    {
+        return Response::json(['packages' => AdPackages::all(), 'tiers' => AdPackages::TIERS, 'currency' => Ads::currency(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured()]);
+    }
+
+    public static function adminPackages(Request $r): Response
+    {
+        Auth::require(['admin']);
+        return Response::json(['packages' => AdPackages::all(false), 'tiers' => AdPackages::TIERS, 'currency' => Ads::currency()]);
+    }
+
+    public static function adminPackageSave(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $id = $r->post('id', '', 40) ?: null;
+        $pkg = AdPackages::save($id, $_POST);
+        Audit::log($u['id'], $id ? 'ad.package.update' : 'ad.package.create', 'ad_package', $pkg['id'], $pkg['name'] . ' ' . $pkg['price_label'] . ' / ' . $pkg['impressions']);
+        return Response::json(['ok' => true, 'package' => $pkg]);
+    }
+
+    public static function adminPackageDelete(Request $r, array $p): Response
+    {
+        $u = Auth::require(['admin']);
+        AdPackages::delete($p['id']);
+        Audit::log($u['id'], 'ad.package.delete', 'ad_package', $p['id']);
+        return Response::json(['ok' => true]);
+    }
+
+    public static function adminOrders(Request $r): Response
+    {
+        Auth::require(['admin']);
+        return Response::json(['orders' => AdOrders::all($r->query('status', '', 20))]);
+    }
+
+    /** Admin: grant a package (bank transfer / comp) or refund an order. */
+    public static function adminOrderAction(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $action = $r->post('action', '', 20);
+        if ($action === 'grant') {
+            $email = mb_strtolower($r->post('email', '', 254));
+            $buyer = Database::one('SELECT * FROM users WHERE email=?', [$email]);
+            $pkg = AdPackages::find($r->post('package_id', '', 40));
+            if (!$buyer || !$pkg) {
+                throw new HttpException(400, 'Choose an existing member email and a package');
+            }
+            $adId = $r->post('ad_id', '', 40) ?: null;
+            if ($adId && (Ads::find($adId)['user_id'] ?? null) !== $buyer['id']) {
+                throw new HttpException(400, 'That advert does not belong to the member');
+            }
+            return Response::json(['ok' => true, 'order' => AdOrders::grant($buyer, $pkg, $u['id'], $adId, $r->post('note', '', 300))]);
+        }
+        if ($action === 'refund') {
+            return Response::json(['ok' => true, 'order' => AdOrders::refund($r->post('order_id', '', 40), $u['id'], $r->post('note', '', 300))]);
+        }
+        throw new HttpException(400, 'Invalid action');
     }
 }
