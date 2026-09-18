@@ -126,6 +126,69 @@ final class Digest
         return $n;
     }
 
+    /**
+     * Members-only monthly county newsletter: the month's most-read and most-confirmed community
+     * reports, notices and the poll for each ME+ member's home county. Sent on the 1st (Irish time).
+     */
+    public static function monthlyHtml(string $county, string $name): string
+    {
+        $base = rtrim(Config::get('PUBLIC_BASE_URL', ''), '/');
+        $since = gmdate('Y-m-d\TH:i:s', strtotime('first day of last month 00:00')) . '+00:00';
+        $monthLabel = date('F Y', strtotime('first day of last month'));
+        $rows = Database::all("SELECT id,slug,title,views,location_name,kind,source_name,(SELECT COUNT(*) FROM confirmations c WHERE c.story_id=s.id) AS confirmations FROM stories s WHERE status='published' AND county LIKE ? AND COALESCE(published_at,created_at)>=? ORDER BY views DESC LIMIT 8", [$county ?: '%', $since]);
+        $reporters = Database::all("SELECT u.display_name,u.handle,COUNT(*) AS n FROM stories s JOIN users u ON u.id=s.author_user_id WHERE s.kind='community' AND s.status='published' AND s.county LIKE ? AND COALESCE(s.published_at,s.created_at)>=? GROUP BY u.id ORDER BY n DESC LIMIT 5", [$county ?: '%', $since]);
+        $deaths = (int)Database::value("SELECT COUNT(*) FROM notices WHERE kind='death' AND status='published' AND county=? AND created_at>=?", [$county, $since]);
+        $events = Notices::recent(['county' => $county, 'kind' => 'event', 'upcoming' => true], 5);
+        $h = '<p style="color:#59685f;font-size:12px;letter-spacing:.15em;text-transform:uppercase;margin:0 0 6px">ME+ members · ' . e($monthLabel) . '</p>';
+        $h .= '<h1 style="font-size:24px;margin:0 0 6px;letter-spacing:-.02em">' . e($county ? 'Co. ' . $county : 'Ireland') . ', the month that was</h1>';
+        $h .= '<p style="color:#33423a;margin:0 0 16px">Thanks for funding local reporting, ' . e(explode(' ', $name)[0]) . '. Here is what your county read, confirmed and sent in during ' . e($monthLabel) . '.</p>';
+        $h .= '<h2 style="font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#139a5c;margin:22px 0 8px">Most read</h2><ol style="padding-left:20px;margin:0">';
+        foreach ($rows as $s) {
+            $h .= '<li style="margin:0 0 10px"><a href="' . e($base . '/story/' . $s['slug']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($s['title']) . '</a><br><span style="color:#59685f;font-size:13px">' . e($s['kind'] === 'wire' ? $s['source_name'] : 'Community report') . ($s['location_name'] ? ' · ' . e($s['location_name']) : '') . ' · ' . (int)$s['views'] . ' reads' . ((int)$s['confirmations'] ? ' · confirmed by ' . (int)$s['confirmations'] . ' neighbours' : '') . '</span></li>';
+        }
+        $h .= $rows ? '</ol>' : '<li>A quiet month on the community desk — <a href="' . e($base . '/#community') . '" style="color:#d92645">send in what you see</a>.</li></ol>';
+        if ($reporters) {
+            $h .= '<h2 style="font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#139a5c;margin:22px 0 8px">Who reported</h2><p style="margin:0;color:#33423a">' . e(implode(', ', array_map(static fn($r) => $r['display_name'] . ' (' . (int)$r['n'] . ')', $reporters))) . '</p>';
+        }
+        $h .= '<p style="margin-top:16px;color:#33423a"><b>' . (int)$deaths . '</b> death notice' . ($deaths === 1 ? '' : 's') . ' were published for the county last month. ';
+        $h .= 'As a member you can follow up to ten areas for death notices, closures and warnings from your <a href="' . e($base . '/dashboard#follows') . '" style="color:#139a5c">dashboard</a>.</p>';
+        if ($events) {
+            $h .= '<h2 style="font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#139a5c;margin:22px 0 8px">Coming up</h2><ul style="padding-left:20px;margin:0">';
+            foreach ($events as $n) {
+                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e(date_irish($n['event_at'], 'D j M H:i')) . ($n['venue'] ? ' · ' . e($n['venue']) : '') . '</span></li>';
+            }
+            $h .= '</ul>';
+        }
+        $h .= '<p style="margin-top:22px"><a href="' . e($base . ($county ? '/county/' . slugify($county) : '/')) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:700">Read the full archive →</a></p>';
+        $h .= '<p style="color:#59685f;font-size:12px;margin-top:22px">Sent once a month to ME+ members. Manage your membership in your <a href="' . e($base . '/dashboard#billing') . '" style="color:#59685f">dashboard</a>.</p>';
+        return $h;
+    }
+
+    /** Send the monthly members' newsletter on the 1st of the month; safe to call daily. */
+    public static function sendMonthly(bool $force = false): int
+    {
+        $today = Daily::today();
+        if (!$force && ((int)$today->format('j') !== 1 || (int)$today->format('G') < 8)) {
+            return 0;
+        }
+        $month = $today->format('Y-m');
+        $n = 0;
+        $cache = [];
+        foreach (Database::all("SELECT id,email,display_name,home_county,last_monthly_at FROM users WHERE plan='ME+' ORDER BY home_county") as $u) {
+            if (!$force && $u['last_monthly_at'] && str_starts_with(date_irish($u['last_monthly_at'], 'Y-m'), $month)) {
+                continue;
+            }
+            $county = (string)($u['home_county'] ?? '');
+            $cache[$county] ??= self::monthlyHtml($county, '{{name}}');
+            $html = str_replace(e('{{name}}'), e($u['display_name']), $cache[$county]);
+            if (Mailer::send($u['email'], ($county ? 'Co. ' . $county : 'Ireland') . ' — your ME+ monthly', $html)) {
+                Database::query('UPDATE users SET last_monthly_at=? WHERE id=?', [now(), $u['id']]);
+                $n++;
+            }
+        }
+        return $n;
+    }
+
     /** Spoken bulletin script (~90 seconds at a natural pace). */
     public static function bulletin(?string $county): array
     {

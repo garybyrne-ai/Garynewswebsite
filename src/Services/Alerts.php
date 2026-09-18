@@ -186,6 +186,23 @@ final class Alerts
 
     // ---------------------------------------------------------- subscriptions
 
+    /** Active subscriptions for a member's email, for the dashboard. */
+    public static function forEmail(string $email): array
+    {
+        $rows = Database::all('SELECT id,county,town,kinds,confirmed_at,created_at,last_daily_at FROM alert_subscriptions WHERE email=? AND unsubscribed_at IS NULL ORDER BY county', [mb_strtolower($email)]);
+        foreach ($rows as &$r) {
+            $r['kinds'] = array_values(array_filter(explode(',', (string)$r['kinds'])));
+            $r['kind_labels'] = array_map(static fn($k) => self::KINDS[$k] ?? $k, $r['kinds']);
+            $r['confirmed'] = (bool)$r['confirmed_at'];
+        }
+        return $rows;
+    }
+
+    public static function remove(int $id, string $email): bool
+    {
+        return Database::query('UPDATE alert_subscriptions SET unsubscribed_at=? WHERE id=? AND email=?', [now(), $id, mb_strtolower($email)])->rowCount() > 0;
+    }
+
     public static function subscribe(array $in, ?array $user, string $ip): array
     {
         RateLimiter::hit($ip . '|subscribe', 15, 3600, 'Too many sign-ups from this connection.');
@@ -200,6 +217,14 @@ final class Alerts
         }
         if (!$kinds) {
             $kinds = ['daily'];
+        }
+        // ME+ covers up to ten areas; a free account gets one county.
+        $limit = Membership::alertLimit($user, $email);
+        $others = (int)Database::value('SELECT COUNT(*) FROM alert_subscriptions WHERE email=? AND county<>? AND unsubscribed_at IS NULL', [$email, $county]);
+        if ($others >= $limit) {
+            throw new HttpException(403, $limit === 1
+                ? 'Free accounts get alerts for one county. ME+ members can follow up to ten areas — ' . Membership::priceLabel() . ' or ' . Membership::annualLabel() . '.'
+                : 'ME+ covers up to ten areas. Remove one in your dashboard to add another.');
         }
         $existing = Database::one('SELECT * FROM alert_subscriptions WHERE email=? AND county=?', [$email, $county]);
         $token = $existing['token'] ?? bin2hex(random_bytes(20));

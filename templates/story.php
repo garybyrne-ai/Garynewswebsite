@@ -23,7 +23,7 @@ $jsonld = $isWire ? null : [
       <?php if ($isWire): ?>
         <span class="byline"><?= Ui::avatar(null, 'md', $story['source_name']) ?><span><b><?= $story['source_author'] ? 'By ' . e($story['source_author']) . ', ' : '' ?><?= e($story['source_name']) ?></b><small>Wire story · curated by <?= $author && !empty($author['handle']) ? '<a href="/contributors/' . e($author['handle']) . '">' . e($author['display_name']) . '</a>' : 'the ME desk' ?> for the <?= e($author['desk'] ?? $story['category']) ?> desk</small></span></span>
       <?php elseif ($author): ?>
-        <a class="byline" href="<?= !empty($author['handle']) ? '/contributors/' . e($author['handle']) : '#' ?>"><?= Ui::avatar($author, 'md') ?><span><b><?= e($author['display_name']) ?></b><small><?= e($author['title'] ?: 'Community reporter') ?><?= !empty($author['reports_published']) ? ' · ' . (int)$author['reports_published'] . ' published reports' : '' ?></small></span></a>
+        <a class="byline" href="<?= !empty($author['handle']) ? '/contributors/' . e($author['handle']) : '#' ?>"><?= Ui::avatar($author, 'md') ?><span><b><?= e($author['display_name']) ?><?= ($author['plan'] ?? '') === 'ME+' ? ' <span class="chip chip--plus chip--xs" title="ME+ member">ME+</span>' : '' ?></b><small><?= e($author['title'] ?: 'Community reporter') ?><?= !empty($author['reports_published']) ? ' · ' . (int)$author['reports_published'] . ' published reports' : '' ?></small></span></a>
       <?php else: ?>
         <span class="byline"><?= Ui::avatar(null, 'md', $story['author_name'] ?: 'ME') ?><span><b><?= e($story['author_name'] ?: 'Community reporter') ?></b><small>Community reporter</small></span></span>
       <?php endif; ?>
@@ -72,6 +72,14 @@ $jsonld = $isWire ? null : [
             </ol>
           </section>
         <?php endif; ?>
+      <?php elseif (!empty($archived)): ?>
+        <div class="article__body article__body--locked"><?= nl2br(e(excerpt($story['body'], 420))) ?></div>
+        <div class="archivegate">
+          <span class="chip chip--plus">ME+</span>
+          <h2>This report is in the members' archive</h2>
+          <p>Stories older than <?= (int)\MeNews\Services\Membership::archiveDays() ?> days are kept for ME+ members, who fund the county reporting behind them. Read the full archive ad-free for <?= e(\MeNews\Services\Membership::priceLabel()) ?> or <?= e(\MeNews\Services\Membership::annualLabel()) ?>.</p>
+          <div class="inline"><a class="btn btn--primary" href="/plus">Get ME+</a><?php if (empty($user)): ?><button class="btn btn--ghost" type="button" data-open-auth="signin">Already a member? Sign in</button><?php endif; ?></div>
+        </div>
       <?php else: ?>
         <div class="article__body"><?= nl2br(e($story['body'])) ?></div>
         <?php if ($story['editorial_note']): ?><div class="editornote"><span class="kicker">Editor's note</span><p><?= e($story['editorial_note']) ?></p></div><?php endif; ?>
@@ -97,7 +105,7 @@ $jsonld = $isWire ? null : [
         <header class="block__head block__head--sm"><h2 class="block__title">Community discussion</h2><span class="mono" id="comment-count"><?= count($comments) ?> published</span></header>
         <div class="comments" id="comments">
           <?php if ($comments): foreach ($comments as $c): ?>
-            <div class="comment"><?= Ui::avatar(['display_name' => $c['author'], 'accent' => $c['accent'] ?? null, 'is_verified' => $c['is_verified'] ?? 0], 'sm', $c['author']) ?><div><b><?= e($c['author']) ?></b><time class="mono"><?= e(time_ago($c['created_at'])) ?></time><p><?= nl2br(e($c['body'])) ?></p></div></div>
+            <div class="comment"><?= Ui::avatar(['display_name' => $c['author'], 'accent' => $c['accent'] ?? null, 'is_verified' => $c['is_verified'] ?? 0], 'sm', $c['author']) ?><div><b><?= e($c['author']) ?><?= ($c['plan'] ?? '') === 'ME+' ? ' <span class="chip chip--plus chip--xs" title="ME+ member">ME+</span>' : '' ?></b><time class="mono"><?= e(time_ago($c['created_at'])) ?></time><p><?= nl2br(e($c['body'])) ?></p></div></div>
           <?php endforeach; else: ?>
             <p class="panel__note" id="no-comments">No published comments yet. Keep it factual and respectful — comments are screened before they appear.</p>
           <?php endif; ?>

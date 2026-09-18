@@ -6,6 +6,8 @@ namespace MeNews\Controllers;
 use MeNews\Auth;
 use MeNews\Config;
 use MeNews\Database;
+use MeNews\Services\Alerts;
+use MeNews\Services\Membership;
 use MeNews\Http\HttpException;
 use MeNews\Http\Request;
 use MeNews\Http\Response;
@@ -23,6 +25,9 @@ use MeNews\Support\Locations;
 /** Authentication, member accounts, community reporting and billing. */
 final class AccountController
 {
+    /** A real bcrypt hash of random text; only used to equalise timing for unknown emails. */
+    private const DUMMY_HASH = '$2y$12$EVPe1YrmplLJ4n/3eS3qyO7O1.U1CTz5s0AJi8QQjhljSCV5xMY/C';
+
     // ---------------------------------------------------------------- auth
 
     public static function register(Request $r): Response
@@ -78,8 +83,23 @@ final class AccountController
             throw new HttpException(400, 'Invalid password');
         }
         $u = Database::one('SELECT * FROM users WHERE email=?', [$email]);
-        if (!$u || !Auth::verifyPassword($password, $u['password_hash'])) {
+        if ($u && !empty($u['locked_until']) && $u['locked_until'] > now()) {
+            Audit::log($u['id'], 'login.locked', 'user', $u['id']);
+            throw new HttpException(429, 'Too many failed sign-ins. This account is locked for a few minutes — try again shortly or reset your password.');
+        }
+        // Verify against a dummy hash when the account does not exist so timing does not reveal valid emails.
+        $ok = $u ? Auth::verifyPassword($password, $u['password_hash']) : (password_verify($password, self::DUMMY_HASH) && false);
+        if (!$ok) {
+            if ($u) {
+                $fails = (int)($u['failed_logins'] ?? 0) + 1;
+                $lock = $fails >= 8 ? gmdate('Y-m-d\TH:i:s', time() + 900) . '+00:00' : null;
+                Database::query('UPDATE users SET failed_logins=?, locked_until=? WHERE id=?', [$lock ? 0 : $fails, $lock, $u['id']]);
+                Audit::log($u['id'], $lock ? 'login.lockout' : 'login.failed', 'user', $u['id']);
+            }
             throw new HttpException(401, 'Incorrect email or password');
+        }
+        if ((int)($u['failed_logins'] ?? 0) > 0 || !empty($u['locked_until'])) {
+            Database::query('UPDATE users SET failed_logins=0, locked_until=NULL WHERE id=?', [$u['id']]);
         }
         if (password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) {
             Database::query('UPDATE users SET password_hash=? WHERE id=?', [password_hash($password, PASSWORD_DEFAULT), $u['id']]);
@@ -118,6 +138,32 @@ final class AccountController
         return Response::json(Auth::publicUser(Database::one('SELECT * FROM users WHERE id=?', [$u['id']])));
     }
 
+    /** Alert subscriptions tied to the member's own email address. */
+    public static function alerts(Request $r): Response
+    {
+        $u = Auth::require();
+        return Response::json(['subscriptions' => Alerts::forEmail($u['email']), 'limit' => Membership::alertLimit($u), 'plan' => $u['plan']]);
+    }
+
+    public static function alertsAdd(Request $r): Response
+    {
+        $u = Auth::require();
+        $in = $_POST + ['kinds' => (array)($_POST['kinds'] ?? [])];
+        $in['email'] = $u['email']; // members can only manage alerts for their own address
+        $out = Alerts::subscribe($in, $u, $r->ip());
+        Audit::log($u['id'], 'alerts.add', 'alert_subscription', $out['county']);
+        return Response::json($out + ['subscriptions' => Alerts::forEmail($u['email'])]);
+    }
+
+    public static function alertsRemove(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        if (!Alerts::remove((int)$p['id'], $u['email'])) {
+            throw new HttpException(404, 'Subscription not found');
+        }
+        return Response::json(['ok' => true, 'subscriptions' => Alerts::forEmail($u['email'])]);
+    }
+
     public static function password(Request $r): Response
     {
         $u = Auth::require();
@@ -130,6 +176,7 @@ final class AccountController
             throw new HttpException(401, 'Current password is incorrect');
         }
         Database::query('UPDATE users SET password_hash=? WHERE id=?', [password_hash($new, PASSWORD_DEFAULT), $u['id']]);
+        Auth::revokeOtherSessions($u['id']);
         Audit::log($u['id'], 'password.change', 'user', $u['id']);
         return Response::json(['ok' => true]);
     }

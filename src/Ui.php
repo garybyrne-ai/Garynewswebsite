@@ -61,7 +61,8 @@ final class Ui
             : '<span class="card__source card__source--community">Community report</span>';
         $place = $s['location_name'] ? '<span class="card__place">' . icon('pin') . ' ' . e($s['location_name']) . '</span>' : '';
         // Wire bylines belong to the publisher's journalist, never to our desk.
-        $by = $isWire ? (!empty($s['source_author']) ? '<span class="card__by">' . e($s['source_author']) . '</span>' : '') : ($s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . '</span>' : '');
+        $plus = !$isWire && ($s['author_plan'] ?? '') === 'ME+' ? ' <span class="chip chip--plus chip--xs" title="ME+ member">ME+</span>' : '';
+        $by = $isWire ? (!empty($s['source_author']) ? '<span class="card__by">' . e($s['source_author']) . '</span>' : '') : ($s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . $plus . '</span>' : '');
         $sig = !empty($s['signal_total']) ? '<span class="chip chip--signal" title="Signal votes">' . icon('signal') . ' ' . (int)$s['signal_total'] . '</span>' : '';
         $cluster = $isWire && $s['cluster_count'] > 1 ? '<span class="chip chip--cluster" title="Outlets covering this story">' . icon('layers') . ' ' . (int)$s['cluster_count'] . ' outlets</span>' : '';
         $label = $isWire ? '' : self::label($s['verification_label']);

@@ -219,6 +219,7 @@ final class LocalController
         set_time_limit(280);
         return Response::json([
             'daily_sent' => Digest::sendDue((bool)$r->query('force')),
+            'monthly_sent' => Digest::sendMonthly((bool)$r->query('force_monthly')),
             'warnings_sent' => Alerts::pushWarnings(),
             'notices_expired' => Notices::expire(),
             'time' => now(),

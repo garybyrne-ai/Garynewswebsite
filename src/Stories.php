@@ -8,7 +8,7 @@ use MeNews\Support\Categories;
 /** Read-model helpers for stories (wire + community). */
 final class Stories
 {
-    private const SELECT = "SELECT s.*, u.is_verified AS reporter_verified, u.reputation AS reporter_reputation, u.handle AS author_handle, u.title AS author_title, u.accent AS author_accent
+    private const SELECT = "SELECT s.*, u.is_verified AS reporter_verified, u.reputation AS reporter_reputation, u.handle AS author_handle, u.title AS author_title, u.accent AS author_accent, u.plan AS author_plan
         FROM stories s LEFT JOIN users u ON u.id=s.author_user_id";
 
     public static function makeSlug(string $title, string $id): string
@@ -58,6 +58,10 @@ final class Stories
             $sql .= ' AND (s.title LIKE ? OR s.summary LIKE ? OR s.body LIKE ? OR s.location_name LIKE ? OR s.county LIKE ?)';
             array_push($args, ...array_fill(0, 5, '%' . $f['q'] . '%'));
         }
+        if (!empty($f['since'])) {
+            $sql .= ' AND COALESCE(s.published_at, s.created_at)>=?';
+            $args[] = $f['since'];
+        }
         $sql .= ' ORDER BY COALESCE(s.published_at, s.created_at) DESC LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset;
         return array_map([self::class, 'present'], Database::all($sql, $args));
     }
@@ -80,6 +84,10 @@ final class Stories
         if (!empty($f['q'])) {
             $sql .= ' AND (s.title LIKE ? OR s.summary LIKE ? OR s.body LIKE ? OR s.location_name LIKE ? OR s.county LIKE ?)';
             array_push($args, ...array_fill(0, 5, '%' . $f['q'] . '%'));
+        }
+        if (!empty($f['since'])) {
+            $sql .= ' AND COALESCE(s.published_at, s.created_at)>=?';
+            $args[] = $f['since'];
         }
         return Database::count($sql, $args);
     }
@@ -251,7 +259,7 @@ final class Stories
 
     public static function comments(string $storyId): array
     {
-        return Database::all("SELECT c.id,c.created_at,c.author,c.body,u.handle,u.accent,u.is_verified FROM comments c LEFT JOIN users u ON u.id=c.user_id WHERE c.story_id=? AND c.status='published' ORDER BY c.created_at", [$storyId]);
+        return Database::all("SELECT c.id,c.created_at,c.author,c.body,u.handle,u.accent,u.is_verified,u.plan FROM comments c LEFT JOIN users u ON u.id=c.user_id WHERE c.story_id=? AND c.status='published' ORDER BY c.created_at", [$storyId]);
     }
 
     public static function confirmations(string $storyId): int

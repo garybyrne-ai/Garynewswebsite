@@ -425,7 +425,9 @@ final class NewsWire
     /** Keep the wire tidy: drop stories older than the max age that nobody interacted with. */
     private static function prune(): void
     {
-        $cutoff = gmdate('Y-m-d\TH:i:s', time() - Config::int('WIRE_MAX_AGE_DAYS', 14) * 86400 * 2) . '+00:00';
+        // Keep wire headlines for the members' archive (a year by default) rather than just the front-page window.
+        $keep = max(Config::int('WIRE_MAX_AGE_DAYS', 14) * 2, Config::int('WIRE_KEEP_DAYS', 365));
+        $cutoff = gmdate('Y-m-d\TH:i:s', time() - $keep * 86400) . '+00:00';
         Database::query("DELETE FROM stories WHERE kind='wire' AND is_featured=0 AND published_at<? AND id NOT IN (SELECT story_id FROM comments) AND id NOT IN (SELECT story_id FROM confirmations)", [$cutoff]);
     }
 

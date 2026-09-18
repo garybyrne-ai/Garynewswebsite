@@ -38,6 +38,38 @@ final class Membership
         return $user !== null && ($user['plan'] ?? '') === 'ME+';
     }
 
+    /** Staff read everything; members read the archive; everyone else gets the last N days. */
+    public static function fullArchive(?array $user): bool
+    {
+        return self::isPlus($user) || ($user !== null && in_array($user['role'] ?? '', ['editor', 'admin'], true));
+    }
+
+    public static function archiveDays(): int
+    {
+        return max(1, (int)(Database::setting('archive_days', '14') ?? 14));
+    }
+
+    /** ISO timestamp before which stories are members-only, or null when the reader has the full archive. */
+    public static function archiveCutoff(?array $user): ?string
+    {
+        return self::fullArchive($user) ? null : gmdate('Y-m-d\TH:i:s', time() - self::archiveDays() * 86400) . '+00:00';
+    }
+
+    public static function isArchived(array $story, ?array $user): bool
+    {
+        $cutoff = self::archiveCutoff($user);
+        return $cutoff !== null && (string)($story['published_at'] ?: $story['created_at']) < $cutoff;
+    }
+
+    /** How many counties an email address may receive alerts for. */
+    public static function alertLimit(?array $user, string $email = ''): int
+    {
+        if ($user === null && $email !== '') {
+            $user = Database::one('SELECT plan, role FROM users WHERE email=?', [mb_strtolower($email)]);
+        }
+        return self::isPlus($user) ? 10 : 1;
+    }
+
     /** Benefits shown on the plan page and sidebar. */
     public static function benefits(): array
     {
