@@ -89,7 +89,9 @@
   window.ME.openModal = openModal; window.ME.closeModals = closeModals;
 
   /* ---------- auth ---------- */
-  function showAuth(view) {
+  let authNext = null; // where to go after a successful sign-in/registration, set by data-next on the opener
+  function showAuth(view, next) {
+    authNext = next && next.startsWith('/') ? next : null;
     $$('[data-auth-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.authTab === view));
     $$('[data-auth-view]').forEach(f => f.hidden = f.dataset.authView !== view);
     $('#auth-title').textContent = view === 'register' ? 'Create your ME News account' : 'Sign in to ME News';
@@ -97,7 +99,7 @@
     openModal('auth-modal');
   }
   window.ME.showAuth = showAuth;
-  $$('[data-open-auth]').forEach(b => b.addEventListener('click', () => showAuth(b.dataset.openAuth || 'signin')));
+  $$('[data-open-auth]').forEach(b => b.addEventListener('click', () => showAuth(b.dataset.openAuth || 'signin', b.dataset.next)));
   $$('[data-auth-tab]').forEach(b => b.addEventListener('click', () => showAuth(b.dataset.authTab)));
   const nextUrl = () => { const p = new URLSearchParams(location.search); const n = p.get('next'); return n && n.startsWith('/') ? n : null; };
   async function authSubmit(e, url) {
@@ -107,7 +109,7 @@
       const j = await api(url, { method: 'POST', body: new FormData(e.target) });
       try { localStorage.setItem('me_token', j.token); } catch (err) { }
       out.textContent = 'Signed in as ' + j.user.display_name;
-      location.href = nextUrl() || location.pathname + (location.hash || '');
+      location.href = nextUrl() || authNext || location.pathname + (location.hash || '');
       location.reload();
     } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
   }

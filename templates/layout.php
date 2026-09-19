@@ -117,6 +117,7 @@ $more = [
       <?php endforeach; ?>
       <a href="/signal" class="sections__signal <?= $active('/signal') ?>"><?= icon('signal') ?> Signal</a>
       <a href="/advertise" class="sections__advertise <?= $active('/advertise') ?>"><?= icon('megaphone') ?> Advertise</a>
+      <a href="/plus" class="sections__plus <?= $active('/plus') ?>"><?= icon('star') ?> ME+<?= $user && ($user['plan'] ?? '') === 'ME+' ? ' <span class="sections__plus-tag">member</span>' : '' ?></a>
       <div class="moremenu" data-more>
         <button type="button" class="moremenu__btn" aria-expanded="false" aria-controls="more-panel">More <?= icon('chevron') ?></button>
         <div class="moremenu__panel" id="more-panel" hidden>

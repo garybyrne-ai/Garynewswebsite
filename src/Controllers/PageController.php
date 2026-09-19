@@ -370,6 +370,11 @@ final class PageController
             'priceLabel' => \MeNews\Services\Membership::priceLabel(),
             'annualLabel' => \MeNews\Services\Membership::annualLabel(),
             'benefits' => \MeNews\Services\Membership::benefits(),
+            'isPlus' => \MeNews\Services\Membership::isPlus(Auth::user()),
+            'archiveDays' => \MeNews\Services\Membership::archiveDays(),
+            'stripe' => \MeNews\Services\Stripe::configured(),
+            'memberCount' => Database::count("SELECT COUNT(*) FROM users WHERE plan='ME+'"),
+            'bodyClass' => 'page-plus',
         ]));
     }
 
