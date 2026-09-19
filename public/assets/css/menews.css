@@ -1055,6 +1055,9 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
 .sections__in a{display:inline-flex;align-items:center;gap:6px}
 .sections__county{color:var(--cy)!important;font-weight:800}
 .sections__county .icon{font-size:1em}
+.sections__advertise{margin-left:4px;padding:6px 14px!important;border:1px solid color-mix(in srgb,var(--em) 55%,transparent)!important;border-radius:999px;background:color-mix(in srgb,var(--em) 12%,transparent);color:var(--em)!important;align-self:center}
+.sections__advertise:hover{background:var(--em);color:#fff!important;border-color:var(--em)!important}
+.sections__advertise.is-active{background:var(--aurora);color:#fff!important;border-color:transparent!important;border-image:none}
 .moremenu{position:relative;margin-left:auto}
 .moremenu__btn{display:inline-flex;align-items:center;gap:6px;padding:12px 14px;font-weight:700;font-size:.86rem;color:var(--ink-2);white-space:nowrap}
 .moremenu__btn:hover,.moremenu__btn[aria-expanded="true"]{color:var(--ink)}
