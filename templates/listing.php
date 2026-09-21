@@ -8,7 +8,7 @@
   <?php endif; ?>
   <div class="pagehead__meta mono"><?= (int)$total ?> published · page <?= (int)$page ?> of <?= (int)$pages ?></div>
 </section>
-<?php if (!empty($banner)): ?><div class="container adslot adslot--top"><?= \MeNews\Services\Ads::render($banner, 'banner') ?></div><?php endif; ?>
+<?php if (!empty($banner)): ?><div class="container adslot adslot--top"><?= \MeNews\Services\Ads::slot($banner, 'banner') ?></div><?php endif; ?>
 <?php if (!empty($countyStrip)): $cs = $countyStrip; ?>
 <div class="container countystrip">
   <a class="countystrip__item <?= $cs['warning'] ? 'is-live' : '' ?>" href="/alerts?county=<?= rawurlencode($county) ?>"><?= icon('alert') ?><span><b><?= $cs['warning'] ? e($cs['warning']) : 'No weather warnings' ?></b><small><?= $cs['closures'] ? count($cs['closures']) . ' school closure' . (count($cs['closures']) === 1 ? '' : 's') . ' today' : 'No school closures reported' ?> · alerts by email →</small></span></a>

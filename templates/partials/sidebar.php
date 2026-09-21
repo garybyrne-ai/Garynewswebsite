@@ -82,10 +82,10 @@ $adFree = $user && ($user['plan'] ?? '') === 'ME+';
 
   <section class="panel panel--ads reveal">
     <header class="panel__head"><span class="kicker">Local businesses</span><a class="mono panel__hint" href="/advertise">Advertise →</a></header>
-    <?php if ($ads): foreach ($ads as $ad): ?>
-      <?= \MeNews\Services\Ads::render($ad, 'sidebar') ?>
-    <?php endforeach; else: ?>
-      <p class="panel__note">Your business could be here — designed in minutes, <?= e(\MeNews\Services\Ads::priceLabel()) ?> after a free trial. <a href="/advertise">Advertise with ME</a>.</p>
+    <?php if ($ads): ?>
+      <?= \MeNews\Services\Ads::slot($ads, 'sidebar') ?>
+    <?php else: ?>
+      <p class="panel__note">Your business could be here — designed in minutes, from <?= e(\MeNews\Services\AdPackages::money((int)(\MeNews\Services\AdPackages::all()[0]['price_cents'] ?? 600))) ?>. <a href="/advertise">Advertise with ME</a>.</p>
     <?php endif; ?>
   </section>
   <?php endif; ?>

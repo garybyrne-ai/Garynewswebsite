@@ -148,7 +148,7 @@ final class ApiController
 
     public static function ads(Request $r): Response
     {
-        if (\MeNews\Services\Membership::isPlus(\MeNews\Auth::user())) {
+        if (\MeNews\Services\Membership::adFree(\MeNews\Auth::user())) {
             return Response::json([]); // ME+ is ad-free everywhere, including client-side slots
         }
         $page = in_array($r->query('page', 'other', 12), ['home', 'section', 'story', 'county', 'notices', 'other'], true) ? $r->query('page', 'other', 12) : 'other';

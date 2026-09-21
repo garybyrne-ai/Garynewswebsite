@@ -112,6 +112,7 @@ return static function (Router $r): void {
     $r->get('/api/admin/ads/orders', [AdsC::class, 'adminOrders']);
     $r->post('/api/admin/ads/orders', [AdsC::class, 'adminOrderAction']);
     $r->post('/api/ads/preview', [AdsC::class, 'preview']);
+    $r->post('/api/ads/impression', [AdsC::class, 'impression']);
     $r->get('/ads/{id:[a-f0-9]+}/go', [AdsC::class, 'go']);
     $r->get('/media/ad/{id:[a-f0-9]+}/{kind:logo|image}', [AdsC::class, 'media']);
     $r->get('/billing/paypal/return', [AdsC::class, 'paypalReturn']);

@@ -457,7 +457,42 @@ final class Ads
      * that is ahead downwards, so a 10,000-impression package is spread over its run rather
      * than burnt in a day. House ads fill whatever is left.
      */
-    public static function pick(string $placement, string $county = '', string $town = '', int $limit = 1, array $exclude = [], string $page = 'other'): array
+    /** Seconds each advert stays on screen before a slot rotates to the next one. */
+    public static function rotateSeconds(): int
+    {
+        return max(5, min(120, (int)(Database::setting('ad_rotate_seconds', '20') ?: 20)));
+    }
+
+    /** Record one impression: totals, the daily stat row and, for package adverts, the order. */
+    public static function countImpression(array $ad): void
+    {
+        Database::query('UPDATE ads SET impressions=impressions+1 WHERE id=?', [$ad['id']]);
+        Database::query('INSERT INTO ad_stats(ad_id,day,impressions,clicks) VALUES(?,?,1,0) ON CONFLICT(ad_id,day) DO UPDATE SET impressions=impressions+1', [$ad['id'], gmdate('Y-m-d')]);
+        if ((int)$ad['is_house'] !== 1 && ($ad['plan_status'] ?? '') === 'credits') {
+            AdOrders::consume($ad['id']);
+        }
+    }
+
+    /**
+     * Rotating slot markup: every eligible advert is rendered, one is visible at a time and the
+     * browser cycles through them, reporting an impression the first time each one is shown.
+     */
+    public static function slot(array $ads, string $format = 'sidebar'): string
+    {
+        if (!$ads) {
+            return '';
+        }
+        $html = '<div class="adrotor adrotor--' . e($format) . '" data-adrotor data-interval="' . (self::rotateSeconds() * 1000) . '">';
+        foreach (array_values($ads) as $i => $ad) {
+            $html .= '<div class="adrotor__item' . ($i === 0 ? ' is-active' : '') . '" data-ad="' . e($ad['id']) . '">' . self::render($ad, $format) . '</div>';
+        }
+        if (count($ads) > 1) {
+            $html .= '<div class="adrotor__dots" aria-hidden="true">' . str_repeat('<i></i>', count($ads)) . '</div>';
+        }
+        return $html . '</div>';
+    }
+
+    public static function pick(string $placement, string $county = '', string $town = '', int $limit = 1, array $exclude = [], string $page = 'other', bool $count = true): array
     {
         if (!Database::installed()) {
             return [];
@@ -505,13 +540,10 @@ final class Ads
         }
         usort($pool, static fn($a, $b) => $b['_score'] <=> $a['_score']);
         $picked = array_slice($pool, 0, $limit);
-        $day = gmdate('Y-m-d');
         foreach ($picked as &$ad) {
             unset($ad['_score']);
-            Database::query('UPDATE ads SET impressions=impressions+1 WHERE id=?', [$ad['id']]);
-            Database::query('INSERT INTO ad_stats(ad_id,day,impressions,clicks) VALUES(?,?,1,0) ON CONFLICT(ad_id,day) DO UPDATE SET impressions=impressions+1', [$ad['id'], $day]);
-            if ((int)$ad['is_house'] !== 1 && ($ad['plan_status'] ?? '') === 'credits') {
-                AdOrders::consume($ad['id']);
+            if ($count) {
+                self::countImpression($ad);
             }
             $ad = self::present($ad);
         }

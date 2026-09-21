@@ -54,7 +54,7 @@ $jsonld = $isWire ? null : [
         <figure class="article__media"><video controls preload="metadata" src="<?= e($story['media_url']) ?>"></video></figure>
       <?php endif; ?>
 
-      <?php if (!empty($banner)): ?><div class="adslot adslot--inline"><?= \MeNews\Services\Ads::render($banner, 'banner') ?></div><?php endif; ?>
+      <?php if (!empty($banner)): ?><div class="adslot adslot--inline"><?= \MeNews\Services\Ads::slot($banner, 'banner') ?></div><?php endif; ?>
 
       <?php if ($isWire): ?>
         <div class="article__body">
@@ -145,7 +145,7 @@ $jsonld = $isWire ? null : [
       </section>
       <?php if ($ads): ?>
         <section class="panel panel--ads reveal"><header class="panel__head"><span class="kicker">Local businesses</span><a class="mono panel__hint" href="/advertise">Advertise →</a></header>
-          <?php foreach ($ads as $ad): ?><?= \MeNews\Services\Ads::render($ad, 'sidebar') ?><?php endforeach; ?>
+          <?= \MeNews\Services\Ads::slot($ads, 'sidebar') ?>
         </section>
       <?php endif; ?>
     </aside>

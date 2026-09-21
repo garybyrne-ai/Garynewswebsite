@@ -58,7 +58,7 @@ final class PageController
             'counties' => Stories::countyActivity(8),
             'mapPoints' => Stories::mapPoints(120),
             'mapCounties' => Stories::countyPoints(),
-            'ads' => self::ads((string)$county, '', 2, 'home'),
+            'ads' => self::ads((string)$county, '', 6, 'home'),
             'banner' => self::banner((string)$county, '', 'home'),
             'weather' => \MeNews\Services\Weather::today(),
             'warnings' => \MeNews\Services\Alerts::headline($county),
@@ -124,7 +124,7 @@ final class PageController
             'basePath' => '/section/' . $p['slug'],
             'feedLinks' => [['/feed/section/' . $p['slug'] . '.xml', $name]],
             'trending' => Stories::trending(5),
-            'ads' => self::ads('', '', 2, 'section'),
+            'ads' => self::ads('', '', 6, 'section'),
             'banner' => self::banner('', '', 'section'),
         ]));
     }
@@ -169,7 +169,7 @@ final class PageController
             'total' => $total,
             'basePath' => '/county/' . $p['slug'],
             'trending' => Stories::trending(5),
-            'ads' => self::ads($county, '', 2, 'county'),
+            'ads' => self::ads($county, '', 6, 'county'),
             'banner' => self::banner($county, '', 'county'),
             'county' => $county,
             'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
@@ -247,7 +247,7 @@ final class PageController
             'more' => Stories::feed(['exclude' => [$story['id']]], 5),
             'signal' => \MeNews\Services\Signal::tally($story['id']) + ['mine' => \MeNews\Services\Signal::myVote($story['id'], Auth::user())],
             'signalRank' => (static function () use ($story) { foreach (\MeNews\Services\Signal::leaderboard('today', 40) as $s) { if ($s['id'] === $story['id']) { return $s['signal_rank']; } } return null; })(),
-            'ads' => self::ads($story['county'] ?? '', (string)($story['location_name'] ?? ''), 2, 'story'),
+            'ads' => self::ads($story['county'] ?? '', (string)($story['location_name'] ?? ''), 6, 'story'),
             'banner' => self::banner($story['county'] ?? '', (string)($story['location_name'] ?? ''), 'story'),
             'bodyClass' => 'page-story',
         ]));
@@ -557,20 +557,21 @@ final class PageController
         return Response::redirect(Auth::user() ? '/dashboard#saved' : '/?auth=signin&next=/dashboard%23saved');
     }
 
-    private static function ads(string $county = '', string $town = '', int $limit = 2, string $page = 'other'): array
+    /** Adverts for the sidebar rotor. Impressions are counted by the browser as each one is shown. */
+    private static function ads(string $county = '', string $town = '', int $limit = 6, string $page = 'other'): array
     {
-        if (\MeNews\Services\Membership::isPlus(Auth::user())) {
+        if (\MeNews\Services\Membership::adFree(Auth::user())) {
             return [];
         }
-        return \MeNews\Services\Ads::pick('sidebar', $county, $town, $limit, [], $page);
+        return \MeNews\Services\Ads::pick('sidebar', $county, $town, max(1, $limit), [], $page, false);
     }
 
-    private static function banner(string $county = '', string $town = '', string $page = 'other'): ?array
+    /** Adverts for the banner rotor (list, first one shown first). */
+    private static function banner(string $county = '', string $town = '', string $page = 'other'): array
     {
-        if (\MeNews\Services\Membership::isPlus(Auth::user())) {
-            return null;
+        if (\MeNews\Services\Membership::adFree(Auth::user())) {
+            return [];
         }
-        $rows = \MeNews\Services\Ads::pick('banner', $county, $town, 1, [], $page);
-        return $rows[0] ?? null;
+        return \MeNews\Services\Ads::pick('banner', $county, $town, 6, [], $page, false);
     }
 }

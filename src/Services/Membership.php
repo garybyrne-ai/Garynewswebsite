@@ -38,6 +38,12 @@ final class Membership
         return $user !== null && ($user['plan'] ?? '') === 'ME+';
     }
 
+    /** ME+ members read ad-free; staff always see adverts so they can check what is running. */
+    public static function adFree(?array $user): bool
+    {
+        return self::isPlus($user) && !in_array($user['role'] ?? '', ['editor', 'admin'], true);
+    }
+
     /** Staff read everything; members read the archive; everyone else gets the last N days. */
     public static function fullArchive(?array $user): bool
     {

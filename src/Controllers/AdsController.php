@@ -11,6 +11,7 @@ use MeNews\Http\Response;
 use MeNews\Services\AdOrders;
 use MeNews\Services\AdPackages;
 use MeNews\Services\Ads;
+use MeNews\Services\RateLimiter;
 use MeNews\Services\Audit;
 use MeNews\Services\PayPal;
 use MeNews\Services\Stripe;
@@ -79,6 +80,26 @@ final class AdsController
     }
 
     /** Live preview for the designer (authenticated: any member). */
+    /** Browser beacon: an advert in a rotating slot was actually shown. One count per advert per viewer per minute. */
+    public static function impression(Request $r): Response
+    {
+        $ids = array_slice(array_unique(array_filter(preg_split('/[\s,]+/', $r->post('ids', '', 800)) ?: [], static fn($v) => preg_match('/^[a-f0-9]{8,40}$/', $v) === 1)), 0, 12);
+        $counted = 0;
+        foreach ($ids as $id) {
+            try {
+                RateLimiter::hit($r->ip() . '|imp|' . $id, 1, 60, 'seen');
+            } catch (HttpException) {
+                continue;
+            }
+            $ad = Database::one("SELECT * FROM ads WHERE id=? AND status='approved' AND paused=0", [$id]);
+            if ($ad && Ads::isLive($ad)) {
+                Ads::countImpression($ad);
+                $counted++;
+            }
+        }
+        return Response::json(['ok' => true, 'counted' => $counted]);
+    }
+
     public static function preview(Request $r): Response
     {
         Auth::require();

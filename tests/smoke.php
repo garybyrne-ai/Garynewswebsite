@@ -309,7 +309,13 @@ check('ads review queue', $s === 200 && in_array($ad['id'] ?? '-', array_column(
 [$s, $dec] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'approve']);
 check('approve advert starts the impressions', $s === 200 && ($dec['ad']['plan_status'] ?? '') === 'credits' && !empty($dec['ad']['live']) && (int)($dec['ad']['impressions_left'] ?? 0) === (int)$premium['impressions'], $dec['ad']['state_label'] ?? '');
 [$s, $plusAds] = http('GET', '/api/ads?county=Wicklow&limit=4&page=home');
-check('ME+ readers (the admin account) get no adverts', $s === 200 && $plusAds === []);
+check('staff always see adverts even on ME+', $s === 200 && count($plusAds) > 0);
+[$s, $homeHtml] = http('GET', '/', [], ['Authorization: Bearer not-a-session'], false);
+check('home page ad slots are rotating rotors', $s === 200 && str_contains($homeHtml, 'data-adrotor') && str_contains($homeHtml, 'data-interval="20000"'));
+[$s, $imp] = http('POST', '/api/ads/impression', ['ids' => ($ad['id'] ?? 'x') . ',nothing'], ['Authorization: Bearer not-a-session']);
+check('browser impression beacon counts a shown advert', $s === 200 && ($imp['counted'] ?? 0) === 1);
+[$s, $imp2] = http('POST', '/api/ads/impression', ['ids' => $ad['id'] ?? 'x'], ['Authorization: Bearer not-a-session']);
+check('the same viewer is not counted twice within a minute', $s === 200 && ($imp2['counted'] ?? 1) === 0);
 $anon = ['Authorization: Bearer not-a-session'];
 [$s, $served] = http('GET', '/api/ads?county=Wicklow&limit=4&page=home', [], $anon);
 check('approved premium advert is served on the home page in its county', $s === 200 && in_array('Smoke Bakery', array_column($served, 'business_name'), true));

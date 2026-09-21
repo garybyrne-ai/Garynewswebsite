@@ -50,7 +50,7 @@ $countySlug = $county ? slugify($county) : '';
 </section>
 <?php endif; ?>
 
-<?php if (!empty($banner) && !\MeNews\Services\Membership::isPlus($user ?? null)): ?><div class="container adslot adslot--top"><?= Ads::render($banner, 'banner') ?></div><?php endif; ?>
+<?php if (!empty($banner)): ?><div class="container adslot adslot--top"><?= Ads::slot($banner, 'banner') ?></div><?php endif; ?>
 
 <div class="container layout">
   <div class="layout__main">

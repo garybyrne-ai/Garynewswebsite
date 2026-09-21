@@ -1431,3 +1431,13 @@ body>.skiptranslate,iframe.skiptranslate,.goog-te-banner-frame,#goog-gt-tt,.goog
 .goog-text-highlight{background:none!important;box-shadow:none!important}
 font[style]{background:inherit!important;box-shadow:none!important}
 @media (max-width:760px){.langswitch{display:none}}
+
+/* Rotating advert slots */
+.adrotor{position:relative}
+.adrotor__item{display:none}
+.adrotor__item.is-active{display:block;animation:adfade .5s ease}
+@keyframes adfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.adrotor__dots{display:flex;gap:4px;justify-content:center;margin-top:6px}
+.adrotor__dots i{width:5px;height:5px;border-radius:50%;background:var(--line-2);transition:.3s}
+.adrotor__dots i.is-active{background:var(--em);width:14px;border-radius:3px}
+.adrotor--banner .adrotor__dots{position:absolute;right:12px;bottom:6px;margin:0}

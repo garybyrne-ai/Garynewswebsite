@@ -125,6 +125,31 @@
   const qp = new URLSearchParams(location.search);
   if (qp.get('auth')) showAuth(qp.get('auth') === 'register' ? 'register' : 'signin');
 
+  /* ---------- advert rotors ---------- */
+  (function () {
+    const rotors = $$('[data-adrotor]'); if (!rotors.length) return;
+    const pending = new Set(); let flushTimer;
+    const flush = () => {
+      if (!pending.size) return;
+      const body = new URLSearchParams({ ids: [...pending].join(',') }); pending.clear();
+      if (navigator.sendBeacon) navigator.sendBeacon('/api/ads/impression', body);
+      else fetch('/api/ads/impression', { method: 'POST', body, keepalive: true }).catch(() => { });
+    };
+    const seen = new Set();
+    const note = id => { if (!id || seen.has(id)) return; seen.add(id); pending.add(id); clearTimeout(flushTimer); flushTimer = setTimeout(flush, 400); };
+    rotors.forEach(r => {
+      const items = $$('.adrotor__item', r), dots = $$('.adrotor__dots i', r); if (!items.length) return;
+      let i = 0;
+      const show = n => { items.forEach((it, k) => it.classList.toggle('is-active', k === n)); dots.forEach((d, k) => d.classList.toggle('is-active', k === n)); note(items[n].dataset.ad); };
+      show(0);
+      if (items.length > 1) {
+        const every = Math.max(5000, parseInt(r.dataset.interval, 10) || 20000);
+        setInterval(() => { if (document.hidden) return; i = (i + 1) % items.length; show(i); }, every);
+      }
+    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
+  })();
+
   /* ---------- saved stories ---------- */
   let savedLists = null, savePop = null;
   const markSaved = (id, on) => $$(`[data-save="${id}"]`).forEach(b => { b.classList.toggle('is-saved', on); const l = $('span', b); if (b.hasAttribute('data-save-label') && l) l.textContent = on ? 'Saved' : 'Save'; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
