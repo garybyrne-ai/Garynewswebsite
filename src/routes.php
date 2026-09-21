@@ -76,7 +76,16 @@ return static function (Router $r): void {
     $r->get('/admin', static fn() => \MeNews\Http\Response::redirect('/newsroom', 301));
     $r->get('/media/{id:[a-f0-9]+}', [Page::class, 'media']);
     $r->get('/sitemap.xml', [Page::class, 'sitemap']);
+    $r->get('/news-sitemap.xml', [Page::class, 'newsSitemap']);
+    $r->get('/robots.txt', [Page::class, 'robots']);
+    $r->get('/opensearch.xml', [Page::class, 'opensearch']);
+    $r->get('/feeds', [Page::class, 'feedsPage']);
     $r->get('/feed.xml', [Page::class, 'rss']);
+    $r->get('/feed.atom', [Page::class, 'rss']);
+    $r->get('/feed.json', [Page::class, 'rss']);
+    $r->get('/feed/{key:[a-z0-9-]+}.{fmt:xml|atom|json}', [Page::class, 'rss']);
+    $r->get('/feed/{group:section|county}/{slug:[a-z0-9-]+}.{fmt:xml|atom|json}', [Page::class, 'rss']);
+    $r->get('/saved', [Page::class, 'savedRedirect']);
 
     // ---- Public API
     $r->get('/.well-known/security.txt', [Page::class, 'securityTxt']);
@@ -116,6 +125,13 @@ return static function (Router $r): void {
     $r->get('/api/me', [Account::class, 'me']);
     $r->post('/api/me/profile', [Account::class, 'profile']);
     $r->post('/api/me/password', [Account::class, 'password']);
+    $r->get('/api/me/saved', [Account::class, 'saved']);
+    $r->post('/api/me/saved/lists', [Account::class, 'savedListCreate']);
+    $r->get('/api/me/saved/lists/{id:[a-f0-9]+}', [Account::class, 'savedListItems']);
+    $r->post('/api/me/saved/lists/{id:[a-f0-9]+}', [Account::class, 'savedListUpdate']);
+    $r->post('/api/me/saved/toggle', [Account::class, 'savedToggle']);
+    $r->post('/api/me/saved/ids', [Account::class, 'savedIds']);
+    $r->delete('/api/me/saved/items/{id:[0-9]+}', [Account::class, 'savedItemRemove']);
     $r->get('/api/me/alerts', [Account::class, 'alerts']);
     $r->post('/api/me/alerts', [Account::class, 'alertsAdd']);
     $r->delete('/api/me/alerts/{id:[0-9]+}', [Account::class, 'alertsRemove']);
@@ -154,6 +170,8 @@ return static function (Router $r): void {
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/rerun-safety', [Admin::class, 'rerun']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/edit', [Admin::class, 'edit']);
     $r->get('/api/admin/users', [Admin::class, 'users']);
+    $r->post('/api/admin/users', [Admin::class, 'createUser']);
+    $r->post('/api/admin/users/{id:[a-f0-9]+}/delete', [Admin::class, 'deleteUser']);
     $r->post('/api/admin/users/{id:[a-f0-9]+}', [Admin::class, 'updateUser']);
     $r->get('/api/admin/comments', [Admin::class, 'comments']);
     $r->get('/api/admin/ads', [AdsC::class, 'adminList']);

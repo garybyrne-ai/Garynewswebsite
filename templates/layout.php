@@ -8,7 +8,8 @@ $user = $user ?? null;
 $title = $title ?? 'ME News Ireland';
 $description = $description ?? 'Your Community. Your News. Live.';
 $bodyClass = $bodyClass ?? '';
-$ogImage = $ogImage ?? absolute_url('/assets/img/og.svg');
+$ogImage = $ogImage ?? absolute_url('/assets/img/og.png');
+$feedLinks = array_values(array_filter($feedLinks ?? []));
 $nav = $nav ?? Categories::NAV;
 $path = $_SERVER['REQUEST_URI'] ?? '/';
 $path = parse_url($path, PHP_URL_PATH) ?: '/';
@@ -29,8 +30,8 @@ $primary = [
 ];
 $more = [
     'Sections' => [['/section/business', 'Business'], ['/section/culture', 'Culture'], ['/section/council', 'Council'], ['/section/community', 'Community reports'], ['/section/traffic', 'Traffic']],
-    'ME News' => [['/signal', 'The Signal · most-voted'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/kids', 'ME Óg · Kids & puzzles'], ['/contributors', 'The desk'], ['/plus', 'ME+ membership']],
-    'About' => [['/about', 'How ME works'], ['/about#sources', 'Our sources'], ['/corrections', 'Corrections'], ['/ownership', 'Who owns ME'], ['/advertise', 'Advertise'], ['/privacy', 'Privacy & cookies']],
+    'ME News' => [['/signal', 'The Signal · most-voted'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/kids', 'ME Óg · Kids & puzzles'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'ME+ membership']],
+    'About' => [['/about', 'How ME works'], ['/about#sources', 'Our sources'], ['/corrections', 'Corrections'], ['/ownership', 'Who owns ME'], ['/advertise', 'Advertise'], ['/feeds', 'RSS & feeds'], ['/privacy', 'Privacy & cookies']],
 ];
 ?><!doctype html>
 <html lang="en-IE" data-theme="light" style="--day-shift:<?= \MeNews\Support\Daily::hueShift() ?>deg">
@@ -47,10 +48,30 @@ $more = [
 <meta property="og:description" content="<?= e($description) ?>">
 <meta property="og:image" content="<?= e($ogImage) ?>">
 <meta property="og:type" content="<?= isset($story) ? 'article' : 'website' ?>">
+<meta property="og:url" content="<?= e($canonical ?: absolute_url($path)) ?>">
+<meta property="og:locale" content="en_IE">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?= e($title) ?>">
+<meta name="twitter:description" content="<?= e($description) ?>">
+<meta name="twitter:image" content="<?= e($ogImage) ?>">
+<?php if (isset($story)): ?>
+<meta property="article:published_time" content="<?= e($story['time']) ?>">
+<meta property="article:modified_time" content="<?= e($story['updated_at'] ?: $story['time']) ?>">
+<meta property="article:section" content="<?= e($story['category']) ?>">
+<meta property="article:publisher" content="<?= e(absolute_url('/')) ?>">
+<?php foreach (array_filter([$story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, $story['category']]) as $tag): ?><meta property="article:tag" content="<?= e($tag) ?>"><?php endforeach; ?>
+<meta name="news_keywords" content="<?= e(implode(', ', array_filter([$story['category'], $story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, 'Ireland']))) ?>">
+<?php if ($story['kind'] !== 'wire'): ?><meta name="author" content="<?= e($story['author_name'] ?: 'ME News community') ?>"><?php endif; ?>
+<?php endif; ?>
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" title="ME News Ireland" href="/feed.xml">
+<link rel="alternate" type="application/atom+xml" title="ME News Ireland (Atom)" href="/feed.atom">
+<link rel="alternate" type="application/feed+json" title="ME News Ireland (JSON Feed)" href="/feed.json">
+<link rel="alternate" type="application/rss+xml" title="ME News Ireland — original reporting" href="/feed/community.xml">
+<?php foreach ($feedLinks as [$href, $label]): ?><link rel="alternate" type="application/rss+xml" title="ME News Ireland — <?= e($label) ?>" href="<?= e($href) ?>"><?php endforeach; ?>
+<link rel="search" type="application/opensearchdescription+xml" title="ME News" href="/opensearch.xml">
+<meta name="application-name" content="ME News Ireland">
 <link rel="preload" href="/assets/fonts/Sora.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
 <?php if (str_contains($bodyClass, 'page-kids') || str_contains($bodyClass, 'page-home')): ?><link rel="preload" href="/assets/fonts/Fraunces.woff2" as="font" type="font/woff2" crossorigin><?php endif; ?>
@@ -99,6 +120,7 @@ $more = [
           </button>
           <div class="account__menu" id="account-menu">
             <a href="/dashboard">My dashboard</a>
+            <a href="/dashboard#saved"><?= icon('bookmark') ?> Saved stories</a>
             <?php if ($isStaff): ?><a href="/newsroom">Newsroom</a><?php endif; ?>
             <?php if (!empty($user['handle']) && in_array($user['role'], ['contributor','editor','admin'], true)): ?><a href="/contributors/<?= e($user['handle']) ?>">Public profile</a><?php endif; ?>
             <button type="button" data-logout>Sign out</button>

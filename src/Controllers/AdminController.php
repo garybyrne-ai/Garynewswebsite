@@ -212,13 +212,96 @@ final class AdminController
         if ($u['id'] === $p['id'] && $role !== 'admin') {
             throw new HttpException(400, 'You cannot remove your own administrator access');
         }
-        if (!Database::one('SELECT id FROM users WHERE id=?', [$p['id']])) {
+        $target = Database::one('SELECT id,role,plan FROM users WHERE id=?', [$p['id']]);
+        if (!$target) {
             throw new HttpException(404, 'User not found');
         }
         $verified = (int)($r->post('is_verified') === '1');
         $rep = max(0, min(100, (int)$r->post('reputation', '50')));
-        Database::query('UPDATE users SET role=?,is_verified=?,reputation=?,title=?,desk=? WHERE id=?', [$role, $verified, $rep, $r->post('title', '', 80) ?: null, $r->post('desk', '', 40) ?: null, $p['id']]);
-        Audit::log($u['id'], 'user.update', 'user', $p['id'], "$role/$verified/$rep");
+        $plan = $r->post('plan', $target['plan'], 10) === 'ME+' ? 'ME+' : 'free';
+        Database::query('UPDATE users SET role=?,is_verified=?,reputation=?,title=?,desk=?,plan=? WHERE id=?', [$role, $verified, $rep, $r->post('title', '', 80) ?: null, $r->post('desk', '', 40) ?: null, $plan, $p['id']]);
+        if ($plan !== $target['plan']) {
+            Audit::log($u['id'], 'user.plan', 'user', $p['id'], $plan . ' (complimentary, set by admin)');
+        }
+        if ($role !== $target['role']) {
+            // A role change takes effect everywhere at once: sign the account out of every device.
+            Database::query('DELETE FROM sessions WHERE user_id=?', [$p['id']]);
+        }
+        Audit::log($u['id'], 'user.update', 'user', $p['id'], "$role/$verified/$rep/$plan");
+        return Response::json(['ok' => true]);
+    }
+
+    /** Admin creates an account (a contributor, an editor, or a member who cannot self-register). */
+    public static function createUser(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $email = mb_strtolower($r->post('email', '', 254));
+        $name = $r->post('display_name', '', 80);
+        $password = $r->rawPost('password');
+        $role = $r->post('role', 'member', 20);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new HttpException(400, 'Enter a valid email address');
+        }
+        if (mb_strlen($name) < 2) {
+            throw new HttpException(400, 'Enter the person\'s name');
+        }
+        if (!in_array($role, ['admin', 'editor', 'contributor', 'member'], true)) {
+            throw new HttpException(400, 'Invalid role');
+        }
+        if (Database::one('SELECT id FROM users WHERE email=?', [$email])) {
+            throw new HttpException(409, 'An account with that email already exists');
+        }
+        $generated = !is_string($password) || $password === '';
+        if ($generated) {
+            $password = bin2hex(random_bytes(6));
+        } elseif (strlen($password) < 8 || strlen($password) > 1024) {
+            throw new HttpException(400, 'Temporary password must be at least 8 characters');
+        }
+        $county = $r->post('home_county', '', 80);
+        $id = uuid();
+        Database::insert('users', [
+            'id' => $id, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'display_name' => $name,
+            'handle' => AccountController::uniqueHandle($name), 'role' => $role, 'title' => $r->post('title', '', 80) ?: null, 'desk' => $r->post('desk', '', 40) ?: null,
+            'home_county' => in_array($county, Locations::countyNames(), true) ? $county : null, 'plan' => $r->post('plan', 'free', 10) === 'ME+' ? 'ME+' : 'free',
+            'accent' => (string)random_int(0, 359), 'created_at' => now(),
+        ]);
+        Database::insert('subscriptions', ['user_id' => $id, 'email' => $email, 'plan' => 'free', 'status' => 'active', 'created_at' => now()]);
+        Audit::log($u['id'], 'user.create', 'user', $id, "$email as $role");
+        \MeNews\Services\Mailer::send($email, 'Your ME News account', '<p>Hi ' . e($name) . ',</p><p>' . e($u['display_name']) . ' has created an ME News account for you' . ($role !== 'member' ? ' as <b>' . e($role) . '</b>' : '') . '.</p><p>Sign in at <a href="' . e(absolute_url('/?auth=signin')) . '">' . e(absolute_url('/')) . '</a> with this address and the temporary password your editor gives you, then change it under <b>Security</b> in your dashboard.</p>');
+        return Response::json(['ok' => true, 'id' => $id, 'temporary_password' => $generated ? $password : null]);
+    }
+
+    /** Admin deletes an account. Reports stay published under their byline text; everything personal goes. */
+    public static function deleteUser(Request $r, array $p): Response
+    {
+        $u = Auth::require(['admin']);
+        if ($u['id'] === $p['id']) {
+            throw new HttpException(400, 'You cannot delete your own account from here');
+        }
+        $target = Database::one('SELECT id,email,role FROM users WHERE id=?', [$p['id']]);
+        if (!$target) {
+            throw new HttpException(404, 'User not found');
+        }
+        if ($target['role'] === 'admin' && (int)Database::value("SELECT COUNT(*) FROM users WHERE role='admin'") <= 1) {
+            throw new HttpException(400, 'That is the last administrator');
+        }
+        if (mb_strtolower($r->post('confirm', '', 254)) !== mb_strtolower($target['email'])) {
+            throw new HttpException(400, 'Type the account\'s email address to confirm');
+        }
+        Database::pdo()->beginTransaction();
+        try {
+            // Tables without a foreign key back to users are detached by hand; the rest cascade or null out.
+            Database::query("DELETE FROM ads WHERE user_id=? AND is_house=0", [$target['id']]);
+            Database::query("UPDATE ads SET user_id=NULL WHERE user_id=?", [$target['id']]);
+            Database::query('UPDATE alert_subscriptions SET user_id=NULL WHERE user_id=?', [$target['id']]);
+            Database::query('UPDATE votes SET user_id=NULL WHERE user_id=?', [$target['id']]);
+            Database::query('DELETE FROM users WHERE id=?', [$target['id']]);
+            Database::pdo()->commit();
+        } catch (\Throwable $e) {
+            Database::pdo()->rollBack();
+            throw $e;
+        }
+        Audit::log($u['id'], 'user.delete', 'user', $target['id'], $target['email']);
         return Response::json(['ok' => true]);
     }
 

@@ -118,6 +118,58 @@
   const qp = new URLSearchParams(location.search);
   if (qp.get('auth')) showAuth(qp.get('auth') === 'register' ? 'register' : 'signin');
 
+  /* ---------- saved stories ---------- */
+  let savedLists = null, savePop = null;
+  const markSaved = (id, on) => $$(`[data-save="${id}"]`).forEach(b => { b.classList.toggle('is-saved', on); const l = $('span', b); if (b.hasAttribute('data-save-label') && l) l.textContent = on ? 'Saved' : 'Save'; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  async function loadSavedMarks() {
+    if (!window.ME.user) return;
+    const ids = [...new Set($$('[data-save]').map(b => b.dataset.save))]; if (!ids.length) return;
+    try { const fd = new FormData(); fd.append('ids', ids.join(',')); const j = await api('/api/me/saved/ids', { method: 'POST', body: fd }); (j.saved || []).forEach(id => markSaved(id, true)); } catch (e) { }
+  }
+  function closeSavePop() { if (savePop) { savePop.remove(); savePop = null; } }
+  document.addEventListener('click', e => { if (savePop && !savePop.contains(e.target) && !e.target.closest('[data-save]')) closeSavePop(); });
+  async function toggleSave(storyId, listId, mode) {
+    const fd = new FormData(); fd.append('story_id', storyId); if (listId) fd.append('list_id', listId); if (mode) fd.append('mode', mode);
+    const j = await api('/api/me/saved/toggle', { method: 'POST', body: fd });
+    savedLists = j.all_lists || savedLists; markSaved(storyId, !!j.saved);
+    return j;
+  }
+  function openSavePop(btn, storyId, inLists) {
+    closeSavePop();
+    savePop = document.createElement('div'); savePop.className = 'savepop';
+    const rows = (savedLists || []).map(l => `<label class="savepop__row"><input type="checkbox" value="${esc(l.id)}" ${inLists.includes(l.id) ? 'checked' : ''}><span>${esc(l.name)}</span><small class="mono">${l.count}</small></label>`).join('');
+    savePop.innerHTML = `<div class="savepop__head"><b>Save to…</b><a href="/dashboard#saved">All saved →</a></div>${rows}<form class="savepop__new"><input name="name" placeholder="New list…" maxlength="60" required><button class="btn btn--primary btn--sm" type="submit">Add</button></form>`;
+    document.body.appendChild(savePop);
+    const r = btn.getBoundingClientRect(); const w = 260;
+    savePop.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + window.scrollX + r.width / 2 - w / 2)) + 'px';
+    savePop.style.top = (r.bottom + window.scrollY + 8) + 'px';
+    savePop.addEventListener('change', async ev => {
+      const cb = ev.target; if (cb.type !== 'checkbox') return;
+      try { await toggleSave(storyId, cb.value, cb.checked ? 'add' : 'remove'); toast(cb.checked ? 'Saved' : 'Removed'); } catch (err) { toast(err.message); cb.checked = !cb.checked; }
+    });
+    $('form', savePop).addEventListener('submit', async ev => {
+      ev.preventDefault();
+      try { const j = await api('/api/me/saved/lists', { method: 'POST', body: new FormData(ev.target) }); savedLists = j.lists; await toggleSave(storyId, j.list.id, 'add'); toast('Saved to ' + j.list.name); openSavePop(btn, storyId, (await api('/api/me/saved/ids', { method: 'POST', body: (() => { const f = new FormData(); f.append('ids', storyId); return f; })() })).saved.length ? [...inLists, j.list.id] : [j.list.id]); }
+      catch (err) { toast(err.message); }
+    });
+  }
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-save]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    if (!window.ME.user) { toast('Sign in to save stories'); showAuth('signin'); return; }
+    const id = b.dataset.save;
+    try {
+      if (savedLists === null) { savedLists = (await api('/api/me/saved')).lists; }
+      if (b.classList.contains('is-saved')) {
+        // Already saved: open the chooser so the reader can move it between lists or remove it.
+        const j = await toggleSave(id, null, 'add'); openSavePop(b, id, j.lists || []); return;
+      }
+      const j = await toggleSave(id, null, 'add');
+      if (savedLists.length > 1) { openSavePop(b, id, j.lists || []); } else { toast('Saved — find it under Saved stories'); }
+    } catch (err) { toast(err.message); }
+  });
+  loadSavedMarks();
+
   /* ---------- locations & counties ---------- */
   let countiesLoaded = false;
   async function loadCounties() {

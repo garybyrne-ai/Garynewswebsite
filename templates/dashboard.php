@@ -5,6 +5,7 @@
     <button class="is-active" data-view="overview">Overview</button>
     <button data-view="reports">My reports <span class="badge" id="nav-reports-count">0</span></button>
     <button data-view="profile">Reporter profile</button>
+    <button data-view="saved">Saved stories <span class="badge" id="nav-saved-count" hidden>0</span></button>
     <button data-view="follows">Followed areas</button>
     <button data-view="membership">ME+ membership</button>
     <button data-view="advertising">Local advertising</button>
@@ -34,6 +35,16 @@
         <label>Bio<textarea name="bio" id="p-bio" maxlength="500" rows="3"></textarea></label>
         <div class="form__actions"><button class="btn btn--primary" type="submit">Save profile</button></div>
       </form>
+    </div>
+
+    <div id="view-saved" class="view">
+      <div class="inline" style="justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+        <div><h1>Saved stories</h1><p class="pagehead__blurb">Tap the bookmark on any story to keep it here. Make lists for whatever you are following — a planning row, a season, a trip home.</p></div>
+        <form id="saved-new" class="inline"><input name="name" placeholder="New list, e.g. Council watch" maxlength="60" required style="min-width:220px"><button class="btn btn--primary" type="submit">Create list</button></form>
+      </div>
+      <div class="listtabs" id="saved-lists"></div>
+      <div class="inline" id="saved-tools" style="justify-content:space-between;margin:6px 0 14px" hidden><span class="mono" id="saved-count"></span><span class="inline"><button class="btn btn--ghost btn--sm" type="button" id="saved-rename">Rename</button><button class="btn btn--ghost btn--sm" type="button" id="saved-delete">Delete list</button></span></div>
+      <div class="grid grid--3" id="saved-items"></div>
     </div>
 
     <div id="view-follows" class="view">

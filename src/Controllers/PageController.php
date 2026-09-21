@@ -78,7 +78,10 @@ final class PageController
             'signalBoard' => \MeNews\Services\Signal::featured(8, 'today'),
             'signalStats' => \MeNews\Services\Signal::stats(),
             'canonical' => absolute_url('/'),
-            'jsonld' => ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'potentialAction' => ['@type' => 'SearchAction', 'target' => absolute_url('/search?q={search_term_string}'), 'query-input' => 'required name=search_term_string']],
+            'jsonld' => ['@context' => 'https://schema.org', '@graph' => [
+                ['@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'publisher' => ['@id' => absolute_url('/#organization')], 'potentialAction' => ['@type' => 'SearchAction', 'target' => absolute_url('/search?q={search_term_string}'), 'query-input' => 'required name=search_term_string']],
+                \MeNews\Services\Feeds::organization(),
+            ]],
             'bodyClass' => 'page-home' . ($county ? ' has-county' : ''),
         ]));
     }
@@ -119,6 +122,7 @@ final class PageController
             'pages' => (int)max(1, ceil($total / $per)),
             'total' => $total,
             'basePath' => '/section/' . $p['slug'],
+            'feedLinks' => [['/feed/section/' . $p['slug'] . '.xml', $name]],
             'trending' => Stories::trending(5),
             'ads' => self::ads('', '', 2, 'section'),
             'banner' => self::banner('', '', 'section'),
@@ -169,6 +173,7 @@ final class PageController
             'banner' => self::banner($county, '', 'county'),
             'county' => $county,
             'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
+            'feedLinks' => [['/feed/county/' . $p['slug'] . '.xml', 'Co. ' . $county]],
             'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => 'County ' . $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => 'County ' . $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'Ireland']]],
         ]));
     }
@@ -234,6 +239,7 @@ final class PageController
             'story' => $story,
             'author' => $author,
             'archived' => $archived,
+            'feedLinks' => [['/feed/section/' . Categories::slug((string)$story['category']) . '.xml', $story['category']], $story['county'] ? ['/feed/county/' . slugify($story['county']) . '.xml', 'Co. ' . $story['county']] : null],
             'robots' => $isWire ? 'noindex,follow' : ($archived ? 'noindex,follow' : null),
             'comments' => Stories::comments($story['id']),
             'confirmations' => Stories::confirmations($story['id']),
@@ -433,7 +439,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus'];
+        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus', '/feeds'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }
@@ -469,15 +475,52 @@ final class PageController
         return Response::text($xml . '</urlset>', 'application/xml; charset=utf-8');
     }
 
-    public static function rss(Request $r): Response
+    /** RSS / Atom / JSON Feed for the whole site, one section, one county or original reporting only. */
+    public static function rss(Request $r, array $p = []): Response
     {
-        $rows = Stories::feed([], 40);
-        $xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>ME News Ireland</title><link>' . e(absolute_url('/')) . '</link><description>Your Community. Your News. Live.</description>';
-        foreach ($rows as $s) {
-            $link = $s['kind'] === 'wire' ? $s['source_url'] : absolute_url($s['url']);
-            $xml .= '<item><title>' . e($s['title']) . '</title><link>' . e($link) . '</link><guid>' . e(absolute_url($s['url'])) . '</guid><source url="' . e(absolute_url('/feed.xml')) . '">' . e($s['kind'] === 'wire' ? $s['source_name'] : 'ME News Ireland') . '</source><description>' . e($s['summary'] ?: excerpt($s['body'], 240)) . '</description><pubDate>' . e(gmdate('D, d M Y H:i:s', strtotime($s['time']) ?: time())) . ' GMT</pubDate><category>' . e($s['category']) . '</category></item>';
+        $key = isset($p['group']) ? $p['group'] . ':' . $p['slug'] : ($p['key'] ?? 'all');
+        $feed = \MeNews\Services\Feeds::resolve($key);
+        if (!$feed) {
+            throw new HttpException(404, 'Feed not found');
         }
-        return Response::text($xml . '</channel></rss>', 'application/rss+xml; charset=utf-8');
+        $fmt = $p['fmt'] ?? (str_ends_with($r->path, '.atom') ? 'atom' : (str_ends_with($r->path, '.json') ? 'json' : 'xml'));
+        $limit = $r->int('limit', 50, 10, 100);
+        $res = match ($fmt) {
+            'atom' => Response::text(\MeNews\Services\Feeds::atom($feed, $limit), 'application/atom+xml; charset=utf-8'),
+            'json' => Response::json(\MeNews\Services\Feeds::json($feed, $limit)),
+            default => Response::text(\MeNews\Services\Feeds::rss($feed, $limit), 'application/rss+xml; charset=utf-8'),
+        };
+        return $res->withHeader('Cache-Control', 'public, max-age=300')->withHeader('Access-Control-Allow-Origin', '*');
+    }
+
+    public static function newsSitemap(Request $r): Response
+    {
+        return Response::text(\MeNews\Services\Feeds::newsSitemap(), 'application/xml; charset=utf-8')->withHeader('Cache-Control', 'public, max-age=300');
+    }
+
+    public static function robots(Request $r): Response
+    {
+        return Response::text(\MeNews\Services\Feeds::robots());
+    }
+
+    public static function opensearch(Request $r): Response
+    {
+        return Response::text(\MeNews\Services\Feeds::opensearch(), 'application/opensearchdescription+xml; charset=utf-8');
+    }
+
+    /** Human-readable directory of every feed for aggregators and readers. */
+    public static function feedsPage(Request $r): Response
+    {
+        return View::page('feeds', self::base([
+            'title' => 'Feeds & syndication — ME News Ireland',
+            'description' => 'RSS, Atom and JSON feeds for every section and county, plus the Google News sitemap and original-reporting feed.',
+            'feeds' => \MeNews\Services\Feeds::catalogue(),
+        ]));
+    }
+
+    public static function savedRedirect(Request $r): Response
+    {
+        return Response::redirect(Auth::user() ? '/dashboard#saved' : '/?auth=signin&next=/dashboard%23saved');
     }
 
     private static function ads(string $county = '', string $town = '', int $limit = 2, string $page = 'other'): array

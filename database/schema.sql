@@ -407,3 +407,26 @@ CREATE TABLE IF NOT EXISTS ad_orders (
 CREATE INDEX IF NOT EXISTS idx_ad_orders_user   ON ad_orders(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ad_orders_ad     ON ad_orders(ad_id, status);
 CREATE INDEX IF NOT EXISTS idx_ad_orders_ref    ON ad_orders(gateway_ref);
+
+-- Saved stories: members keep reading lists (a default "Saved" list plus their own).
+CREATE TABLE IF NOT EXISTS saved_lists (
+  id         TEXT PRIMARY KEY,
+  user_id    TEXT NOT NULL,
+  name       TEXT NOT NULL,
+  is_default INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS saved_items (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  list_id    TEXT NOT NULL,
+  story_id   TEXT NOT NULL,
+  note       TEXT,
+  created_at TEXT NOT NULL,
+  UNIQUE (list_id, story_id),
+  FOREIGN KEY (list_id) REFERENCES saved_lists(id) ON DELETE CASCADE,
+  FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_saved_lists_user ON saved_lists(user_id);
+CREATE INDEX IF NOT EXISTS idx_saved_items_story ON saved_items(story_id);

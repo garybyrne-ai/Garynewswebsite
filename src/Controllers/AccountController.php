@@ -8,6 +8,7 @@ use MeNews\Config;
 use MeNews\Database;
 use MeNews\Services\Alerts;
 use MeNews\Services\Membership;
+use MeNews\Services\Saved;
 use MeNews\Http\HttpException;
 use MeNews\Http\Request;
 use MeNews\Http\Response;
@@ -138,6 +139,78 @@ final class AccountController
         return Response::json(Auth::publicUser(Database::one('SELECT * FROM users WHERE id=?', [$u['id']])));
     }
 
+    // ------------------------------------------------------------- saved stories
+
+    public static function saved(Request $r): Response
+    {
+        $u = Auth::require();
+        return Response::json(['lists' => Saved::lists($u['id']), 'max_lists' => Saved::MAX_LISTS]);
+    }
+
+    public static function savedListCreate(Request $r): Response
+    {
+        $u = Auth::require();
+        $list = Saved::createList($u['id'], $r->post('name', '', 60));
+        return Response::json(['ok' => true, 'list' => $list, 'lists' => Saved::lists($u['id'])]);
+    }
+
+    public static function savedListItems(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        $items = Saved::items($u['id'], $p['id']);
+        foreach ($items as &$it) {
+            $it['html'] = \MeNews\Ui::card($it['story'], 'standard', 0);
+            $it['story'] = ['id' => $it['story']['id'], 'title' => $it['story']['title'], 'url' => $it['story']['url']];
+        }
+        return Response::json(['list' => Saved::find($u['id'], $p['id']), 'items' => $items]);
+    }
+
+    public static function savedListUpdate(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        if ($r->post('action', '', 10) === 'delete') {
+            Saved::deleteList($u['id'], $p['id']);
+        } else {
+            Saved::renameList($u['id'], $p['id'], $r->post('name', '', 60));
+        }
+        return Response::json(['ok' => true, 'lists' => Saved::lists($u['id'])]);
+    }
+
+    public static function savedToggle(Request $r): Response
+    {
+        $u = Auth::require();
+        RateLimiter::hit($u['id'] . '|save', 120, 600, 'Slow down a little.');
+        $storyId = $r->post('story_id', '', 40);
+        $listId = $r->post('list_id', '', 40) ?: null;
+        if (!preg_match('/^[a-f0-9]{8,40}$/', $storyId)) {
+            throw new HttpException(400, 'Invalid story');
+        }
+        $mode = $r->post('mode', 'toggle', 10);
+        if ($mode === 'add') {
+            $out = Saved::save($u['id'], $storyId, $listId) + ['lists' => Saved::listsFor($u['id'], $storyId)];
+        } elseif ($mode === 'remove') {
+            Saved::unsave($u['id'], $storyId, $listId);
+            $out = ['saved' => Saved::isSaved($u['id'], $storyId), 'lists' => Saved::listsFor($u['id'], $storyId)];
+        } else {
+            $out = Saved::toggle($u['id'], $storyId, $listId);
+        }
+        return Response::json($out + ['all_lists' => Saved::lists($u['id'])]);
+    }
+
+    public static function savedIds(Request $r): Response
+    {
+        $u = Auth::require();
+        $ids = preg_split('/[\s,]+/', $r->post('ids', '', 12000)) ?: [];
+        return Response::json(['saved' => Saved::savedIds($u['id'], $ids)]);
+    }
+
+    public static function savedItemRemove(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        Saved::removeItem($u['id'], (int)$p['id']);
+        return Response::json(['ok' => true]);
+    }
+
     /** Alert subscriptions tied to the member's own email address. */
     public static function alerts(Request $r): Response
     {
@@ -181,7 +254,7 @@ final class AccountController
         return Response::json(['ok' => true]);
     }
 
-    private static function uniqueHandle(string $name): string
+    public static function uniqueHandle(string $name): string
     {
         $base = slugify($name, 24) ?: 'member';
         $handle = $base;

@@ -1,14 +1,19 @@
 <?php use MeNews\Ui; use MeNews\Support\Categories;
 $isWire = $story['kind'] === 'wire';
 $cluster = $cluster ?? null; $members = $members ?? [];
+$archived = !empty($archived);
 $jsonld = $isWire ? null : [
-    '@context' => 'https://schema.org', '@type' => 'NewsArticle', 'headline' => $story['title'],
-    'datePublished' => $story['time'], 'dateModified' => $story['updated_at'] ?: $story['time'],
-    'description' => $story['summary'], 'image' => $story['image'] ? [absolute_url($story['image'])] : [],
-    'author' => ['@type' => 'Person', 'name' => $story['author_name']],
-    'publisher' => ['@type' => 'Organization', 'name' => 'ME News Ireland', 'url' => absolute_url('/')],
-    'mainEntityOfPage' => absolute_url($story['url']),
-];
+    '@context' => 'https://schema.org', '@type' => 'NewsArticle', '@id' => absolute_url($story['url']), 'url' => absolute_url($story['url']),
+    'headline' => mb_substr($story['title'], 0, 110), 'datePublished' => $story['time'], 'dateModified' => $story['updated_at'] ?: $story['time'],
+    'description' => $story['summary'] ?: excerpt($story['body'], 200), 'image' => $story['image'] ? [absolute_url($story['image'])] : [absolute_url('/assets/img/og.png')],
+    'articleSection' => $story['category'], 'inLanguage' => 'en-IE', 'wordCount' => str_word_count((string)$story['body']),
+    'keywords' => implode(', ', array_filter([$story['category'], $story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, 'Ireland'])),
+    'author' => ['@type' => 'Person', 'name' => $story['author_name'] ?: 'ME News community'] + (!empty($author['handle']) ? ['url' => absolute_url('/contributors/' . $author['handle'])] : []),
+    'publisher' => ['@type' => 'NewsMediaOrganization', '@id' => absolute_url('/#organization'), 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'logo' => ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/logo-512.png'), 'width' => 512, 'height' => 512]],
+    'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => absolute_url($story['url'])],
+    'isAccessibleForFree' => !$archived,
+] + ($archived ? ['hasPart' => ['@type' => 'WebPageElement', 'isAccessibleForFree' => false, 'cssSelector' => '.article__body']] : [])
+  + ($story['county'] ? ['contentLocation' => ['@type' => 'Place', 'name' => trim(($story['location_name'] ? $story['location_name'] . ', ' : '') . 'County ' . $story['county'] . ', Ireland')]] : []);
 ?>
 <div class="progress" aria-hidden="true"><i id="read-progress"></i></div>
 <?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
@@ -97,6 +102,7 @@ $jsonld = $isWire ? null : [
         <p class="trust__note"><?= $isWire ? 'Wire stories come from established Irish publishers and carry their own editorial standards. ME labels them <b>Wire</b>: the source is known and linked, but ME has not independently checked the story. <b>Verified</b> is reserved for reports our desk has checked.' : 'Safety is not truth. The safety score screens for harmful content; the confidence score weighs evidence such as media, GPS and reporter track record. Only editors set the public label. Three independent “I saw this too” confirmations earn a <b>Corroborated</b> label.' ?> <a href="/about#labels">How we check things →</a></p>
         <div class="trust__actions">
           <button class="btn btn--ghost" type="button" data-confirm="<?= e($story['id']) ?>"><?= $isWire ? 'I can add local context' : icon('eye') . ' I saw this too' ?></button>
+          <button class="btn btn--ghost" type="button" data-save="<?= e($story['id']) ?>" data-save-label><?= icon('bookmark') ?> <span>Save</span></button>
           <button class="btn btn--ghost" type="button" data-share data-title="<?= e($story['title']) ?>">Share ↗</button>
         </div>
       </section>

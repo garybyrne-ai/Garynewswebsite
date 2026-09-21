@@ -139,15 +139,32 @@
       <td><select data-role ${admin ? '' : 'disabled'}>${opts(['member', 'contributor', 'editor', 'admin'], x.role)}</select></td>
       <td><input data-title value="${esc(x.title || '')}" placeholder="Title" ${admin ? '' : 'disabled'}><br><select data-desk ${admin ? '' : 'disabled'}><option value="">— desk —</option>${opts(['National', 'Local', 'Business', 'Sport', 'Culture'], x.desk)}</select></td>
       <td><input type="checkbox" data-verified ${x.is_verified ? 'checked' : ''} ${admin ? '' : 'disabled'}></td>
-      <td>${esc(x.plan)}</td>
+      <td><select data-plan ${admin ? '' : 'disabled'}>${opts(['free', 'ME+'], x.plan)}</select></td>
       <td><input type="number" data-rep min="0" max="100" value="${x.reputation}" style="width:70px" ${admin ? '' : 'disabled'}></td>
-      <td>${admin ? '<button class="btn btn--ghost btn--sm" data-save-user>Save</button>' : ''}</td></tr>`).join('')}</tbody></table></div>`;
+      <td class="inline" style="gap:4px">${admin ? '<button class="btn btn--ghost btn--sm" data-save-user>Save</button>' + (x.id !== me.id ? '<button class="btn btn--hot btn--sm" data-delete-user>Delete…</button>' : '') : ''}</td></tr>`).join('')}</tbody></table></div>`;
+    $('#user-add-toggle').hidden = !admin;
   }
+  $('#user-add-toggle').addEventListener('click', () => { const f = $('#user-add'); f.hidden = !f.hidden; if (!f.hidden) f.display_name.focus(); });
+  $('#user-add').addEventListener('submit', async e => {
+    e.preventDefault(); const out = $('#user-add-result'); out.classList.remove('is-error');
+    try {
+      const j = await api('/api/admin/users', { method: 'POST', body: new FormData(e.target) });
+      out.textContent = j.temporary_password ? `Account created. Temporary password: ${j.temporary_password} — pass it on securely; it is not shown again.` : 'Account created.';
+      e.target.reset(); loadUsers(); summary();
+    } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+  });
   $('#users-q').addEventListener('input', () => { clearTimeout(window._uq); window._uq = setTimeout(loadUsers, 300); });
   $('#users-table').addEventListener('click', async e => {
     if (!e.target.hasAttribute('data-save-user')) return;
     const row = e.target.closest('tr');
-    try { await api('/api/admin/users/' + row.dataset.id, { method: 'POST', body: fd({ role: $('[data-role]', row).value, is_verified: $('[data-verified]', row).checked ? '1' : '0', reputation: $('[data-rep]', row).value, title: $('[data-title]', row).value, desk: $('[data-desk]', row).value }) }); toast('User saved'); } catch (err) { toast(err.message); }
+    try { await api('/api/admin/users/' + row.dataset.id, { method: 'POST', body: fd({ role: $('[data-role]', row).value, is_verified: $('[data-verified]', row).checked ? '1' : '0', reputation: $('[data-rep]', row).value, title: $('[data-title]', row).value, desk: $('[data-desk]', row).value, plan: $('[data-plan]', row).value }) }); toast('User saved'); } catch (err) { toast(err.message); }
+  });
+  $('#users-table').addEventListener('click', async e => {
+    if (!e.target.hasAttribute('data-delete-user')) return;
+    const row = e.target.closest('tr'); const email = $('.sub', row).textContent.trim();
+    const confirmEmail = prompt(`Delete this account permanently? Their published reports stay under the byline text; sessions, follows, alerts, saved lists and adverts are removed.\n\nType the email address to confirm:`);
+    if (confirmEmail === null) return;
+    try { await api('/api/admin/users/' + row.dataset.id + '/delete', { method: 'POST', body: fd({ confirm: confirmEmail }) }); toast('Account deleted'); loadUsers(); summary(); } catch (err) { toast(err.message); }
   });
 
   async function loadAds() { if (window.ME.loadAds) window.ME.loadAds(); }

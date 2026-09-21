@@ -1372,3 +1372,27 @@ body.has-bottombar .consent{bottom:64px}
 .faq p{margin:0 0 16px;color:var(--ink-2)}
 @media (max-width:900px){.perks{grid-template-columns:1fr 1fr}}
 @media (max-width:600px){.perks{grid-template-columns:1fr}}
+
+/* Saved stories */
+.card__save{margin-left:auto;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:inline-grid;place-items:center;cursor:pointer;transition:.2s;flex:none}
+.card__save:hover{color:var(--em);border-color:var(--em)}
+.card__save.is-saved{background:var(--em);border-color:var(--em);color:#fff}
+.card__save.is-saved svg{fill:currentColor}
+[data-save-label].is-saved{background:var(--em);color:#fff;border-color:var(--em)}
+[data-save-label].is-saved svg{fill:currentColor}
+.savepop{position:absolute;z-index:120;width:260px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-sm);box-shadow:0 20px 50px rgba(0,0,0,.18);padding:10px;display:flex;flex-direction:column;gap:4px}
+.savepop__head{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 8px;border-bottom:1px solid var(--line);margin-bottom:4px;font-size:.9rem}
+.savepop__head a{color:var(--em);font-size:.8rem;font-weight:700}
+.savepop__row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:8px;cursor:pointer;font-size:.9rem}
+.savepop__row:hover{background:var(--bg-2)}
+.savepop__row span{flex:1}
+.savepop__row small{color:var(--muted)}
+.savepop__new{display:flex;gap:6px;margin-top:6px;padding-top:8px;border-top:1px solid var(--line)}
+.savepop__new input{flex:1;min-width:0;background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:7px 9px;color:var(--ink);font:500 .85rem var(--body)}
+.listtabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 10px}
+.listtab{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.listtab.is-active{background:var(--em);border-color:var(--em);color:#fff}
+.listtab .badge{background:rgba(0,0,0,.15);color:inherit}
+.savedcard{display:flex;flex-direction:column;gap:6px}
+.savedcard .card{flex:1}
+.savedcard__remove{align-self:flex-start}

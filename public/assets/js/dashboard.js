@@ -20,7 +20,7 @@
     $('#hello').textContent = 'Hello, ' + me.display_name.split(' ')[0];
     $('#p-name').value = me.display_name; $('#p-town').value = me.home_town || ''; $('#p-county').value = me.home_county || ''; $('#p-bio').value = me.bio || '';
     window.ME.loadCounties().then(() => { $('#p-county').value = me.home_county || ''; });
-    await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAlerts(), loadAds()]);
+    await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAlerts(), loadSaved(), loadAds()]);
     const hash = location.hash.replace('#', '');
     if (hash && $('#view-' + hash)) show(hash);
     if (qs.get('billing') === 'success') toast('Thank you — ME+ will activate as soon as Stripe confirms payment.');
@@ -52,6 +52,30 @@
     try { await api('/api/me/follows', { method: 'POST', body: new FormData(e.target) }); toast('Area followed'); e.target.reset(); loadFollows(); }
     catch (err) { toast(err.message); }
   });
+
+  /* ---------- saved stories ---------- */
+  let savedLists = [], currentList = null;
+  async function loadSaved(keep) {
+    const j = await api('/api/me/saved'); savedLists = j.lists;
+    const total = savedLists.reduce((s, l) => s + l.count, 0);
+    $('#nav-saved-count').textContent = total; $('#nav-saved-count').hidden = !total;
+    if (!keep || !savedLists.some(l => l.id === currentList)) currentList = (savedLists.find(l => l.is_default) || savedLists[0]).id;
+    $('#saved-lists').innerHTML = savedLists.map(l => `<button type="button" class="listtab ${l.id === currentList ? 'is-active' : ''}" data-list="${esc(l.id)}">${esc(l.name)} <span class="badge">${l.count}</span></button>`).join('');
+    await loadSavedItems();
+  }
+  async function loadSavedItems() {
+    const j = await api('/api/me/saved/lists/' + currentList);
+    $('#saved-tools').hidden = false; $('#saved-count').textContent = `${j.items.length} in ${j.list.name}`;
+    $('#saved-delete').hidden = !!j.list.is_default;
+    $('#saved-items').innerHTML = j.items.length ? j.items.map(it => `<div class="savedcard" data-item="${it.item_id}">${it.html}<button class="btn btn--ghost btn--sm savedcard__remove" type="button" data-remove-item="${it.item_id}">Remove from list</button></div>`).join('')
+      : '<div class="empty"><div class="empty__glyph">—</div><h3>Nothing saved here yet.</h3><p>Tap the bookmark on any story card or article to add it.</p><a class="btn btn--primary" href="/">Browse stories</a></div>';
+    $$('#saved-items [data-save]').forEach(b => b.classList.add('is-saved'));
+  }
+  $('#saved-lists').addEventListener('click', e => { const b = e.target.closest('[data-list]'); if (!b) return; currentList = b.dataset.list; $$('#saved-lists .listtab').forEach(x => x.classList.toggle('is-active', x === b)); loadSavedItems(); });
+  $('#saved-new').addEventListener('submit', async e => { e.preventDefault(); try { const j = await api('/api/me/saved/lists', { method: 'POST', body: new FormData(e.target) }); currentList = j.list.id; e.target.reset(); toast('List created'); loadSaved(true); } catch (err) { toast(err.message); } });
+  $('#saved-rename').addEventListener('click', async () => { const l = savedLists.find(x => x.id === currentList); const name = prompt('Rename list', l ? l.name : ''); if (name === null) return; try { const fd = new FormData(); fd.append('name', name); await api('/api/me/saved/lists/' + currentList, { method: 'POST', body: fd }); loadSaved(true); } catch (err) { toast(err.message); } });
+  $('#saved-delete').addEventListener('click', async () => { if (!confirm('Delete this list? The stories stay on the site.')) return; try { const fd = new FormData(); fd.append('action', 'delete'); await api('/api/me/saved/lists/' + currentList, { method: 'POST', body: fd }); loadSaved(false); } catch (err) { toast(err.message); } });
+  $('#saved-items').addEventListener('click', async e => { const b = e.target.closest('[data-remove-item]'); if (!b) return; try { await api('/api/me/saved/items/' + b.dataset.removeItem, { method: 'DELETE' }); loadSaved(true); } catch (err) { toast(err.message); } });
 
   async function loadAlerts() {
     const j = await api('/api/me/alerts');

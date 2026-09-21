@@ -57,12 +57,22 @@ function check(string $name, bool $ok, string $detail = ''): void
 }
 
 echo "ME News smoke test → {$base}\n\nPublic pages\n";
-foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/signal', '/signal?window=rising', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/notices', '/notices/death', '/notices/submit', '/alerts', '/alerts?county=Wicklow', '/poll', '/corrections', '/ownership', '/privacy', '/moderation', '/county/wicklow/map', '/api/alerts?county=Cork', '/api/bulletin?county=Cork', '/sitemap.xml', '/feed.xml', '/robots.txt', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
+foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/signal', '/signal?window=rising', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/notices', '/notices/death', '/notices/submit', '/alerts', '/alerts?county=Wicklow', '/poll', '/corrections', '/ownership', '/privacy', '/moderation', '/county/wicklow/map', '/api/alerts?county=Cork', '/api/bulletin?county=Cork', '/sitemap.xml', '/news-sitemap.xml', '/feed.xml', '/feed.atom', '/feed.json', '/feed/community.xml', '/feed/section/sport.xml', '/feed/county/wicklow.atom', '/feeds', '/opensearch.xml', '/robots.txt', '/assets/img/logo-512.png', '/assets/img/og.png', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
     [$s, $html] = http('GET', $p, [], [], false);
     check("GET {$p}", $s === 200 && strlen($html) > 20, "HTTP {$s}");
 }
 [$s] = http('GET', '/no-such-page', [], [], false);
 check('404 page', $s === 404);
+[$s, $rssRaw] = http('GET', '/feed/community.xml', [], [], false);
+check('RSS feed is well-formed with aggregator extensions', $s === 200 && simplexml_load_string($rssRaw) !== false && str_contains($rssRaw, 'xmlns:media') && str_contains($rssRaw, 'content:encoded'));
+[$s, $newsRaw] = http('GET', '/news-sitemap.xml', [], [], false);
+check('Google News sitemap is well-formed', $s === 200 && simplexml_load_string($newsRaw) !== false && str_contains($newsRaw, 'sitemap-news/0.9'));
+[$s, $robots] = http('GET', '/robots.txt', [], [], false);
+check('robots.txt lists both sitemaps', $s === 200 && substr_count($robots, 'Sitemap: http') === 2);
+[$s, $home] = http('GET', '/', [], [], false);
+check('home page declares the publisher and feed autodiscovery', $s === 200 && str_contains($home, 'NewsMediaOrganization') && str_contains($home, 'application/feed+json') && str_contains($home, 'opensearchdescription'));
+[$s] = http('GET', '/feed/section/no-such.xml', [], [], false);
+check('unknown feed is a 404', $s === 404);
 [$s] = http('GET', '/dashboard', [], [], false);
 check('dashboard redirects anonymous users', $s === 302 || $s === 200);
 
@@ -194,6 +204,20 @@ check('member cannot grant themselves a package', $s === 403);
 check('free plan alerts limited to one county', $s === 403, $al['detail'] ?? '');
 [$s, $al] = http('GET', '/api/me/alerts');
 check('member lists their alert subscriptions', $s === 200 && count($al['subscriptions'] ?? []) === 1 && ($al['limit'] ?? 0) === 1);
+[$s, $fd0] = http('GET', '/api/feed?limit=2');
+$saveId = $fd0['items'][0]['id'] ?? 'x';
+[$s, $sv] = http('POST', '/api/me/saved/toggle', ['story_id' => $saveId]);
+check('save a story to the default list', $s === 200 && !empty($sv['saved']));
+[$s, $sl] = http('POST', '/api/me/saved/lists', ['name' => 'Smoke list']);
+check('create a saved list', $s === 200 && ($sl['list']['name'] ?? '') === 'Smoke list' && count($sl['lists'] ?? []) === 2);
+[$s, $sv2] = http('POST', '/api/me/saved/toggle', ['story_id' => $fd0['items'][1]['id'] ?? 'x', 'list_id' => $sl['list']['id'] ?? 'x', 'mode' => 'add']);
+check('save a story into a named list', $s === 200 && !empty($sv2['saved']));
+[$s, $si] = http('GET', '/api/me/saved/lists/' . ($sl['list']['id'] ?? 'x'));
+check('list items render as cards', $s === 200 && count($si['items'] ?? []) === 1 && str_contains($si['items'][0]['html'] ?? '', 'card'));
+[$s, $sids] = http('POST', '/api/me/saved/ids', ['ids' => $saveId . ',nothing']);
+check('saved ids are reported for marking cards', $s === 200 && ($sids['saved'] ?? []) === [$saveId]);
+[$s] = http('POST', '/api/me/saved/lists/' . ($sl['list']['id'] ?? 'x'), ['action' => 'delete']);
+check('delete a saved list', $s === 200);
 [$s] = http('GET', '/api/admin/summary');
 check('member cannot access newsroom', $s === 403);
 http('POST', '/api/auth/logout');
@@ -295,6 +319,13 @@ check('currency editable from the newsroom', $s === 200 && ($set['pricing']['cur
 check('delete advert (cleanup)', $s === 200);
 [$s, $html] = http('GET', '/kids', [], [], false);
 check('kids section is ad-free', $s === 200 && !str_contains($html, 'class="ad ad--'));
+[$s, $nu] = http('POST', '/api/admin/users', ['email' => "smoke-editor-{$stamp}@example.ie", 'display_name' => 'Smoke Editor', 'role' => 'editor', 'home_county' => 'Cork']);
+check('admin creates an account', $s === 200 && !empty($nu['id']) && strlen($nu['temporary_password'] ?? '') >= 8);
+check('new account can sign in', bearerToken("smoke-editor-{$stamp}@example.ie", $nu['temporary_password'] ?? '') !== '');
+[$s] = http('POST', '/api/admin/users/' . ($nu['id'] ?? 'x') . '/delete', ['confirm' => 'wrong']);
+check('deleting an account needs the email typed', $s === 400);
+[$s] = http('POST', '/api/admin/users/' . ($nu['id'] ?? 'x') . '/delete', ['confirm' => "smoke-editor-{$stamp}@example.ie"]);
+check('admin deletes an account', $s === 200);
 [$s, $users] = http('GET', '/api/admin/users?q=smoke');
 check('user search', $s === 200 && count($users) >= 1);
 [$s, $audit] = http('GET', '/api/admin/audit');

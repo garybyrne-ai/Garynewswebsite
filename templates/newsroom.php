@@ -45,7 +45,23 @@
 
       <div id="view-comments" class="view"><h1>Flagged comments</h1><div id="comments-list"></div></div>
 
-      <div id="view-users" class="view"><h1>People</h1><div class="filters"><input id="users-q" placeholder="Search name or email…"></div><div id="users-table"></div></div>
+      <div id="view-users" class="view">
+        <div class="inline" style="justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap"><h1>People</h1><button class="btn btn--primary" type="button" id="user-add-toggle" hidden>+ Add a person</button></div>
+        <form id="user-add" class="form panel" hidden>
+          <span class="kicker">New account</span>
+          <div class="form__row"><label>Name<input name="display_name" required minlength="2" maxlength="80"></label><label>Email<input name="email" type="email" required></label></div>
+          <div class="form__row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+            <label>Role<select name="role"><option value="member">Member</option><option value="contributor">Contributor</option><option value="editor">Editor</option><option value="admin">Admin</option></select></label>
+            <label>Plan<select name="plan"><option value="free">Free</option><option value="ME+">ME+ (complimentary)</option></select></label>
+            <label>Home county<select name="home_county" data-county-select><option value="">—</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+            <label>Temporary password<input name="password" type="text" autocomplete="off" placeholder="blank = generate one" minlength="8"></label>
+          </div>
+          <div class="form__row"><label>Title (contributors)<input name="title" maxlength="80" placeholder="e.g. Council reporter"></label><label>Desk<select name="desk"><option value="">—</option><option>National</option><option>Local</option><option>Business</option><option>Sport</option><option>Culture</option></select></label></div>
+          <div class="form__actions"><button class="btn btn--primary" type="submit">Create account</button><span class="form__hint">They get an email telling them an account exists; you pass on the temporary password yourself. Roles take effect immediately.</span></div>
+          <p class="form__result" id="user-add-result"></p>
+        </form>
+        <div class="filters"><input id="users-q" placeholder="Search name or email…"></div><div id="users-table"></div>
+      </div>
 
       <div id="view-ads" class="view">
         <div class="inline" style="justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">

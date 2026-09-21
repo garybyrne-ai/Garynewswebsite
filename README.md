@@ -148,6 +148,12 @@ tests/smoke.php         end-to-end smoke test against a running server
 
 **Newsroom** — review queue with media preview, publish/hold/reject, re-run safety, edit any story (section, county, label, featured), flagged comments, people & roles, advertising approvals, wire control panel with run log, official CSO / Tailte Éireann town import, full audit log.
 
+**Saved stories** — every member has a Saved list and can make up to 20 more (`/dashboard#saved`); bookmark buttons on every card and article save with one tap or open a list chooser; lists can be created, renamed, deleted and emptied.
+
+**Syndication** — RSS 2.0 (Atom, Dublin Core, Media RSS and `content:encoded` extensions), Atom 1.0 and JSON Feed 1.1 for the whole site, every section, every county and original reporting only (`/feeds` lists them); a Google News sitemap at `/news-sitemap.xml` (own reporting from the last 48 hours) referenced from a dynamic `robots.txt`; `NewsMediaOrganization` on the home page and full `NewsArticle` structured data (author, section, keywords, location, publisher logo, paywall markup for the members' archive) on every report; Open Graph, Twitter and `article:*` meta, OpenSearch and feed autodiscovery in the page head. Wire headlines link to their publishers in every feed.
+
+**People admin** — admins add accounts (member, contributor, editor or admin, with an optional complimentary ME+ plan and a generated or chosen temporary password) and delete them with the email typed to confirm; the last admin and your own account are protected, role changes sign the account out everywhere, and published reports keep their byline text.
+
 **Billing** — Stripe Checkout for ME+ and ad packages, PayPal Orders for ad packages, signed webhook handling for both.
 
 **Security** — HSTS behind HTTPS, a Content-Security-Policy that blocks framing, `<base>` hijacks and off-site form posts, per-account login lockout after 8 failed attempts (plus per-IP rate limits), sessions revoked on password change, uploaded images re-encoded through GD, editors see masked email addresses, every `/api/admin/*` and `/api/me/*` route checks the caller's role, and `/.well-known/security.txt` for researchers.
