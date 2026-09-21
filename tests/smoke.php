@@ -73,6 +73,12 @@ check('robots.txt lists both sitemaps', $s === 200 && substr_count($robots, 'Sit
 check('home page declares the publisher and feed autodiscovery', $s === 200 && str_contains($home, 'NewsMediaOrganization') && str_contains($home, 'application/feed+json') && str_contains($home, 'opensearchdescription'));
 [$s] = http('GET', '/feed/section/no-such.xml', [], [], false);
 check('unknown feed is a 404', $s === 404);
+[$s, $mapHtml] = http('GET', '/', [], [], false);
+preg_match('/data-map="side" data-points=\'(.*?)\'/', $mapHtml, $mm);
+$mapPts = json_decode(html_entity_decode($mm[1] ?? '[]', ENT_QUOTES), true) ?: [];
+check('home page map ships points and counties', $s === 200 && count($mapPts) > 5 && !empty($mapPts[0]['latitude']) && str_contains($mapHtml, 'data-counties='));
+[$s, $mapApi] = http('GET', '/api/map?limit=20');
+check('map API returns located stories', $s === 200 && count($mapApi['points'] ?? []) > 0 && count($mapApi['counties'] ?? []) > 0);
 foreach (['pl' => 'Twoje hrabstwo', 'ga' => 'Do chontae', 'de' => 'Dein County', 'uk' => 'Ваше графство', 'ru' => 'Ваше графство'] as $code => $word) {
     $ch = curl_init($base . '/');
     curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => 'me_lang=' . $code, CURLOPT_TIMEOUT => 30]);

@@ -26,14 +26,14 @@ $adFree = $user && ($user['plan'] ?? '') === 'ME+';
 
   <?php if (isset($mapPoints)): $colours = \MeNews\Support\Geo::COLOURS; ?>
   <section class="panel panel--map reveal" data-map-root>
-    <header class="panel__head"><span class="kicker">Live map</span><a class="mono panel__hint" href="<?= $county ? '/county/' . e(slugify($county)) . '/map' : '/map' ?>" data-map-count><?= $county ? 'Co. ' . e($county) : 'Ireland' ?> →</a></header>
+    <header class="panel__head"><span class="kicker">Live map</span><a class="mono panel__hint" href="<?= $county ? '/county/' . e(slugify($county)) . '/map' : '/map' ?>"><?= $county ? 'Co. ' . e($county) : 'Ireland' ?> →</a></header>
     <div class="mapchips">
       <button type="button" class="is-active" data-map-chip>All</button>
       <button type="button" data-map-chip data-kind="community" style="--c:<?= e($colours['Community']) ?>"><i></i>Community</button>
       <?php foreach (['Local', 'Traffic', 'Sport'] as $c): ?><button type="button" data-map-chip data-category="<?= e($c) ?>" style="--c:<?= e($colours[$c]) ?>"><i></i><?= e($c) ?></button><?php endforeach; ?>
     </div>
     <div id="map" class="map" data-map="side" data-points='<?= e(json_encode($mapPoints, JSON_UNESCAPED_UNICODE)) ?>' data-counties='<?= e(json_encode($mapCounties ?? [], JSON_UNESCAPED_UNICODE)) ?>' data-colours='<?= e(json_encode($colours)) ?>' data-focus-county="<?= e((string)$county) ?>"></div>
-    <p class="panel__note">Counties cluster when zoomed out; zoom in for pins. <a href="/map">Full map →</a></p>
+    <p class="panel__note"><b class="mono" data-map-count></b> across Ireland. Counties cluster when zoomed out; zoom in for pins. <a href="/map">Full map →</a></p>
   </section>
   <?php endif; ?>
 

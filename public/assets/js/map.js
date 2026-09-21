@@ -10,7 +10,12 @@
     const colours = opts.colours || {};
     const full = !!opts.full;
     const map = L.map(el, { zoomControl: false, attributionControl: true, scrollWheelZoom: full, minZoom: 5, maxZoom: 17 }).setView([53.42, -7.9], full ? 7 : 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+    // Canonical OpenStreetMap endpoint (the {s} subdomains are deprecated). If tiles cannot be
+    // reached the map still works: pins and clusters draw over the background.
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, crossOrigin: true, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+    let tileFails = 0, tilesEverLoaded = false;
+    tiles.on('tileerror', () => { if (++tileFails >= 6 && !tilesEverLoaded) el.classList.add('map--notiles'); });
+    tiles.on('tileload', () => { tilesEverLoaded = true; el.classList.remove('map--notiles'); });
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     if (!full) map.on('click', () => map.scrollWheelZoom.enable());
 
@@ -47,18 +52,34 @@
       } else {
         pts.forEach((p, i) => L.marker([p.latitude, p.longitude], { icon: pinIcon(p, i), riseOnHover: true }).bindPopup(popup(p), { maxWidth: 300, className: 'me-popup' }).addTo(pinLayer));
       }
-      if (opts.count) opts.count.textContent = pts.length + (clustered ? ' stories · zoom in for pins' : ' pins');
+      if (opts.count) opts.count.textContent = pts.length + (clustered ? ' stories' : ' pins');
       if (opts.list) opts.list.innerHTML = pts.slice(0, 40).map((p, i) => `<button type="button" class="maplist__item" data-i="${all.indexOf(p)}"><span class="maplist__dot" style="--c:${colours[p.category] || '#139a5c'}"></span><span><b>${esc(p.title)}</b><small>${esc(p.location_name || p.county || 'Ireland')} · ${esc(p.ago)}</small></span></button>`).join('');
       return pts;
+    }
+    /** Fit to whatever is drawn (pins when zoomed in, county bubbles when clustered). Never throws on an empty map. */
+    function fitToMarkers(maxZoom) {
+      const layers = pinLayer.getLayers().concat(countyLayer.getLayers());
+      if (!layers.length) return false;
+      try {
+        const bounds = L.featureGroup(layers).getBounds();
+        if (!bounds || !bounds.isValid()) return false;
+        map.fitBounds(bounds.pad(.12), { maxZoom });
+        return true;
+      } catch (e) { return false; }
     }
     let pts = render();
     map.on('zoomend', () => { pts = render(); });
     if (opts.focus && opts.focus.lat) {
       map.setView([opts.focus.lat, opts.focus.lng], 9);
-    } else if (opts.center) {
+    } else if (opts.center && opts.center.lat) {
       L.circleMarker([opts.center.lat, opts.center.lng], { radius: 8, color: '#fff', weight: 2, fillColor: '#ff4d6d', fillOpacity: 1 }).bindTooltip('You are here', { className: 'me-tip' }).addTo(map);
       map.setView([opts.center.lat, opts.center.lng], 9);
-    } else if (pts.length) map.fitBounds(L.featureGroup(pinLayer.getLayers()).getBounds().pad(.12), { maxZoom: full ? 8 : 7 });
+    } else {
+      fitToMarkers(full ? 8 : 7);
+    }
+    // The panel fades in, so tell Leaflet its real size once the layout has settled.
+    setTimeout(() => map.invalidateSize(), 250);
+    window.addEventListener('resize', () => map.invalidateSize());
 
     if (opts.list) opts.list.addEventListener('click', e => {
       const b = e.target.closest('[data-i]'); if (!b) return;
@@ -69,7 +90,7 @@
       (opts.chips || []).forEach(c => c.classList.remove('is-active')); chip.classList.add('is-active');
       filter.category = chip.dataset.category || ''; filter.kind = chip.dataset.kind || '';
       pts = render();
-      if (pts.length && !opts.focus) { const layers = pinLayer.getLayers().length ? pinLayer.getLayers() : countyLayer.getLayers(); if (layers.length) map.fitBounds(L.featureGroup(layers).getBounds().pad(.15), { maxZoom: 9 }); }
+      if (pts.length && !opts.focus) fitToMarkers(9);
     }));
     (opts.timeChips || []).forEach(chip => chip.addEventListener('click', () => {
       (opts.timeChips || []).forEach(c => c.classList.remove('is-active')); chip.classList.add('is-active');
@@ -90,10 +111,16 @@
     let points = [], counties = [], colours = {}, center = null, focus = null;
     try { points = JSON.parse(el.dataset.points || '[]'); counties = JSON.parse(el.dataset.counties || '[]'); colours = JSON.parse(el.dataset.colours || '{}'); center = el.dataset.center ? JSON.parse(el.dataset.center) : null; focus = el.dataset.focus ? JSON.parse(el.dataset.focus) : null; } catch (e) { }
     const root = el.closest('[data-map-root]') || document;
-    window.ME.initMap(el, {
-      points, counties, colours, center, focus, full: el.dataset.map === 'full',
-      count: root.querySelector('[data-map-count]'), list: root.querySelector('[data-map-list]'),
-      chips: Array.from(root.querySelectorAll('[data-map-chip]')), timeChips: Array.from(root.querySelectorAll('[data-map-time]')), locate: root.querySelector('[data-locate]'),
-    });
+    try {
+      window.ME.initMap(el, {
+        points, counties, colours, center, focus, full: el.dataset.map === 'full',
+        count: root.querySelector('[data-map-count]'), list: root.querySelector('[data-map-list]'),
+        chips: Array.from(root.querySelectorAll('[data-map-chip]')), timeChips: Array.from(root.querySelectorAll('[data-map-time]')), locate: root.querySelector('[data-locate]'),
+      });
+    } catch (err) {
+      // A broken map must never take the rest of the page down with it.
+      el.classList.add('map--failed');
+      console.error('Map failed to start', err);
+    }
   });
 })();
