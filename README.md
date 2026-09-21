@@ -102,7 +102,7 @@ Self-serve local advertising at `/advertise`:
 **ME+ perks are enforced, not just advertised**: members get no adverts anywhere (server-rendered slots and `/api/ads`), alert subscriptions for up to ten counties versus one free (`/api/me/alerts`), the full archive (non-members see the last `archive_days` days in sections and search and a summary with a members' gate on older community reports), a monthly members' county newsletter (sent on the 1st from `/cron/daily`), and an ME+ badge on their reports and comments.
 - **House ads** — `database/seed/house-ads.json` ships four ads for Gary's Tech Hub, the Tech Hub Shop, KnowIT and VanQuotes.ie, seeded at install.
 
-Set `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` and/or `PAYPAL_CLIENT_ID` + `PAYPAL_CLIENT_SECRET` + `PAYPAL_WEBHOOK_ID` (`PAYPAL_MODE=sandbox|live`) in `.env`, then point the providers' webhooks at the two endpoints above.
+Enter the Stripe and PayPal keys in the newsroom under **Settings → Payment gateways** (admins only). They are encrypted with libsodium before they are stored, using `APP_KEY` from `.env` when set or a random key generated once into `storage/data/.secret_key`; the panel shows only the last four characters and has a "Test connection" button for each provider. The same names still work in `.env` as a fallback. Point the providers' webhooks at the two endpoints above.
 
 ## ME Óg · The Junior Post (kids section)
 

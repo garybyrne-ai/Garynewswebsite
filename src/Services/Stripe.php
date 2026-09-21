@@ -13,13 +13,13 @@ final class Stripe
     /** ME+ needs only the secret key: prices come from the newsroom settings (inline price_data). */
     public static function configured(): bool
     {
-        return Config::get('STRIPE_SECRET_KEY') !== '';
+        return Secrets::get('STRIPE_SECRET_KEY') !== '';
     }
 
     /** Stripe usable for advertising (only the secret key is needed; prices are inline). */
     public static function adsConfigured(): bool
     {
-        return Config::get('STRIPE_SECRET_KEY') !== '';
+        return Secrets::get('STRIPE_SECRET_KEY') !== '';
     }
 
     public static function checkoutUrl(array $user, string $interval = 'month'): string
@@ -35,8 +35,8 @@ final class Stripe
             throw new HttpException(503, 'Configure the public HTTPS URL');
         }
         $annual = $interval === 'year';
-        $lineItem = Config::get('STRIPE_PRICE_ME_PLUS') !== '' && !$annual
-            ? ['price' => Config::get('STRIPE_PRICE_ME_PLUS'), 'quantity' => 1]
+        $lineItem = Secrets::get('STRIPE_PRICE_ME_PLUS') !== '' && !$annual
+            ? ['price' => Secrets::get('STRIPE_PRICE_ME_PLUS'), 'quantity' => 1]
             : ['quantity' => 1, 'price_data' => [
                 'currency' => 'eur', 'unit_amount' => $annual ? Membership::annualCents() : Membership::priceCents(),
                 'recurring' => ['interval' => $annual ? 'year' : 'month'],
@@ -50,14 +50,14 @@ final class Stripe
             'customer_email' => $user['email'],
             'metadata' => ['user_id' => $user['id']],
             'subscription_data' => ['metadata' => ['user_id' => $user['id']]],
-        ], ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY')], 'form');
+        ], ['Authorization: Bearer ' . Secrets::get('STRIPE_SECRET_KEY')], 'form');
         return (string)$session['url'];
     }
 
     /** Stripe Checkout for an advertising subscription (price from settings, trial aligned with ours). */
     public static function adCheckoutUrl(array $user, array $ad): string
     {
-        if (Config::get('STRIPE_SECRET_KEY') === '') {
+        if (Secrets::get('STRIPE_SECRET_KEY') === '') {
             throw new HttpException(503, 'Stripe is not configured yet');
         }
         $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
@@ -84,14 +84,14 @@ final class Stripe
         if ($left >= 1) {
             $body['subscription_data']['trial_period_days'] = $left;
         }
-        $session = Remote::json('https://api.stripe.com/v1/checkout/sessions', $body, ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY')], 'form');
+        $session = Remote::json('https://api.stripe.com/v1/checkout/sessions', $body, ['Authorization: Bearer ' . Secrets::get('STRIPE_SECRET_KEY')], 'form');
         return (string)$session['url'];
     }
 
     /** One-time Stripe Checkout for an ad package order. */
     public static function orderCheckoutUrl(array $user, array $order): string
     {
-        if (Config::get('STRIPE_SECRET_KEY') === '') {
+        if (Secrets::get('STRIPE_SECRET_KEY') === '') {
             throw new HttpException(503, 'Card payments are not configured yet');
         }
         $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
@@ -113,14 +113,14 @@ final class Stripe
             'client_reference_id' => $order['id'],
             'metadata' => ['kind' => 'ad_order', 'order_id' => $order['id'], 'user_id' => $user['id']],
             'payment_intent_data' => ['metadata' => ['kind' => 'ad_order', 'order_id' => $order['id']]],
-        ], ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY'), 'Idempotency-Key: order-' . $order['id']], 'form');
+        ], ['Authorization: Bearer ' . Secrets::get('STRIPE_SECRET_KEY'), 'Idempotency-Key: order-' . $order['id']], 'form');
         AdOrders::setGatewayRef($order['id'], (string)$session['id']);
         return (string)$session['url'];
     }
 
     public static function webhook(string $payload, string $signature): array
     {
-        $secret = Config::get('STRIPE_WEBHOOK_SECRET');
+        $secret = Secrets::get('STRIPE_WEBHOOK_SECRET');
         if ($secret === '') {
             throw new HttpException(503, 'Stripe webhook not configured');
         }

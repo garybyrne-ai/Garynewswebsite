@@ -257,7 +257,7 @@ final class AdOrders
         if ($o['gateway_ref'] !== $sessionId) {
             throw new HttpException(400, 'Session does not match this order');
         }
-        $session = Remote::json('https://api.stripe.com/v1/checkout/sessions/' . rawurlencode($sessionId), null, ['Authorization: Bearer ' . Config::get('STRIPE_SECRET_KEY')], 'json', 30);
+        $session = Remote::json('https://api.stripe.com/v1/checkout/sessions/' . rawurlencode($sessionId), null, ['Authorization: Bearer ' . Secrets::get('STRIPE_SECRET_KEY')], 'json', 30);
         if (($session['payment_status'] ?? '') === 'paid' && (string)($session['metadata']['order_id'] ?? '') === $orderId) {
             return self::markPaid($orderId, 'stripe', (string)($session['payment_intent'] ?? $sessionId), (int)($session['amount_total'] ?? 0), (string)($session['currency'] ?? '')) ?? self::present($o);
         }

@@ -117,6 +117,7 @@
 
       <div id="view-settings" class="view">
         <h1>Settings</h1><p class="pagehead__blurb">Prices, the wire's display mode, WhatsApp numbers and the ownership page. Administrators only.</p>
+        <div class="panel" id="gateways"></div>
         <form class="form" id="settings-form"><div class="settingsgrid" id="settings-grid"></div><div class="form__actions"><button class="btn btn--primary" type="submit">Save settings</button></div><p class="form__result" id="settings-result"></p></form>
       </div>
 

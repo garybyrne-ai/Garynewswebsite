@@ -18,12 +18,12 @@ final class PayPal
 {
     public static function configured(): bool
     {
-        return Config::get('PAYPAL_CLIENT_ID') !== '' && Config::get('PAYPAL_CLIENT_SECRET') !== '';
+        return Secrets::get('PAYPAL_CLIENT_ID') !== '' && Secrets::get('PAYPAL_CLIENT_SECRET') !== '';
     }
 
     public static function base(): string
     {
-        return Config::get('PAYPAL_MODE', 'sandbox') === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+        return Secrets::get('PAYPAL_MODE', 'sandbox') === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
     }
 
     private static function token(): string
@@ -33,7 +33,7 @@ final class PayPal
             return (string)$cached['token'];
         }
         $res = Remote::json(self::base() . '/v1/oauth2/token', ['grant_type' => 'client_credentials'], [
-            'Authorization: Basic ' . base64_encode(Config::get('PAYPAL_CLIENT_ID') . ':' . Config::get('PAYPAL_CLIENT_SECRET')),
+            'Authorization: Basic ' . base64_encode(Secrets::get('PAYPAL_CLIENT_ID') . ':' . Secrets::get('PAYPAL_CLIENT_SECRET')),
         ], 'form', 30);
         if (empty($res['access_token'])) {
             throw new HttpException(502, 'PayPal did not issue a token');
@@ -204,7 +204,7 @@ final class PayPal
     /** Webhook: verify the signature with PayPal, then mirror subscription state. */
     public static function webhook(string $payload, array $headers): array
     {
-        $webhookId = Config::get('PAYPAL_WEBHOOK_ID');
+        $webhookId = Secrets::get('PAYPAL_WEBHOOK_ID');
         if ($webhookId === '') {
             throw new HttpException(503, 'PAYPAL_WEBHOOK_ID is not configured');
         }

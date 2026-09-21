@@ -58,7 +58,7 @@ final class Ads
     {
         return [
             'price_cents' => self::price(), 'price_label' => self::priceLabel(), 'currency' => self::currency(),
-            'trial_days' => self::trialDays(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured(), 'paypal_mode' => Config::get('PAYPAL_MODE', 'sandbox'),
+            'trial_days' => self::trialDays(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured(), 'paypal_mode' => Secrets::get('PAYPAL_MODE', 'sandbox'),
             'templates' => self::TEMPLATES, 'limits' => self::LIMITS,
             'packages' => AdPackages::all(), 'tiers' => AdPackages::TIERS,
         ];

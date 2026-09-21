@@ -257,7 +257,37 @@
   });
 
   /* ---- settings ---- */
+  async function loadGateways() {
+    const box = $('#gateways');
+    try {
+      const g = await api('/api/admin/gateways');
+      const src = f => f.source === 'panel' ? '<span class="chip chip--ok">set here</span>' : (f.source === 'env' ? '<span class="chip">from .env</span>' : '<span class="chip chip--muted">not set</span>');
+      const field = ([k, f]) => `<label><span class="gwlabel">${esc(f.label)} ${src(f)}</span>${k === 'PAYPAL_MODE'
+        ? `<select name="${k}"><option value="">— keep ${esc(f.masked || 'sandbox')} —</option><option value="sandbox">sandbox</option><option value="live">live</option></select>`
+        : `<input name="${k}" type="password" autocomplete="new-password" placeholder="${f.set ? esc(f.masked) + '  (leave blank to keep)' : 'Paste here'}">`}<small class="form__hint">${esc(f.hint)}${f.source === 'panel' ? ` · <a href="#" data-clear="${k}">remove</a>` : ''}</small></label>`;
+      const group = name => Object.entries(g.fields).filter(([, f]) => f.group === name).map(field).join('');
+      box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Payment gateways</span><span class="mono">Stripe: <b class="${g.stripe ? 'is-good' : 'is-bad'}">${g.stripe ? 'connected' : 'not connected'}</b> · PayPal: <b class="${g.paypal ? 'is-good' : 'is-bad'}">${g.paypal ? 'connected' : 'not connected'}</b></span></div>
+        <p class="panel__note" style="margin:6px 0 12px">Paste the keys from your Stripe and PayPal dashboards here; they are encrypted before they are stored (key: <code>${esc(g.key_source)}</code>) and never shown again, only the last four characters. Nothing needs to be edited on the server. Add these webhook URLs in each dashboard: <code>${esc(g.webhooks.stripe)}</code> (events: checkout.session.completed, payment_intent.succeeded, charge.refunded, customer.subscription.*) and <code>${esc(g.webhooks.paypal)}</code> (PAYMENT.CAPTURE.COMPLETED, PAYMENT.CAPTURE.REFUNDED, BILLING.SUBSCRIPTION.*).</p>
+        <form id="gateways-form" class="form">
+          <div class="gwgrid"><div><h3 style="margin:0 0 8px">Stripe</h3><div class="settingsgrid">${group('stripe')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="stripe">Test Stripe connection</button></div></div>
+          <div><h3 style="margin:0 0 8px">PayPal</h3><div class="settingsgrid">${group('paypal')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="paypal">Test PayPal connection</button></div></div></div>
+          <div class="form__actions"><button class="btn btn--primary" type="submit">Save gateway keys</button><span class="form__hint">Only fields you fill in are changed.</span></div>
+          <p class="form__result" id="gateways-result"></p>
+        </form>`;
+      $('#gateways-form').addEventListener('submit', async e => {
+        e.preventDefault(); const out = $('#gateways-result'); out.classList.remove('is-error');
+        try { const j = await api('/api/admin/gateways', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Gateway keys saved'); loadGateways(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+      });
+      box.addEventListener('click', async e => {
+        const t = e.target.closest('[data-test]'), c = e.target.closest('[data-clear]');
+        const out = $('#gateways-result');
+        if (t) { t.disabled = true; out.classList.remove('is-error'); out.textContent = 'Checking…'; try { const j = await api('/api/admin/gateways/test', { method: 'POST', body: fd({ gateway: t.dataset.test }) }); out.textContent = j.message; } catch (err) { out.classList.add('is-error'); out.textContent = err.message; } t.disabled = false; }
+        if (c) { e.preventDefault(); if (!confirm('Remove this key from the newsroom store?')) return; try { await api('/api/admin/gateways', { method: 'POST', body: fd({ ['clear_' + c.dataset.clear]: '1' }) }); toast('Removed'); loadGateways(); } catch (err) { toast(err.message); } }
+      });
+    } catch (e) { box.hidden = true; }
+  }
   async function loadSettings() {
+    loadGateways();
     try {
       const s = await api('/api/admin/settings');
       const groups = {};

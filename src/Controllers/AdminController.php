@@ -447,6 +447,56 @@ final class AdminController
         return Response::json($out);
     }
 
+    /** Payment gateway credentials: status only, never the values. */
+    public static function gateways(Request $r): Response
+    {
+        Auth::require(['admin']);
+        return Response::json([
+            'fields' => \MeNews\Services\Secrets::status(),
+            'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(),
+            'webhooks' => ['stripe' => absolute_url('/api/stripe/webhook'), 'paypal' => absolute_url('/api/paypal/webhook')],
+            'key_source' => \MeNews\Config::get('APP_KEY') !== '' ? 'APP_KEY' : 'storage/data/.secret_key',
+        ]);
+    }
+
+    public static function saveGateways(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $changed = [];
+        foreach (array_keys(\MeNews\Services\Secrets::FIELDS) as $name) {
+            if (($r->post('clear_' . $name, '', 1)) === '1') {
+                \MeNews\Services\Secrets::clear($name);
+                $changed[] = $name . ' cleared';
+                continue;
+            }
+            $v = $r->rawPost($name);
+            if (is_string($v) && trim($v) !== '') {
+                \MeNews\Services\Secrets::set($name, $v);
+                $changed[] = $name;
+            }
+        }
+        if ($changed) {
+            Audit::log($u['id'], 'gateways.update', 'settings', 'gateways', implode(', ', $changed));
+        }
+        return Response::json(['ok' => true, 'changed' => $changed, 'fields' => \MeNews\Services\Secrets::status(), 'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured()]);
+    }
+
+    public static function testGateway(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $gateway = $r->post('gateway', '', 10);
+        try {
+            $out = \MeNews\Services\Secrets::test($gateway);
+        } catch (\JsonException | \RuntimeException $e) {
+            if (str_contains($e->getMessage(), '401') || str_contains($e->getMessage(), '403')) {
+                throw new HttpException(400, ucfirst($gateway) . ' rejected the credentials. Check they were copied in full and belong to the right mode (test/live, sandbox/live).');
+            }
+            throw new HttpException(502, ucfirst($gateway) . ' could not be reached: ' . $e->getMessage());
+        }
+        Audit::log($u['id'], 'gateways.test', 'settings', $gateway, $out['message']);
+        return Response::json($out);
+    }
+
     public static function saveSettings(Request $r): Response
     {
         $u = Auth::require(['admin']);

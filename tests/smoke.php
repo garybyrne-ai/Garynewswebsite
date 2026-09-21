@@ -319,6 +319,16 @@ check('currency editable from the newsroom', $s === 200 && ($set['pricing']['cur
 check('delete advert (cleanup)', $s === 200);
 [$s, $html] = http('GET', '/kids', [], [], false);
 check('kids section is ad-free', $s === 200 && !str_contains($html, 'class="ad ad--'));
+[$s, $gw] = http('GET', '/api/admin/gateways');
+check('gateway status is admin-only and never returns values', $s === 200 && isset($gw['fields']['STRIPE_SECRET_KEY']) && !isset($gw['fields']['STRIPE_SECRET_KEY']['value']));
+[$s] = http('POST', '/api/admin/gateways', ['STRIPE_SECRET_KEY' => 'nonsense']);
+check('gateway keys are validated', $s === 400);
+[$s, $gs] = http('POST', '/api/admin/gateways', ['STRIPE_SECRET_KEY' => 'sk_test_SmokeTestKey0000000000' . $stamp, 'STRIPE_WEBHOOK_SECRET' => 'whsec_SmokeTestSecret000000']);
+check('gateway keys saved from the newsroom and Stripe reads as connected', $s === 200 && !empty($gs['stripe']) && ($gs['fields']['STRIPE_SECRET_KEY']['source'] ?? '') === 'panel' && str_starts_with($gs['fields']['STRIPE_SECRET_KEY']['masked'] ?? '', 'sk_test_••••'));
+[$s, $pr] = http('GET', '/api/ads/pricing');
+check('advert pricing sees the newsroom-entered key', $s === 200 && !empty($pr['stripe']));
+[$s, $gc] = http('POST', '/api/admin/gateways', ['clear_STRIPE_SECRET_KEY' => '1', 'clear_STRIPE_WEBHOOK_SECRET' => '1']);
+check('gateway keys can be removed again', $s === 200 && empty($gc['stripe']));
 [$s, $nu] = http('POST', '/api/admin/users', ['email' => "smoke-editor-{$stamp}@example.ie", 'display_name' => 'Smoke Editor', 'role' => 'editor', 'home_county' => 'Cork']);
 check('admin creates an account', $s === 200 && !empty($nu['id']) && strlen($nu['temporary_password'] ?? '') >= 8);
 check('new account can sign in', bearerToken("smoke-editor-{$stamp}@example.ie", $nu['temporary_password'] ?? '') !== '');
