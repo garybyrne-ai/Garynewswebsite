@@ -518,6 +518,40 @@ final class PageController
         ]));
     }
 
+    /** Remember the visitor's language (and Google Translate's own cookie) and go back where they were. */
+    public static function setLang(Request $r, array $p): Response
+    {
+        $code = $p['code'];
+        if (!\MeNews\Support\Lang::valid($code)) {
+            throw new HttpException(404, 'Unknown language');
+        }
+        $back = $r->query('back', '/', 500);
+        if ($back === '' || $back[0] !== '/' || str_starts_with($back, '//')) {
+            $back = '/';
+        }
+        $year = time() + 365 * 86400;
+        $secure = $r->isSecure();
+        setcookie(\MeNews\Support\Lang::COOKIE, $code, ['expires' => $year, 'path' => '/', 'secure' => $secure, 'httponly' => false, 'samesite' => 'Lax']);
+        $google = \MeNews\Support\Lang::LANGS[$code][2];
+        // Google's page translator reads its own cookie; set or clear it so the whole page follows the choice.
+        $host = (string)($_SERVER['HTTP_HOST'] ?? '');
+        $host = preg_replace('/:\d+$/', '', $host);
+        $domains = [''];
+        if ($host !== '' && !filter_var($host, FILTER_VALIDATE_IP) && substr_count($host, '.') >= 1) {
+            $domains[] = '.' . $host;
+        }
+        foreach ($domains as $d) {
+            $opts = ['path' => '/', 'secure' => $secure, 'httponly' => false, 'samesite' => 'Lax'] + ($d !== '' ? ['domain' => $d] : []);
+            if ($google) {
+                // Google's widget compares the raw cookie text, so the slashes must not be URL-encoded.
+                setrawcookie('googtrans', '/en/' . $google, $opts + ['expires' => $year]);
+            } else {
+                setrawcookie('googtrans', '', $opts + ['expires' => time() - 86400]);
+            }
+        }
+        return Response::redirect($back);
+    }
+
     public static function savedRedirect(Request $r): Response
     {
         return Response::redirect(Auth::user() ? '/dashboard#saved' : '/?auth=signin&next=/dashboard%23saved');

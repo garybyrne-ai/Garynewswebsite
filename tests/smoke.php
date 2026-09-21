@@ -73,6 +73,18 @@ check('robots.txt lists both sitemaps', $s === 200 && substr_count($robots, 'Sit
 check('home page declares the publisher and feed autodiscovery', $s === 200 && str_contains($home, 'NewsMediaOrganization') && str_contains($home, 'application/feed+json') && str_contains($home, 'opensearchdescription'));
 [$s] = http('GET', '/feed/section/no-such.xml', [], [], false);
 check('unknown feed is a 404', $s === 404);
+foreach (['pl' => 'Twoje hrabstwo', 'ga' => 'Do chontae', 'de' => 'Dein County', 'uk' => 'Ваше графство', 'ru' => 'Ваше графство'] as $code => $word) {
+    $ch = curl_init($base . '/');
+    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => 'me_lang=' . $code, CURLOPT_TIMEOUT => 30]);
+    $html = (string)curl_exec($ch);
+    check("language {$code} translates the chrome and loads Google Translate", str_contains($html, 'lang="' . $code . '"') && str_contains($html, $word) && str_contains($html, 'translate_a/element.js'));
+}
+$ch = curl_init($base . '/lang/pl?back=/section/sport');
+curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_TIMEOUT => 30]);
+$hdr = (string)curl_exec($ch);
+check('language switch sets both cookies and redirects back', str_contains($hdr, 'me_lang=pl') && str_contains($hdr, 'googtrans=/en/pl') && str_contains($hdr, 'Location: /section/sport'));
+[$s] = http('GET', '/lang/xx', [], [], false);
+check('unknown language is a 404', $s === 404);
 [$s] = http('GET', '/dashboard', [], [], false);
 check('dashboard redirects anonymous users', $s === 302 || $s === 200);
 

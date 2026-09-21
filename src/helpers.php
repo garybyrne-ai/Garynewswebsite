@@ -138,3 +138,9 @@ function possessive(string $name): string
 {
     return $name . (str_ends_with($name, 's') ? '’' : '’s');
 }
+
+/** Translate a site-chrome string into the visitor's language (English when unknown). */
+function t(string $text): string
+{
+    return \MeNews\Support\Lang::t($text);
+}

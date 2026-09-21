@@ -65,6 +65,13 @@
     $$('.reveal').forEach(el => io.observe(el));
   } else document.documentElement.classList.add('no-observer');
 
+  /* ---------- language menu ---------- */
+  const langToggle = $('#lang-toggle'), langMenu = $('#lang-menu');
+  if (langToggle) {
+    langToggle.addEventListener('click', e => { e.stopPropagation(); langMenu.classList.toggle('is-open'); langToggle.setAttribute('aria-expanded', langMenu.classList.contains('is-open')); });
+    document.addEventListener('click', () => langMenu.classList.remove('is-open'));
+  }
+
   /* ---------- account menu ---------- */
   const accToggle = $('#account-toggle'), accMenu = $('#account-menu');
   if (accToggle) {

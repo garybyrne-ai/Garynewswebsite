@@ -55,6 +55,7 @@ final class Icons
         'share' => '<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1"/>',
         'text' => '<path d="M4 7V4h16v3M12 4v16M9 20h6"/>',
         'plus' => '<path d="M12 5v14M5 12h14"/>',
+        'globe' => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
         'bookmark' => '<path d="M6 4h12v17l-6-4-6 4z"/>',
         'rss' => '<path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
         'megaphone' => '<path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1z"/><path d="M17 8.5a4 4 0 0 1 0 7M8.5 15l1 5H12"/>',

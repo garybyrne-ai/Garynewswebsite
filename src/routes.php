@@ -86,6 +86,7 @@ return static function (Router $r): void {
     $r->get('/feed/{key:[a-z0-9-]+}.{fmt:xml|atom|json}', [Page::class, 'rss']);
     $r->get('/feed/{group:section|county}/{slug:[a-z0-9-]+}.{fmt:xml|atom|json}', [Page::class, 'rss']);
     $r->get('/saved', [Page::class, 'savedRedirect']);
+    $r->get('/lang/{code:[a-zA-Z-]+}', [Page::class, 'setLang']);
 
     // ---- Public API
     $r->get('/.well-known/security.txt', [Page::class, 'securityTxt']);
