@@ -125,4 +125,4 @@
     </section>
   </div>
 </div>
-<?php $extraScripts = '<script>window.NEWSROOM=' . json_encode(['labels' => $labels, 'categories' => $categories, 'counties' => $counties], JSON_UNESCAPED_UNICODE) . ';</script><script src="/assets/js/newsroom.js?v=' . e(ME_VERSION) . '" defer></script>'; ?>
+<?php $extraScripts = '<script>window.NEWSROOM=' . json_encode(['labels' => $labels, 'categories' => $categories, 'counties' => $counties], JSON_UNESCAPED_UNICODE) . ';</script><script src="/assets/js/newsroom.js?v=' . e(ME_ASSETS) . '" defer></script>'; ?>

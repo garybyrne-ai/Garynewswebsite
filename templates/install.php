@@ -6,7 +6,7 @@
 <title>Install — ME News Ireland</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_VERSION) ?>">
+<link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_ASSETS) ?>">
 <style>.install{max-width:640px;margin:48px auto;padding:0 20px}.install .panel{padding:28px}.install h1{font-size:2rem;margin:10px 0 6px}.install .lede{color:var(--ink-2);margin-bottom:22px}.check{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:.9rem}.check:last-child{border:0}.cred{display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:.9rem;padding:8px 0;border-bottom:1px solid var(--line)}.cred code{font-family:var(--mono);font-size:.8rem;color:var(--cy)}.errorbox{border:1px solid color-mix(in srgb,var(--hot) 50%,transparent);background:color-mix(in srgb,var(--hot) 10%,transparent);padding:12px 14px;border-radius:10px;margin-bottom:16px;color:var(--ink)}</style>
 </head>
 <body>

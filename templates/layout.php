@@ -76,7 +76,7 @@ $more = [
 <link rel="preload" href="/assets/fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
 <?php if (str_contains($bodyClass, 'page-kids') || str_contains($bodyClass, 'page-home')): ?><link rel="preload" href="/assets/fonts/Fraunces.woff2" as="font" type="font/woff2" crossorigin><?php endif; ?>
 <link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
-<link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_VERSION) ?>">
+<link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_ASSETS) ?>">
 <?php if (!empty($jsonld) && !isset($story) && !isset($notice)): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
 <script>try{var t=localStorage.getItem('me_theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var ts=localStorage.getItem('me_textsize');if(ts)document.documentElement.setAttribute('data-textsize',ts)}catch(e){}</script>
 </head>
@@ -279,12 +279,12 @@ $more = [
 <?= \MeNews\View::partial('partials/consent') ?>
 
 <script>window.ME={located:<?= (Visitor::position() || Visitor::county()) ? 'true' : 'false' ?>,county:<?= json_encode($myCounty) ?>,user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
-<script src="/assets/js/menews.js?v=<?= e(ME_VERSION) ?>" defer></script>
+<script src="/assets/js/menews.js?v=<?= e(ME_ASSETS) ?>" defer></script>
 <script src="/assets/vendor/leaflet/leaflet.js" defer></script>
-<script src="/assets/js/map.js?v=<?= e(ME_VERSION) ?>" defer></script>
-<script src="/assets/js/signal.js?v=<?= e(ME_VERSION) ?>" defer></script>
-<?php if (str_contains($bodyClass, 'page-kids')): ?><script src="/assets/js/kids.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>
+<script src="/assets/js/map.js?v=<?= e(ME_ASSETS) ?>" defer></script>
+<script src="/assets/js/signal.js?v=<?= e(ME_ASSETS) ?>" defer></script>
+<?php if (str_contains($bodyClass, 'page-kids')): ?><script src="/assets/js/kids.js?v=<?= e(ME_ASSETS) ?>" defer></script><?php endif; ?>
 <?php if (!empty($extraScripts)) echo $extraScripts; ?>
-<?php if (str_contains($bodyClass, 'page-app')): ?><script src="/assets/js/ads.js?v=<?= e(ME_VERSION) ?>" defer></script><?php endif; ?>
+<?php if (str_contains($bodyClass, 'page-app')): ?><script src="/assets/js/ads.js?v=<?= e(ME_ASSETS) ?>" defer></script><?php endif; ?>
 </body>
 </html>

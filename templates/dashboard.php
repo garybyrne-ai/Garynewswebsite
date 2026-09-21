@@ -110,4 +110,4 @@
     </div>
   </section>
 </div>
-<?php $extraScripts = '<script src="/assets/js/dashboard.js?v=' . e(ME_VERSION) . '" defer></script>'; ?>
+<?php $extraScripts = '<script src="/assets/js/dashboard.js?v=' . e(ME_ASSETS) . '" defer></script>'; ?>
