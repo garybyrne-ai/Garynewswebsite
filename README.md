@@ -22,7 +22,7 @@ php scripts/setup.php --seed    # creates storage/, the database, the admin, 5 c
 php -S 127.0.0.1:8000 -t public public/router.php
 ```
 
-Or simply `scripts/serve.sh` (macOS/Linux) / `scripts\start.bat` (Windows) — they do all of the above.
+Or simply `scripts/serve.sh` on macOS/Linux, which does all of the above. On Windows run the same three commands in PowerShell (`copy .env.example .env`, then `php scripts\setup.php --seed`, then `php -S 127.0.0.1:8000 -t public public\router.php`). The repository deliberately ships no `.bat` or `.ps1` launcher: Windows Defender flags script files inside downloaded ZIPs.
 
 Open <http://127.0.0.1:8000>.
 
@@ -132,7 +132,7 @@ templates/              PHP templates (layout, home, story, listing, contributor
 database/schema.sql     SQLite schema (idempotent)
 database/seed/          contributors.json, wire-snapshot.json
 config/                 sources.json (RSS feeds), locations.json (places), geo.json (coordinates), kids/ (puzzle banks)
-scripts/                setup.php, seed.php, fetch-news.php, backup.php, import-locations.php, serve.sh, start.bat
+scripts/                setup.php, seed.php, fetch-news.php, backup.php, import-locations.php, geocode-locations.php, serve.sh
 storage/                runtime data (git-ignored): data/menews.sqlite, uploads/, logs/, cache/
 deploy/                 apache.conf, nginx.conf, php.ini
 tests/smoke.php         end-to-end smoke test against a running server
