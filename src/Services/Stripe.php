@@ -30,7 +30,7 @@ final class Stripe
         if ($user['plan'] === 'ME+') {
             throw new HttpException(409, 'ME+ is already active');
         }
-        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        $base = rtrim(Config::baseUrl(), '/');
         if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
             throw new HttpException(503, 'Configure the public HTTPS URL');
         }
@@ -60,7 +60,7 @@ final class Stripe
         if (Secrets::get('STRIPE_SECRET_KEY') === '') {
             throw new HttpException(503, 'Stripe is not configured yet');
         }
-        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        $base = rtrim(Config::baseUrl(), '/');
         if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
             throw new HttpException(503, 'Configure the public HTTPS URL');
         }
@@ -94,7 +94,7 @@ final class Stripe
         if (Secrets::get('STRIPE_SECRET_KEY') === '') {
             throw new HttpException(503, 'Card payments are not configured yet');
         }
-        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        $base = rtrim(Config::baseUrl(), '/');
         if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
             throw new HttpException(503, 'Configure the public HTTPS URL');
         }

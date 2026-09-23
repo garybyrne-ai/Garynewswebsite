@@ -11,6 +11,8 @@ final class Config
 {
     /** @var array<string,string> */
     private static array $values = [];
+    private static ?string $base = null;
+    private static bool $resolving = false;
 
     public static function load(string $file): void
     {
@@ -42,6 +44,87 @@ final class Config
             return $env;
         }
         return self::$values[$key] ?? $default;
+    }
+
+    /**
+     * The canonical site address used for canonical tags, feeds, sitemaps, emails and payment
+     * return URLs. Precedence: the newsroom's Site address setting, then PUBLIC_BASE_URL from
+     * .env, then the address the visitor actually used. A configured value whose host does not
+     * match the live request is ignored for web requests, so moving to a real domain cannot
+     * leave every URL pointing at an old staging address.
+     */
+    public static function baseUrl(): string
+    {
+        if (self::$base !== null) {
+            return self::$base;
+        }
+        $fromRequest = self::requestBase();
+        if (self::$resolving) {
+            // Re-entered while the database was opening: answer without touching it again.
+            return $fromRequest ?: self::normaliseBase(self::get('PUBLIC_BASE_URL'));
+        }
+        self::$resolving = true;
+        try {
+            $setting = Database::installed() ? trim((string)Database::setting('site_url', '')) : '';
+        } catch (\Throwable $e) {
+            $setting = ''; // during install, or before the settings table exists
+        } finally {
+            self::$resolving = false;
+        }
+        $candidate = self::normaliseBase($setting) ?: self::normaliseBase(self::get('PUBLIC_BASE_URL'));
+        if ($candidate === '') {
+            return self::$base = $fromRequest;
+        }
+        // Explicit newsroom setting always wins; a stale .env value loses to the live host.
+        if ($setting === '' && $fromRequest !== '' && parse_url($candidate, PHP_URL_HOST) !== parse_url($fromRequest, PHP_URL_HOST)) {
+            return self::$base = $fromRequest;
+        }
+        return self::$base = $candidate;
+    }
+
+    /** Forget the memoised base (used after the setting changes, and by tests). */
+    public static function forgetBaseUrl(): void
+    {
+        self::$base = null;
+    }
+
+    /** scheme://host[:port] for the current request, or '' on the command line. */
+    private static function requestBase(): string
+    {
+        // The requested host first; the forwarded header only when a proxy hid it.
+        $host = (string)($_SERVER['HTTP_HOST'] ?? $_SERVER['HTTP_X_FORWARDED_HOST'] ?? '');
+        $host = trim(explode(',', $host)[0]);
+        if ($host === '' || !preg_match('/^[A-Za-z0-9.\-]+(:\d+)?$/', $host)) {
+            return '';
+        }
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || ($_SERVER['SERVER_PORT'] ?? '') === '443'
+            || strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+        return ($https ? 'https://' : 'http://') . $host;
+    }
+
+    /** Accept "example.ie", "https://example.ie/" etc.; reject anything that is not a web address. */
+    public static function normaliseBase(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+        if (str_contains($value, '://') && !preg_match('~^https?://~i', $value)) {
+            return ''; // only web addresses
+        }
+        if (!preg_match('~^https?://~i', $value)) {
+            $value = 'https://' . $value;
+        }
+        $parts = parse_url(rtrim($value, '/'));
+        if (!$parts || empty($parts['host']) || !preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9.\-]*[A-Za-z0-9])?$/', $parts['host'])) {
+            return '';
+        }
+        $scheme = strtolower($parts['scheme'] ?? 'https');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return '';
+        }
+        return $scheme . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '') . rtrim($parts['path'] ?? '', '/');
     }
 
     public static function bool(string $key, bool $default = false): bool

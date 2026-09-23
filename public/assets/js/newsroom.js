@@ -292,7 +292,7 @@
       const s = await api('/api/admin/settings');
       const groups = {};
       Object.entries(s).forEach(([k, v]) => { (groups[v.group] ??= []).push([k, v]); });
-      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}">`}</label>`;
+      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://menews.ie"' : ''}>`}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
       $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(field).join('')}</div></details>` : items.map(field).join('')).join('');
     } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
   }

@@ -442,8 +442,9 @@ final class AdminController
         $keys = self::settingKeys();
         $out = [];
         foreach ($keys as $k => $meta) {
-            $out[$k] = ['value' => Database::setting($k, (string)$meta['default']), 'label' => $meta['label'], 'group' => $meta['group'], 'type' => $meta['type'], 'options' => $meta['options'] ?? null];
+            $out[$k] = ['value' => Database::setting($k, (string)$meta['default']), 'label' => $meta['label'], 'group' => $meta['group'], 'type' => $meta['type'], 'options' => $meta['options'] ?? null, 'hint' => $meta['hint'] ?? null];
         }
+        $out['site_url']['hint'] = 'Currently using ' . rtrim(absolute_url('/'), '/') . ' for the sitemap, canonical tags, feeds, emails and payment return URLs. Leave blank to follow whichever domain visitors use.';
         return Response::json($out);
     }
 
@@ -508,6 +509,12 @@ final class AdminController
             }
             $v = trim($v);
             $meta = $keys[$k];
+            if ($k === 'site_url' && $v !== '') {
+                $v = \MeNews\Config::normaliseBase($v);
+                if ($v === '') {
+                    throw new HttpException(400, 'Site address must be a web address such as https://menews.ie');
+                }
+            }
             if ($meta['type'] === 'cents') {
                 $v = (string)max(0, (int)round((float)str_replace(',', '.', $v) * 100));
             } elseif ($meta['type'] === 'int') {
@@ -519,12 +526,14 @@ final class AdminController
             $saved[] = $k;
         }
         Audit::log($u['id'], 'settings.save', 'settings', '', implode(',', $saved));
+        \MeNews\Config::forgetBaseUrl();
         return Response::json(['ok' => true, 'saved' => $saved]);
     }
 
     private static function settingKeys(): array
     {
         $keys = [
+            'site_url' => ['label' => 'Site address (canonical domain)', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
             'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
             'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'default' => '1'],
             'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],

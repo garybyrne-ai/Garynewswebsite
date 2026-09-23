@@ -95,9 +95,9 @@ final class PayPal
         if (!self::configured()) {
             throw new HttpException(503, 'PayPal is not configured yet');
         }
-        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        $base = rtrim(Config::baseUrl(), '/');
         if (!filter_var($base, FILTER_VALIDATE_URL)) {
-            throw new HttpException(503, 'Configure PUBLIC_BASE_URL first');
+            throw new HttpException(503, 'Set the site address in Settings first');
         }
         $body = [
             'plan_id' => self::planId(),
@@ -128,9 +128,9 @@ final class PayPal
         if (!self::configured()) {
             throw new HttpException(503, 'PayPal is not configured yet');
         }
-        $base = rtrim(Config::get('PUBLIC_BASE_URL'), '/');
+        $base = rtrim(Config::baseUrl(), '/');
         if (!filter_var($base, FILTER_VALIDATE_URL)) {
-            throw new HttpException(503, 'Configure PUBLIC_BASE_URL first');
+            throw new HttpException(503, 'Set the site address in Settings first');
         }
         $res = self::call('POST', '/v2/checkout/orders', [
             'intent' => 'CAPTURE',

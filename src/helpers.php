@@ -22,7 +22,7 @@ function uuid(): string
 /** Build an absolute URL for a path using PUBLIC_BASE_URL. */
 function absolute_url(string $path = '/'): string
 {
-    return rtrim(MeNews\Config::get('PUBLIC_BASE_URL', ''), '/') . '/' . ltrim($path, '/');
+    return rtrim(MeNews\Config::baseUrl(), '/') . '/' . ltrim($path, '/');
 }
 
 /** Human-friendly relative time ("4 min ago", "Yesterday"). */
