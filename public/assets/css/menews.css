@@ -126,7 +126,7 @@ p{margin:0}
 .account__menu a,.account__menu button{text-align:left;padding:9px 12px;border-radius:9px;font-weight:600;font-size:.9rem}
 .account__menu a:hover,.account__menu button:hover{background:var(--surface-2)}
 
-.sections{border-top:1px solid var(--line)}
+.sections{border-top:1px solid var(--line);position:relative}
 .sections__in{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
 .sections__in::-webkit-scrollbar{display:none}
 .sections__in a{padding:12px 14px;font-weight:700;font-size:.86rem;color:var(--ink-2);white-space:nowrap;border-bottom:2px solid transparent;transition:.2s;position:relative}
@@ -1063,11 +1063,11 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
 .sections__plus.is-active{background:linear-gradient(120deg,var(--gold),#ffe6a3);color:#2b1d00!important;border-color:transparent!important;border-image:none}
 .sections__plus-tag{font:700 .58rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:99px;background:var(--gold);color:#2b1d00}
 .sections__plus.is-active .sections__plus-tag,.sections__plus:hover .sections__plus-tag{background:#2b1d00;color:var(--gold)}
-.moremenu{position:relative;margin-left:auto}
+.moremenu{position:static;margin-left:auto}
 .moremenu__btn{display:inline-flex;align-items:center;gap:6px;padding:12px 14px;font-weight:700;font-size:.86rem;color:var(--ink-2);white-space:nowrap}
 .moremenu__btn:hover,.moremenu__btn[aria-expanded="true"]{color:var(--ink)}
 .moremenu__btn[aria-expanded="true"] .icon{transform:rotate(180deg)}
-.moremenu__panel{position:absolute;right:0;top:calc(100% + 2px);width:min(640px,calc(100vw - 32px));display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:20px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);box-shadow:var(--shadow);z-index:70;animation:pop .2s}
+.moremenu__panel{position:absolute;right:16px;top:calc(100% + 2px);width:min(640px,calc(100vw - 32px));display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:20px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);box-shadow:var(--shadow);z-index:70;animation:pop .2s}
 .moremenu__col{display:flex;flex-direction:column;gap:4px}
 .moremenu__col h4{color:var(--cy);margin-bottom:6px}
 .moremenu__col a{padding:6px 8px;border-radius:8px;font-weight:600;font-size:.9rem;color:var(--ink-2)}
