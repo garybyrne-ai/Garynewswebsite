@@ -26,6 +26,8 @@ final class Secrets
         'PAYPAL_CLIENT_SECRET' => ['label' => 'PayPal client secret', 'group' => 'paypal', 'hint' => 'Same app, “Secret key”', 'pattern' => '/^[A-Za-z0-9_\-]{20,}$/'],
         'PAYPAL_WEBHOOK_ID' => ['label' => 'PayPal webhook ID', 'group' => 'paypal', 'hint' => 'Shown after you add the webhook URL to the app', 'pattern' => '/^[A-Z0-9]{10,}$/'],
         'PAYPAL_MODE' => ['label' => 'PayPal mode', 'group' => 'paypal', 'hint' => 'sandbox while testing, live when ready', 'pattern' => '/^(sandbox|live)$/'],
+        'SMTP_PASS' => ['label' => 'SMTP password', 'group' => 'mail', 'hint' => 'The password or API key your mail host gave you', 'pattern' => '/^\S[\s\S]{2,255}$/'],
+        'BREVO_API_KEY' => ['label' => 'Brevo API key', 'group' => 'mail', 'hint' => 'xkeysib-… from Brevo → SMTP & API → API keys', 'pattern' => '/^xkeysib-[A-Za-z0-9._\-]{10,}$/'],
     ];
 
     private static ?string $key = null;
@@ -61,6 +63,9 @@ final class Secrets
         self::$cache[$name] = $value;
         if (str_starts_with($name, 'PAYPAL_')) {
             Database::setSetting('paypal_token', ''); // credentials changed: drop the cached OAuth token
+        }
+        if (str_starts_with($name, 'SMTP_') || str_starts_with($name, 'BREVO_')) {
+            Database::setSetting('mail_last_error', ''); // give delivery a clean slate after a change
         }
     }
 
@@ -163,6 +168,15 @@ final class Secrets
                 throw new HttpException(400, 'PayPal rejected the credentials: ' . ($res['error_description'] ?? $res['error'] ?? 'unknown error'));
             }
             return ['ok' => true, 'message' => 'PayPal connected (' . self::get('PAYPAL_MODE', 'sandbox') . ' mode' . (self::get('PAYPAL_WEBHOOK_ID') === '' ? ', webhook ID still missing' : '') . ')'];
+        }
+        if ($gateway === 'brevo') {
+            $key = self::get('BREVO_API_KEY');
+            if ($key === '') {
+                throw new HttpException(400, 'Enter a Brevo API key first');
+            }
+            $acct = Remote::json('https://api.brevo.com/v3/account', null, ['api-key: ' . $key, 'accept: application/json'], 'json', 20);
+            $name = trim(($acct['companyName'] ?? '') ?: ($acct['email'] ?? 'account'));
+            return ['ok' => true, 'message' => 'Brevo connected: ' . $name . ($acct['plan'][0]['credits'] ?? null ? ' · ' . (int)$acct['plan'][0]['credits'] . ' credits' : '')];
         }
         throw new HttpException(400, 'Unknown gateway');
     }

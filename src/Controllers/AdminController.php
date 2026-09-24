@@ -460,6 +460,98 @@ final class AdminController
         ]);
     }
 
+    /** Email delivery: transport, addresses and the encrypted credentials. */
+    public static function mail(Request $r): Response
+    {
+        Auth::require(['admin']);
+        $m = \MeNews\Services\Mailer::class;
+        return Response::json([
+            'transport' => $m::transport(),
+            'transports' => $m::TRANSPORTS,
+            'configured' => $m::configured(),
+            'from' => $m::from(),
+            'from_name' => $m::fromName(),
+            'reply_to' => $m::replyTo(),
+            'smtp_host' => $m::setting('smtp_host', 'SMTP_HOST'),
+            'smtp_port' => $m::setting('smtp_port', 'SMTP_PORT', '587'),
+            'smtp_user' => $m::setting('smtp_user', 'SMTP_USER'),
+            'smtp_secure' => $m::setting('smtp_secure', 'SMTP_SECURE', 'tls'),
+            'secrets' => array_intersect_key(\MeNews\Services\Secrets::status(), array_flip(['SMTP_PASS', 'BREVO_API_KEY'])),
+            'last_error' => Database::setting('mail_last_error', ''),
+            'last_sent_at' => Database::setting('mail_last_sent_at', ''),
+            'log_path' => 'storage/logs/mail.log',
+        ]);
+    }
+
+    public static function saveMail(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $m = \MeNews\Services\Mailer::class;
+        $transport = $r->post('transport', '', 10);
+        if ($transport !== '' && !in_array($transport, $m::TRANSPORTS, true)) {
+            throw new HttpException(400, 'Unknown transport');
+        }
+        foreach (['from', 'reply_to'] as $k) {
+            $v = trim($r->post($k, '', 254));
+            if ($v !== '' && !filter_var($v, FILTER_VALIDATE_EMAIL)) {
+                throw new HttpException(400, 'Enter a valid ' . str_replace('_', ' ', $k) . ' address');
+            }
+        }
+        $port = (int)$r->post('smtp_port', '587', 6);
+        if ($port < 1 || $port > 65535) {
+            throw new HttpException(400, 'SMTP port must be between 1 and 65535');
+        }
+        $secure = $r->post('smtp_secure', 'tls', 6);
+        Database::setSetting('mail_transport', $transport ?: $m::transport());
+        foreach (['from', 'from_name', 'reply_to', 'smtp_host', 'smtp_user'] as $k) {
+            Database::setSetting('mail_' . $k, trim($r->post($k, '', 254)));
+        }
+        Database::setSetting('mail_smtp_port', (string)$port);
+        Database::setSetting('mail_smtp_secure', in_array($secure, ['tls', 'ssl', 'none'], true) ? $secure : 'tls');
+        $changed = [];
+        foreach (['SMTP_PASS', 'BREVO_API_KEY'] as $name) {
+            if ($r->post('clear_' . $name, '', 1) === '1') {
+                \MeNews\Services\Secrets::clear($name);
+                $changed[] = $name . ' cleared';
+                continue;
+            }
+            $v = $r->rawPost($name);
+            if (is_string($v) && trim($v) !== '') {
+                \MeNews\Services\Secrets::set($name, $v);
+                $changed[] = $name;
+            }
+        }
+        Database::setSetting('mail_last_error', '');
+        Audit::log($u['id'], 'mail.settings', 'settings', 'mail', $m::transport() . ($changed ? ' · ' . implode(', ', $changed) : ''));
+        return self::mail($r);
+    }
+
+    /** Send a real message so delivery is proven before readers depend on it. */
+    public static function testMail(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $to = trim($r->post('to', '', 254)) ?: $u['email'];
+        if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            throw new HttpException(400, 'Enter a valid address to send the test to');
+        }
+        Database::setSetting('mail_last_error', '');
+        $m = \MeNews\Services\Mailer::class;
+        $sent = $m::send($to, 'ME News test email', '<p>This is a test from the ME News newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_irish(now())) . ' by ' . e($u['display_name']) . '.</p>');
+        $err = (string)Database::setting('mail_last_error', '');
+        Audit::log($u['id'], 'mail.test', 'settings', 'mail', $to . ' · ' . ($err ?: 'ok'));
+        if ($err !== '') {
+            if (preg_match('/\b(401|403)\b/', $err)) {
+                $err = $m::transport() === 'brevo'
+                    ? 'Brevo rejected the API key. Check it was copied in full and is an SMTP/API key, not a marketing key.'
+                    : 'The mail server rejected the username or password.';
+            }
+            throw new HttpException(502, 'Delivery failed: ' . $err . ' The message was written to storage/logs/mail.log instead.');
+        }
+        return Response::json(['ok' => (bool)$sent, 'message' => $m::transport() === 'log'
+            ? 'Written to storage/logs/mail.log — choose SMTP or Brevo to send for real.'
+            : 'Test sent to ' . $to . ' via ' . $m::transport() . '. Check the inbox, and the spam folder the first time.']);
+    }
+
     public static function saveGateways(Request $r): Response
     {
         $u = Auth::require(['admin']);

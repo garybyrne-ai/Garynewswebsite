@@ -257,6 +257,55 @@
   });
 
   /* ---- settings ---- */
+  async function loadMail() {
+    const box = $('#maildelivery');
+    try {
+      const m = await api('/api/admin/mail');
+      const src = f => f.source === 'panel' ? '<span class="chip chip--ok">set here</span>' : (f.source === 'env' ? '<span class="chip">from .env</span>' : '<span class="chip chip--muted">not set</span>');
+      const secret = (k, f) => `<label><span class="gwlabel">${esc(f.label)} ${src(f)}</span><input name="${k}" type="password" autocomplete="new-password" placeholder="${f.set ? esc(f.masked) + '  (leave blank to keep)' : 'Paste here'}"><small class="form__hint">${esc(f.hint)}${f.source === 'panel' ? ` · <a href="#" data-mail-clear="${k}">remove</a>` : ''}</small></label>`;
+      const labels = { log: 'Write to a log file (nothing is sent)', mail: 'PHP mail() — the server itself', smtp: 'SMTP — Brevo relay, Gmail, your host', brevo: 'Brevo API over HTTPS (no open ports needed)' };
+      box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Email delivery</span><span class="mono">Sending by <b>${esc(m.transport)}</b> · <b class="${m.configured ? 'is-good' : 'is-bad'}">${m.configured ? 'ready' : 'needs details'}</b>${m.last_sent_at ? ' · last sent ' + fmt(m.last_sent_at) : ''}</span></div>
+        ${m.last_error ? `<p class="form__result is-error" style="margin:8px 0">Last send failed: ${esc(m.last_error)}</p>` : ''}
+        <p class="panel__note" style="margin:6px 0 12px">Alerts, the 7am county email, the members' monthly, report updates and receipts all go out this way. Brevo works either as an API key (best on hosts that block mail ports) or as an ordinary SMTP relay at <code>smtp-relay.brevo.com:587</code>. Nothing sends while this is set to the log file.</p>
+        <form id="mail-form" class="form">
+          <div class="settingsgrid">
+            <label>Transport<select name="transport">${m.transports.map(t => `<option value="${t}" ${t === m.transport ? 'selected' : ''}>${esc(labels[t] || t)}</option>`).join('')}</select></label>
+            <label>From address<input name="from" type="email" value="${esc(m.from)}" placeholder="news@menews.ie"><small class="form__hint">Must be a sender your provider has verified.</small></label>
+            <label>From name<input name="from_name" maxlength="80" value="${esc(m.from_name)}"></label>
+            <label>Reply-to<input name="reply_to" type="email" value="${esc(m.reply_to)}"></label>
+          </div>
+          <div class="settingsgrid" data-mail-smtp ${m.transport === 'smtp' ? '' : 'hidden'} style="margin-top:12px">
+            <label>SMTP host<input name="smtp_host" value="${esc(m.smtp_host)}" placeholder="smtp-relay.brevo.com"></label>
+            <label>Port<input name="smtp_port" type="number" min="1" max="65535" value="${esc(m.smtp_port)}"></label>
+            <label>Username<input name="smtp_user" value="${esc(m.smtp_user)}" autocomplete="off"></label>
+            <label>Encryption<select name="smtp_secure">${['tls', 'ssl', 'none'].map(x => `<option value="${x}" ${x === m.smtp_secure ? 'selected' : ''}>${x === 'tls' ? 'STARTTLS (587)' : x === 'ssl' ? 'SSL (465)' : 'None'}</option>`).join('')}</select></label>
+            ${secret('SMTP_PASS', m.secrets.SMTP_PASS)}
+          </div>
+          <div class="settingsgrid" data-mail-brevo ${m.transport === 'brevo' ? '' : 'hidden'} style="margin-top:12px">
+            ${secret('BREVO_API_KEY', m.secrets.BREVO_API_KEY)}
+          </div>
+          <div class="form__actions"><button class="btn btn--primary" type="submit">Save email settings</button><button class="btn btn--ghost" type="button" id="mail-test">Send a test email</button><span class="form__hint">The test goes to your own address unless you change it below.</span></div>
+          <label style="max-width:320px">Send the test to<input name="to" type="email" placeholder="you@example.ie"></label>
+          <p class="form__result" id="mail-result"></p>
+        </form>`;
+      const sync = () => { const t = $('[name=transport]', box).value; $('[data-mail-smtp]', box).hidden = t !== 'smtp'; $('[data-mail-brevo]', box).hidden = t !== 'brevo'; };
+      $('[name=transport]', box).addEventListener('change', sync);
+      $('#mail-form').addEventListener('submit', async e => {
+        e.preventDefault(); const out = $('#mail-result'); out.classList.remove('is-error'); out.textContent = 'Saving…';
+        try { await api('/api/admin/mail', { method: 'POST', body: new FormData(e.target) }); toast('Email settings saved'); loadMail(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+      });
+      $('#mail-test').addEventListener('click', async () => {
+        const out = $('#mail-result'); out.classList.remove('is-error'); out.textContent = 'Sending…';
+        const f = new FormData(); f.append('to', $('[name=to]', box).value);
+        try { const j = await api('/api/admin/mail/test', { method: 'POST', body: f }); out.textContent = j.message; loadMail(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+      });
+      box.addEventListener('click', async e => {
+        const c = e.target.closest('[data-mail-clear]'); if (!c) return;
+        e.preventDefault(); if (!confirm('Remove this credential?')) return;
+        try { await api('/api/admin/mail', { method: 'POST', body: fd({ ['clear_' + c.dataset.mailClear]: '1' }) }); toast('Removed'); loadMail(); } catch (err) { toast(err.message); }
+      });
+    } catch (e) { box.hidden = true; }
+  }
   async function loadGateways() {
     const box = $('#gateways');
     try {
@@ -287,7 +336,7 @@
     } catch (e) { box.hidden = true; }
   }
   async function loadSettings() {
-    loadGateways();
+    loadMail(); loadGateways();
     try {
       const s = await api('/api/admin/settings');
       const groups = {};

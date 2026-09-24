@@ -171,6 +171,9 @@ return static function (Router $r): void {
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/decision', [Admin::class, 'decision']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/rerun-safety', [Admin::class, 'rerun']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/edit', [Admin::class, 'edit']);
+    $r->get('/api/admin/mail', [Admin::class, 'mail']);
+    $r->post('/api/admin/mail', [Admin::class, 'saveMail']);
+    $r->post('/api/admin/mail/test', [Admin::class, 'testMail']);
     $r->get('/api/admin/gateways', [Admin::class, 'gateways']);
     $r->post('/api/admin/gateways', [Admin::class, 'saveGateways']);
     $r->post('/api/admin/gateways/test', [Admin::class, 'testGateway']);

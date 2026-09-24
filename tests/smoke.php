@@ -357,6 +357,17 @@ check('currency editable from the newsroom', $s === 200 && ($set['pricing']['cur
 check('delete advert (cleanup)', $s === 200);
 [$s, $html] = http('GET', '/kids', [], [], false);
 check('kids section is ad-free', $s === 200 && !str_contains($html, 'class="ad ad--'));
+[$s, $ml] = http('GET', '/api/admin/mail');
+check('mail settings are admin-only and hide credentials', $s === 200 && in_array($ml['transport'], ['log', 'mail', 'smtp', 'brevo'], true) && !isset($ml['secrets']['BREVO_API_KEY']['value']));
+[$s] = http('POST', '/api/admin/mail', ['transport' => 'brevo', 'BREVO_API_KEY' => 'nonsense']);
+check('Brevo key is validated', $s === 400);
+[$s] = http('POST', '/api/admin/mail', ['transport' => 'smtp', 'from' => 'not-an-address']);
+check('sender address is validated', $s === 400);
+[$s, $ms] = http('POST', '/api/admin/mail', ['transport' => 'smtp', 'from' => "smoke-{$stamp}@example.ie", 'from_name' => 'ME News', 'smtp_host' => 'smtp-relay.brevo.com', 'smtp_port' => '587', 'smtp_secure' => 'tls', 'SMTP_PASS' => 'smoke-test-password']);
+check('SMTP settings save with an encrypted password', $s === 200 && ($ms['smtp_host'] ?? '') === 'smtp-relay.brevo.com' && ($ms['secrets']['SMTP_PASS']['source'] ?? '') === 'panel' && !str_contains(json_encode($ms), 'smoke-test-password'));
+[$s] = http('POST', '/api/admin/mail', ['transport' => 'log']);
+[$s, $mt] = http('POST', '/api/admin/mail/test', ['to' => "smoke-{$stamp}@example.ie"]);
+check('test email runs through the chosen transport', $s === 200 && !empty($mt['ok']));
 [$s, $gw] = http('GET', '/api/admin/gateways');
 check('gateway status is admin-only and never returns values', $s === 200 && isset($gw['fields']['STRIPE_SECRET_KEY']) && !isset($gw['fields']['STRIPE_SECRET_KEY']['value']));
 [$s] = http('POST', '/api/admin/gateways', ['STRIPE_SECRET_KEY' => 'nonsense']);

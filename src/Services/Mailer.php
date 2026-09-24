@@ -4,25 +4,65 @@ declare(strict_types=1);
 namespace MeNews\Services;
 
 use MeNews\Config;
+use MeNews\Database;
 
 /**
- * Outbound email without dependencies. MAIL_TRANSPORT selects:
+ * Outbound email without dependencies. The transport is set in the newsroom
+ * (Settings → Email delivery), falling back to MAIL_TRANSPORT in .env:
  *   log   - append to storage/logs/mail.log (default in development)
  *   mail  - PHP mail() (works on most shared hosts such as Cloudways)
- *   smtp  - plain SMTP with optional STARTTLS/SSL (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_SECURE)
+ *   smtp  - SMTP with STARTTLS/SSL, for Brevo's relay or any other host
+ *   brevo - Brevo's transactional API over HTTPS, which needs no open mail port
  * Every message gets a plain-text alternative and a branded HTML wrapper.
  */
 final class Mailer
 {
+    public const TRANSPORTS = ['log', 'mail', 'smtp', 'brevo'];
+
+    /** A newsroom setting, falling back to .env and then the given default. */
+    public static function setting(string $key, string $env, string $default = ''): string
+    {
+        $v = '';
+        try {
+            $v = Database::installed() ? trim((string)Database::setting('mail_' . $key, '')) : '';
+        } catch (\Throwable $e) {
+            $v = '';
+        }
+        return $v !== '' ? $v : Config::get($env, $default);
+    }
+
     public static function transport(): string
     {
-        $t = strtolower(Config::get('MAIL_TRANSPORT', Config::production() ? 'mail' : 'log'));
-        return in_array($t, ['log', 'mail', 'smtp'], true) ? $t : 'log';
+        $t = strtolower(self::setting('transport', 'MAIL_TRANSPORT', Config::production() ? 'mail' : 'log'));
+        return in_array($t, self::TRANSPORTS, true) ? $t : 'log';
     }
 
     public static function from(): string
     {
-        return Config::get('MAIL_FROM', 'news@' . (parse_url(Config::get('PUBLIC_BASE_URL', 'http://menews.ie'), PHP_URL_HOST) ?: 'menews.ie'));
+        $host = parse_url(Config::baseUrl(), PHP_URL_HOST) ?: 'menews.ie';
+        $from = self::setting('from', 'MAIL_FROM', 'news@' . $host);
+        return filter_var($from, FILTER_VALIDATE_EMAIL) ? $from : 'news@' . $host;
+    }
+
+    public static function fromName(): string
+    {
+        return self::setting('from_name', 'MAIL_FROM_NAME', Config::appName());
+    }
+
+    public static function replyTo(): string
+    {
+        $r = self::setting('reply_to', 'MAIL_REPLY_TO', '');
+        return filter_var($r, FILTER_VALIDATE_EMAIL) ? $r : self::from();
+    }
+
+    /** True when the chosen transport has everything it needs. */
+    public static function configured(): bool
+    {
+        return match (self::transport()) {
+            'smtp' => self::setting('smtp_host', 'SMTP_HOST') !== '',
+            'brevo' => Secrets::get('BREVO_API_KEY') !== '',
+            default => true,
+        };
     }
 
     /** Send. Returns true when handed to a transport (or logged). Never throws to callers. */
@@ -34,20 +74,41 @@ final class Mailer
         $text = $text !== '' ? $text : trim(html_entity_decode(strip_tags(preg_replace('/<br\s*\/?>|<\/p>|<\/h\d>|<\/li>/i', "\n", $html) ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         $html = self::wrap($subject, $html);
         try {
-            return match (self::transport()) {
+            $ok = match (self::transport()) {
                 'mail' => self::viaMail($to, $subject, $html, $text),
                 'smtp' => self::viaSmtp($to, $subject, $html, $text),
+                'brevo' => self::viaBrevo($to, $subject, $html, $text),
                 default => self::viaLog($to, $subject, $text),
             };
+            self::record($ok ? '' : 'The mail server accepted nothing back');
+            return $ok;
         } catch (\Throwable $e) {
             error_log('Mailer: ' . $e->getMessage());
+            self::record($e->getMessage());
+            // Never lose the message: fall back to the log so the newsroom can see what failed.
             return self::viaLog($to, $subject, $text . "\n[transport error: " . $e->getMessage() . ']');
+        }
+    }
+
+    /** Remember how the last send went, so Settings can show it. */
+    private static function record(string $error): void
+    {
+        try {
+            if (!Database::installed()) {
+                return;
+            }
+            Database::setSetting('mail_last_error', $error);
+            if ($error === '') {
+                Database::setSetting('mail_last_sent_at', now());
+            }
+        } catch (\Throwable $e) {
+            // never let bookkeeping break a send
         }
     }
 
     private static function wrap(string $subject, string $body): string
     {
-        $base = rtrim(Config::get('PUBLIC_BASE_URL', ''), '/');
+        $base = rtrim(Config::baseUrl(), '/');
         return '<!doctype html><html><head><meta charset="utf-8"><title>' . e($subject) . '</title></head>'
             . '<body style="margin:0;background:#f3f7f4;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0b1410">'
             . '<div style="max-width:620px;margin:0 auto;padding:24px 16px">'
@@ -60,8 +121,8 @@ final class Mailer
     private static function headers(string $boundary): array
     {
         return [
-            'From: ' . Config::appName() . ' <' . self::from() . '>',
-            'Reply-To: ' . Config::get('MAIL_REPLY_TO', self::from()),
+            'From: ' . self::encodeName(self::fromName()) . ' <' . self::from() . '>',
+            'Reply-To: ' . self::replyTo(),
             'MIME-Version: 1.0',
             'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
             'X-Mailer: MENews/' . ME_VERSION,
@@ -72,6 +133,32 @@ final class Mailer
     {
         return "--{$boundary}\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n{$text}\r\n\r\n"
             . "--{$boundary}\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n{$html}\r\n\r\n--{$boundary}--\r\n";
+    }
+
+    private static function encodeName(string $name): string
+    {
+        return preg_match('/^[\x20-\x7E]+$/', $name) ? '"' . str_replace('"', '', $name) . '"' : '=?UTF-8?B?' . base64_encode($name) . '?=';
+    }
+
+    /** Brevo's transactional API: HTTPS only, so it works where SMTP ports are blocked. */
+    private static function viaBrevo(string $to, string $subject, string $html, string $text): bool
+    {
+        $key = Secrets::get('BREVO_API_KEY');
+        if ($key === '') {
+            throw new \RuntimeException('Brevo API key is not set');
+        }
+        $res = Remote::json('https://api.brevo.com/v3/smtp/email', [
+            'sender' => ['name' => self::fromName(), 'email' => self::from()],
+            'replyTo' => ['email' => self::replyTo()],
+            'to' => [['email' => $to]],
+            'subject' => $subject,
+            'htmlContent' => $html,
+            'textContent' => $text,
+        ], ['api-key: ' . $key, 'accept: application/json'], 'json', 30);
+        if (!empty($res['messageId'])) {
+            return true;
+        }
+        throw new \RuntimeException('Brevo refused the message: ' . ($res['message'] ?? json_encode($res)));
     }
 
     private static function viaMail(string $to, string $subject, string $html, string $text): bool
@@ -89,9 +176,11 @@ final class Mailer
 
     private static function viaSmtp(string $to, string $subject, string $html, string $text): bool
     {
-        $host = Config::get('SMTP_HOST');
-        $port = Config::int('SMTP_PORT', 587);
-        $secure = strtolower(Config::get('SMTP_SECURE', 'tls'));
+        $host = self::setting('smtp_host', 'SMTP_HOST');
+        $port = (int)(self::setting('smtp_port', 'SMTP_PORT', '587') ?: 587);
+        $secure = strtolower(self::setting('smtp_secure', 'SMTP_SECURE', 'tls'));
+        $user = self::setting('smtp_user', 'SMTP_USER');
+        $pass = Secrets::get('SMTP_PASS');
         if ($host === '') {
             throw new \RuntimeException('SMTP_HOST is not set');
         }
@@ -119,7 +208,7 @@ final class Mailer
             return $r;
         };
         $read();
-        $me = parse_url(Config::get('PUBLIC_BASE_URL', 'http://localhost'), PHP_URL_HOST) ?: 'localhost';
+        $me = parse_url(Config::baseUrl(), PHP_URL_HOST) ?: 'localhost';
         $cmd('EHLO ' . $me, [250]);
         if ($secure === 'tls') {
             $cmd('STARTTLS', [220]);
@@ -128,16 +217,16 @@ final class Mailer
             }
             $cmd('EHLO ' . $me, [250]);
         }
-        if (Config::get('SMTP_USER') !== '') {
+        if ($user !== '') {
             $cmd('AUTH LOGIN', [334]);
-            $cmd(base64_encode(Config::get('SMTP_USER')), [334]);
-            $cmd(base64_encode(Config::get('SMTP_PASS')), [235]);
+            $cmd(base64_encode($user), [334]);
+            $cmd(base64_encode($pass), [235]);
         }
         $cmd('MAIL FROM:<' . self::from() . '>', [250]);
         $cmd('RCPT TO:<' . $to . '>', [250, 251]);
         $cmd('DATA', [354]);
         $b = 'me-' . bin2hex(random_bytes(8));
-        $data = 'To: <' . $to . ">\r\nSubject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\nDate: " . date('r') . "\r\n" . implode("\r\n", self::headers($b)) . "\r\n\r\n" . self::body($b, $html, $text);
+        $data = 'To: <' . $to . ">\r\nSubject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\nMessage-ID: <" . bin2hex(random_bytes(10)) . '@' . $me . ">\r\nDate: " . date('r') . "\r\n" . implode("\r\n", self::headers($b)) . "\r\n\r\n" . self::body($b, $html, $text);
         $data = preg_replace('/^\./m', '..', $data) ?? $data;
         fwrite($sock, $data . "\r\n.\r\n");
         $r = $read();
