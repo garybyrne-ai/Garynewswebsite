@@ -32,6 +32,7 @@ $jsonld = $isWire ? null : [
       <?php else: ?>
         <span class="byline"><?= Ui::avatar(null, 'md', $story['author_name'] ?: 'ME') ?><span><b><?= e($story['author_name'] ?: 'Community reporter') ?></b><small>Community reporter</small></span></span>
       <?php endif; ?>
+      <?= \MeNews\Support\Share::bar(['url' => absolute_url($story['url']), 'title' => $story['title'], 'text' => (string)($story['summary'] ?: ''), 'image' => $story['image'] ? absolute_url($story['image']) : ''], 'compact') ?>
       <div class="textsize" role="group" aria-label="Text size"><button type="button" data-textsize="" aria-label="Normal text">A</button><button type="button" data-textsize="lg" aria-label="Larger text">A</button><button type="button" data-textsize="xl" aria-label="Largest text">A</button></div>
       <div class="article__time mono">
         <time datetime="<?= e($story['time']) ?>"><?= e(date_irish($story['time'])) ?></time>
@@ -103,8 +104,8 @@ $jsonld = $isWire ? null : [
         <div class="trust__actions">
           <button class="btn btn--ghost" type="button" data-confirm="<?= e($story['id']) ?>"><?= $isWire ? 'I can add local context' : icon('eye') . ' I saw this too' ?></button>
           <button class="btn btn--ghost" type="button" data-save="<?= e($story['id']) ?>" data-save-label><?= icon('bookmark') ?> <span>Save</span></button>
-          <button class="btn btn--ghost" type="button" data-share data-title="<?= e($story['title']) ?>">Share ↗</button>
         </div>
+        <?= \MeNews\Support\Share::bar(['url' => absolute_url($story['url']), 'title' => $story['title'], 'text' => (string)($story['summary'] ?: ''), 'image' => $story['image'] ? absolute_url($story['image']) : '']) ?>
       </section>
 
       <section class="discussion" id="discussion">

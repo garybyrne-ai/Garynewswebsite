@@ -125,6 +125,68 @@
   const qp = new URLSearchParams(location.search);
   if (qp.get('auth')) showAuth(qp.get('auth') === 'register' ? 'register' : 'signin');
 
+  /* ---------- sharing ---------- */
+  (function () {
+    const NETS = window.ME_SHARE || {};
+    const modal = $('#share-modal'), grid = $('#share-grid');
+    const touch = matchMedia('(hover: none)').matches || navigator.maxTouchPoints > 0;
+    let ctx = null;
+    const fill = (tpl, c) => tpl
+      .replace(/{url}/g, encodeURIComponent(c.url))
+      .replace(/{title}/g, encodeURIComponent(c.title))
+      .replace(/{text}/g, encodeURIComponent(c.text || c.title))
+      .replace(/{image}/g, encodeURIComponent(c.image || ''))
+      .replace(/{host}/g, encodeURIComponent((() => { try { return new URL(c.url).host; } catch (e) { return ''; } })()));
+    const readCtx = el => {
+      const bar = el.closest('[data-share-url]');
+      return bar ? { url: bar.dataset.shareUrl || location.href, title: bar.dataset.shareTitle || document.title, text: bar.dataset.shareText || '', image: bar.dataset.shareImage || '' }
+                 : { url: location.href, title: document.title, text: '', image: '' };
+    };
+    async function act(key, c) {
+      if (key === 'native') {
+        try { await navigator.share({ title: c.title, text: c.text || c.title, url: c.url }); } catch (e) { }
+        return true;
+      }
+      if (key === 'copy') {
+        try { await navigator.clipboard.writeText(c.url); } catch (e) { const t = document.createElement('textarea'); t.value = c.url; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (err) { } t.remove(); }
+        toast(window.ME_T && window.ME_T.copied || 'Link copied');
+        return true;
+      }
+      if (key === 'print') { window.print(); return true; }
+      return false;
+    }
+    // Native share tile only where the device can actually do it.
+    if (navigator.share && touch) $$('.sharetile--native').forEach(b => { b.hidden = false; });
+    document.addEventListener('click', async e => {
+      const t = e.target.closest('[data-share-do]'); if (!t) return;
+      const key = t.dataset.shareDo;
+      const c = t.closest('#share-modal') ? ctx : readCtx(t);
+      if (!c) return;
+      if (key === 'native' || key === 'copy' || key === 'print') { e.preventDefault(); await act(key, c); return; }
+      if (t.tagName !== 'A') { e.preventDefault(); const n = NETS[key]; if (n && n.url) window.open(fill(n.url, c), '_blank', 'noopener,width=680,height=640'); }
+    });
+    function render(filter) {
+      const q = (filter || '').trim().toLowerCase();
+      grid.innerHTML = Object.entries(NETS)
+        .filter(([k, n]) => k !== 'native' && (!n.mobile || touch) && (!q || n.label.toLowerCase().includes(q)))
+        .map(([k, n]) => `<a class="sharecard" ${n.url ? `href="${fill(n.url, ctx)}" target="_blank" rel="noopener nofollow"` : 'href="#"'} data-share-do="${k}" style="--b:${n.colour}"><span class="sharecard__i">${n.icon}</span><span>${esc(n.label)}</span></a>`).join('')
+        || `<p class="panel__note">Nothing matches that.</p>`;
+    }
+    $$('[data-share-more]').forEach(b => b.addEventListener('click', () => {
+      ctx = readCtx(b);
+      $('#share-url').value = ctx.url;
+      $('#share-what').textContent = ctx.title;
+      $('#share-filter').value = '';
+      render('');
+      modal.hidden = false; document.body.style.overflow = 'hidden';
+      setTimeout(() => $('#share-filter').focus(), 60);
+    }));
+    $('#share-filter')?.addEventListener('input', e => render(e.target.value));
+    $('#share-url')?.addEventListener('focus', e => e.target.select());
+    modal?.addEventListener('click', e => { if (e.target === modal || e.target.closest('[data-close]')) { modal.hidden = true; document.body.style.overflow = ''; } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal && !modal.hidden) { modal.hidden = true; document.body.style.overflow = ''; } });
+  })();
+
   /* ---------- advert rotors ---------- */
   (function () {
     const rotors = $$('[data-adrotor]'); if (!rotors.length) return;
@@ -265,10 +327,7 @@
       try { const j = await api('/api/story/' + id + '/confirm', { method: 'POST', body: new FormData() }); $('#confirm-count').textContent = j.confirmations; e.currentTarget.disabled = true; toast(j.corroborated ? 'Thanks — this report is now Corroborated' : 'Thanks — confirmation recorded'); }
       catch (err) { toast(err.message); }
     });
-    $('[data-share]')?.addEventListener('click', async e => {
-      const data = { title: e.currentTarget.dataset.title, url: location.href };
-      try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(location.href); toast('Link copied'); } } catch (err) { }
-    });
+
     $('#comment-form')?.addEventListener('submit', async e => {
       e.preventDefault();
       if (!window.ME.user) return showAuth('signin');

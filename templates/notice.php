@@ -32,7 +32,8 @@
       <?php if ($n['family_message']): ?><blockquote class="familymsg"><?= icon('quote') ?><?= nl2br(e($n['family_message'])) ?></blockquote><?php endif; ?>
       <?php if (!empty($x['club_notes'])): ?><div class="article__body"><h3>Club notes</h3><?= nl2br(e($x['club_notes'])) ?></div><?php endif; ?>
       <?php if ($n['url']): ?><p><a class="btn btn--primary" href="<?= e($n['url']) ?>" target="_blank" rel="noopener nofollow"><?= e($n['kind'] === 'job' ? 'Apply' : ($n['kind'] === 'event' ? 'Tickets & details' : 'More information')) ?> <?= icon('external') ?></a></p><?php endif; ?>
-      <div class="trust__actions"><button class="btn btn--ghost" type="button" data-share data-title="<?= e($n['title']) ?>"><?= icon('share') ?> Share</button><a class="btn btn--ghost" href="/notices/submit?kind=<?= e($n['kind']) ?>">Place a similar notice</a></div>
+      <div class="trust__actions"><a class="btn btn--ghost" href="/notices/submit?kind=<?= e($n['kind']) ?>">Place a similar notice</a></div>
+      <?= \MeNews\Support\Share::bar(['url' => absolute_url('/notices/' . $n['kind'] . '/' . $n['slug']), 'title' => $n['title'], 'text' => (string)($n['summary'] ?? ''), 'image' => '']) ?>
       <p class="form__legal">Placed by <?= e($n['contact_org'] ?: ($n['contact_name'] ?: 'a member of the community')) ?> · published <?= e(date_irish($n['published_at'])) ?>. Something wrong? <a href="/moderation#takedown">Ask for a correction or removal</a>.</p>
     </div>
     <aside class="side side--article">

@@ -1447,3 +1447,31 @@ font[style]{background:inherit!important;box-shadow:none!important}
 .map--notiles::after{content:"Map tiles unavailable — pins still show positions";position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:500;font:600 .7rem/1 var(--mono);color:var(--muted);background:var(--surface);padding:6px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;pointer-events:none}
 .map--failed{display:grid;place-items:center}
 .map--failed::after{content:"The map could not be loaded. Try refreshing.";font:600 .8rem/1.4 var(--body);color:var(--muted);text-align:center;padding:20px}
+
+/* =====================================================================
+   Sharing — self-hosted, no third-party widget
+   ===================================================================== */
+.sharebar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sharebar--row{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.sharebar--compact{margin:0}
+.sharebar__label{color:var(--muted);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;margin-right:2px}
+.sharebar--compact .sharebar__label{display:none}
+.sharetile{width:32px;height:32px;flex:none;border-radius:50%;display:inline-grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);transition:transform .18s cubic-bezier(.2,.8,.2,1),background .18s,color .18s,border-color .18s;cursor:pointer}
+.sharetile svg{width:15px;height:15px;display:block}
+.sharetile:hover,.sharetile:focus-visible{background:var(--b);border-color:var(--b);color:#fff;transform:translateY(-2px)}
+.sharetile--more:hover,.sharetile--more:focus-visible{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.sharebar--compact .sharetile{width:28px;height:28px}
+.sharebar--compact .sharetile svg{width:13px;height:13px}
+/* Snapchat's yellow needs dark ink at any size to stay readable */
+.sharetile[style*="#FFFC00"]:hover,.sharetile[style*="#FFFC00"]:focus-visible,.sharecard[style*="#FFFC00"] .sharecard__i{color:#1b1b1b}
+.sharelink{display:flex;gap:8px;margin:0 0 14px}
+.sharelink input{flex:1;min-width:0;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;color:var(--ink-2);font:500 .85rem/1.2 var(--mono)}
+.sharesearch{width:100%;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;color:var(--ink);font:500 .9rem var(--body);margin-bottom:14px}
+.sharegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.sharecard{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink-2);font-weight:600;font-size:.84rem;line-height:1.25;transition:.18s;min-width:0}
+.sharecard>span:last-child{min-width:0}
+.sharecard:hover{border-color:var(--b);background:color-mix(in srgb,var(--b) 10%,var(--surface));color:var(--ink);transform:translateY(-1px)}
+.sharecard__i{width:26px;height:26px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--b);color:#fff}
+.sharecard__i svg{width:14px;height:14px}
+@media print{.sharebar,#share-modal{display:none!important}}
+@media (max-width:600px){.sharegrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}}

@@ -291,6 +291,20 @@ $more = [
 <div class="newpill mono notranslate" id="new-stories" hidden><button type="button"><?= icon('refresh') ?> <?= e(t('New stories on the wire — refresh')) ?></button></div>
 <?= \MeNews\View::partial('partials/consent') ?>
 
+<!-- Share sheet: every network, built in the browser from the bar that opened it -->
+<div class="modal modal--sheet notranslate" id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-title" hidden>
+  <div class="modal__box modal__box--wide">
+    <header class="modal__head"><h2 id="share-title"><?= icon('share') ?> <?= e(t('Share')) ?></h2><button class="iconbtn" type="button" data-close aria-label="<?= e(t('Close')) ?>"><?= icon('close') ?></button></header>
+    <div class="modal__body">
+      <p class="modal__lede" id="share-what"></p>
+      <div class="sharelink"><input type="text" id="share-url" readonly aria-label="<?= e(t('Link')) ?>"><button class="btn btn--primary" type="button" data-share-do="copy"><?= e(t('Copy link')) ?></button></div>
+      <input class="sharesearch" type="search" id="share-filter" placeholder="<?= e(t('Search networks…')) ?>" aria-label="<?= e(t('Search networks')) ?>">
+      <div class="sharegrid" id="share-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>window.ME_SHARE=<?= json_encode(\MeNews\Support\Share::jsPayload(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
 <script>window.ME={located:<?= (Visitor::position() || Visitor::county()) ? 'true' : 'false' ?>,county:<?= json_encode($myCounty) ?>,user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
 <script src="/assets/js/menews.js?v=<?= e(ME_ASSETS) ?>" defer></script>
 <?php if ($gt): ?>

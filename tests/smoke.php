@@ -73,6 +73,9 @@ check('robots.txt lists both sitemaps', $s === 200 && substr_count($robots, 'Sit
 check('home page declares the publisher and feed autodiscovery', $s === 200 && str_contains($home, 'NewsMediaOrganization') && str_contains($home, 'application/feed+json') && str_contains($home, 'opensearchdescription'));
 [$s] = http('GET', '/feed/section/no-such.xml', [], [], false);
 check('unknown feed is a 404', $s === 404);
+[, $anyFeed] = http('GET', '/api/feed?limit=1');
+[$s, $storyShare] = http('GET', '/story/' . ($anyFeed['items'][0]['slug'] ?? 'x'), [], [], false);
+check('story pages carry share buttons and the network list', $s === 200 && str_contains($storyShare, 'sharebar') && str_contains($storyShare, 'data-share-more') && str_contains($storyShare, 'api.whatsapp.com') && str_contains($storyShare, 'window.ME_SHARE'));
 [$s, $mapHtml] = http('GET', '/', [], [], false);
 preg_match('/data-map="side" data-points=\'(.*?)\'/', $mapHtml, $mm);
 $mapPts = json_decode(html_entity_decode($mm[1] ?? '[]', ENT_QUOTES), true) ?: [];
