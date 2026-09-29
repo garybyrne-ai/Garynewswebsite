@@ -20,6 +20,11 @@
     { "key": "toi-chennai",        "name": "The Times of India",   "url": "https://timesofindia.indiatimes.com/rssfeeds/2950623.cms",     "category": "Local", "county": "Tamil Nadu",   "home": "https://timesofindia.indiatimes.com/city/chennai" },
     { "key": "toi-kolkata",        "name": "The Times of India",   "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128830821.cms", "category": "Local", "county": "West Bengal",  "home": "https://timesofindia.indiatimes.com/city/kolkata" },
     { "key": "toi-hyderabad",      "name": "The Times of India",   "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128816011.cms", "category": "Local", "county": "Telangana",    "home": "https://timesofindia.indiatimes.com/city/hyderabad" },
-    { "key": "toi-pune",           "name": "The Times of India",   "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128821991.cms", "category": "Local", "county": "Maharashtra",  "home": "https://timesofindia.indiatimes.com/city/pune" }
+    { "key": "toi-pune",           "name": "The Times of India",   "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128821991.cms", "category": "Local", "county": "Maharashtra",  "home": "https://timesofindia.indiatimes.com/city/pune" },
+    { "key": "hindu-himachal",     "name": "The Hindu",            "url": "https://www.thehindu.com/news/national/himachal-pradesh/feeder/default.rss", "category": "Local", "county": "Himachal Pradesh", "home": "https://www.thehindu.com/news/national/himachal-pradesh/" },
+    { "key": "hindu-assam",        "name": "The Hindu",            "url": "https://www.thehindu.com/news/national/assam/feeder/default.rss",           "category": "Local", "county": "Assam",            "home": "https://www.thehindu.com/news/national/assam/" },
+    { "key": "hindu-manipur",      "name": "The Hindu",            "url": "https://www.thehindu.com/news/national/manipur/feeder/default.rss",         "category": "Local", "county": "Manipur",          "home": "https://www.thehindu.com/news/national/manipur/" },
+    { "key": "hindu-kerala",       "name": "The Hindu",            "url": "https://www.thehindu.com/news/national/kerala/feeder/default.rss",          "category": "Local", "county": "Kerala",           "home": "https://www.thehindu.com/news/national/kerala/" },
+    { "key": "hindu-andhra",       "name": "The Hindu",            "url": "https://www.thehindu.com/news/national/andhra-pradesh/feeder/default.rss",   "category": "Local", "county": "Andhra Pradesh",   "home": "https://www.thehindu.com/news/national/andhra-pradesh/" }
   ]
 }

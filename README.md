@@ -39,7 +39,7 @@ Change every password before any public deployment (`ADMIN_PASSWORD`, `CONTRIBUT
 
 ## Real news: the wire
 
-`config/sources.json` lists 20 RSS feeds from The Times of India, Hindustan Times, The Hindu, The Indian Express, The Economic Times and city editions for Mumbai, Delhi, Bengaluru, Chennai, Kolkata, Hyderabad and Pune. The wire:
+`config/sources.json` lists 25 RSS feeds from The Times of India, Hindustan Times, The Hindu, The Indian Express and The Economic Times, including city/state editions spanning the north (Delhi, Himachal Pradesh), west (Mumbai, Pune), south (Bengaluru, Chennai, Hyderabad, Kerala, Andhra Pradesh), east (Kolkata) and the northeast (Assam, Manipur). The wire:
 
 - stores only the headline, standfirst, image reference, byline and publication time — every story links back to its publisher;
 - infers the section (National, Local, Business, Sport, Culture, Traffic, Council, What's On, World) and the state/town from the text;
