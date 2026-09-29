@@ -17,11 +17,12 @@ final class Lang
     public const LANGS = [
         'en-GB' => ['English (UK)', 'English (UK)', null, '🇬🇧'],
         'en-US' => ['English (US)', 'English (US)', null, '🇺🇸'],
-        'ga' => ['Irish', 'Gaeilge', 'ga', '🇮🇪'],
-        'pl' => ['Polish', 'Polski', 'pl', '🇵🇱'],
-        'de' => ['German', 'Deutsch', 'de', '🇩🇪'],
-        'uk' => ['Ukrainian', 'Українська', 'uk', '🇺🇦'],
-        'ru' => ['Russian', 'Русский', 'ru', '🇷🇺'],
+        'hi' => ['Hindi', 'हिन्दी', 'hi', '🇮🇳'],
+        'bn' => ['Bengali', 'বাংলা', 'bn', '🇮🇳'],
+        'te' => ['Telugu', 'తెలుగు', 'te', '🇮🇳'],
+        'mr' => ['Marathi', 'मराठी', 'mr', '🇮🇳'],
+        'ta' => ['Tamil', 'தமிழ்', 'ta', '🇮🇳'],
+        'ur' => ['Urdu', 'اردو', 'ur', '🇮🇳'],
     ];
 
     private static ?string $current = null;

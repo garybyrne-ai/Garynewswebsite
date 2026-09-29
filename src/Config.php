@@ -164,6 +164,6 @@ final class Config
 
     public static function appName(): string
     {
-        return self::get('APP_NAME', 'ME News Ireland');
+        return self::get('APP_NAME', 'Bharat Wire India');
     }
 }

@@ -2,7 +2,7 @@
 <article class="noticecard noticecard--<?= e($n['kind']) ?> <?= $n['promoted'] ? 'is-promoted' : '' ?> reveal">
   <span class="noticecard__kind mono"><?= icon($n['icon']) ?> <?= e($n['kind_label']) ?><?= $n['promoted'] ? ' · Promoted' : '' ?><?php if ($n['kind'] === 'pet' && !empty($x['pet_status'])): ?> · <?= e(ucfirst($x['pet_status'])) ?><?php endif; ?></span>
   <h3><a href="<?= e($n['url']) ?>"><?= e($n['title']) ?></a></h3>
-  <p class="noticecard__where"><?= icon('pin') ?> <?= e(($n['town'] ? $n['town'] . ', ' : '') . 'Co. ' . $n['county']) ?></p>
+  <p class="noticecard__where"><?= icon('pin') ?> <?= e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) ?></p>
   <?php if ($n['kind'] === 'death'): ?>
     <?php if ($n['date_of_death']): ?><p class="noticecard__line"><b>Died</b> <?= e(date('j F Y', strtotime($n['date_of_death']) ?: time())) ?></p><?php endif; ?>
     <?php if ($n['reposing']): ?><p class="noticecard__line"><b>Reposing</b> <?= e(excerpt($n['reposing'], 120)) ?></p><?php endif; ?>

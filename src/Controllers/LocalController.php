@@ -52,9 +52,9 @@ final class LocalController
         $rows = Notices::recent($filters, $per, ($page - 1) * $per);
         $total = Notices::count($filters);
         $meta = $kind ? Notices::KINDS[$kind] : null;
-        $where = $county ? 'Co. ' . $county : 'Ireland';
+        $where = $county ?: 'India';
         return View::page('notices', self::base([
-            'title' => ($meta ? $meta['plural'] : 'Deaths & notices') . ' · ' . $where . ' — ME News Ireland',
+            'title' => ($meta ? $meta['plural'] : 'Deaths & notices') . ' · ' . $where . ' — Bharat Wire India',
             'description' => $meta ? $meta['blurb'] . ' ' . $where . '.' : 'Death notices, in memoriam, events, local jobs, planning notices, lost pets and club results for ' . $where . ', updated all day.',
             'kind' => $kind, 'meta' => $meta, 'county' => $county, 'q' => $q,
             'rows' => $rows, 'total' => $total, 'page' => $page, 'pages' => (int)max(1, ceil($total / $per)),
@@ -73,8 +73,8 @@ final class LocalController
         $related = Notices::recent(['kind' => $n['kind'], 'county' => $n['county']], 6);
         $related = array_values(array_filter($related, static fn($x) => $x['id'] !== $n['id']));
         return View::page('notice', self::base([
-            'title' => $n['title'] . ' · ' . $n['kind_label'] . ' · Co. ' . $n['county'] . ' — ME News Ireland',
-            'description' => excerpt($n['body'] ?: ($n['kind_label'] . ' for ' . $n['title'] . ', ' . ($n['town'] ?: 'Co. ' . $n['county'])), 180),
+            'title' => $n['title'] . ' · ' . $n['kind_label'] . ' · Co. ' . $n['county'] . ' — Bharat Wire India',
+            'description' => excerpt($n['body'] ?: ($n['kind_label'] . ' for ' . $n['title'] . ', ' . ($n['town'] ?: $n['county'])), 180),
             'notice' => $n, 'related' => array_slice($related, 0, 5),
             'jsonld' => Notices::eventJsonLd($n),
             'bodyClass' => 'page-notices',
@@ -85,7 +85,7 @@ final class LocalController
     {
         $kind = $r->query('kind', 'death', 20);
         return View::page('notice-submit', self::base([
-            'title' => 'Place a notice — ME News Ireland',
+            'title' => 'Place a notice — Bharat Wire India',
             'description' => 'Place a death notice, in memoriam, event, job, planning notice, lost pet or club result. Free for families and clubs.',
             'kind' => Notices::kind($kind) ? $kind : 'death',
             'kinds' => Notices::KINDS, 'counties' => Locations::countyNames(), 'county' => Visitor::county(),
@@ -106,7 +106,7 @@ final class LocalController
     {
         $n = Notices::confirm($p['token']);
         return View::page('confirmed', self::base([
-            'title' => ($n ? 'Notice confirmed' : 'Link not found') . ' — ME News Ireland',
+            'title' => ($n ? 'Notice confirmed' : 'Link not found') . ' — Bharat Wire India',
             'heading' => $n ? 'Thanks, that’s confirmed.' : 'That link doesn’t match anything.',
             'text' => $n ? 'An editor will check “' . $n['title'] . '” and publish it, usually within a few hours. You’ll get an email when it’s live.' : 'The link may have been used already or copied incompletely. You can place the notice again.',
             'link' => '/notices', 'linkText' => 'Back to notices',
@@ -122,8 +122,8 @@ final class LocalController
         $warnings = Alerts::forCounty($county);
         $closures = Alerts::closures($county, 3);
         return View::page('alerts', self::base([
-            'title' => ($status ? $status . ' warning' : 'Weather warnings & school closures') . ($county ? ' · Co. ' . $county : ' · Ireland') . ' — ME News Ireland',
-            'description' => 'Met Éireann weather warnings by county and school closures submitted by principals' . ($county ? ' for County ' . $county : '') . '. Sign up for alerts by email.',
+            'title' => ($status ? $status . ' warning' : 'Weather warnings & school closures') . ($county ? ' · ' . $county : ' · India') . ' — Bharat Wire India',
+            'description' => 'Severe weather warnings by state and school closures submitted by principals' . ($county ? ' for ' . $county : '') . '. Sign up for alerts by email.',
             'county' => $county, 'status' => $status, 'warnings' => $warnings, 'closures' => $closures,
             'allWarnings' => Alerts::warnings(), 'counties' => Locations::countyNames(), 'kinds' => Alerts::KINDS,
             'whatsapp' => Database::setting('whatsapp_channel_' . slugify((string)$county)) ?: Database::setting('whatsapp_channel'),
@@ -143,7 +143,7 @@ final class LocalController
     {
         $s = Alerts::confirmSubscription($p['token']);
         return View::page('confirmed', self::base([
-            'title' => 'Alerts confirmed — ME News Ireland',
+            'title' => 'Alerts confirmed — Bharat Wire India',
             'heading' => $s ? 'You’re set up for Co. ' . $s['county'] . '.' : 'That link doesn’t match anything.',
             'text' => $s ? 'You’ll get: ' . implode(', ', array_map(static fn($k) => strtolower(Alerts::KINDS[$k] ?? $k), explode(',', $s['kinds']))) . '. Every email has a one-tap unsubscribe.' : 'The link may have been used already.',
             'link' => '/alerts' . ($s ? '?county=' . rawurlencode($s['county']) : ''), 'linkText' => 'Alerts for your county',
@@ -154,10 +154,10 @@ final class LocalController
     {
         $s = Alerts::unsubscribe($p['token']);
         return View::page('confirmed', self::base([
-            'title' => 'Unsubscribed — ME News Ireland',
+            'title' => 'Unsubscribed — Bharat Wire India',
             'heading' => $s ? 'Unsubscribed.' : 'That link doesn’t match anything.',
             'text' => $s ? 'No more emails for Co. ' . $s['county'] . '. Changed your mind? Sign up again any time.' : '',
-            'link' => '/', 'linkText' => 'Back to ME News',
+            'link' => '/', 'linkText' => 'Back to Bharat Wire',
         ]));
     }
 
@@ -172,7 +172,7 @@ final class LocalController
     {
         $c = Alerts::confirmClosure($p['token']);
         return View::page('confirmed', self::base([
-            'title' => 'Closure confirmed — ME News Ireland',
+            'title' => 'Closure confirmed — Bharat Wire India',
             'heading' => $c ? $c['school'] . ' is now listed as closed.' : 'That link doesn’t match anything.',
             'text' => $c ? 'Parents in Co. ' . $c['county'] . ' who asked for closure alerts have been emailed. Email us if the school reopens earlier than planned.' : '',
             'link' => '/alerts' . ($c ? '?county=' . rawurlencode($c['county']) : ''), 'linkText' => 'See the closures list',
@@ -194,7 +194,7 @@ final class LocalController
         $poll = Polls::current($county);
         $past = Database::all("SELECT id,week,question,closes_at FROM polls WHERE status<>'open' OR closes_at<? ORDER BY week DESC LIMIT 8", [now()]);
         return View::page('poll', self::base([
-            'title' => ($poll ? $poll['question'] : 'Weekly county poll') . ' — ME News Ireland',
+            'title' => ($poll ? $poll['question'] : 'Weekly county poll') . ' — Bharat Wire India',
             'description' => 'This week’s county poll and the county-by-county breakdown.',
             'poll' => $poll, 'county' => $county, 'past' => $past, 'counties' => Locations::countyNames(),
         ]));
@@ -239,7 +239,7 @@ final class LocalController
             }
         }
         if (!$county) {
-            throw new HttpException(404, 'County not found');
+            throw new HttpException(404, 'State not found');
         }
         return Response::html(Digest::html($county, 'preview'));
     }

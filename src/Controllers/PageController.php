@@ -44,10 +44,10 @@ final class PageController
             }
         }
         $community = Stories::feed(['kind' => 'community'], 4);
-        $leadKicker = $hero && $county && $hero['county'] === $county ? 'Lead story · Co. ' . e($county) : ($hero && $hero['is_featured'] ? 'Editor\'s pick' : 'Lead story · Ireland');
+        $leadKicker = $hero && $county && $hero['county'] === $county ? 'Lead story · ' . e($county) : ($hero && $hero['is_featured'] ? 'Editor\'s pick' : 'Lead story · India');
         return View::page('home', self::base([
-            'title' => ($county ? $county . ' news today — ' : '') . 'ME News Ireland — Your Community. Your News. Live.',
-            'description' => ($county ? 'Local news, deaths and notices, school closures and weather warnings for County ' . $county . ', plus ' : 'Ireland-wide news, county-by-county reporting and community stories, ') . 'the stories Ireland is voting for on the Signal.',
+            'title' => ($county ? $county . ' news today — ' : '') . 'Bharat Wire India — Your Community. Your News. Live.',
+            'description' => ($county ? 'Local news, deaths and notices, school closures and weather warnings for ' . $county . ', plus ' : 'India-wide news, state-by-state reporting and community stories, ') . 'the stories India is voting for on the Signal.',
             'hero' => $hero,
             'leadKicker' => $leadKicker,
             'latest' => $latest,
@@ -79,7 +79,7 @@ final class PageController
             'signalStats' => \MeNews\Services\Signal::stats(),
             'canonical' => absolute_url('/'),
             'jsonld' => ['@context' => 'https://schema.org', '@graph' => [
-                ['@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'publisher' => ['@id' => absolute_url('/#organization')], 'potentialAction' => ['@type' => 'SearchAction', 'target' => absolute_url('/search?q={search_term_string}'), 'query-input' => 'required name=search_term_string']],
+                ['@type' => 'WebSite', 'name' => 'Bharat Wire India', 'url' => absolute_url('/'), 'publisher' => ['@id' => absolute_url('/#organization')], 'potentialAction' => ['@type' => 'SearchAction', 'target' => absolute_url('/search?q={search_term_string}'), 'query-input' => 'required name=search_term_string']],
                 \MeNews\Services\Feeds::organization(),
             ]],
             'bodyClass' => 'page-home' . ($county ? ' has-county' : ''),
@@ -111,11 +111,11 @@ final class PageController
             ];
         }
         return View::page('listing', self::base($extra + [
-            'title' => $name . ' — ME News Ireland',
+            'title' => $name . ' — Bharat Wire India',
             'description' => Categories::ALL[$name]['blurb'],
             'heading' => $name,
             'kicker' => 'Section',
-            'blurb' => Categories::ALL[$name]['blurb'] . ($cutoff ? ' Showing the last ' . \MeNews\Services\Membership::archiveDays() . ' days; ME+ members read the full archive.' : ''),
+            'blurb' => Categories::ALL[$name]['blurb'] . ($cutoff ? ' Showing the last ' . \MeNews\Services\Membership::archiveDays() . ' days; Wire+ members read the full archive.' : ''),
             'icon' => Categories::ALL[$name]['icon'],
             'rows' => $rows,
             'page' => $page,
@@ -138,7 +138,7 @@ final class PageController
             }
         }
         if ($county === null) {
-            throw new HttpException(404, 'County not found');
+            throw new HttpException(404, 'State not found');
         }
         $page = $r->int('page', 1, 1, 200);
         $per = 24;
@@ -152,15 +152,15 @@ final class PageController
         $events = \MeNews\Services\Notices::recent(['county' => $county, 'kind' => 'event', 'upcoming' => true], 3);
         $warning = \MeNews\Services\Alerts::headline($county);
         $closures = \MeNews\Services\Alerts::closures($county, 1);
-        $intro = 'County ' . $county . ' news from ME News Ireland: ' . ($week ? $week . ' stories this week' : 'the latest stories') . ' across ' . count($towns) . ' towns and villages in ' . ($province ?: 'Ireland')
+        $intro = $county . ' news from Bharat Wire India: ' . ($week ? $week . ' stories this week' : 'the latest stories') . ' across ' . count($towns) . ' towns and villages in ' . ($province ?: 'India')
             . ($topTowns ? ', busiest lately in ' . implode(', ', array_map(static fn($t) => $t['location_name'], array_slice($topTowns, 0, 3))) : '')
-            . '. Alongside the wire from RTÉ, the Irish Times, TheJournal and the local press, this page carries what nobody else publishes for ' . possessive($county) . ' communities: death notices and funeral arrangements, school closures and Met Éireann warnings, club results, planning notices and reports from neighbours on the ground.';
+            . '. Alongside the wire from The Times of India, Hindustan Times, The Hindu and the local press, this page carries what nobody else publishes for ' . possessive($county) . ' communities: death notices and funeral arrangements, school closures and severe weather warnings, club results, planning notices and reports from neighbours on the ground.';
         return View::page('listing', self::base([
-            'title' => $county . ' news today: local stories, deaths, school closures & alerts — ME News Ireland',
-            'description' => 'Local news for County ' . $county . ' updated all day, plus death notices, school closures, weather warnings, planning notices, club results and community reports from ' . implode(', ', array_slice($towns, 0, 4)) . ' and every town in the county.',
+            'title' => $county . ' news today: local stories, deaths, school closures & alerts — Bharat Wire India',
+            'description' => 'Local news for ' . $county . ' updated all day, plus death notices, school closures, weather warnings, planning notices, club results and community reports from ' . implode(', ', array_slice($towns, 0, 4)) . ' and every town in the state.',
             'canonical' => absolute_url('/county/' . $p['slug'] . ($page > 1 ? '?page=' . $page : '')),
-            'heading' => 'Co. ' . $county,
-            'kicker' => ($province ?: 'County') . ' · ' . count($towns) . ' towns',
+            'heading' => $county,
+            'kicker' => ($province ?: 'State') . ' · ' . count($towns) . ' towns',
             'blurb' => $intro,
             'icon' => 'pin',
             'rows' => $rows,
@@ -173,15 +173,15 @@ final class PageController
             'banner' => self::banner($county, '', 'county'),
             'county' => $county,
             'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
-            'feedLinks' => [['/feed/county/' . $p['slug'] . '.xml', 'Co. ' . $county]],
-            'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => 'County ' . $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'ME News Ireland', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => 'County ' . $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'Ireland']]],
+            'feedLinks' => [['/feed/county/' . $p['slug'] . '.xml', $county]],
+            'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'Bharat Wire India', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'India']]],
         ]));
     }
 
     /** RFC 9116 contact for security researchers. */
     public static function securityTxt(Request $r): Response
     {
-        $contact = Database::setting('security_contact') ?: Database::setting('contact_email') ?: \MeNews\Config::get('MAIL_FROM', 'security@menews.ie');
+        $contact = Database::setting('security_contact') ?: Database::setting('contact_email') ?: \MeNews\Config::get('MAIL_FROM', 'security@bharatwire.in');
         $lines = [
             'Contact: mailto:' . $contact,
             'Expires: ' . gmdate('Y-m-d\TH:i:s\Z', strtotime('+1 year')),
@@ -198,11 +198,11 @@ final class PageController
         $cutoff = \MeNews\Services\Membership::archiveCutoff(Auth::user());
         $rows = $q !== '' ? Stories::feed(['q' => $q, 'since' => $cutoff], 40) : [];
         return View::page('listing', self::base([
-            'title' => ($q !== '' ? '“' . $q . '” — ' : '') . 'Search — ME News Ireland',
-            'description' => 'Search every published story on ME News Ireland.',
+            'title' => ($q !== '' ? '“' . $q . '” — ' : '') . 'Search — Bharat Wire India',
+            'description' => 'Search every published story on Bharat Wire India.',
             'heading' => $q !== '' ? '“' . $q . '”' : 'Search',
             'kicker' => 'Search',
-            'blurb' => $q !== '' ? count($rows) . ' result' . (count($rows) === 1 ? '' : 's') . ' across the wire and community desk' . ($cutoff ? ' from the last ' . \MeNews\Services\Membership::archiveDays() . ' days — ME+ members search the full archive' : '') : 'Search stories, towns and counties.',
+            'blurb' => $q !== '' ? count($rows) . ' result' . (count($rows) === 1 ? '' : 's') . ' across the wire and community desk' . ($cutoff ? ' from the last ' . \MeNews\Services\Membership::archiveDays() . ' days — Wire+ members search the full archive' : '') : 'Search stories, towns and counties.',
             'icon' => 'search',
             'rows' => $rows,
             'page' => 1,
@@ -233,13 +233,13 @@ final class PageController
             'robots' => $isWire ? 'noindex,follow' : null,
             'cluster' => \MeNews\Services\Clusters::get($story['cluster_id'] ?? null),
             'members' => \MeNews\Services\Clusters::members($story['cluster_id'] ?? null, $story['id']),
-            'title' => $story['title'] . ' — ME News Ireland',
+            'title' => $story['title'] . ' — Bharat Wire India',
             'description' => excerpt($story['summary'] ?: $story['body'], 200),
             'ogImage' => $story['image'],
             'story' => $story,
             'author' => $author,
             'archived' => $archived,
-            'feedLinks' => [['/feed/section/' . Categories::slug((string)$story['category']) . '.xml', $story['category']], $story['county'] ? ['/feed/county/' . slugify($story['county']) . '.xml', 'Co. ' . $story['county']] : null],
+            'feedLinks' => [['/feed/section/' . Categories::slug((string)$story['category']) . '.xml', $story['category']], $story['county'] ? ['/feed/county/' . slugify($story['county']) . '.xml', $story['county']] : null],
             'robots' => $isWire ? 'noindex,follow' : ($archived ? 'noindex,follow' : null),
             'comments' => Stories::comments($story['id']),
             'confirmations' => Stories::confirmations($story['id']),
@@ -257,8 +257,8 @@ final class PageController
     {
         $locality = \MeNews\Support\Visitor::locality(24);
         return View::page('near', self::base([
-            'title' => ($locality['mode'] === 'none' ? 'Near me' : $locality['title']) . ' — ME News Ireland',
-            'description' => 'Local stories for wherever you are in Ireland, chosen by your location.',
+            'title' => ($locality['mode'] === 'none' ? 'Near me' : $locality['title']) . ' — Bharat Wire India',
+            'description' => 'Local stories for wherever you are in India, chosen by your location.',
             'locality' => $locality,
             'counties' => Locations::countyNames(),
             'mapPoints' => $locality['position'] ? array_values(array_filter($locality['stories'], static fn($s) => $s['latitude'] !== null)) : [],
@@ -269,7 +269,7 @@ final class PageController
     public static function map(Request $r): Response
     {
         return View::page('map', self::base([
-            'title' => 'Live map — ME News Ireland',
+            'title' => 'Live map — Bharat Wire India',
             'description' => 'Every published story pinned across the island, from the wire and the community desk.',
             'points' => Stories::mapPoints(300),
             'counties' => Stories::countyPoints(),
@@ -288,13 +288,13 @@ final class PageController
             }
         }
         if ($county === null) {
-            throw new HttpException(404, 'County not found');
+            throw new HttpException(404, 'State not found');
         }
         $points = array_values(array_filter(Stories::mapPoints(400), static fn($pt) => $pt['county'] === $county));
         $centre = \MeNews\Support\Geo::county($county);
         return View::page('map', self::base([
-            'title' => $county . ' news map: every story in County ' . $county . ', placed — ME News Ireland',
-            'description' => 'A live map of County ' . $county . ': wire stories by town, community reports where they were filed, filtered by section and time.',
+            'title' => $county . ' news map: every story in ' . $county . ', placed — Bharat Wire India',
+            'description' => 'A live map of ' . $county . ': wire stories by town, community reports where they were filed, filtered by section and time.',
             'points' => $points,
             'counties' => array_values(array_filter(Stories::countyPoints(), static fn($cp) => $cp['county'] === $county)),
             'colours' => \MeNews\Support\Geo::COLOURS,
@@ -320,8 +320,8 @@ final class PageController
     public static function contributorsPage(Request $r): Response
     {
         return View::page('contributors', self::base([
-            'title' => 'Contributors — ME News Ireland',
-            'description' => 'Meet the ME News Ireland editorial team.',
+            'title' => 'Contributors — Bharat Wire India',
+            'description' => 'Meet the Bharat Wire India editorial team.',
             'contributors' => self::contributors(),
         ]));
     }
@@ -339,7 +339,7 @@ final class PageController
         $c['curated'] = Database::count("SELECT COUNT(*) FROM stories WHERE author_user_id=? AND status='published' AND kind='wire'", [$c['id']]);
         $c['reported'] = $total - $c['curated'];
         return View::page('contributor', self::base([
-            'title' => $c['display_name'] . ' — ME News Ireland',
+            'title' => $c['display_name'] . ' — Bharat Wire India',
             'description' => $c['title'] . '. ' . excerpt($c['bio'], 150),
             'contributor' => $c,
             'rows' => $rows,
@@ -353,15 +353,15 @@ final class PageController
     public static function about(Request $r): Response
     {
         return View::page('about', self::base([
-            'title' => 'How ME News works — ME News Ireland',
-            'description' => 'The ME Trust Engine, editorial labels, our sources and how community reporting is screened.',
+            'title' => 'How Bharat Wire works — Bharat Wire India',
+            'description' => 'The Wire Trust Engine, editorial labels, our sources and how community reporting is screened.',
             'sources' => NewsWire::sources(),
             'runs' => Database::installed() ? Database::all('SELECT * FROM wire_runs ORDER BY id DESC LIMIT 16') : [],
             'contributors' => self::contributors(),
             'pulse' => Stories::pulse(),
             'jsonld' => ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => [
-                ['@type' => 'Question', 'name' => 'What does the Wire label mean?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'A headline from an established Irish publisher, curated by our desk and linked to the original. ME has not independently checked it.']],
-                ['@type' => 'Question', 'name' => 'What does Verified mean on ME News?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'An ME editor contacted the reporter, examined the media and location, and the facts stood up. Never applied to wire headlines.']],
+                ['@type' => 'Question', 'name' => 'What does the Wire label mean?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'A headline from an established Indian publisher, curated by our desk and linked to the original. Bharat Wire has not independently checked it.']],
+                ['@type' => 'Question', 'name' => 'What does Verified mean on Bharat Wire?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'A Bharat Wire editor contacted the reporter, examined the media and location, and the facts stood up. Never applied to wire headlines.']],
                 ['@type' => 'Question', 'name' => 'What is a Corroborated report?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'A community report that three separate people have independently confirmed with “I saw this too”.']],
                 ['@type' => 'Question', 'name' => 'Do I need an account to report something?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'No. A first report needs only a name and an email or mobile number, confirmed by a one-tap link; an editor reads every report before it appears.']],
             ]],
@@ -371,15 +371,15 @@ final class PageController
     public static function plus(Request $r): Response
     {
         return View::page('plus', self::base([
-            'title' => 'ME+ membership — ME News Ireland',
-            'description' => 'Follow up to ten local areas, receive local alerts first and support independent Irish community journalism.',
+            'title' => 'Wire+ membership — Bharat Wire India',
+            'description' => 'Follow up to ten local areas, receive local alerts first and support independent Indian community journalism.',
             'priceLabel' => \MeNews\Services\Membership::priceLabel(),
             'annualLabel' => \MeNews\Services\Membership::annualLabel(),
             'benefits' => \MeNews\Services\Membership::benefits(),
             'isPlus' => \MeNews\Services\Membership::isPlus(Auth::user()),
             'archiveDays' => \MeNews\Services\Membership::archiveDays(),
             'stripe' => \MeNews\Services\Stripe::configured(),
-            'memberCount' => Database::count("SELECT COUNT(*) FROM users WHERE plan='ME+'"),
+            'memberCount' => Database::count("SELECT COUNT(*) FROM users WHERE plan='Wire+'"),
             'bodyClass' => 'page-plus',
         ]));
     }
@@ -390,7 +390,7 @@ final class PageController
             return Response::redirect('/?auth=signin&next=/dashboard');
         }
         return View::page('dashboard', self::base([
-            'title' => 'My dashboard — ME News Ireland',
+            'title' => 'My dashboard — Bharat Wire India',
             'description' => 'Your reports, followed areas, membership and notifications.',
             'counties' => Locations::countyNames(),
             'categories' => Categories::community(),
@@ -401,7 +401,7 @@ final class PageController
     public static function newsroom(Request $r): Response
     {
         return View::page('newsroom', self::base([
-            'title' => 'Newsroom — ME News Ireland',
+            'title' => 'Newsroom — Bharat Wire India',
             'description' => 'Editorial review queue and administration.',
             'labels' => Categories::LABELS,
             'categories' => Categories::names(),
@@ -512,7 +512,7 @@ final class PageController
     public static function feedsPage(Request $r): Response
     {
         return View::page('feeds', self::base([
-            'title' => 'Feeds & syndication — ME News Ireland',
+            'title' => 'Feeds & syndication — Bharat Wire India',
             'description' => 'RSS, Atom and JSON feeds for every section and county, plus the Google News sitemap and original-reporting feed.',
             'feeds' => \MeNews\Services\Feeds::catalogue(),
         ]));

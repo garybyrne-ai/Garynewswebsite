@@ -1,8 +1,8 @@
 <?php $k = $kind; ?>
 <section class="container pagehead pagehead--narrow">
   <span class="kicker">Place a notice</span>
-  <h1 class="pagehead__title">Tell your <em>county.</em></h1>
-  <p class="pagehead__blurb">Death notices, in memoriam, events, jobs, planning notices, lost pets and club results. No account needed: confirm from your email, an editor checks it, and it is emailed to everyone in the county who asked for alerts. Free while ME News grows in your county.</p>
+  <h1 class="pagehead__title">Tell your <em>state.</em></h1>
+  <p class="pagehead__blurb">Death notices, in memoriam, events, jobs, planning notices, lost pets and club results. No account needed: confirm from your email, an editor checks it, and it is emailed to everyone in the state who asked for alerts. Free while Bharat Wire grows in your state.</p>
 </section>
 <div class="container layout">
   <div class="layout__main">
@@ -14,7 +14,7 @@
       <label><span data-title-label>Full name of the deceased</span><input name="title" required maxlength="160" placeholder=""></label>
       <div class="form__row">
         <label>Town / parish<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Rathdrum"></label>
-        <label>County<select name="county" required data-county-select><option value="">Select county</option><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select></label>
+        <label>State<select name="county" required data-county-select><option value="">Select state</option><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select></label>
       </div>
 
       <fieldset data-for="death memoriam" class="noticeform__group">
@@ -38,14 +38,14 @@
         </div>
         <div class="form__row">
           <label>Venue<input name="venue" placeholder="e.g. Arklow Bay Hotel"></label>
-          <label>Price<input name="price" placeholder="e.g. Free · €10 · €5 kids"></label>
+          <label>Price<input name="price" placeholder="e.g. Free · ₹500 · ₹200 kids"></label>
         </div>
       </fieldset>
 
       <fieldset data-for="job" class="noticeform__group">
         <div class="form__row">
           <label>Employer<input name="contact_org_job" placeholder="e.g. Byrne's Hardware"></label>
-          <label>Pay / hours<input name="price" placeholder="e.g. €14.50/hr, 30 hrs"></label>
+          <label>Pay / hours<input name="price" placeholder="e.g. ₹300/hr, 30 hrs"></label>
         </div>
       </fieldset>
 
@@ -83,10 +83,10 @@
   </div>
   <aside class="side">
     <section class="panel reveal"><header class="panel__head"><span class="kicker">How it works</span></header>
-      <ol class="howlist"><li><b>Fill it in</b> — two minutes, no account.</li><li><b>Confirm by email</b> — one tap from the address you gave.</li><li><b>An editor checks it</b> — usually within the hour in the daytime.</li><li><b>It goes live and out by email</b> to everyone in the county who asked for alerts.</li></ol>
+      <ol class="howlist"><li><b>Fill it in</b> — two minutes, no account.</li><li><b>Confirm by email</b> — one tap from the address you gave.</li><li><b>An editor checks it</b> — usually within the hour in the daytime.</li><li><b>It goes live and out by email</b> to everyone in the state who asked for alerts.</li></ol>
     </section>
     <section class="panel reveal"><header class="panel__head"><span class="kicker">Pricing</span></header>
-      <p class="panel__note" style="margin:0">Death notices, in memoriam, club results and lost pets are free. Events and jobs are free to list; a <b>promoted</b> slot at the top of the county for 30 days is available from the newsroom.</p>
+      <p class="panel__note" style="margin:0">Death notices, in memoriam, club results and lost pets are free. Events and jobs are free to list; a <b>promoted</b> slot at the top of the state for 30 days is available from the newsroom.</p>
     </section>
   </aside>
 </div>

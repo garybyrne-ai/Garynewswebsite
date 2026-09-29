@@ -46,21 +46,21 @@ final class Visitor
         $pos = self::position();
         if ($pos) {
             $place = Geo::nearest($pos['lat'], $pos['lng']);
-            if ($place['in_ireland']) {
+            if ($place['in_india']) {
                 $radius = 40;
                 $stories = \MeNews\Stories::near($pos['lat'], $pos['lng'], $radius, $limit, $place['county']);
                 if (count($stories) < 4) {
                     $radius = 80;
                     $stories = \MeNews\Stories::near($pos['lat'], $pos['lng'], $radius, $limit, $place['county']);
                 }
-                $title = $place['town'] ? $place['town'] . ', Co. ' . $place['county'] : 'Co. ' . $place['county'];
+                $title = $place['town'] ? $place['town'] . ', ' . $place['county'] : $place['county'];
                 return ['mode' => 'gps', 'place' => $place, 'stories' => $stories, 'radius' => $radius, 'county' => $place['county'], 'title' => $title, 'position' => $pos];
             }
-            return ['mode' => 'abroad', 'place' => $place, 'stories' => [], 'radius' => 0, 'county' => null, 'title' => 'Outside Ireland', 'position' => $pos];
+            return ['mode' => 'abroad', 'place' => $place, 'stories' => [], 'radius' => 0, 'county' => null, 'title' => 'Outside India', 'position' => $pos];
         }
         $county = self::county();
         if ($county) {
-            return ['mode' => 'county', 'place' => null, 'stories' => \MeNews\Stories::feed(['county' => $county], $limit), 'radius' => 0, 'county' => $county, 'title' => 'Co. ' . $county, 'position' => null];
+            return ['mode' => 'county', 'place' => null, 'stories' => \MeNews\Stories::feed(['county' => $county], $limit), 'radius' => 0, 'county' => $county, 'title' => $county, 'position' => null];
         }
         return ['mode' => 'none', 'place' => null, 'stories' => [], 'radius' => 0, 'county' => null, 'title' => 'Near you', 'position' => null];
     }

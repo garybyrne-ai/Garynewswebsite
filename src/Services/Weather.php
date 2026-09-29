@@ -7,14 +7,14 @@ use MeNews\Config;
 use Throwable;
 
 /**
- * Today's weather across Ireland from Open-Meteo (free, no key). Cached for 30 minutes;
+ * Today's weather across India from Open-Meteo (free, no key). Cached for 30 minutes;
  * a stale cache is used when the service is unreachable so pages never wait.
  */
 final class Weather
 {
     public const CITIES = [
-        ['Dublin', 53.35, -6.26], ['Cork', 51.90, -8.47], ['Galway', 53.27, -9.05], ['Limerick', 52.66, -8.63],
-        ['Belfast', 54.60, -5.93], ['Sligo', 54.27, -8.47], ['Waterford', 52.26, -7.11], ['Letterkenny', 54.95, -7.73],
+        ['Delhi', 28.61, 77.21], ['Mumbai', 19.08, 72.88], ['Bengaluru', 12.97, 77.59], ['Kolkata', 22.57, 88.36],
+        ['Chennai', 13.08, 80.27], ['Hyderabad', 17.39, 78.49], ['Jaipur', 26.91, 75.79], ['Guwahati', 26.14, 91.74],
     ];
 
     private const CODES = [
@@ -64,7 +64,7 @@ final class Weather
             'latitude' => $lat, 'longitude' => $lng,
             'current' => 'temperature_2m,weather_code,wind_speed_10m',
             'daily' => 'sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code',
-            'timezone' => 'Europe/Dublin', 'forecast_days' => 1,
+            'timezone' => 'Asia/Kolkata', 'forecast_days' => 1,
         ]);
         $raw = Remote::get($url, ['Accept: application/json'], 8);
         $data = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
@@ -82,11 +82,11 @@ final class Weather
                 'label' => $label, 'icon' => $icon, 'code' => $code,
             ];
         }
-        $dublin = $rows[0];
+        $primary = $rows[0];
         return [
             'updated' => now(),
-            'sunrise' => substr((string)($dublin['daily']['sunrise'][0] ?? ''), 11, 5),
-            'sunset' => substr((string)($dublin['daily']['sunset'][0] ?? ''), 11, 5),
+            'sunrise' => substr((string)($primary['daily']['sunrise'][0] ?? ''), 11, 5),
+            'sunset' => substr((string)($primary['daily']['sunset'][0] ?? ''), 11, 5),
             'cities' => $cities,
             'source' => 'Open-Meteo',
         ];

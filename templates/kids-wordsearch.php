@@ -7,7 +7,7 @@
       <div class="puzzle__levels"><button class="btn btn--sm btn--ghost" type="button" onclick="window.print()">Print</button></div>
     </div>
     <div class="puzzle__bar"><span class="mono" data-timer>00:00</span><span class="mono" data-progress>0 / <?= count($p['words']) ?> found</span><span class="puzzle__actions"><button class="btn btn--sm btn--ghost" type="button" data-hint>Hint</button><button class="btn btn--sm btn--ghost" type="button" data-clear>Clear</button></span></div>
-    <div class="puzzle__done" data-done hidden>🎉 <b>Maith thú!</b> All <?= count($p['words']) ?> words found.</div>
+    <div class="puzzle__done" data-done hidden>🎉 <b>Shabaash!</b> All <?= count($p['words']) ?> words found.</div>
     <div class="ws">
       <div class="ws__grid" data-grid style="--n:<?= (int)$p['size'] ?>" aria-label="Word search grid">
         <?php foreach ($p['grid'] as $r => $row): foreach ($row as $c => $ch): ?><div class="ws-cell" data-r="<?= $r ?>" data-c="<?= $c ?>"><?= e($ch) ?></div><?php endforeach; endforeach; ?>

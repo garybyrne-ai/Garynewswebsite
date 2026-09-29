@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Install — ME News Ireland</title>
+<title>Install — Bharat Wire India</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_ASSETS) ?>">
@@ -13,13 +13,13 @@
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="gridlines" aria-hidden="true"></div>
 <main class="install">
-  <a class="brand" href="/" style="margin-bottom:18px"><svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg><span class="brand__word"><b>ME</b> News<small>Ireland</small></span></a>
+  <a class="brand" href="/" style="margin-bottom:18px"><svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg><span class="brand__word"><b>Bharat</b> Wire<small>India</small></span></a>
 
   <?php if ($result): ?>
     <section class="panel">
       <span class="kicker">Installed</span>
-      <h1>ME News is live.</h1>
-      <p class="lede"><?= (int)$result['stories'] ?> real Irish stories are published (<?= (int)$result['wire']['snapshot'] ?> from the bundled snapshot<?= $result['wire']['live'] ? ', ' . (int)$result['wire']['live'] . ' fresh from the live wire' : '' ?>). Save these details now — passwords are shown only once.</p>
+      <h1>Bharat Wire is live.</h1>
+      <p class="lede"><?= (int)$result['stories'] ?> real Indian stories are published (<?= (int)$result['wire']['snapshot'] ?> from the bundled snapshot<?= $result['wire']['live'] ? ', ' . (int)$result['wire']['live'] . ' fresh from the live wire' : '' ?>). Save these details now — passwords are shown only once.</p>
       <div class="cred"><span>Administrator / newsroom</span><code><?= e($result['email']) ?></code></div>
       <?php foreach ($result['contributors'] as $name => $pw): ?>
         <div class="cred"><span><?= e($name) ?></span><code><?= $pw === null ? 'existing account' : e($pw) ?></code></div>
@@ -36,8 +36,8 @@
   <?php else: ?>
     <section class="panel">
       <span class="kicker">Setup</span>
-      <h1>Install ME News Ireland</h1>
-      <p class="lede">One form. This writes your configuration, creates the SQLite database, the administrator, five desk editors and loads today's Irish news.</p>
+      <h1>Install Bharat Wire India</h1>
+      <p class="lede">One form. This writes your configuration, creates the SQLite database, the administrator, five desk editors and loads today's Indian news.</p>
 
       <div style="margin-bottom:20px">
         <div class="check"><span class="<?= PHP_VERSION_ID >= 80200 ? 'is-good' : 'is-bad' ?>">●</span> PHP <?= e(PHP_VERSION) ?><?= PHP_VERSION_ID >= 80200 ? '' : ' — 8.2 or newer required' ?></div>
@@ -57,8 +57,8 @@
           <label>Mode<select name="app_env"><option value="production" <?= $values['APP_ENV'] === 'production' ? 'selected' : '' ?>>Production</option><option value="development" <?= $values['APP_ENV'] === 'development' ? 'selected' : '' ?>>Development</option></select></label>
           <label>News wire<select name="load_live"><option value="1">Load bundled + live news now</option><option value="0">Bundled snapshot only</option></select></label>
         </div>
-        <button class="btn btn--primary btn--block" type="submit">Install ME News</button>
-        <p class="form__legal">Installation takes 10–30 seconds while the wire fetches from RTÉ, The Irish Times, TheJournal.ie and the other sources. This page disappears once the site is installed.</p>
+        <button class="btn btn--primary btn--block" type="submit">Install Bharat Wire</button>
+        <p class="form__legal">Installation takes 10–30 seconds while the wire fetches from The Times of India, Hindustan Times, The Hindu and the other sources. This page disappears once the site is installed.</p>
       </form>
     </section>
   <?php endif; ?>

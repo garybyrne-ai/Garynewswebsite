@@ -1,7 +1,7 @@
 <section class="container pagehead pagehead--narrow">
-  <span class="kicker">How ME works</span>
+  <span class="kicker">How Bharat Wire works</span>
   <h1 class="pagehead__title">Built for trust, <em>not for clicks.</em></h1>
-  <p class="pagehead__blurb">ME News Ireland combines two streams: a live wire of headlines from established Irish publishers, and community reports from the people who live where the news happens. Both pass through the same editorial labels.</p>
+  <p class="pagehead__blurb">Bharat Wire India combines two streams: a live wire of headlines from established Indian publishers, and community reports from the people who live where the news happens. Both pass through the same editorial labels.</p>
 </section>
 <div class="container prose">
   <div class="steps">

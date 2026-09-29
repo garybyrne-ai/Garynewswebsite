@@ -15,7 +15,7 @@
       <label>Supporting line <small class="mono" data-count="body">0/120</small><input name="body" maxlength="120" placeholder="What you offer, where, from how much"></label>
       <div class="form__row">
         <label>Button text<input name="cta" maxlength="22" value="Learn more"></label>
-        <label>Badge (optional)<input name="badge" maxlength="18" placeholder="e.g. From €29"></label>
+        <label>Badge (optional)<input name="badge" maxlength="18" placeholder="e.g. From ₹499"></label>
       </div>
       <fieldset class="designer__templates">
         <legend class="mono">Template</legend>
@@ -35,7 +35,7 @@
       </div>
       <input type="hidden" name="remove_logo" value="0"><input type="hidden" name="remove_image" value="0">
       <div class="form__row">
-        <label>Target county<select name="target_county" data-county-select><option value="">All of Ireland</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+        <label>Target state<select name="target_county" data-county-select><option value="">All of India</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
         <label>Target town (optional)<input name="target_town" list="all-locations" autocomplete="off" placeholder="Any town"></label>
       </div>
       <?php if ($admin): ?><label>Placement<select name="placement"><option value="both">Sidebar card + banner (recommended)</option><option value="sidebar">Sidebar card only</option><option value="banner">Banner only</option></select></label><?php endif; ?>

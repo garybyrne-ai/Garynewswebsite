@@ -1,4 +1,4 @@
-/* ME News Ireland — newsroom */
+/* Bharat Wire India — newsroom */
 (function () {
   'use strict';
   const { api, esc, toast } = window.ME;
@@ -139,7 +139,7 @@
       <td><select data-role ${admin ? '' : 'disabled'}>${opts(['member', 'contributor', 'editor', 'admin'], x.role)}</select></td>
       <td><input data-title value="${esc(x.title || '')}" placeholder="Title" ${admin ? '' : 'disabled'}><br><select data-desk ${admin ? '' : 'disabled'}><option value="">— desk —</option>${opts(['National', 'Local', 'Business', 'Sport', 'Culture'], x.desk)}</select></td>
       <td><input type="checkbox" data-verified ${x.is_verified ? 'checked' : ''} ${admin ? '' : 'disabled'}></td>
-      <td><select data-plan ${admin ? '' : 'disabled'}>${opts(['free', 'ME+'], x.plan)}</select></td>
+      <td><select data-plan ${admin ? '' : 'disabled'}>${opts(['free', 'Wire+'], x.plan)}</select></td>
       <td><input type="number" data-rep min="0" max="100" value="${x.reputation}" style="width:70px" ${admin ? '' : 'disabled'}></td>
       <td class="inline" style="gap:4px">${admin ? '<button class="btn btn--ghost btn--sm" data-save-user>Save</button>' + (x.id !== me.id ? '<button class="btn btn--hot btn--sm" data-delete-user>Delete…</button>' : '') : ''}</td></tr>`).join('')}</tbody></table></div>`;
     $('#user-add-toggle').hidden = !admin;
@@ -270,7 +270,7 @@
         <form id="mail-form" class="form">
           <div class="settingsgrid">
             <label>Transport<select name="transport">${m.transports.map(t => `<option value="${t}" ${t === m.transport ? 'selected' : ''}>${esc(labels[t] || t)}</option>`).join('')}</select></label>
-            <label>From address<input name="from" type="email" value="${esc(m.from)}" placeholder="news@menews.ie"><small class="form__hint">Must be a sender your provider has verified.</small></label>
+            <label>From address<input name="from" type="email" value="${esc(m.from)}" placeholder="news@bharatwire.in"><small class="form__hint">Must be a sender your provider has verified.</small></label>
             <label>From name<input name="from_name" maxlength="80" value="${esc(m.from_name)}"></label>
             <label>Reply-to<input name="reply_to" type="email" value="${esc(m.reply_to)}"></label>
           </div>
@@ -341,7 +341,7 @@
       const s = await api('/api/admin/settings');
       const groups = {};
       Object.entries(s).forEach(([k, v]) => { (groups[v.group] ??= []).push([k, v]); });
-      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://menews.ie"' : ''}>`}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
+      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://bharatwire.in"' : ''}>`}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
       $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(field).join('')}</div></details>` : items.map(field).join('')).join('');
     } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
   }

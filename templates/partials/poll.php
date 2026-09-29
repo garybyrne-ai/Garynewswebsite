@@ -6,7 +6,7 @@ $showResults = $mine !== null || $poll['closed'];
 $countyRes = $poll['county_results'] ?? null;
 ?>
 <section class="panel panel--poll reveal" data-poll="<?= e($poll['id']) ?>">
-  <header class="panel__head"><span class="kicker">Weekly county poll</span><a class="mono panel__hint" href="/poll">By county →</a></header>
+  <header class="panel__head"><span class="kicker">Weekly state poll</span><a class="mono panel__hint" href="/poll">By state →</a></header>
   <h3 class="poll__q"><?= e($poll['question']) ?></h3>
   <div class="poll__opts" data-poll-opts>
     <?php foreach ($poll['options'] as $i => $opt): $pct = $res['pct'][$i] ?? 0; ?>

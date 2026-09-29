@@ -2,243 +2,633 @@
  "_comment": "Crossword word bank. Junior entries are kid-friendly; adult puzzles draw from both.",
  "words": [
   {
-   "word": "DUBLIN",
-   "clue": "Ireland's capital city",
+   "word": "INDIA",
+   "clue": "Our country, home to over a billion people",
    "level": "junior"
   },
   {
-   "word": "CORK",
-   "clue": "County and city in the south with a famous harbour",
+   "word": "DELHI",
+   "clue": "India's capital city",
    "level": "junior"
   },
   {
-   "word": "GALWAY",
-   "clue": "City of the Tribes on the west coast",
+   "word": "MUMBAI",
+   "clue": "India's biggest city, home to Bollywood",
    "level": "junior"
   },
   {
-   "word": "SHAMROCK",
-   "clue": "Three-leafed plant and symbol of Ireland",
+   "word": "CHENNAI",
+   "clue": "Coastal capital of Tamil Nadu",
    "level": "junior"
   },
   {
-   "word": "HARP",
-   "clue": "Instrument on Irish euro coins",
+   "word": "KOLKATA",
+   "clue": "City of Joy, capital of West Bengal",
    "level": "junior"
   },
   {
-   "word": "SHANNON",
-   "clue": "Ireland's longest river",
+   "word": "JAIPUR",
+   "clue": "The Pink City, capital of Rajasthan",
    "level": "junior"
   },
   {
-   "word": "LIFFEY",
-   "clue": "River that flows through Dublin",
+   "word": "AGRA",
+   "clue": "City where the Taj Mahal stands",
    "level": "junior"
   },
   {
-   "word": "GREEN",
-   "clue": "Colour of Ireland's rugby jerseys",
+   "word": "GOA",
+   "clue": "India's smallest state, famous for its beaches",
    "level": "junior"
   },
   {
-   "word": "RAINBOW",
-   "clue": "Colourful arc after the rain",
+   "word": "KERALA",
+   "clue": "God's Own Country, land of backwaters",
    "level": "junior"
   },
   {
-   "word": "SHEEP",
-   "clue": "Woolly animals on Irish hillsides",
+   "word": "PUNJAB",
+   "clue": "Land of five rivers, home of bhangra",
    "level": "junior"
   },
   {
-   "word": "COW",
-   "clue": "Farm animal that gives milk",
+   "word": "GANGA",
+   "clue": "India's holiest river",
    "level": "junior"
   },
   {
-   "word": "PUFFIN",
-   "clue": "Seabird with a colourful beak that nests on the Skelligs",
+   "word": "YAMUNA",
+   "clue": "River that flows past the Taj Mahal",
    "level": "junior"
   },
   {
-   "word": "SEAL",
-   "clue": "Sea mammal often spotted in Irish harbours",
+   "word": "INDUS",
+   "clue": "Ancient river that gave India its name",
    "level": "junior"
   },
   {
-   "word": "DOLPHIN",
-   "clue": "Fungie was a famous one in Dingle",
+   "word": "NARMADA",
+   "clue": "River that flows through central India",
    "level": "junior"
   },
   {
-   "word": "HURLING",
-   "clue": "Fast Irish sport played with a sliotar",
+   "word": "TAJMAHAL",
+   "clue": "White marble monument of love in Agra",
    "level": "junior"
   },
   {
-   "word": "SLIOTAR",
-   "clue": "Ball used in hurling",
+   "word": "HIMALAYA",
+   "clue": "Mighty mountains along India's north",
    "level": "junior"
   },
   {
-   "word": "CAMOGIE",
-   "clue": "Hurling played by women and girls",
+   "word": "EVEREST",
+   "clue": "World's tallest mountain, in the Himalayas",
    "level": "junior"
   },
   {
-   "word": "GOAL",
-   "clue": "Worth three points in Gaelic football",
-   "level": "junior"
-  },
-  {
-   "word": "BREAD",
-   "clue": "Soda ___, a classic Irish loaf",
-   "level": "junior"
-  },
-  {
-   "word": "POTATO",
-   "clue": "Spud!",
-   "level": "junior"
-  },
-  {
-   "word": "BUTTER",
-   "clue": "Spread made from cream; Kerrygold makes it",
-   "level": "junior"
-  },
-  {
-   "word": "TEA",
-   "clue": "Ireland's favourite hot drink",
-   "level": "junior"
-  },
-  {
-   "word": "SCONE",
-   "clue": "Baked treat served with jam and cream",
-   "level": "junior"
-  },
-  {
-   "word": "CRISPS",
-   "clue": "Tayto makes these salty snacks",
-   "level": "junior"
-  },
-  {
-   "word": "FIDDLE",
-   "clue": "The violin at a trad session",
-   "level": "junior"
-  },
-  {
-   "word": "BODHRAN",
-   "clue": "Irish drum played with a tipper",
-   "level": "junior"
-  },
-  {
-   "word": "CEILI",
-   "clue": "Irish dance gathering",
-   "level": "junior"
-  },
-  {
-   "word": "JIG",
-   "clue": "Lively Irish dance tune",
-   "level": "junior"
-  },
-  {
-   "word": "REEL",
-   "clue": "Irish dance tune, faster than a jig",
-   "level": "junior"
-  },
-  {
-   "word": "CASTLE",
-   "clue": "Bunratty and Blarney are famous ones",
-   "level": "junior"
-  },
-  {
-   "word": "BLARNEY",
-   "clue": "Kiss its stone for the gift of the gab",
-   "level": "junior"
-  },
-  {
-   "word": "CLIFFS",
-   "clue": "The ___ of Moher in County Clare",
-   "level": "junior"
-  },
-  {
-   "word": "MOHER",
-   "clue": "Cliffs of ___, Co. Clare",
-   "level": "junior"
-  },
-  {
-   "word": "BOG",
-   "clue": "Wet land where turf is cut",
-   "level": "junior"
-  },
-  {
-   "word": "TURF",
-   "clue": "Fuel cut from a bog",
-   "level": "junior"
-  },
-  {
-   "word": "RAIN",
-   "clue": "Ireland gets plenty of this weather",
-   "level": "junior"
-  },
-  {
-   "word": "WIND",
-   "clue": "Weather that flies a kite",
-   "level": "junior"
-  },
-  {
-   "word": "SUN",
-   "clue": "It shines during a rare Irish heatwave",
-   "level": "junior"
-  },
-  {
-   "word": "CLOUD",
-   "clue": "Fluffy white thing in the sky",
-   "level": "junior"
-  },
-  {
-   "word": "BEACH",
-   "clue": "Sandy place by the sea, like Brittas Bay",
+   "word": "DESERT",
+   "clue": "Sandy Thar ___ in Rajasthan",
    "level": "junior"
   },
   {
    "word": "ISLAND",
-   "clue": "Ireland is one, and so is Achill",
+   "clue": "The Andamans are a group of these",
    "level": "junior"
   },
   {
-   "word": "ARAN",
-   "clue": "Islands famous for woolly jumpers",
+   "word": "FOREST",
+   "clue": "Home to tigers and elephants",
    "level": "junior"
   },
   {
-   "word": "ACHILL",
-   "clue": "County Mayo's biggest island",
+   "word": "VILLAGE",
+   "clue": "Small rural settlement",
    "level": "junior"
   },
   {
-   "word": "BOAT",
-   "clue": "It floats on water",
+   "word": "MARKET",
+   "clue": "Bazaar where you buy fruit and spices",
    "level": "junior"
   },
   {
-   "word": "FERRY",
-   "clue": "Boat that carries cars across the sea",
+   "word": "TEMPLE",
+   "clue": "Hindu place of worship",
+   "level": "junior"
+  },
+  {
+   "word": "MOSQUE",
+   "clue": "Muslim place of worship",
+   "level": "junior"
+  },
+  {
+   "word": "CHURCH",
+   "clue": "Christian place of worship",
+   "level": "junior"
+  },
+  {
+   "word": "GURDWARA",
+   "clue": "Sikh place of worship",
+   "level": "junior"
+  },
+  {
+   "word": "FORT",
+   "clue": "Red ___, in Old Delhi",
+   "level": "junior"
+  },
+  {
+   "word": "PALACE",
+   "clue": "Grand royal home, like the Mysore ___",
+   "level": "junior"
+  },
+  {
+   "word": "STUPA",
+   "clue": "Dome-shaped Buddhist monument",
+   "level": "junior"
+  },
+  {
+   "word": "MINAR",
+   "clue": "Qutub ___, a tall tower in Delhi",
+   "level": "junior"
+  },
+  {
+   "word": "TIGER",
+   "clue": "India's national animal, striped and orange",
+   "level": "junior"
+  },
+  {
+   "word": "LION",
+   "clue": "Asiatic ___, found only in Gujarat's Gir forest",
+   "level": "junior"
+  },
+  {
+   "word": "ELEPHANT",
+   "clue": "Huge grey animal with a trunk, honoured at festivals",
+   "level": "junior"
+  },
+  {
+   "word": "PEACOCK",
+   "clue": "India's national bird, famous for its feathers",
+   "level": "junior"
+  },
+  {
+   "word": "COBRA",
+   "clue": "Snake that can rise up and spread its hood",
+   "level": "junior"
+  },
+  {
+   "word": "CAMEL",
+   "clue": "Desert animal used for rides in Rajasthan",
+   "level": "junior"
+  },
+  {
+   "word": "MONKEY",
+   "clue": "Cheeky animal often seen near temples",
+   "level": "junior"
+  },
+  {
+   "word": "PARROT",
+   "clue": "Colourful bird that can copy your words",
+   "level": "junior"
+  },
+  {
+   "word": "BUFFALO",
+   "clue": "Water ___, common on Indian farms",
+   "level": "junior"
+  },
+  {
+   "word": "GOAT",
+   "clue": "Small farm animal that gives milk",
+   "level": "junior"
+  },
+  {
+   "word": "DEER",
+   "clue": "Spotted ___ roam India's national parks",
+   "level": "junior"
+  },
+  {
+   "word": "RHINO",
+   "clue": "One-horned ___ found in Assam",
+   "level": "junior"
+  },
+  {
+   "word": "LEOPARD",
+   "clue": "Spotted big cat that can climb trees",
+   "level": "junior"
+  },
+  {
+   "word": "DOLPHIN",
+   "clue": "River ___ swims in the Ganges",
+   "level": "junior"
+  },
+  {
+   "word": "CROCODILE",
+   "clue": "Long-jawed reptile basking on a riverbank",
+   "level": "junior"
+  },
+  {
+   "word": "MONGOOSE",
+   "clue": "Brave little animal that can fight cobras",
+   "level": "junior"
+  },
+  {
+   "word": "VULTURE",
+   "clue": "Large bird that circles high in the sky",
+   "level": "junior"
+  },
+  {
+   "word": "EAGLE",
+   "clue": "Sharp-eyed bird of prey",
+   "level": "junior"
+  },
+  {
+   "word": "SPARROW",
+   "clue": "Small brown bird common in Indian homes",
+   "level": "junior"
+  },
+  {
+   "word": "JACKAL",
+   "clue": "Wild dog that howls at night",
+   "level": "junior"
+  },
+  {
+   "word": "CRANE",
+   "clue": "Tall wading bird seen near wetlands",
+   "level": "junior"
+  },
+  {
+   "word": "STORK",
+   "clue": "Long-legged bird that nests on rooftops",
+   "level": "junior"
+  },
+  {
+   "word": "HORSE",
+   "clue": "Animal ridden by Rajput warriors of old",
+   "level": "junior"
+  },
+  {
+   "word": "OTTER",
+   "clue": "Playful animal that lives near rivers",
+   "level": "junior"
+  },
+  {
+   "word": "SAMOSA",
+   "clue": "Fried triangle snack stuffed with potato",
+   "level": "junior"
+  },
+  {
+   "word": "MANGO",
+   "clue": "India's national fruit, sweet and juicy",
+   "level": "junior"
+  },
+  {
+   "word": "LASSI",
+   "clue": "Cool yoghurt drink, sweet or salty",
+   "level": "junior"
+  },
+  {
+   "word": "CHAPATI",
+   "clue": "Round flatbread cooked on a tawa",
+   "level": "junior"
+  },
+  {
+   "word": "PANEER",
+   "clue": "Soft Indian cheese used in curries",
+   "level": "junior"
+  },
+  {
+   "word": "IDLI",
+   "clue": "Steamed rice cake from South India",
+   "level": "junior"
+  },
+  {
+   "word": "DOSA",
+   "clue": "Crispy rice-and-lentil crepe",
+   "level": "junior"
+  },
+  {
+   "word": "LADDU",
+   "clue": "Round sweet often given out at festivals",
+   "level": "junior"
+  },
+  {
+   "word": "JALEBI",
+   "clue": "Orange, syrup-soaked, spiral-shaped sweet",
+   "level": "junior"
+  },
+  {
+   "word": "CURRY",
+   "clue": "Spiced sauce eaten with rice or bread",
+   "level": "junior"
+  },
+  {
+   "word": "MASALA",
+   "clue": "Spice mix used in Indian cooking",
+   "level": "junior"
+  },
+  {
+   "word": "CHUTNEY",
+   "clue": "Tangy side dish made from mint or mango",
+   "level": "junior"
+  },
+  {
+   "word": "NAAN",
+   "clue": "Soft bread baked in a tandoor",
+   "level": "junior"
+  },
+  {
+   "word": "ROTI",
+   "clue": "Everyday flatbread on an Indian plate",
+   "level": "junior"
+  },
+  {
+   "word": "KHICHDI",
+   "clue": "Comforting dish of rice and lentils",
+   "level": "junior"
+  },
+  {
+   "word": "PAKORA",
+   "clue": "Vegetables dipped in batter and fried",
+   "level": "junior"
+  },
+  {
+   "word": "BIRYANI",
+   "clue": "Fragrant rice dish cooked with spices",
+   "level": "junior"
+  },
+  {
+   "word": "RASGULLA",
+   "clue": "Spongy, syrupy sweet from Bengal",
+   "level": "junior"
+  },
+  {
+   "word": "PAPAD",
+   "clue": "Thin crispy disc served with a meal",
+   "level": "junior"
+  },
+  {
+   "word": "GHEE",
+   "clue": "Clarified butter used in Indian cooking",
+   "level": "junior"
+  },
+  {
+   "word": "DIWALI",
+   "clue": "Festival of lights celebrated with diyas",
+   "level": "junior"
+  },
+  {
+   "word": "HOLI",
+   "clue": "Festival of colours in spring",
+   "level": "junior"
+  },
+  {
+   "word": "EID",
+   "clue": "Muslim festival after Ramadan fasting",
+   "level": "junior"
+  },
+  {
+   "word": "ONAM",
+   "clue": "Kerala's harvest festival with boat races",
+   "level": "junior"
+  },
+  {
+   "word": "PONGAL",
+   "clue": "Tamil Nadu's harvest festival",
+   "level": "junior"
+  },
+  {
+   "word": "RAKHI",
+   "clue": "Thread tied by sisters on their brothers' wrists",
+   "level": "junior"
+  },
+  {
+   "word": "LOHRI",
+   "clue": "Punjab's bonfire festival in January",
+   "level": "junior"
+  },
+  {
+   "word": "NAVRATRI",
+   "clue": "Nine nights of dance and worship",
+   "level": "junior"
+  },
+  {
+   "word": "DUSSEHRA",
+   "clue": "Festival marking good winning over evil",
+   "level": "junior"
+  },
+  {
+   "word": "BAISAKHI",
+   "clue": "Punjabi harvest and New Year festival",
+   "level": "junior"
+  },
+  {
+   "word": "SARI",
+   "clue": "Long draped garment worn by women",
+   "level": "junior"
+  },
+  {
+   "word": "TURBAN",
+   "clue": "Cloth wrapped around the head, worn by Sikhs",
+   "level": "junior"
+  },
+  {
+   "word": "HENNA",
+   "clue": "Reddish-brown dye painted on hands as mehndi",
+   "level": "junior"
+  },
+  {
+   "word": "RANGOLI",
+   "clue": "Colourful pattern made on the floor with powder",
+   "level": "junior"
+  },
+  {
+   "word": "BINDI",
+   "clue": "Coloured dot worn on the forehead",
+   "level": "junior"
+  },
+  {
+   "word": "KURTA",
+   "clue": "Long loose shirt worn by men and women",
+   "level": "junior"
+  },
+  {
+   "word": "BANGLE",
+   "clue": "Round bracelet worn on the wrist",
+   "level": "junior"
+  },
+  {
+   "word": "MEHNDI",
+   "clue": "Henna designs painted for weddings",
+   "level": "junior"
+  },
+  {
+   "word": "DIYA",
+   "clue": "Small clay lamp lit at Diwali",
+   "level": "junior"
+  },
+  {
+   "word": "KITE",
+   "clue": "Flown from rooftops on Makar Sankranti",
+   "level": "junior"
+  },
+  {
+   "word": "WICKET",
+   "clue": "Three stumps a bowler aims at",
+   "level": "junior"
+  },
+  {
+   "word": "STUMPS",
+   "clue": "Wooden posts behind the batter",
+   "level": "junior"
+  },
+  {
+   "word": "UMPIRE",
+   "clue": "Person who makes the decisions in a match",
+   "level": "junior"
+  },
+  {
+   "word": "TROPHY",
+   "clue": "Cup lifted by the winning team",
+   "level": "junior"
+  },
+  {
+   "word": "HOCKEY",
+   "clue": "Sport in which India's men have won 8 Olympic golds",
+   "level": "junior"
+  },
+  {
+   "word": "KABADDI",
+   "clue": "Fast tag-and-wrestle sport, popular across India",
+   "level": "junior"
+  },
+  {
+   "word": "BADMINTON",
+   "clue": "Racquet sport played with a shuttlecock",
+   "level": "junior"
+  },
+  {
+   "word": "WRESTLING",
+   "clue": "Kushti, an ancient Indian sport",
+   "level": "junior"
+  },
+  {
+   "word": "CHESS",
+   "clue": "Board game said to have begun in ancient India",
+   "level": "junior"
+  },
+  {
+   "word": "FOOTBALL",
+   "clue": "Sport with goals, hugely popular in Kolkata",
+   "level": "junior"
+  },
+  {
+   "word": "GANDHI",
+   "clue": "Mahatma ___, father of the nation",
+   "level": "junior"
+  },
+  {
+   "word": "NEHRU",
+   "clue": "India's first Prime Minister",
+   "level": "junior"
+  },
+  {
+   "word": "ASHOKA",
+   "clue": "Mauryan emperor who spread peace after war",
+   "level": "junior"
+  },
+  {
+   "word": "AKBAR",
+   "clue": "Great Mughal emperor known for tolerance",
+   "level": "junior"
+  },
+  {
+   "word": "MUGHAL",
+   "clue": "Empire that built the Taj Mahal",
+   "level": "junior"
+  },
+  {
+   "word": "FREEDOM",
+   "clue": "India won its ___ in 1947",
+   "level": "junior"
+  },
+  {
+   "word": "FLAG",
+   "clue": "Tricolour flown on Independence Day",
+   "level": "junior"
+  },
+  {
+   "word": "RUPEE",
+   "clue": "India's currency",
+   "level": "junior"
+  },
+  {
+   "word": "ANTHEM",
+   "clue": "National song, 'Jana Gana Mana'",
+   "level": "junior"
+  },
+  {
+   "word": "LOTUS",
+   "clue": "India's national flower",
+   "level": "junior"
+  },
+  {
+   "word": "BANYAN",
+   "clue": "India's national tree, with hanging roots",
+   "level": "junior"
+  },
+  {
+   "word": "MONSOON",
+   "clue": "Rainy season that waters India's crops",
+   "level": "junior"
+  },
+  {
+   "word": "JUNGLE",
+   "clue": "Thick forest home to wild animals",
+   "level": "junior"
+  },
+  {
+   "word": "VALLEY",
+   "clue": "Low land between hills, like Kashmir's",
+   "level": "junior"
+  },
+  {
+   "word": "GLACIER",
+   "clue": "Frozen river of ice high in the mountains",
+   "level": "junior"
+  },
+  {
+   "word": "PLATEAU",
+   "clue": "Flat raised land, like the Deccan ___",
+   "level": "junior"
+  },
+  {
+   "word": "MOUNTAIN",
+   "clue": "Tall landform; the Himalayas are full of them",
    "level": "junior"
   },
   {
    "word": "TRAIN",
-   "clue": "Travels on rails from Heuston Station",
+   "clue": "Long vehicle that runs on rails across India",
    "level": "junior"
   },
   {
-   "word": "BUS",
-   "clue": "Big vehicle that carries lots of passengers",
+   "word": "STATION",
+   "clue": "Where you catch a train",
    "level": "junior"
   },
   {
-   "word": "BIKE",
-   "clue": "Two wheels and pedals",
+   "word": "AIRPORT",
+   "clue": "Where planes take off and land",
+   "level": "junior"
+  },
+  {
+   "word": "RICKSHAW",
+   "clue": "Three-wheeled taxi buzzing through Indian streets",
+   "level": "junior"
+  },
+  {
+   "word": "BICYCLE",
+   "clue": "Two-wheeled vehicle you pedal",
    "level": "junior"
   },
   {
@@ -248,7 +638,7 @@
   },
   {
    "word": "TEACHER",
-   "clue": "Múinteoir, in English",
+   "clue": "Guru, in English",
    "level": "junior"
   },
   {
@@ -267,83 +657,78 @@
    "level": "junior"
   },
   {
-   "word": "CROKE",
-   "clue": "___ Park, Dublin's GAA stadium",
+   "word": "GANESHA",
+   "clue": "Elephant-headed god of new beginnings",
    "level": "junior"
   },
   {
-   "word": "PARK",
-   "clue": "Phoenix ___, home to Dublin's deer",
+   "word": "KRISHNA",
+   "clue": "Blue-skinned god who played the flute",
    "level": "junior"
   },
   {
-   "word": "DEER",
-   "clue": "Antlered animals living in the Phoenix Park",
+   "word": "HANUMAN",
+   "clue": "Monkey god known for his strength and devotion",
    "level": "junior"
   },
   {
-   "word": "FOX",
-   "clue": "Red bushy-tailed animal (sionnach)",
+   "word": "SHIVA",
+   "clue": "God often shown holding a trident",
    "level": "junior"
   },
   {
-   "word": "BADGER",
-   "clue": "Black-and-white striped animal (broc)",
+   "word": "VISHNU",
+   "clue": "God who preserves and protects the universe",
    "level": "junior"
   },
   {
-   "word": "HARE",
-   "clue": "Long-eared animal, faster than a rabbit",
+   "word": "DURGA",
+   "clue": "Warrior goddess riding a lion",
    "level": "junior"
   },
   {
-   "word": "ROBIN",
-   "clue": "Red-breasted garden bird (spideog)",
+   "word": "RAMA",
+   "clue": "Hero of the Ramayana",
    "level": "junior"
   },
   {
-   "word": "SWAN",
-   "clue": "The Children of Lir were turned into these",
+   "word": "SITA",
+   "clue": "Rama's wife in the Ramayana",
    "level": "junior"
   },
   {
-   "word": "LIR",
-   "clue": "Legendary king whose children became swans",
+   "word": "RAVANA",
+   "clue": "Ten-headed demon king in the Ramayana",
    "level": "junior"
   },
   {
-   "word": "SALMON",
-   "clue": "The fish of knowledge in Irish legend",
+   "word": "MYNA",
+   "clue": "Chatty bird that can mimic sounds",
    "level": "junior"
   },
   {
-   "word": "FINN",
-   "clue": "___ McCool, giant of Irish legend",
+   "word": "KOEL",
+   "clue": "Bird whose call announces spring",
    "level": "junior"
   },
   {
-   "word": "GIANT",
-   "clue": "The ___'s Causeway",
+   "word": "FLAMINGO",
+   "clue": "Pink wading bird seen in Gujarat's wetlands",
    "level": "junior"
   },
   {
-   "word": "OAK",
-   "clue": "Tree hidden in Kildare's name (Cill Dara)",
+   "word": "HORNBILL",
+   "clue": "Bird with a huge curved beak, found in the northeast",
    "level": "junior"
   },
   {
-   "word": "HOLLY",
-   "clue": "Prickly Christmas leaves",
+   "word": "ISRO",
+   "clue": "India's space agency",
    "level": "junior"
   },
   {
-   "word": "DAISY",
-   "clue": "Small white flower with a yellow middle",
-   "level": "junior"
-  },
-  {
-   "word": "MOON",
-   "clue": "It shines at night",
+   "word": "ROCKET",
+   "clue": "Vehicle that blasts satellites into space",
    "level": "junior"
   },
   {
@@ -352,1513 +737,1053 @@
    "level": "junior"
   },
   {
-   "word": "SNOW",
-   "clue": "White winter weather",
+   "word": "MOON",
+   "clue": "It shines at night",
    "level": "junior"
   },
   {
-   "word": "FROST",
-   "clue": "Icy coating on a cold morning",
+   "word": "SUN",
+   "clue": "It rises in the east every morning",
    "level": "junior"
   },
   {
-   "word": "PIRATE",
-   "clue": "Grace O'Malley was a famous Irish one",
+   "word": "RAIN",
+   "clue": "Falls during the monsoon",
    "level": "junior"
   },
   {
-   "word": "QUEEN",
-   "clue": "Grace O'Malley, the pirate ___",
+   "word": "RAINBOW",
+   "clue": "Colourful arc after the rain",
    "level": "junior"
   },
   {
-   "word": "KING",
-   "clue": "Brian Boru was a High ___",
+   "word": "SHIMLA",
+   "clue": "Hill station once the summer capital of British India",
    "level": "junior"
   },
   {
-   "word": "VIKING",
-   "clue": "Sea raider who helped found Dublin",
+   "word": "LUCKNOW",
+   "clue": "City famous for kebabs and nawabs",
    "level": "junior"
   },
   {
-   "word": "TOWER",
-   "clue": "Round ___ at Glendalough",
+   "word": "VARANASI",
+   "clue": "Ancient city on the Ganges, also called Kashi",
    "level": "junior"
   },
   {
-   "word": "MONK",
-   "clue": "Someone who lived at Glendalough long ago",
+   "word": "AMRITSAR",
+   "clue": "Punjab city, home to the Golden Temple",
    "level": "junior"
   },
   {
-   "word": "SAINT",
-   "clue": "Patrick, Brigid or Colmcille",
+   "word": "MYSURU",
+   "clue": "Karnataka city famous for its palace and silk",
    "level": "junior"
   },
   {
-   "word": "PATRICK",
-   "clue": "Ireland's patron saint",
+   "word": "SURAT",
+   "clue": "Gujarat city famous for diamonds and textiles",
    "level": "junior"
   },
   {
-   "word": "BRIGID",
-   "clue": "Saint with a special cross made of rushes",
+   "word": "PATNA",
+   "clue": "Capital of Bihar, on the Ganges",
    "level": "junior"
   },
   {
-   "word": "CROSS",
-   "clue": "Saint Brigid's is woven from rushes",
+   "word": "BHOPAL",
+   "clue": "Capital of Madhya Pradesh, city of lakes",
    "level": "junior"
   },
   {
-   "word": "FEAST",
-   "clue": "A big celebration meal",
+   "word": "NAGPUR",
+   "clue": "City in Maharashtra famous for oranges",
    "level": "junior"
   },
   {
-   "word": "MUSIC",
-   "clue": "Trad sessions are full of it",
+   "word": "KANPUR",
+   "clue": "Big industrial city on the Ganges",
    "level": "junior"
   },
   {
-   "word": "SONG",
-   "clue": "You sing one",
+   "word": "INDORE",
+   "clue": "Madhya Pradesh city famous for street food",
    "level": "junior"
   },
   {
-   "word": "DANCE",
-   "clue": "Riverdance is a famous Irish one",
+   "word": "RANCHI",
+   "clue": "Capital of Jharkhand",
    "level": "junior"
   },
   {
-   "word": "STAGE",
-   "clue": "Where performers act",
+   "word": "GUWAHATI",
+   "clue": "Gateway to India's northeast, on the Brahmaputra",
    "level": "junior"
   },
   {
-   "word": "ZOO",
-   "clue": "Dublin's is in the Phoenix Park",
-   "level": "junior"
-  },
-  {
-   "word": "PONY",
-   "clue": "Connemara has its own breed of this",
-   "level": "junior"
-  },
-  {
-   "word": "HORSE",
-   "clue": "Ridden at the Dublin Horse Show",
-   "level": "junior"
-  },
-  {
-   "word": "DONKEY",
-   "clue": "Long-eared farm animal",
-   "level": "junior"
-  },
-  {
-   "word": "PIG",
-   "clue": "Farm animal that says oink",
-   "level": "junior"
-  },
-  {
-   "word": "HEN",
-   "clue": "Farm bird that lays eggs",
-   "level": "junior"
-  },
-  {
-   "word": "EGG",
-   "clue": "A hen lays one",
-   "level": "junior"
-  },
-  {
-   "word": "MILK",
-   "clue": "White drink from cows",
-   "level": "junior"
-  },
-  {
-   "word": "CHEESE",
-   "clue": "Made from milk; Cashel Blue is one",
-   "level": "junior"
-  },
-  {
-   "word": "APPLE",
-   "clue": "Armagh is the orchard county for these",
-   "level": "junior"
-  },
-  {
-   "word": "CAKE",
-   "clue": "Birthday treat with candles",
-   "level": "junior"
-  },
-  {
-   "word": "SWEETS",
-   "clue": "Sugary treats (milseáin)",
-   "level": "junior"
-  },
-  {
-   "word": "IRISH",
-   "clue": "Gaeilge, the language you learn at school",
-   "level": "junior"
-  },
-  {
-   "word": "GAEILGE",
-   "clue": "The Irish language, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "MADRA",
-   "clue": "Dog, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "CAT",
-   "clue": "Purring pet, the same word in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "GRIAN",
-   "clue": "Sun, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "UISCE",
-   "clue": "Water, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "TEACH",
-   "clue": "House, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "SIOPA",
-   "clue": "Shop, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "BAILE",
-   "clue": "Town, in Irish (as in Baile Átha Cliath)",
-   "level": "junior"
-  },
-  {
-   "word": "SLAN",
-   "clue": "Goodbye, in Irish",
-   "level": "junior"
-  },
-  {
-   "word": "FOUR",
-   "clue": "Number of provinces in Ireland",
-   "level": "junior"
-  },
-  {
-   "word": "LEINSTER",
-   "clue": "Province that includes Dublin",
-   "level": "junior"
-  },
-  {
-   "word": "MUNSTER",
-   "clue": "Province of Cork and Kerry",
-   "level": "junior"
-  },
-  {
-   "word": "ULSTER",
-   "clue": "Ireland's northern province",
-   "level": "junior"
-  },
-  {
-   "word": "CONNACHT",
-   "clue": "Ireland's western province",
-   "level": "junior"
-  },
-  {
-   "word": "COUNTY",
-   "clue": "The island of Ireland has 32 of these",
-   "level": "junior"
-  },
-  {
-   "word": "KERRY",
-   "clue": "County with Ireland's highest mountain",
-   "level": "junior"
-  },
-  {
-   "word": "MAYO",
-   "clue": "County of Croagh Patrick and Achill",
-   "level": "junior"
-  },
-  {
-   "word": "CLARE",
-   "clue": "County of the Cliffs of Moher and the Burren",
-   "level": "junior"
-  },
-  {
-   "word": "BURREN",
-   "clue": "Rocky limestone landscape in Clare",
-   "level": "junior"
-  },
-  {
-   "word": "DONEGAL",
-   "clue": "County in the far north-west",
-   "level": "junior"
-  },
-  {
-   "word": "SLIGO",
-   "clue": "Yeats's county",
-   "level": "junior"
-  },
-  {
-   "word": "WEXFORD",
-   "clue": "Sunny south-east county famous for strawberries",
-   "level": "junior"
-  },
-  {
-   "word": "KILDARE",
-   "clue": "County famous for racehorses",
-   "level": "junior"
-  },
-  {
-   "word": "MEATH",
-   "clue": "County of Newgrange and the Hill of Tara",
-   "level": "junior"
-  },
-  {
-   "word": "TARA",
-   "clue": "Hill where the High Kings were crowned",
-   "level": "junior"
-  },
-  {
-   "word": "LOUGH",
-   "clue": "Irish word for lake",
-   "level": "junior"
-  },
-  {
-   "word": "NEAGH",
-   "clue": "Lough ___, Ireland's largest lake",
-   "level": "junior"
-  },
-  {
-   "word": "DINGLE",
-   "clue": "Kerry town where Fungie lived",
-   "level": "junior"
-  },
-  {
-   "word": "TAYTO",
-   "clue": "Ireland's famous crisps",
-   "level": "junior"
-  },
-  {
-   "word": "WICKLOW",
-   "clue": "The Garden of Ireland",
-   "level": "junior"
-  },
-  {
-   "word": "KILKENNY",
-   "clue": "Marble City famous for hurling",
-   "level": "junior"
-  },
-  {
-   "word": "LIMERICK",
-   "clue": "City on the Shannon, and a funny five-line poem",
-   "level": "junior"
-  },
-  {
-   "word": "BELFAST",
-   "clue": "Capital of Northern Ireland",
-   "level": "junior"
-  },
-  {
-   "word": "DART",
-   "clue": "Dublin's coastal train",
-   "level": "junior"
-  },
-  {
-   "word": "LUAS",
-   "clue": "Dublin's tram; Irish for speed",
-   "level": "junior"
-  },
-  {
-   "word": "SPIRE",
-   "clue": "Tall silver needle on O'Connell Street",
-   "level": "junior"
-  },
-  {
-   "word": "HOWTH",
-   "clue": "Fishing village on Dublin Bay",
-   "level": "junior"
-  },
-  {
-   "word": "BRAY",
-   "clue": "Wicklow seaside town at the end of the DART",
-   "level": "junior"
-  },
-  {
-   "word": "MOLLY",
-   "clue": "___ Malone and her wheelbarrow",
-   "level": "junior"
-  },
-  {
-   "word": "COCKLES",
-   "clue": "Molly Malone sold these and mussels",
-   "level": "junior"
-  },
-  {
-   "word": "SEAWEED",
-   "clue": "Slippery green stuff on the rocks at the beach",
-   "level": "junior"
-  },
-  {
-   "word": "CRAB",
-   "clue": "Sideways-walking creature in a rock pool",
-   "level": "junior"
-  },
-  {
-   "word": "SHELL",
-   "clue": "A snail carries its home in one",
-   "level": "junior"
-  },
-  {
-   "word": "KITE",
-   "clue": "Fly it on a windy beach",
-   "level": "junior"
-  },
-  {
-   "word": "SANDCASTLE",
-   "clue": "Build one with a bucket and spade",
-   "level": "junior"
-  },
-  {
-   "word": "LIGHTHOUSE",
-   "clue": "Tall tower that guides ships at night",
-   "level": "junior"
-  },
-  {
-   "word": "RIVER",
-   "clue": "Water that flows to the sea",
-   "level": "junior"
-  },
-  {
-   "word": "LAKE",
-   "clue": "Lough, in English",
-   "level": "junior"
-  },
-  {
-   "word": "HILL",
-   "clue": "Smaller than a mountain",
-   "level": "junior"
-  },
-  {
-   "word": "FIELD",
-   "clue": "Cows graze in one",
-   "level": "junior"
-  },
-  {
-   "word": "FARM",
-   "clue": "Where tractors and animals live",
-   "level": "junior"
-  },
-  {
-   "word": "TRACTOR",
-   "clue": "Farmer's big machine",
-   "level": "junior"
-  },
-  {
-   "word": "WELLIES",
-   "clue": "Boots for muddy puddles",
-   "level": "junior"
-  },
-  {
-   "word": "UMBRELLA",
-   "clue": "Keeps the rain off",
-   "level": "junior"
-  },
-  {
-   "word": "JUMPER",
-   "clue": "Aran islanders are famous for knitting these",
-   "level": "junior"
-  },
-  {
-   "word": "WOOL",
-   "clue": "Sheep give us this",
-   "level": "junior"
-  },
-  {
-   "word": "HONEY",
-   "clue": "Bees make it",
-   "level": "junior"
-  },
-  {
-   "word": "BEE",
-   "clue": "Buzzing insect that makes honey",
-   "level": "junior"
-  },
-  {
-   "word": "FROG",
-   "clue": "Green hopper that says ribbit",
-   "level": "junior"
-  },
-  {
-   "word": "LADYBIRD",
-   "clue": "Red beetle with black spots",
-   "level": "junior"
-  },
-  {
-   "word": "LEPRECHAUN",
-   "clue": "Mischievous little folk with a pot of gold",
-   "level": "adult"
-  },
-  {
-   "word": "CARRAUNTOOHIL",
-   "clue": "Ireland's highest peak",
-   "level": "adult"
-  },
-  {
-   "word": "GLENDALOUGH",
-   "clue": "Wicklow monastic valley of two lakes",
-   "level": "adult"
-  },
-  {
-   "word": "KILMAINHAM",
-   "clue": "Dublin gaol that is now a museum",
-   "level": "adult"
-  },
-  {
-   "word": "KELLS",
-   "clue": "Book of ___, kept at Trinity College",
-   "level": "adult"
-  },
-  {
-   "word": "TRINITY",
-   "clue": "Dublin college founded in 1592",
-   "level": "adult"
-  },
-  {
-   "word": "OIREACHTAS",
-   "clue": "Ireland's national parliament",
-   "level": "adult"
-  },
-  {
-   "word": "DAIL",
-   "clue": "Lower house of the Oireachtas",
-   "level": "adult"
-  },
-  {
-   "word": "SEANAD",
-   "clue": "Upper house of the Oireachtas",
-   "level": "adult"
-  },
-  {
-   "word": "TAOISEACH",
-   "clue": "Head of the Irish Government",
-   "level": "adult"
-  },
-  {
-   "word": "TANAISTE",
-   "clue": "Deputy head of the Irish Government",
-   "level": "adult"
-  },
-  {
-   "word": "ARAS",
-   "clue": "___ an Uachtaráin, the President's residence",
-   "level": "adult"
-  },
-  {
-   "word": "GARDA",
-   "clue": "Irish police officer",
-   "level": "adult"
-  },
-  {
-   "word": "SEANCHAI",
-   "clue": "Traditional Irish storyteller",
-   "level": "adult"
-  },
-  {
-   "word": "UILLEANN",
-   "clue": "Irish pipes powered by a bellows",
-   "level": "adult"
-  },
-  {
-   "word": "CLADDAGH",
-   "clue": "Ring with hands, a heart and a crown",
-   "level": "adult"
-  },
-  {
-   "word": "CONNEMARA",
-   "clue": "Rugged region of west Galway",
-   "level": "adult"
-  },
-  {
-   "word": "SKELLIG",
-   "clue": "___ Michael, monastic island off Kerry",
-   "level": "adult"
-  },
-  {
-   "word": "BOYNE",
-   "clue": "River of a famous 1690 battle",
-   "level": "adult"
-  },
-  {
-   "word": "CORRIB",
-   "clue": "Lough and river at Galway",
+   "word": "RAJASTHAN",
+   "clue": "Desert state famous for its forts and palaces",
    "level": "adult"
   },
   {
-   "word": "SUIR",
-   "clue": "River through Clonmel and Waterford",
+   "word": "MAHARASHTRA",
+   "clue": "State whose capital is Mumbai",
    "level": "adult"
   },
   {
-   "word": "BARROW",
-   "clue": "River through Carlow and New Ross",
+   "word": "KARNATAKA",
+   "clue": "State whose capital is Bengaluru",
    "level": "adult"
   },
   {
-   "word": "NORE",
-   "clue": "River through Kilkenny",
+   "word": "TELANGANA",
+   "clue": "State formed in 2014, capital Hyderabad",
    "level": "adult"
   },
   {
-   "word": "LEE",
-   "clue": "River through Cork city",
+   "word": "CHHATTISGARH",
+   "clue": "Central state rich in forests and minerals",
    "level": "adult"
   },
   {
-   "word": "LAGAN",
-   "clue": "River through Belfast",
+   "word": "UTTARAKHAND",
+   "clue": "Himalayan state, home to the Char Dham pilgrimage",
    "level": "adult"
   },
   {
-   "word": "FOYLE",
-   "clue": "River and lough at Derry",
+   "word": "JHARKHAND",
+   "clue": "State carved from Bihar in 2000, rich in coal",
    "level": "adult"
   },
   {
-   "word": "ERNE",
-   "clue": "Fermanagh's lough",
+   "word": "CHANDIGARH",
+   "clue": "Planned city that serves two state capitals",
    "level": "adult"
   },
   {
-   "word": "SWILLY",
-   "clue": "Donegal lough",
+   "word": "PONDICHERRY",
+   "clue": "Former French colony on the Tamil Nadu coast",
    "level": "adult"
   },
   {
-   "word": "WATERFORD",
-   "clue": "Ireland's oldest city, famous for crystal",
+   "word": "LAKSHADWEEP",
+   "clue": "Smallest union territory, a coral island chain",
    "level": "adult"
   },
   {
-   "word": "CRYSTAL",
-   "clue": "Waterford's famous glassware",
+   "word": "MEGHALAYA",
+   "clue": "Abode of clouds, one of the wettest places on Earth",
    "level": "adult"
   },
   {
-   "word": "GUINNESS",
-   "clue": "Stout brewed at St James's Gate",
+   "word": "ARUNACHAL",
+   "clue": "___ Pradesh, land of the dawn-lit mountains",
    "level": "adult"
   },
   {
-   "word": "STOUT",
-   "clue": "Dark beer such as Murphy's or Beamish",
+   "word": "NAGALAND",
+   "clue": "Northeastern state famous for the Hornbill Festival",
    "level": "adult"
   },
   {
-   "word": "WHISKEY",
-   "clue": "Uisce beatha, the water of life",
+   "word": "MIZORAM",
+   "clue": "Northeastern state on the Myanmar border",
    "level": "adult"
   },
   {
-   "word": "JAMESON",
-   "clue": "Whiskey first distilled on Bow Street",
+   "word": "TRIPURA",
+   "clue": "Small northeastern state, once a princely kingdom",
    "level": "adult"
   },
   {
-   "word": "YEATS",
-   "clue": "Poet buried under Ben Bulben",
+   "word": "SIKKIM",
+   "clue": "Smallest state by area, home to Kangchenjunga",
    "level": "adult"
   },
   {
-   "word": "JOYCE",
-   "clue": "Author of Ulysses",
+   "word": "MANIPUR",
+   "clue": "Jewel of India, birthplace of modern polo",
    "level": "adult"
   },
   {
-   "word": "BLOOMSDAY",
-   "clue": "16 June celebration of a Dublin novel",
+   "word": "ODISHA",
+   "clue": "State home to the Jagannath Temple in Puri",
    "level": "adult"
   },
   {
-   "word": "ULYSSES",
-   "clue": "Joyce's novel set on a single Dublin day",
+   "word": "GUJARAT",
+   "clue": "Westernmost state, birthplace of Mahatma Gandhi",
    "level": "adult"
   },
   {
-   "word": "HEANEY",
-   "clue": "Nobel-winning poet from County Derry",
+   "word": "HARYANA",
+   "clue": "State surrounding Delhi on three sides",
    "level": "adult"
   },
   {
-   "word": "BECKETT",
-   "clue": "He wrote Waiting for Godot",
+   "word": "ANDHRAPRADESH",
+   "clue": "Southeastern state, capital Amaravati",
    "level": "adult"
   },
   {
-   "word": "WILDE",
-   "clue": "Oscar, author of The Importance of Being Earnest",
+   "word": "BENGALURU",
+   "clue": "India's Silicon Valley",
    "level": "adult"
   },
   {
-   "word": "SWIFT",
-   "clue": "Dean who wrote Gulliver's Travels",
+   "word": "HYDERABAD",
+   "clue": "City of Nizams and biryani",
    "level": "adult"
   },
   {
-   "word": "STOKER",
-   "clue": "Bram, creator of Dracula",
+   "word": "AHMEDABAD",
+   "clue": "Gujarat's largest city, on the Sabarmati river",
    "level": "adult"
   },
   {
-   "word": "BINCHY",
-   "clue": "Maeve, author of Circle of Friends",
+   "word": "DARJEELING",
+   "clue": "Hill town famous for its tea gardens",
    "level": "adult"
   },
   {
-   "word": "ROONEY",
-   "clue": "Sally, author of Normal People",
+   "word": "COIMBATORE",
+   "clue": "Tamil Nadu city known as the Manchester of South India",
    "level": "adult"
   },
   {
-   "word": "DOYLE",
-   "clue": "Roddy, author of The Commitments",
+   "word": "VISAKHAPATNAM",
+   "clue": "Port city on Andhra Pradesh's coast",
    "level": "adult"
   },
   {
-   "word": "BONO",
-   "clue": "U2's frontman",
+   "word": "UDAIPUR",
+   "clue": "City of Lakes in Rajasthan",
    "level": "adult"
   },
   {
-   "word": "ENYA",
-   "clue": "Donegal singer of Orinoco Flow",
+   "word": "JODHPUR",
+   "clue": "The Blue City of Rajasthan",
    "level": "adult"
   },
   {
-   "word": "CRANBERRIES",
-   "clue": "Limerick band fronted by Dolores O'Riordan",
+   "word": "BRAHMAPUTRA",
+   "clue": "Mighty river flowing through Assam",
    "level": "adult"
   },
   {
-   "word": "CHIEFTAINS",
-   "clue": "Trad group founded by Paddy Moloney",
+   "word": "MAHANADI",
+   "clue": "Great river of Odisha and Chhattisgarh",
    "level": "adult"
   },
   {
-   "word": "HOZIER",
-   "clue": "Wicklow singer of Take Me to Church",
+   "word": "GODAVARI",
+   "clue": "Ganga of the South, India's second-longest river",
    "level": "adult"
   },
   {
-   "word": "RIVERDANCE",
-   "clue": "Show born as a Eurovision interval act",
+   "word": "KAVERI",
+   "clue": "River sacred to Tamil Nadu and Karnataka",
    "level": "adult"
   },
   {
-   "word": "EUROVISION",
-   "clue": "Song contest Ireland has won seven times",
+   "word": "TUNGABHADRA",
+   "clue": "River that flows past the ruins of Hampi",
    "level": "adult"
   },
   {
-   "word": "ABBEY",
-   "clue": "Dublin's national theatre",
+   "word": "CHAMBAL",
+   "clue": "Ravine-carved river once home to bandits",
    "level": "adult"
   },
   {
-   "word": "GAIETY",
-   "clue": "South King Street theatre",
+   "word": "SUTLEJ",
+   "clue": "One of the five rivers that give Punjab its name",
    "level": "adult"
   },
   {
-   "word": "OLYMPIA",
-   "clue": "Dame Street theatre",
+   "word": "SUBCONTINENT",
+   "clue": "Vast landmass India shares with its neighbours",
    "level": "adult"
   },
   {
-   "word": "DRUID",
-   "clue": "Galway theatre company",
+   "word": "PENINSULA",
+   "clue": "Land surrounded by sea on three sides, like South India",
    "level": "adult"
   },
   {
-   "word": "FLEADH",
-   "clue": "Trad music festival, ___ Cheoil",
+   "word": "ARCHIPELAGO",
+   "clue": "Chain of islands, like the Andaman group",
    "level": "adult"
   },
   {
-   "word": "OYSTER",
-   "clue": "Shellfish celebrated at a Galway festival",
+   "word": "DECCAN",
+   "clue": "Plateau covering much of southern India",
    "level": "adult"
   },
   {
-   "word": "PLOUGHING",
-   "clue": "The National ___ Championships",
+   "word": "SUNDARBANS",
+   "clue": "Mangrove forest home to the Royal Bengal Tiger",
    "level": "adult"
   },
   {
-   "word": "TRALEE",
-   "clue": "Kerry town of the Rose festival",
+   "word": "HILLSTATION",
+   "clue": "Cool retreat in the hills, like Ooty or Shimla",
    "level": "adult"
   },
   {
-   "word": "CURRAGH",
-   "clue": "Kildare plain and racecourse",
+   "word": "BACKWATERS",
+   "clue": "Kerala's network of lakes, canals and lagoons",
    "level": "adult"
   },
   {
-   "word": "LEOPARDSTOWN",
-   "clue": "South Dublin racecourse",
+   "word": "MANGROVE",
+   "clue": "Salt-tolerant coastal tree found in the Sundarbans",
    "level": "adult"
   },
   {
-   "word": "FAIRYHOUSE",
-   "clue": "Meath racecourse of the Irish Grand National",
+   "word": "INDEPENDENCE",
+   "clue": "Freedom won from British rule in 1947",
    "level": "adult"
   },
   {
-   "word": "PUNCHESTOWN",
-   "clue": "Kildare festival racecourse",
+   "word": "CONSTITUTION",
+   "clue": "Document adopted in 1950 that governs India",
    "level": "adult"
   },
   {
-   "word": "LANSDOWNE",
-   "clue": "Road with Ireland's rugby stadium",
+   "word": "SATYAGRAHA",
+   "clue": "Gandhi's method of peaceful resistance",
    "level": "adult"
   },
   {
-   "word": "THOMOND",
-   "clue": "Limerick rugby park",
+   "word": "NONVIOLENCE",
+   "clue": "Ahimsa, Gandhi's guiding principle",
    "level": "adult"
   },
   {
-   "word": "KEANE",
-   "clue": "Roy, Cork footballer turned pundit",
+   "word": "PARTITION",
+   "clue": "1947 division of British India into two nations",
    "level": "adult"
   },
   {
-   "word": "TAYLOR",
-   "clue": "Katie, Bray's boxing champion",
+   "word": "MAURYAN",
+   "clue": "Empire ruled by Ashoka and Chandragupta",
    "level": "adult"
   },
   {
-   "word": "MCILROY",
-   "clue": "Rory, Holywood golfer",
+   "word": "GUPTA",
+   "clue": "Golden Age empire of ancient India",
    "level": "adult"
   },
   {
-   "word": "HARRINGTON",
-   "clue": "Pádraig, three-time major winner",
+   "word": "CHOLA",
+   "clue": "Great South Indian dynasty of temple builders",
    "level": "adult"
   },
   {
-   "word": "SEXTON",
-   "clue": "Johnny, Ireland out-half",
+   "word": "MARATHA",
+   "clue": "Empire led by Shivaji in western India",
    "level": "adult"
   },
   {
-   "word": "MAGUIRE",
-   "clue": "Sam ___ Cup for Gaelic football",
+   "word": "RAJPUT",
+   "clue": "Warrior clans of medieval Rajasthan",
    "level": "adult"
   },
   {
-   "word": "LIAM",
-   "clue": "___ MacCarthy Cup for hurling",
+   "word": "SULTANATE",
+   "clue": "Delhi ___, a series of Muslim dynasties before the Mughals",
    "level": "adult"
   },
   {
-   "word": "HANDBALL",
-   "clue": "GAA game played against a wall",
+   "word": "BRITISHRAJ",
+   "clue": "Period of British rule over India",
    "level": "adult"
   },
   {
-   "word": "ROUNDERS",
-   "clue": "GAA bat-and-ball game",
+   "word": "TAGORE",
+   "clue": "Rabindranath ___, Nobel-winning poet",
    "level": "adult"
   },
   {
-   "word": "DUBS",
-   "clue": "Dublin GAA nickname",
+   "word": "AMBEDKAR",
+   "clue": "Chief architect of India's Constitution",
    "level": "adult"
   },
   {
-   "word": "KINGDOM",
-   "clue": "Kerry's nickname",
+   "word": "PATEL",
+   "clue": "Iron Man of India who united the princely states",
    "level": "adult"
   },
   {
-   "word": "REBELS",
-   "clue": "Cork's nickname",
+   "word": "BOSE",
+   "clue": "Subhas Chandra ___, founder of the Indian National Army",
    "level": "adult"
   },
   {
-   "word": "CATS",
-   "clue": "Kilkenny hurlers' nickname",
+   "word": "SWARAJ",
+   "clue": "Self-rule, a rallying cry of the freedom movement",
    "level": "adult"
   },
   {
-   "word": "TRIBESMEN",
-   "clue": "Galway's nickname",
+   "word": "SWADESHI",
+   "clue": "Movement to boycott British goods",
    "level": "adult"
   },
   {
-   "word": "BANNER",
-   "clue": "Clare's county nickname",
+   "word": "DANDIMARCH",
+   "clue": "Gandhi's 1930 protest walk against the salt tax",
    "level": "adult"
   },
   {
-   "word": "NEWGRANGE",
-   "clue": "Passage tomb lit by the winter solstice sun",
+   "word": "QUITINDIA",
+   "clue": "1942 movement demanding an end to British rule",
    "level": "adult"
   },
   {
-   "word": "DOLMEN",
-   "clue": "Portal tomb such as Poulnabrone",
+   "word": "BHARATANATYAM",
+   "clue": "Classical dance form from Tamil Nadu",
    "level": "adult"
   },
   {
-   "word": "POULNABRONE",
-   "clue": "Burren dolmen",
+   "word": "KATHAKALI",
+   "clue": "Kerala dance-drama with elaborate face paint",
    "level": "adult"
   },
   {
-   "word": "OGHAM",
-   "clue": "Ancient Irish alphabet of notches",
+   "word": "KATHAK",
+   "clue": "Classical dance form of North India, full of spins",
    "level": "adult"
   },
   {
-   "word": "CELTIC",
-   "clue": "___ Tiger, the 1990s boom",
+   "word": "ODISSI",
+   "clue": "Classical dance form of Odisha",
    "level": "adult"
   },
   {
-   "word": "EURO",
-   "clue": "Irish currency since 2002",
+   "word": "BHANGRA",
+   "clue": "Energetic Punjabi dance and music style",
    "level": "adult"
   },
   {
-   "word": "PUNT",
-   "clue": "Irish currency before the euro",
+   "word": "GARBA",
+   "clue": "Gujarati dance performed in a circle during Navratri",
    "level": "adult"
   },
   {
-   "word": "FAMINE",
-   "clue": "The Great Hunger of the 1840s",
+   "word": "QAWWALI",
+   "clue": "Devotional Sufi singing style",
    "level": "adult"
   },
   {
-   "word": "DIASPORA",
-   "clue": "Irish people living abroad",
+   "word": "CARNATIC",
+   "clue": "Classical music tradition of South India",
    "level": "adult"
   },
   {
-   "word": "RISING",
-   "clue": "Easter 1916 ___",
+   "word": "HINDUSTANI",
+   "clue": "Classical music tradition of North India",
    "level": "adult"
   },
   {
-   "word": "PEARSE",
-   "clue": "He read the Proclamation in 1916",
+   "word": "SITAR",
+   "clue": "Stringed instrument played by Ravi Shankar",
    "level": "adult"
   },
   {
-   "word": "COLLINS",
-   "clue": "Michael, the Big Fellow",
+   "word": "TABLA",
+   "clue": "Pair of hand drums used in Indian music",
    "level": "adult"
   },
   {
-   "word": "DEVALERA",
-   "clue": "Éamon, the Long Fellow",
+   "word": "VEENA",
+   "clue": "Ancient stringed instrument of South India",
    "level": "adult"
   },
   {
-   "word": "MARKIEVICZ",
-   "clue": "Countess elected to Westminster in 1918",
+   "word": "SHEHNAI",
+   "clue": "Wind instrument played at weddings",
    "level": "adult"
   },
   {
-   "word": "PARNELL",
-   "clue": "The Uncrowned King of Ireland",
+   "word": "MRIDANGAM",
+   "clue": "Double-headed drum used in Carnatic music",
    "level": "adult"
   },
   {
-   "word": "OCONNELL",
-   "clue": "Daniel, the Liberator",
+   "word": "KOHLI",
+   "clue": "Virat ___, star batter and former captain",
    "level": "adult"
   },
   {
-   "word": "GPO",
-   "clue": "1916 headquarters on O'Connell Street",
+   "word": "DHONI",
+   "clue": "MS ___, captain who won the 2011 World Cup",
    "level": "adult"
   },
   {
-   "word": "HAPENNY",
-   "clue": "___ Bridge over the Liffey",
+   "word": "CENTURY",
+   "clue": "Score of 100 runs by one batter",
    "level": "adult"
   },
   {
-   "word": "TITANIC",
-   "clue": "Liner built in Belfast",
+   "word": "BOUNDARY",
+   "clue": "Shot that reaches the edge of the field",
    "level": "adult"
   },
   {
-   "word": "HARLAND",
-   "clue": "___ and Wolff shipyard",
+   "word": "SPINNER",
+   "clue": "Bowler who turns the ball with their fingers",
    "level": "adult"
   },
   {
-   "word": "COBH",
-   "clue": "Titanic's last port of call",
+   "word": "STADIUM",
+   "clue": "Huge venue where matches are played",
    "level": "adult"
   },
   {
-   "word": "DERRY",
-   "clue": "Walled city on the Foyle",
+   "word": "WORLDCUP",
+   "clue": "Cricket tournament India has won at home and away",
    "level": "adult"
   },
   {
-   "word": "ARMAGH",
-   "clue": "Ecclesiastical capital of Ireland",
+   "word": "TOURNAMENT",
+   "clue": "Series of matches, like the IPL",
    "level": "adult"
   },
   {
-   "word": "MOURNE",
-   "clue": "Mountains that sweep down to the sea",
+   "word": "GHARIAL",
+   "clue": "Long-snouted crocodile found in Indian rivers",
    "level": "adult"
   },
   {
-   "word": "CAUSEWAY",
-   "clue": "Giant's ___, basalt columns in Antrim",
+   "word": "BLACKBUCK",
+   "clue": "Antelope with spiral horns, found on the plains",
    "level": "adult"
   },
   {
-   "word": "ANTRIM",
-   "clue": "County of the Giant's Causeway",
+   "word": "BARASINGHA",
+   "clue": "Swamp deer with many-branched antlers",
    "level": "adult"
   },
   {
-   "word": "FERMANAGH",
-   "clue": "Lakeland county",
+   "word": "PANGOLIN",
+   "clue": "Scaly mammal that curls into a ball when scared",
    "level": "adult"
   },
   {
-   "word": "TYRONE",
-   "clue": "County of Omagh and Cookstown",
+   "word": "NILGAI",
+   "clue": "Largest Asian antelope, also called the blue bull",
    "level": "adult"
   },
   {
-   "word": "LAOIS",
-   "clue": "County town: Portlaoise",
+   "word": "SLOTHBEAR",
+   "clue": "Shaggy bear that loves termites and honey",
    "level": "adult"
   },
   {
-   "word": "OFFALY",
-   "clue": "County of Birr and Tullamore",
+   "word": "CHANDRAYAAN",
+   "clue": "Mission that landed near the Moon's south pole",
    "level": "adult"
   },
   {
-   "word": "LONGFORD",
-   "clue": "Midlands county on the Shannon",
+   "word": "MANGALYAAN",
+   "clue": "India's first mission to Mars",
    "level": "adult"
   },
   {
-   "word": "ROSCOMMON",
-   "clue": "Connacht county of Boyle and Strokestown",
+   "word": "ARYABHATA",
+   "clue": "Ancient mathematician who calculated pi",
    "level": "adult"
   },
   {
-   "word": "LEITRIM",
-   "clue": "County with Ireland's shortest coastline",
+   "word": "RAMANUJAN",
+   "clue": "Self-taught mathematical genius from Tamil Nadu",
    "level": "adult"
   },
   {
-   "word": "CAVAN",
-   "clue": "Said to have a lake for every day of the year",
+   "word": "RAMAN",
+   "clue": "C.V. ___, physicist who won the 1930 Nobel Prize",
    "level": "adult"
   },
   {
-   "word": "MONAGHAN",
-   "clue": "Drumlin county of Patrick Kavanagh",
+   "word": "RAMAYANA",
+   "clue": "Epic telling the story of Rama and Sita",
    "level": "adult"
   },
   {
-   "word": "KAVANAGH",
-   "clue": "Poet of Raglan Road",
+   "word": "MAHABHARATA",
+   "clue": "Epic containing the Bhagavad Gita",
    "level": "adult"
   },
   {
-   "word": "LOUTH",
-   "clue": "Ireland's smallest county",
+   "word": "SARASWATI",
+   "clue": "Goddess of knowledge, music and learning",
    "level": "adult"
   },
   {
-   "word": "CARLOW",
-   "clue": "County of the Browneshill dolmen",
+   "word": "LAKSHMI",
+   "clue": "Goddess of wealth, worshipped at Diwali",
    "level": "adult"
   },
   {
-   "word": "TIPPERARY",
-   "clue": "It's a long way to it",
+   "word": "ARJUNA",
+   "clue": "Warrior prince guided by Krishna in the Mahabharata",
    "level": "adult"
   },
   {
-   "word": "CASHEL",
-   "clue": "Rock of ___",
+   "word": "DRAUPADI",
+   "clue": "Queen married to the five Pandava brothers",
    "level": "adult"
   },
   {
-   "word": "WESTMEATH",
-   "clue": "County of Athlone and Mullingar",
+   "word": "GULABJAMUN",
+   "clue": "Deep-fried milk balls soaked in sugar syrup",
    "level": "adult"
   },
   {
-   "word": "ATHLONE",
-   "clue": "Shannon town at the centre of Ireland",
+   "word": "RASMALAI",
+   "clue": "Soft paneer patties in sweetened milk",
    "level": "adult"
   },
   {
-   "word": "LEAP",
-   "clue": "Card for Irish public transport",
+   "word": "VINDALOO",
+   "clue": "Fiery Goan curry with Portuguese roots",
    "level": "adult"
   },
   {
-   "word": "MOTORWAY",
-   "clue": "The M50 is one",
+   "word": "TANDOORI",
+   "clue": "Style of cooking in a clay oven",
    "level": "adult"
   },
   {
-   "word": "AERLINGUS",
-   "clue": "Airline with a shamrock on its tail",
+   "word": "PULIHORA",
+   "clue": "Tangy tamarind rice from South India",
    "level": "adult"
   },
   {
-   "word": "RYANAIR",
-   "clue": "Low-fares airline headquartered at Swords",
+   "word": "ANDAMAN",
+   "clue": "___ and Nicobar Islands, India's far southeast",
    "level": "adult"
   },
   {
-   "word": "KNOCK",
-   "clue": "Mayo airport and shrine",
+   "word": "NICOBAR",
+   "clue": "Andaman and ___ Islands",
    "level": "adult"
   },
   {
-   "word": "KYLEMORE",
-   "clue": "Connemara abbey with a Victorian walled garden",
+   "word": "KASHMIR",
+   "clue": "Region often called Paradise on Earth",
    "level": "adult"
   },
   {
-   "word": "BUNRATTY",
-   "clue": "Clare castle famous for medieval banquets",
+   "word": "LADAKH",
+   "clue": "High-altitude desert union territory in the north",
    "level": "adult"
   },
   {
-   "word": "MUCKROSS",
-   "clue": "Killarney house and abbey",
+   "word": "SIACHEN",
+   "clue": "World's highest battlefield, a glacier",
    "level": "adult"
   },
   {
-   "word": "KILLARNEY",
-   "clue": "Kerry's lakes town",
+   "word": "VINDHYA",
+   "clue": "Mountain range dividing north and south India",
    "level": "adult"
   },
   {
-   "word": "RING",
-   "clue": "___ of Kerry scenic drive",
+   "word": "ARAVALLI",
+   "clue": "India's oldest mountain range, running through Rajasthan",
    "level": "adult"
   },
   {
-   "word": "BENBULBEN",
-   "clue": "Sligo's flat-topped mountain",
+   "word": "GHATS",
+   "clue": "Mountain ranges running along India's coasts",
    "level": "adult"
   },
   {
-   "word": "ERRIGAL",
-   "clue": "Donegal's highest mountain",
+   "word": "THAR",
+   "clue": "Great Indian Desert, mostly in Rajasthan",
    "level": "adult"
   },
   {
-   "word": "SLIEVE",
-   "clue": "Irish for mountain, as in ___ League",
+   "word": "HAMPI",
+   "clue": "Ruined capital of the Vijayanagara Empire",
    "level": "adult"
   },
   {
-   "word": "CROAGH",
-   "clue": "___ Patrick, the Reek",
+   "word": "KHAJURAHO",
+   "clue": "Temple town famous for intricate carvings",
    "level": "adult"
   },
   {
-   "word": "PILGRIM",
-   "clue": "Climbs the Reek on Reek Sunday",
+   "word": "ELLORA",
+   "clue": "Caves with rock-cut Hindu, Buddhist and Jain temples",
    "level": "adult"
   },
   {
-   "word": "INISHMORE",
-   "clue": "Largest of the Aran Islands",
+   "word": "AJANTA",
+   "clue": "Caves famous for ancient Buddhist paintings",
    "level": "adult"
   },
   {
-   "word": "CURRACH",
-   "clue": "Traditional west-coast rowing boat",
+   "word": "KONARK",
+   "clue": "Sun Temple shaped like a giant chariot",
    "level": "adult"
   },
   {
-   "word": "HOOKER",
-   "clue": "Galway sailing boat with red sails",
+   "word": "MAHABALIPURAM",
+   "clue": "Shore temple town near Chennai",
    "level": "adult"
   },
   {
-   "word": "CARRAGEEN",
-   "clue": "Irish moss seaweed",
+   "word": "FATEHPURSIKRI",
+   "clue": "Mughal city built by Akbar, later abandoned",
    "level": "adult"
   },
   {
-   "word": "BOXTY",
-   "clue": "Potato pancake",
+   "word": "QUTUBMINAR",
+   "clue": "Tallest brick minaret in Delhi",
    "level": "adult"
   },
   {
-   "word": "COLCANNON",
-   "clue": "Mash with cabbage or kale",
+   "word": "HAWAMAHAL",
+   "clue": "Palace of Winds in Jaipur, pink and honeycombed",
    "level": "adult"
   },
   {
-   "word": "CODDLE",
-   "clue": "Dublin sausage and rasher stew",
+   "word": "AMBERFORT",
+   "clue": "Hilltop fort overlooking Jaipur",
    "level": "adult"
   },
   {
-   "word": "BARMBRACK",
-   "clue": "Halloween loaf hiding a ring",
+   "word": "MEHRANGARH",
+   "clue": "Massive fort towering over Jodhpur",
    "level": "adult"
   },
   {
-   "word": "CRUBEENS",
-   "clue": "Pigs' trotters",
+   "word": "CHITTORGARH",
+   "clue": "Rajasthan's largest fort, site of legendary sieges",
    "level": "adult"
   },
   {
-   "word": "DRISHEEN",
-   "clue": "Cork blood pudding",
+   "word": "GOLCONDA",
+   "clue": "Ruined fort near Hyderabad, once famous for diamonds",
    "level": "adult"
   },
   {
-   "word": "RASHER",
-   "clue": "Bacon for the fry",
+   "word": "WARANGAL",
+   "clue": "Telangana city with a famous thousand-pillar temple",
    "level": "adult"
   },
   {
-   "word": "BLAA",
-   "clue": "Waterford's floury bread roll",
+   "word": "THANJAVUR",
+   "clue": "Tamil Nadu city famous for the Brihadeeswarar Temple",
    "level": "adult"
   },
   {
-   "word": "SPICEBAG",
-   "clue": "Chipper favourite of crispy chicken and chips",
+   "word": "MADURAI",
+   "clue": "Temple city famous for the Meenakshi Temple",
    "level": "adult"
   },
   {
-   "word": "CHIPPER",
-   "clue": "Where you order a single",
+   "word": "RAMESHWARAM",
+   "clue": "Island town with a major Shiva temple",
    "level": "adult"
   },
   {
-   "word": "BREAKFAST",
-   "clue": "Full Irish ___",
+   "word": "PUSHKAR",
+   "clue": "Rajasthan town famous for its camel fair",
    "level": "adult"
   },
   {
-   "word": "TED",
-   "clue": "Father ___ of Craggy Island",
+   "word": "SANCHI",
+   "clue": "Site of India's oldest surviving Buddhist stupa",
    "level": "adult"
   },
   {
-   "word": "CRAGGY",
-   "clue": "___ Island, home of Father Ted",
+   "word": "BODHGAYA",
+   "clue": "Place where the Buddha attained enlightenment",
    "level": "adult"
   },
   {
-   "word": "BANSHEE",
-   "clue": "Wailing spirit of Irish legend",
+   "word": "AMARAVATI",
+   "clue": "Ancient Buddhist site, also Andhra Pradesh's capital",
    "level": "adult"
   },
   {
-   "word": "PUCA",
-   "clue": "Shape-shifting fairy spirit",
+   "word": "LOTHAL",
+   "clue": "Ancient Indus Valley port city in Gujarat",
    "level": "adult"
   },
   {
-   "word": "DULLAHAN",
-   "clue": "Headless horseman of legend",
+   "word": "HARAPPA",
+   "clue": "One of the great cities of the Indus Valley Civilisation",
    "level": "adult"
   },
   {
-   "word": "TIRNANOG",
-   "clue": "Land of eternal youth",
+   "word": "MOHENJODARO",
+   "clue": "Mound of the Dead, an ancient Indus Valley city",
    "level": "adult"
   },
   {
-   "word": "OISIN",
-   "clue": "Warrior-poet who rode to Tír na nÓg",
+   "word": "VEDIC",
+   "clue": "___ period, era of India's earliest sacred texts",
    "level": "adult"
   },
   {
-   "word": "NIAMH",
-   "clue": "Golden-haired maiden of Tír na nÓg",
+   "word": "UPANISHAD",
+   "clue": "Ancient philosophical Hindu text",
    "level": "adult"
   },
   {
-   "word": "CUCHULAINN",
-   "clue": "The Hound of Ulster",
+   "word": "DEVANAGARI",
+   "clue": "Script used to write Hindi and Sanskrit",
    "level": "adult"
   },
   {
-   "word": "SETANTA",
-   "clue": "Cúchulainn's boyhood name",
+   "word": "SANSKRIT",
+   "clue": "Ancient classical language of India",
    "level": "adult"
   },
   {
-   "word": "MAEVE",
-   "clue": "Warrior queen of Connacht",
+   "word": "BENGALI",
+   "clue": "Language of West Bengal, also spoken in Bangladesh",
    "level": "adult"
   },
   {
-   "word": "TAIN",
-   "clue": "___ Bó Cúailnge, the Cattle Raid of Cooley",
+   "word": "TAMIL",
+   "clue": "One of the world's oldest surviving languages",
    "level": "adult"
   },
   {
-   "word": "FIANNA",
-   "clue": "Finn McCool's warrior band",
+   "word": "TELUGU",
+   "clue": "Language of Andhra Pradesh and Telangana",
    "level": "adult"
   },
   {
-   "word": "DEIRDRE",
-   "clue": "___ of the Sorrows",
+   "word": "MARATHI",
+   "clue": "Language of Maharashtra",
    "level": "adult"
   },
   {
-   "word": "SAMHAIN",
-   "clue": "Celtic festival that became Halloween",
+   "word": "MALAYALAM",
+   "clue": "Language of Kerala, a palindrome in its own script",
    "level": "adult"
   },
   {
-   "word": "IMBOLC",
-   "clue": "Saint Brigid's festival on 1 February",
+   "word": "PUNJABI",
+   "clue": "Language of Punjab, written in Gurmukhi script",
    "level": "adult"
   },
   {
-   "word": "BEALTAINE",
-   "clue": "May Day festival",
+   "word": "URDU",
+   "clue": "Language that grew alongside Hindi in Delhi's courts",
    "level": "adult"
   },
   {
-   "word": "LUGHNASA",
-   "clue": "August harvest festival",
+   "word": "KANNADA",
+   "clue": "Language of Karnataka",
    "level": "adult"
   },
   {
-   "word": "COLMCILLE",
-   "clue": "Saint who founded Iona",
+   "word": "GUJARATI",
+   "clue": "Language of Gujarat",
    "level": "adult"
   },
   {
-   "word": "KEVIN",
-   "clue": "Saint of Glendalough",
+   "word": "ODIA",
+   "clue": "Language of Odisha",
    "level": "adult"
   },
   {
-   "word": "CIARAN",
-   "clue": "Saint of Clonmacnoise",
+   "word": "ASSAMESE",
+   "clue": "Language of Assam",
    "level": "adult"
   },
   {
-   "word": "CLONMACNOISE",
-   "clue": "Monastery on the Shannon",
+   "word": "KASHMIRI",
+   "clue": "Language of the Kashmir Valley",
    "level": "adult"
   },
   {
-   "word": "PALE",
-   "clue": "Area around Dublin once under English rule",
+   "word": "VIJAYANAGARA",
+   "clue": "Powerful South Indian empire centred on Hampi",
    "level": "adult"
   },
   {
-   "word": "STRONGBOW",
-   "clue": "Norman who married Aoife in 1170",
+   "word": "PALLAVA",
+   "clue": "Dynasty that carved the shore temples of Mahabalipuram",
    "level": "adult"
   },
   {
-   "word": "CROMWELL",
-   "clue": "He arrived in 1649, to Ireland's cost",
+   "word": "KALINGA",
+   "clue": "Ancient kingdom whose war changed Ashoka forever",
    "level": "adult"
   },
   {
-   "word": "HEDGE",
-   "clue": "___ school, a secret classroom",
+   "word": "MAGADHA",
+   "clue": "Powerful ancient kingdom based in modern Bihar",
    "level": "adult"
   },
   {
-   "word": "QUAY",
-   "clue": "Riverside road in Dublin",
+   "word": "AURANGZEB",
+   "clue": "Last of the great Mughal emperors",
    "level": "adult"
   },
   {
-   "word": "GEORGIAN",
-   "clue": "Style of Merrion Square's doors",
+   "word": "SHAHJAHAN",
+   "clue": "Mughal emperor who built the Taj Mahal",
    "level": "adult"
   },
   {
-   "word": "PHOENIX",
-   "clue": "___ Park, Europe's largest enclosed city park",
+   "word": "HUMAYUN",
+   "clue": "Mughal emperor whose Delhi tomb inspired the Taj Mahal",
    "level": "adult"
   },
   {
-   "word": "MALONE",
-   "clue": "Molly of the wheelbarrow",
+   "word": "BABUR",
+   "clue": "First Mughal emperor, descended from Timur and Genghis Khan",
    "level": "adult"
   },
   {
-   "word": "GRAFTON",
-   "clue": "Dublin's pedestrian shopping street",
+   "word": "SHIVAJI",
+   "clue": "Maratha king famed for guerrilla warfare and forts",
    "level": "adult"
   },
   {
-   "word": "TEMPLE",
-   "clue": "___ Bar, Dublin's cultural quarter",
+   "word": "RANIOFJHANSI",
+   "clue": "Warrior queen of the 1857 uprising",
    "level": "adult"
   },
   {
-   "word": "DALKEY",
-   "clue": "South Dublin village with a castle",
+   "word": "BHAGATSINGH",
+   "clue": "Young revolutionary hanged by the British in 1931",
    "level": "adult"
   },
   {
-   "word": "POWERSCOURT",
-   "clue": "Wicklow estate with Ireland's tallest waterfall",
+   "word": "LALBAHADUR",
+   "clue": "___ Shastri, India's second Prime Minister",
    "level": "adult"
   },
   {
-   "word": "LUGNAQUILLA",
-   "clue": "Wicklow's highest mountain",
+   "word": "RAJENDRA",
+   "clue": "___ Prasad, India's first President",
    "level": "adult"
   },
   {
-   "word": "SUGARLOAF",
-   "clue": "Cone-shaped Wicklow hill",
+   "word": "KALAM",
+   "clue": "A.P.J. Abdul ___, the Missile Man who became President",
    "level": "adult"
   },
   {
-   "word": "LAMBAY",
-   "clue": "Dublin island with wallabies",
+   "word": "HOMIBHABHA",
+   "clue": "Father of India's nuclear programme",
    "level": "adult"
   },
   {
-   "word": "WALLABY",
-   "clue": "Marsupial living on Lambay Island",
+   "word": "SARABHAI",
+   "clue": "Vikram ___, father of India's space programme",
    "level": "adult"
   },
   {
-   "word": "SKERRIES",
-   "clue": "North Dublin town with windmills",
+   "word": "GATEWAY",
+   "clue": "___ of India, arch monument overlooking the sea in Mumbai",
    "level": "adult"
   },
   {
-   "word": "MALAHIDE",
-   "clue": "North Dublin castle village",
+   "word": "VICTORIA",
+   "clue": "___ Memorial, grand white marble building in Kolkata",
    "level": "adult"
   },
   {
-   "word": "SWORDS",
-   "clue": "Fingal's county town",
+   "word": "CHARMINAR",
+   "clue": "Four-towered monument at the heart of Hyderabad",
    "level": "adult"
   },
   {
-   "word": "FINGAL",
-   "clue": "North Dublin council area",
+   "word": "JANTARMANTAR",
+   "clue": "Ancient astronomical observatory in Jaipur",
    "level": "adult"
   },
   {
-   "word": "TALLAGHT",
-   "clue": "South-west Dublin suburb",
+   "word": "RASHTRAPATI",
+   "clue": "___ Bhavan, official home of India's President",
    "level": "adult"
   },
   {
-   "word": "HOGAN",
-   "clue": "___ Stand at Croke Park",
+   "word": "PARLIAMENT",
+   "clue": "Circular building in Delhi where laws are made",
    "level": "adult"
   },
   {
-   "word": "CUSACK",
-   "clue": "GAA founder honoured with a Croke Park stand",
+   "word": "LOKSABHA",
+   "clue": "Lower house of India's Parliament",
    "level": "adult"
   },
   {
-   "word": "NEWROSS",
-   "clue": "Wexford town with the Dunbrody famine ship",
+   "word": "RAJYASABHA",
+   "clue": "Upper house of India's Parliament",
    "level": "adult"
   },
   {
-   "word": "STRAWBERRY",
-   "clue": "Wexford's famous summer fruit",
+   "word": "REPUBLIC",
+   "clue": "India became one on 26 January 1950",
    "level": "adult"
   },
   {
-   "word": "LIMESTONE",
-   "clue": "Rock of the Burren",
+   "word": "TRICOLOUR",
+   "clue": "Saffron, white and green flag of India",
    "level": "adult"
   },
   {
-   "word": "PEAT",
-   "clue": "Turf, before it is cut",
+   "word": "SAFFRON",
+   "clue": "Top colour band of the Indian flag",
    "level": "adult"
   },
   {
-   "word": "SEANNOS",
-   "clue": "Old-style unaccompanied Irish singing",
+   "word": "KABIR",
+   "clue": "Mystic poet-saint who wrote in simple Hindi verse",
    "level": "adult"
   },
   {
-   "word": "GAELTACHT",
-   "clue": "Irish-speaking region",
+   "word": "TULSIDAS",
+   "clue": "Poet who wrote the Ramcharitmanas",
    "level": "adult"
   },
   {
-   "word": "SCOIL",
-   "clue": "School, in Irish",
+   "word": "PREMCHAND",
+   "clue": "Celebrated Hindi and Urdu novelist",
    "level": "adult"
   },
   {
-   "word": "FAILTE",
-   "clue": "Welcome, in Irish",
+   "word": "MIRABAI",
+   "clue": "Poet-saint devoted to Krishna through her songs",
    "level": "adult"
   },
   {
-   "word": "CRAIC",
-   "clue": "Fun and good conversation",
+   "word": "SATYAJITRAY",
+   "clue": "Legendary Bengali filmmaker",
    "level": "adult"
   },
   {
-   "word": "SLAINTE",
-   "clue": "Cheers, in Irish",
+   "word": "MANGESHKAR",
+   "clue": "Lata ___, Nightingale of Indian playback singing",
    "level": "adult"
   },
   {
-   "word": "GAA",
-   "clue": "Ireland's largest sporting body",
+   "word": "RAVISHANKAR",
+   "clue": "Pandit ___, sitar maestro who took Indian music to the West",
    "level": "adult"
   },
   {
-   "word": "CROKEPARK",
-   "clue": "Ireland's biggest stadium",
+   "word": "BHARATRATNA",
+   "clue": "India's highest civilian award",
    "level": "adult"
   },
   {
-   "word": "AVIVA",
-   "clue": "Lansdowne Road stadium's current name",
+   "word": "PADMASHRI",
+   "clue": "One of India's top civilian honours",
    "level": "adult"
   }
  ]

@@ -1,17 +1,17 @@
 <section class="container pagehead pagehead--narrow">
   <span class="kicker">Moderation &amp; takedowns</span>
   <h1 class="pagehead__title">Rules for what <em>gets published.</em></h1>
-  <p class="pagehead__blurb">Community reporting is the point of ME News, so the rules are public, the process is real, and removal requests get answered.</p>
+  <p class="pagehead__blurb">Community reporting is the point of Bharat Wire, so the rules are public, the process is real, and removal requests get answered.</p>
 </section>
 <div class="container prose">
   <h2>Before anything is published</h2>
   <p>Every community report and comment is screened for harmful content by the Trust Engine, then read by an editor. Reports that name a person in connection with a crime, identify a minor, show graphic injury, or make a high-impact claim always get human review before publication, and often a phone call to the reporter.</p>
   <h2>The no-naming rule</h2>
-  <p>We do not publish the name of anyone in connection with a crime or serious allegation unless they have been convicted, charged in open court, or named by An Garda Síochána or a court. Irish defamation law is strict and, more importantly, so are we: a wrong name can end a life as it is lived. Reports that break this rule are edited or declined and the contributor is told why.</p>
+  <p>We do not publish the name of anyone in connection with a crime or serious allegation unless they have been convicted, charged in open court, or named by the police or a court. Indian defamation law is strict and, more importantly, so are we: a wrong name can end a life as it is lived. Reports that break this rule are edited or declined and the contributor is told why.</p>
   <h2>Corroboration</h2>
   <p>“I saw this too” lets neighbours independently confirm a report. Three confirmations from separate people earn a <b>Corroborated</b> label. Editors also check photo metadata, run a reverse image search on anything that looks familiar, and compare reports of the same incident so the desk sees one event, not five submissions.</p>
   <h2>What we remove</h2>
-  <p>Content that is illegal, defamatory, a privacy intrusion, identifies a minor, infringes copyright or is shown to be inaccurate. Under the Digital Services Act we operate a notice-and-action process: anyone can flag content below, we acknowledge every request, and we act on clear cases first and review after. Coimisiún na Meán is the Irish regulator.</p>
+  <p>Content that is illegal, defamatory, a privacy intrusion, identifies a minor, infringes copyright or is shown to be inaccurate. Under the IT Rules, 2021 (Intermediary Guidelines and Digital Media Ethics Code) we operate a notice-and-action process: anyone can flag content below, we acknowledge every request, and we act on clear cases first and review after. The Ministry of Electronics and Information Technology is the Indian regulator.</p>
   <h2>Contributors</h2>
   <p>Contributors build a track record: reports filed, published and corroborated. Good standing earns a verified tick and faster publication. Repeated inaccuracy, harassment or attempts to identify people lose it, and can lead to a ban.</p>
 

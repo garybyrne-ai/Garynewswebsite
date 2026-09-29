@@ -2,7 +2,7 @@
 <section class="container pagehead">
   <span class="kicker">The desk</span>
   <h1 class="pagehead__title">Five desks. <em>One island.</em></h1>
-  <p class="pagehead__blurb">Desk editors curate the wire (they choose and file headlines from established publishers; they do not write them) and check community reports before publication. Real bylines on ME are reserved for original work: community reports our desk has verified, council coverage and county roundups.</p>
+  <p class="pagehead__blurb">Desk editors curate the wire (they choose and file headlines from established publishers; they do not write them) and check community reports before publication. Real bylines on Bharat Wire are reserved for original work: community reports our desk has verified, municipal coverage and state roundups.</p>
 </section>
 <div class="container">
   <div class="profiles">

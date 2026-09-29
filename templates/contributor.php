@@ -2,7 +2,7 @@
 <section class="container profilehead" style="--h:<?= (int)$c['accent'] ?>">
   <div class="profile__ring"><?= Ui::avatar($c, 'xl') ?></div>
   <div>
-    <span class="kicker">Desk editor · curates the <?= e($c['desk'] ?: 'ME News') ?> desk</span>
+    <span class="kicker">Desk editor · curates the <?= e($c['desk'] ?: 'Bharat Wire') ?> desk</span>
     <h1 class="pagehead__title"><?= e($c['display_name']) ?></h1>
     <p class="profile__title"><?= e($c['title']) ?></p>
     <p class="pagehead__blurb"><?= e($c['bio']) ?></p>

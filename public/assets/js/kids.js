@@ -1,4 +1,4 @@
-/* ME Óg — daily puzzles: crossword, word search, quiz, find the county */
+/* Wire Junior — daily puzzles: crossword, word search, quiz, find the state */
 (function () {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -120,25 +120,25 @@
     $('[data-reset]').addEventListener('click', () => { form.reset(); $$('input', form).forEach(i => i.disabled = false); $$('.quiz__opt').forEach(o => o.classList.remove('is-right', 'is-wrong')); $$('.quiz__fact').forEach(f => f.hidden = true); $('[data-done]').hidden = true; $('[data-reset]').hidden = true; form.querySelector('[type=submit]').hidden = false; $('[data-score]').textContent = ''; });
   }
 
-  /* ---------------- find the county ---------------- */
+  /* ---------------- find the state ---------------- */
   if (game === 'county' && window.L) {
     const L = window.L, el = $('#county-map');
-    const map = L.map(el, { zoomControl: false, attributionControl: false, minZoom: 6, maxZoom: 9 }).setView([53.42, -7.9], 7);
+    const map = L.map(el, { zoomControl: false, attributionControl: false, minZoom: 4, maxZoom: 8 }).setView([22.5, 80], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     const layer = L.layerGroup().addTo(map);
     const dist = (a, b) => { const R = 6371, dLat = (b[0] - a[0]) * Math.PI / 180, dLng = (b[1] - a[1]) * Math.PI / 180; const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * Math.PI / 180) * Math.cos(b[0] * Math.PI / 180) * Math.sin(dLng / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
     let round = 0, score = 0, locked = false;
-    const prompt = () => { const r = data.rounds[round]; $('[data-prompt]').innerHTML = `Find <b>Co. ${r.county}</b> <span class="mono">(${r.province})</span>`; $('[data-score]').textContent = `Round ${round + 1} of ${data.rounds.length} · ${score} pts`; $('[data-feedback]').textContent = ''; };
-    const finish = () => { const d = $('[data-done]'); d.hidden = false; d.innerHTML = `<b>${score} points out of ${data.rounds.length * 3}.</b> ${score >= 24 ? 'You know Ireland like the back of your hand!' : score >= 15 ? 'Grand job — a few more road trips and you\'ll have it.' : 'Time to get the atlas out — try again tomorrow!'}`; $('[data-prompt]').textContent = 'Game over.'; };
+    const prompt = () => { const r = data.rounds[round]; $('[data-prompt]').innerHTML = `Find <b>${r.county}</b> <span class="mono">(${r.province})</span>`; $('[data-score]').textContent = `Round ${round + 1} of ${data.rounds.length} · ${score} pts`; $('[data-feedback]').textContent = ''; };
+    const finish = () => { const d = $('[data-done]'); d.hidden = false; d.innerHTML = `<b>${score} points out of ${data.rounds.length * 3}.</b> ${score >= 24 ? 'You know India like the back of your hand!' : score >= 15 ? 'Great job — a few more trips on the atlas and you\'ll have it.' : 'Time to get the atlas out — try again tomorrow!'}`; $('[data-prompt]').textContent = 'Game over.'; };
     map.on('click', e => {
       if (locked || round >= data.rounds.length) return;
       locked = true;
       const r = data.rounds[round], km = dist([e.latlng.lat, e.latlng.lng], [r.latitude, r.longitude]);
-      const pts = km <= 40 ? 3 : (km <= 80 ? 1 : 0); score += pts;
+      const pts = km <= 150 ? 3 : (km <= 350 ? 1 : 0); score += pts;
       L.marker(e.latlng, { icon: L.divIcon({ className: '', html: `<div class="cg-pin" style="--c:${pts === 3 ? '#2e6b3a' : pts ? '#c88a12' : '#b8321f'}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }) }).addTo(layer);
-      L.marker([r.latitude, r.longitude], { icon: L.divIcon({ className: '', html: '<div class="cg-pin" style="--c:#1c1813"></div>', iconSize: [14, 14], iconAnchor: [7, 7] }) }).bindTooltip(`Co. ${r.county}`, { permanent: true, className: 'cg-label', direction: 'top', offset: [0, -6] }).addTo(layer);
+      L.marker([r.latitude, r.longitude], { icon: L.divIcon({ className: '', html: '<div class="cg-pin" style="--c:#1c1813"></div>', iconSize: [14, 14], iconAnchor: [7, 7] }) }).bindTooltip(`${r.county}`, { permanent: true, className: 'cg-label', direction: 'top', offset: [0, -6] }).addTo(layer);
       L.polyline([e.latlng, [r.latitude, r.longitude]], { color: '#1c1813', weight: 1, dashArray: '4 4' }).addTo(layer);
-      $('[data-feedback]').innerHTML = `${Math.round(km)} km from the centre of Co. ${r.county} — <b>${pts === 3 ? 'spot on, +3' : pts ? 'close, +1' : 'not this time'}</b>.`;
+      $('[data-feedback]').innerHTML = `${Math.round(km)} km from the centre of ${r.county} — <b>${pts === 3 ? 'spot on, +3' : pts ? 'close, +1' : 'not this time'}</b>.`;
       $('[data-score]').textContent = `Round ${round + 1} of ${data.rounds.length} · ${score} pts`;
       round++;
       setTimeout(() => { locked = false; if (round < data.rounds.length) prompt(); else finish(); }, 1400);

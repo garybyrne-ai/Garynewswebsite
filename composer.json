@@ -1,6 +1,6 @@
 {
-    "name": "menews/ireland",
-    "description": "ME News Ireland — community-first Irish news platform built on PHP 8.2+ and SQLite.",
+    "name": "bharatwire/india",
+    "description": "Bharat Wire India — community-first Indian news platform built on PHP 8.2+ and SQLite.",
     "type": "project",
     "license": "proprietary",
     "require": {

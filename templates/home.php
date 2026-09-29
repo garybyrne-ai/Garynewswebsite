@@ -63,7 +63,7 @@ $countySlug = $county ? slugify($county) : '';
       <header class="block__head">
         <span class="block__index mono"><?= icon('community') ?></span>
         <h2 class="block__title"><a href="/section/community">From the ground</a></h2>
-        <p class="block__blurb">What people in <?= e($county ? 'Co. ' . $county : 'Ireland') ?> are seeing right now. Reports are screened, then an editor decides. No account needed for your first one.</p>
+        <p class="block__blurb">What people in <?= e($county ?: 'India') ?> are seeing right now. Reports are screened, then an editor decides. No account needed for your first one.</p>
         <button class="btn btn--hot" type="button" data-open-report><?= icon('report') ?> Report a story</button>
       </header>
       <?php if ($community): ?>

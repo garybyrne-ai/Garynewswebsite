@@ -7,10 +7,10 @@ use MeNews\Config;
 use MeNews\Database;
 use MeNews\Http\HttpException;
 
-/** ME+ membership billing through Stripe Checkout and signed webhooks. */
+/** Wire+ membership billing through Stripe Checkout and signed webhooks. */
 final class Stripe
 {
-    /** ME+ needs only the secret key: prices come from the newsroom settings (inline price_data). */
+    /** Wire+ needs only the secret key: prices come from the newsroom settings (inline price_data). */
     public static function configured(): bool
     {
         return Secrets::get('STRIPE_SECRET_KEY') !== '';
@@ -27,20 +27,20 @@ final class Stripe
         if (!self::configured()) {
             throw new HttpException(503, 'Stripe is not configured yet');
         }
-        if ($user['plan'] === 'ME+') {
-            throw new HttpException(409, 'ME+ is already active');
+        if ($user['plan'] === 'Wire+') {
+            throw new HttpException(409, 'Wire+ is already active');
         }
         $base = rtrim(Config::baseUrl(), '/');
         if (!filter_var($base, FILTER_VALIDATE_URL) || (Config::production() && !str_starts_with($base, 'https://'))) {
             throw new HttpException(503, 'Configure the public HTTPS URL');
         }
         $annual = $interval === 'year';
-        $lineItem = Secrets::get('STRIPE_PRICE_ME_PLUS') !== '' && !$annual
-            ? ['price' => Secrets::get('STRIPE_PRICE_ME_PLUS'), 'quantity' => 1]
+        $lineItem = Secrets::get('STRIPE_PRICE_WIRE_PLUS') !== '' && !$annual
+            ? ['price' => Secrets::get('STRIPE_PRICE_WIRE_PLUS'), 'quantity' => 1]
             : ['quantity' => 1, 'price_data' => [
-                'currency' => 'eur', 'unit_amount' => $annual ? Membership::annualCents() : Membership::priceCents(),
+                'currency' => 'inr', 'unit_amount' => $annual ? Membership::annualCents() : Membership::priceCents(),
                 'recurring' => ['interval' => $annual ? 'year' : 'month'],
-                'product_data' => ['name' => 'ME+ membership (' . ($annual ? 'annual' : 'monthly') . ')', 'description' => 'Ad-free reading, alerts for up to ten areas, the 7am email and the archive'],
+                'product_data' => ['name' => 'Wire+ membership (' . ($annual ? 'annual' : 'monthly') . ')', 'description' => 'Ad-free reading, alerts for up to ten areas, the 7am email and the archive'],
             ]];
         $session = Remote::json('https://api.stripe.com/v1/checkout/sessions', [
             'mode' => 'subscription',
@@ -185,19 +185,19 @@ final class Stripe
                 }
                 return;
             }
-            // ---- ME+ membership
+            // ---- Wire+ membership
             if ($event['type'] === 'checkout.session.completed' && ($obj['mode'] ?? '') === 'subscription') {
                 $uid = (string)($obj['metadata']['user_id'] ?? '');
                 if (in_array($obj['payment_status'] ?? '', ['paid', 'no_payment_required'], true) && Database::one('SELECT id FROM users WHERE id=?', [$uid])) {
-                    Database::query('UPDATE subscriptions SET stripe_customer_id=?,stripe_subscription_id=?,plan=?,status=?,updated_at=? WHERE user_id=?', [$obj['customer'] ?? null, $obj['subscription'] ?? null, 'ME+', 'active', now(), $uid]);
-                    Database::query("UPDATE users SET plan='ME+' WHERE id=?", [$uid]);
-                    Notifier::send($uid, 'billing', 'ME+ activated', 'Your membership is active.');
+                    Database::query('UPDATE subscriptions SET stripe_customer_id=?,stripe_subscription_id=?,plan=?,status=?,updated_at=? WHERE user_id=?', [$obj['customer'] ?? null, $obj['subscription'] ?? null, 'Wire+', 'active', now(), $uid]);
+                    Database::query("UPDATE users SET plan='Wire+' WHERE id=?", [$uid]);
+                    Notifier::send($uid, 'billing', 'Wire+ activated', 'Your membership is active.');
                 }
             } elseif (in_array($event['type'], ['customer.subscription.updated', 'customer.subscription.deleted'], true)) {
                 $sub = Database::one('SELECT * FROM subscriptions WHERE stripe_subscription_id=?', [$obj['id']]);
                 if ($sub) {
                     $status = $event['type'] === 'customer.subscription.deleted' ? 'canceled' : (string)($obj['status'] ?? 'incomplete');
-                    $plan = in_array($status, ['active', 'trialing'], true) ? 'ME+' : 'free';
+                    $plan = in_array($status, ['active', 'trialing'], true) ? 'Wire+' : 'free';
                     Database::query('UPDATE users SET plan=? WHERE id=?', [$plan, $sub['user_id']]);
                     Database::query('UPDATE subscriptions SET plan=?,status=?,updated_at=? WHERE id=?', [$plan, $status, now(), $sub['id']]);
                 }

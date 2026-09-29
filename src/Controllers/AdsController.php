@@ -19,7 +19,7 @@ use MeNews\Support\Categories;
 use MeNews\Support\Locations;
 use MeNews\View;
 
-/** ME Ads: advertiser self-service, billing hand-offs, newsroom management and serving. */
+/** Wire Ads: advertiser self-service, billing hand-offs, newsroom management and serving. */
 final class AdsController
 {
     // ------------------------------------------------------------ public
@@ -27,7 +27,7 @@ final class AdsController
     public static function advertisePage(Request $r): Response
     {
         $demo = [
-            'id' => 'demo', 'business_name' => 'Your business', 'title' => 'Your headline, seen across Ireland', 'body' => 'Sidebar cards and banners on the home page, section pages and inside every article.',
+            'id' => 'demo', 'business_name' => 'Your business', 'title' => 'Your headline, seen across India', 'body' => 'Sidebar cards and banners on the home page, section pages and inside every article.',
             'cta' => 'Start free trial', 'badge' => '7-day trial', 'url' => 'https://example.ie', 'logo_path' => null, 'image_path' => null,
             'design' => ['template' => 'aurora'] + Ads::TEMPLATES['aurora'] + ['shape' => 'orb', 'align' => 'left'],
         ];
@@ -37,8 +37,8 @@ final class AdsController
         $demo['badge'] = $cheapest ? 'From ' . $cheapest : '';
         return View::page('advertise', [
             'user' => Auth::user(), 'nav' => Categories::NAV,
-            'title' => 'Advertise on ME News Ireland — impression packages from ' . $cheapest,
-            'description' => 'Buy a package of impressions, design your ad in minutes, and run it in sidebars and banners across ME News Ireland. From ' . $cheapest . '.',
+            'title' => 'Advertise on Bharat Wire India — impression packages from ' . $cheapest,
+            'description' => 'Buy a package of impressions, design your ad in minutes, and run it in sidebars and banners across Bharat Wire India. From ' . $cheapest . '.',
             'pricing' => Ads::pricing(),
             'packages' => $packages,
             'tiers' => AdPackages::TIERS,
@@ -376,7 +376,7 @@ final class AdsController
     {
         $u = Auth::require(['admin']);
         $price = (float)str_replace(',', '.', $r->post('price', (string)(Ads::price() / 100), 12));
-        Ads::updateSettings((int)round($price * 100), (int)$r->post('trial_days', (string)Ads::trialDays(), 4), strtoupper($r->post('currency', 'EUR', 3)));
+        Ads::updateSettings((int)round($price * 100), (int)$r->post('trial_days', (string)Ads::trialDays(), 4), strtoupper($r->post('currency', 'INR', 3)));
         Audit::log($u['id'], 'ads.settings', 'settings', 'ads', Ads::currency());
         return Response::json(['ok' => true, 'pricing' => Ads::pricing()]);
     }

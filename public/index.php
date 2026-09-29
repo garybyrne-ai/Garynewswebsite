@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * ME News Ireland — HTTP front controller.
+ * Bharat Wire India — HTTP front controller.
  * The web server document root must be this directory (public/).
  */
 
@@ -39,7 +39,7 @@ try {
             exit;
         }
         if ($request->wantsJson()) {
-            throw new HttpException(503, 'ME News is not installed yet. Open /install in a browser or run php scripts/setup.php --seed.');
+            throw new HttpException(503, 'Bharat Wire is not installed yet. Open /install in a browser or run php scripts/setup.php --seed.');
         }
         Response::redirect('/install')->send();
         exit;
@@ -55,7 +55,7 @@ try {
     if ($request->wantsJson()) {
         Response::json(['detail' => $e->getMessage()], $e->status)->send();
     } else {
-        View::page('error', ['user' => Auth::user(), 'nav' => MeNews\Support\Categories::NAV, 'status' => $e->status, 'message' => $e->getMessage(), 'title' => $e->status . ' — ME News Ireland'], $e->status)->send();
+        View::page('error', ['user' => Auth::user(), 'nav' => MeNews\Support\Categories::NAV, 'status' => $e->status, 'message' => $e->getMessage(), 'title' => $e->status . ' — Bharat Wire India'], $e->status)->send();
     }
 } catch (Throwable $e) {
     error_log((string)$e);

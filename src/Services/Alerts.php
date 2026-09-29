@@ -6,74 +6,111 @@ namespace MeNews\Services;
 use MeNews\Config;
 use MeNews\Database;
 use MeNews\Http\HttpException;
+use MeNews\Support\Geo;
 use MeNews\Support\Locations;
 
 /**
- * The page that stays dormant and lights up: Met Éireann warnings by county (open data,
- * cached 10 minutes), school closures submitted by principals, and the email subscriptions
- * that power death-notice alerts and the 7am county digest.
+ * The page that stays dormant and lights up: severe-weather/disaster warnings by state (from
+ * SACHET, India's National Disaster Alert Portal — open data, cached 10 minutes), school
+ * closures submitted by principals, and the email subscriptions that power death-notice alerts
+ * and the 7am state digest.
  */
 final class Alerts
 {
-    /** Met Éireann region codes (FIPS-style EIxx) → county. */
-    private const REGIONS = [
-        'EI01' => 'Carlow', 'EI02' => 'Cavan', 'EI03' => 'Clare', 'EI04' => 'Cork', 'EI06' => 'Donegal', 'EI07' => 'Dublin',
-        'EI10' => 'Galway', 'EI11' => 'Kerry', 'EI12' => 'Kildare', 'EI13' => 'Kilkenny', 'EI14' => 'Laois', 'EI15' => 'Leitrim',
-        'EI16' => 'Limerick', 'EI18' => 'Longford', 'EI19' => 'Louth', 'EI20' => 'Mayo', 'EI21' => 'Meath', 'EI22' => 'Monaghan',
-        'EI23' => 'Offaly', 'EI24' => 'Roscommon', 'EI25' => 'Sligo', 'EI26' => 'Tipperary', 'EI27' => 'Waterford',
-        'EI29' => 'Westmeath', 'EI30' => 'Wexford', 'EI31' => 'Wicklow',
-    ];
-
-    public const KINDS = ['daily' => 'Your 7am county morning email', 'deaths' => 'Death notices as they are published', 'warnings' => 'Weather warnings for your county', 'closures' => 'School closures', 'planning' => 'Planning and statutory notices'];
+    public const KINDS = ['daily' => 'Your 7am state morning email', 'deaths' => 'Death notices as they are published', 'warnings' => 'Weather and disaster warnings for your state', 'closures' => 'School closures', 'planning' => 'Planning and statutory notices'];
 
     private static ?array $cache = null;
 
-    /** All current Met Éireann warnings, normalised. Cached in storage/cache for 10 minutes. */
+    /** All current SACHET warnings, normalised. Cached in storage/cache for 10 minutes. */
     public static function warnings(): array
     {
         if (self::$cache !== null) {
             return self::$cache;
         }
-        $file = Config::storage() . '/cache/met-warnings.json';
+        $file = Config::storage() . '/cache/sachet-warnings.json';
         if (is_file($file) && filemtime($file) > time() - 600) {
             return self::$cache = json_decode((string)file_get_contents($file), true) ?: [];
         }
         $out = [];
         try {
-            $raw = json_decode(Remote::get('https://www.met.ie/Open_Data/json/warning_IRELAND.json', ['Accept: application/json'], 12), true);
+            $raw = json_decode(Remote::get('https://sachet.ndma.gov.in/cap_public_website/FetchAllAlertDetails', ['Accept: application/json'], 15), true);
             foreach (is_array($raw) ? $raw : [] as $w) {
-                if (($w['status'] ?? 'Warning') === 'Cancel') {
+                if (($w['disseminated'] ?? 'true') === 'false') {
                     continue;
                 }
-                $counties = [];
-                foreach ($w['regions'] ?? [] as $code) {
-                    $c = self::REGIONS[$code] ?? null;
-                    if ($c) {
-                        $counties[] = $c;
-                    }
-                }
-                $level = ucfirst(strtolower((string)($w['level'] ?? 'Yellow')));
-                $type = trim(explode(';', (string)($w['type'] ?? ''))[0]);
+                $level = ucfirst(strtolower((string)($w['severity_color'] ?? 'yellow')));
+                $level = in_array($level, ['Yellow', 'Orange', 'Red'], true) ? $level : 'Yellow';
+                $kind = trim((string)($w['disaster_type'] ?? 'Weather'));
+                $message = trim((string)($w['warning_message'] ?? ''));
+                $onset = self::sachetTime($w['effective_start_time'] ?? null);
+                $expiry = self::sachetTime($w['effective_end_time'] ?? null);
+                $counties = self::sachetStates($w);
                 $out[] = [
-                    'id' => (string)($w['capId'] ?? md5(json_encode($w))),
-                    'level' => in_array($level, ['Yellow', 'Orange', 'Red'], true) ? $level : 'Yellow',
-                    'kind' => ucfirst(strtolower($type)),
-                    'headline' => (string)($w['headline'] ?? 'Weather warning'),
-                    'description' => (string)($w['description'] ?? ''),
-                    'onset' => (string)($w['onset'] ?? ''), 'expiry' => (string)($w['expiry'] ?? ''), 'issued' => (string)($w['issued'] ?? ''),
-                    'counties' => $counties, 'national' => count($counties) >= 24,
-                    'advisory' => str_contains(strtolower((string)($w['headline'] ?? '')), 'advisory'),
+                    'id' => (string)($w['identifier'] ?? md5(json_encode($w))),
+                    'level' => $level,
+                    'kind' => $kind,
+                    'headline' => $kind . ' warning',
+                    'description' => $message,
+                    'onset' => $onset, 'expiry' => $expiry, 'issued' => $onset,
+                    'counties' => $counties, 'national' => count($counties) >= 30,
+                    'advisory' => str_contains(strtolower($message), 'advisory'),
+                    'source' => trim((string)($w['alert_source'] ?? 'SACHET')),
                 ];
             }
             usort($out, static fn($a, $b) => self::rank($b['level']) <=> self::rank($a['level']));
             file_put_contents($file, json_encode($out, JSON_UNESCAPED_UNICODE));
         } catch (\Throwable $e) {
-            error_log('Met Éireann warnings: ' . $e->getMessage());
+            error_log('SACHET warnings: ' . $e->getMessage());
             if (is_file($file)) {
                 $out = json_decode((string)file_get_contents($file), true) ?: [];
             }
         }
         return self::$cache = $out;
+    }
+
+    /** Parse a SACHET "Tue Sep 29 19:00:00 IST 2026" timestamp (always India Standard Time) into our canonical UTC ISO format. */
+    private static function sachetTime(?string $raw): string
+    {
+        $raw = trim((string)$raw);
+        if ($raw === '') {
+            return '';
+        }
+        $clean = preg_replace('/\s+IST\s+/', ' ', $raw) ?? $raw;
+        $dt = \DateTime::createFromFormat('D M d H:i:s Y', $clean, new \DateTimeZone('Asia/Kolkata'));
+        return $dt ? gmdate('Y-m-d\TH:i:s', $dt->getTimestamp()) . '+00:00' : '';
+    }
+
+    /**
+     * SACHET's area_description is free text — sometimes "district1, district2 districts of
+     * <State>", sometimes just mandal/tehsil codes with no state name at all. Try the "of
+     * <State>" suffix first, then the issuing agency's name, then fall back to reverse-geocoding
+     * the alert's own centroid against our state centroids.
+     */
+    private static function sachetStates(array $w): array
+    {
+        $states = Locations::countyNames();
+        $area = (string)($w['area_description'] ?? '');
+        if (preg_match('/\bof\s+([A-Za-z .&]+?)\s*$/u', trim($area), $m)) {
+            foreach ($states as $s) {
+                if (strcasecmp(trim($m[1]), $s) === 0) {
+                    return [$s];
+                }
+            }
+        }
+        $source = (string)($w['alert_source'] ?? '');
+        foreach ($states as $s) {
+            if (stripos($source, $s) !== false) {
+                return [$s];
+            }
+        }
+        $centroid = explode(',', (string)($w['centroid'] ?? ''));
+        if (count($centroid) === 2 && is_numeric($centroid[0]) && is_numeric($centroid[1])) {
+            $near = Geo::nearest((float)$centroid[1], (float)$centroid[0]); // centroid is "lon,lat"
+            if ($near['in_india'] && $near['county']) {
+                return [$near['county']];
+            }
+        }
+        return [];
     }
 
     public static function rank(string $level): int
@@ -100,7 +137,7 @@ final class Alerts
                 continue;
             }
             $until = $w['expiry'] ? ' until ' . date_irish($w['expiry'], 'D H:i') : '';
-            return $w['level'] . ' ' . strtolower($w['kind']) . ' warning' . ($w['national'] ? '' : ($county ? ' · ' . $county : ' · ' . count($w['counties']) . ' counties')) . $until;
+            return $w['level'] . ' ' . strtolower($w['kind']) . ' warning' . ($w['national'] ? '' : ($county ? ' · ' . $county : ' · ' . count($w['counties']) . ' states')) . $until;
         }
         return '';
     }
@@ -137,7 +174,7 @@ final class Alerts
             throw new HttpException(400, 'Enter the school name');
         }
         if (!in_array($county, Locations::countyNames(), true)) {
-            throw new HttpException(400, 'Choose a county');
+            throw new HttpException(400, 'Choose a state');
         }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $day)) {
             throw new HttpException(400, 'Choose the date the school is closed');
@@ -154,7 +191,7 @@ final class Alerts
             'reason' => mb_substr(trim((string)($in['reason'] ?? '')), 0, 300), 'contact_name' => mb_substr(trim((string)($in['contact_name'] ?? '')), 0, 100),
             'contact_role' => mb_substr(trim((string)($in['contact_role'] ?? 'Principal')), 0, 60), 'contact_email' => $email, 'verify_token' => $token,
         ]);
-        Mailer::send($email, 'Confirm the closure of ' . $school, '<p>Tap to confirm that <b>' . e($school) . '</b> is closed on <b>' . e(date('l j F', strtotime($day) ?: time())) . '</b>' . ($in['reason'] ?? '' ? ' (' . e($in['reason']) . ')' : '') . '. It appears on the ME News closures list as soon as you confirm, and an editor can remove it if anything looks wrong.</p>'
+        Mailer::send($email, 'Confirm the closure of ' . $school, '<p>Tap to confirm that <b>' . e($school) . '</b> is closed on <b>' . e(date('l j F', strtotime($day) ?: time())) . '</b>' . ($in['reason'] ?? '' ? ' (' . e($in['reason']) . ')' : '') . '. It appears on the Bharat Wire closures list as soon as you confirm, and an editor can remove it if anything looks wrong.</p>'
             . '<p><a href="' . e(absolute_url('/alerts/closures/confirm/' . $token)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm closure</a></p>');
         return ['id' => $id, 'status' => 'review'];
     }
@@ -178,7 +215,7 @@ final class Alerts
         $rows = Database::all("SELECT email, token FROM alert_subscriptions WHERE county=? AND confirmed_at IS NOT NULL AND unsubscribed_at IS NULL AND (','||kinds||',') LIKE '%,closures,%'", [$c['county']]);
         foreach ($rows as $s) {
             Mailer::send($s['email'], 'School closure: ' . $c['school'] . ' (' . date('D j M', strtotime($c['closed_on']) ?: time()) . ')',
-                '<p><b>' . e($c['school']) . '</b>' . ($c['town'] ? ', ' . e($c['town']) : '') . ', Co. ' . e($c['county']) . ' is closed on <b>' . e(date('l j F', strtotime($c['closed_on']) ?: time())) . '</b>.' . ($c['reason'] ? ' ' . e($c['reason']) . '.' : '') . '</p>'
+                '<p><b>' . e($c['school']) . '</b>' . ($c['town'] ? ', ' . e($c['town']) : '') . ', ' . e($c['county']) . ' is closed on <b>' . e(date('l j F', strtotime($c['closed_on']) ?: time())) . '</b>.' . ($c['reason'] ? ' ' . e($c['reason']) . '.' : '') . '</p>'
                 . '<p><a href="' . e(absolute_url('/alerts')) . '" style="color:#139a5c;font-weight:700">All closures and warnings →</a></p>'
                 . '<p style="color:#59685f;font-size:12px"><a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
         }
@@ -213,18 +250,18 @@ final class Alerts
             throw new HttpException(400, 'Enter a valid email');
         }
         if (!in_array($county, Locations::countyNames(), true)) {
-            throw new HttpException(400, 'Choose a county');
+            throw new HttpException(400, 'Choose a state');
         }
         if (!$kinds) {
             $kinds = ['daily'];
         }
-        // ME+ covers up to ten areas; a free account gets one county.
+        // Wire+ covers up to ten areas; a free account gets one state.
         $limit = Membership::alertLimit($user, $email);
         $others = (int)Database::value('SELECT COUNT(*) FROM alert_subscriptions WHERE email=? AND county<>? AND unsubscribed_at IS NULL', [$email, $county]);
         if ($others >= $limit) {
             throw new HttpException(403, $limit === 1
-                ? 'Free accounts get alerts for one county. ME+ members can follow up to ten areas — ' . Membership::priceLabel() . ' or ' . Membership::annualLabel() . '.'
-                : 'ME+ covers up to ten areas. Remove one in your dashboard to add another.');
+                ? 'Free accounts get alerts for one state. Wire+ members can follow up to ten areas — ' . Membership::priceLabel() . ' or ' . Membership::annualLabel() . '.'
+                : 'Wire+ covers up to ten areas. Remove one in your dashboard to add another.');
         }
         $existing = Database::one('SELECT * FROM alert_subscriptions WHERE email=? AND county=?', [$email, $county]);
         $token = $existing['token'] ?? bin2hex(random_bytes(20));
@@ -236,8 +273,8 @@ final class Alerts
         }
         $confirmed = (bool)Database::value('SELECT confirmed_at FROM alert_subscriptions WHERE token=?', [$token]);
         if (!$confirmed) {
-            Mailer::send($email, 'Confirm your ' . $county . ' alerts from ME News',
-                '<p>One tap and you are set up for <b>' . e(implode(', ', array_map(static fn($k) => strtolower(self::KINDS[$k]), $kinds))) . '</b> for Co. ' . e($county) . ($town ? ' (' . e($town) . ')' : '') . '.</p>'
+            Mailer::send($email, 'Confirm your ' . $county . ' alerts from Bharat Wire',
+                '<p>One tap and you are set up for <b>' . e(implode(', ', array_map(static fn($k) => strtolower(self::KINDS[$k]), $kinds))) . '</b> for ' . e($county) . ($town ? ' (' . e($town) . ')' : '') . '.</p>'
                 . '<p><a href="' . e(absolute_url('/alerts/confirm/' . $token)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm my alerts</a></p>'
                 . '<p style="color:#59685f;font-size:13px">Didn’t ask for this? Ignore it and nothing will be sent.</p>');
         }
@@ -278,10 +315,10 @@ final class Alerts
                 if (!$w['national'] && !in_array($s['county'], $w['counties'], true)) {
                     continue;
                 }
-                Mailer::send($s['email'], 'Met Éireann ' . $w['level'] . ' ' . strtolower($w['kind']) . ' warning · Co. ' . $s['county'],
+                Mailer::send($s['email'], ($w['source'] ?? 'SACHET') . ' ' . $w['level'] . ' ' . strtolower($w['kind']) . ' warning · ' . $s['county'],
                     '<p><b style="color:' . (['Yellow' => '#c7780a', 'Orange' => '#e0641e', 'Red' => '#d92645'][$w['level']] ?? '#c7780a') . '">' . e($w['level'] . ' ' . $w['kind'] . ' warning') . '</b> · ' . e($w['headline']) . '</p><p>' . nl2br(e($w['description'])) . '</p>'
                     . ($w['expiry'] ? '<p>Valid until ' . e(date_irish($w['expiry'], 'l H:i')) . '.</p>' : '')
-                    . '<p><a href="' . e(absolute_url('/alerts')) . '" style="color:#139a5c;font-weight:700">Closures and warnings for your county →</a></p>'
+                    . '<p><a href="' . e(absolute_url('/alerts')) . '" style="color:#139a5c;font-weight:700">Closures and warnings for your state →</a></p>'
                     . '<p style="color:#59685f;font-size:12px"><a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
                 $n++;
             }

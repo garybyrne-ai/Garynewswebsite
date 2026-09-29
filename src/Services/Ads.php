@@ -9,7 +9,7 @@ use MeNews\Http\HttpException;
 use MeNews\Support\Locations;
 
 /**
- * ME Ads — self-serve local advertising.
+ * Wire Ads — self-serve local advertising.
  *
  * Advertisers design an ad in the browser (structured spec, rendered server-side so no
  * arbitrary HTML ever reaches the page), submit it for editorial approval, run a free trial,
@@ -34,7 +34,7 @@ final class Ads
 
     public static function price(): int
     {
-        return max(0, (int)Database::setting('ads_price_cents', '2500'));
+        return max(0, (int)Database::setting('ads_price_cents', '99900'));
     }
 
     public static function trialDays(): int
@@ -44,13 +44,13 @@ final class Ads
 
     public static function currency(): string
     {
-        return strtoupper(Database::setting('ads_currency', 'EUR') ?: 'EUR');
+        return strtoupper(Database::setting('ads_currency', 'INR') ?: 'INR');
     }
 
     public static function priceLabel(?int $cents = null): string
     {
         $cents ??= self::price();
-        $symbol = ['EUR' => '€', 'GBP' => '£', 'USD' => '$'][self::currency()] ?? self::currency() . ' ';
+        $symbol = ['INR' => '₹', 'EUR' => '€', 'GBP' => '£', 'USD' => '$'][self::currency()] ?? self::currency() . ' ';
         return $symbol . number_format($cents / 100, $cents % 100 === 0 ? 0 : 2) . '/month';
     }
 
@@ -68,7 +68,7 @@ final class Ads
     {
         Database::setSetting('ads_price_cents', (string)max(100, $cents));
         Database::setSetting('ads_trial_days', (string)max(0, min(60, $trialDays)));
-        Database::setSetting('ads_currency', in_array($currency, ['EUR', 'GBP', 'USD'], true) ? $currency : 'EUR');
+        Database::setSetting('ads_currency', in_array($currency, ['INR', 'EUR', 'GBP', 'USD'], true) ? $currency : 'INR');
     }
 
     // ------------------------------------------------------------- lookup
@@ -367,7 +367,7 @@ final class Ads
             Notifier::send($ad['user_id'], 'ad', 'Advert approved: ' . $ad['title'], $left > 0 ? 'Your advert is live with ' . number_format($left) . ' impressions to deliver.' : 'Your advert is approved; buy a package to start it running.');
             $email = Database::value('SELECT email FROM users WHERE id=?', [$ad['user_id']]);
             if ($email) {
-                Mailer::send((string)$email, 'Your advert is live · ME News', '<p><b>' . e($ad['title']) . '</b> has been approved' . ($left > 0 ? ' and is now running with ' . number_format($left) . ' impressions to deliver.' : '.') . '</p><p>Watch impressions and clicks in your <a href="' . e(absolute_url('/dashboard#advertising')) . '">dashboard</a>.</p>');
+                Mailer::send((string)$email, 'Your advert is live · Bharat Wire', '<p><b>' . e($ad['title']) . '</b> has been approved' . ($left > 0 ? ' and is now running with ' . number_format($left) . ' impressions to deliver.' : '.') . '</p><p>Watch impressions and clicks in your <a href="' . e(absolute_url('/dashboard#advertising')) . '">dashboard</a>.</p>');
             }
         }
     }

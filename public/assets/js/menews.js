@@ -1,4 +1,4 @@
-/* ME News Ireland — site runtime (no framework, no build step) */
+/* Bharat Wire India — site runtime (no framework, no build step) */
 (function () {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -50,7 +50,7 @@
     paint();
   }
 
-  /* ---------- HUD clock (Irish time) ---------- */
+  /* ---------- HUD clock (Indian time) ---------- */
   const clock = $('#hud-clock'), dateEl = $('#hud-date');
   if (clock) {
     const tf = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -101,7 +101,7 @@
     authNext = next && next.startsWith('/') ? next : null;
     $$('[data-auth-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.authTab === view));
     $$('[data-auth-view]').forEach(f => f.hidden = f.dataset.authView !== view);
-    $('#auth-title').textContent = view === 'register' ? 'Create your ME News account' : 'Sign in to ME News';
+    $('#auth-title').textContent = view === 'register' ? 'Create your Bharat Wire account' : 'Sign in to Bharat Wire';
     $('#auth-result').textContent = '';
     openModal('auth-modal');
   }
@@ -365,7 +365,7 @@
         const j = await api(`/api/near?lat=${lat.toFixed(3)}&lng=${lng.toFixed(3)}${document.body.classList.contains('page-home') ? '&compact=1&limit=8' : '&limit=24'}`);
         const tmp = document.createElement('div'); tmp.innerHTML = j.html;
         const fresh = tmp.firstElementChild; near.replaceWith(fresh); fresh.classList.add('is-in'); bindNear();
-        toast(j.place.in_ireland ? 'Local section set to ' + j.title : 'You seem to be outside Ireland — choose a county');
+        toast(j.place.in_india ? 'Local section set to ' + j.title : 'You seem to be outside India — choose a state');
         if (!document.body.classList.contains('page-home')) location.reload();
       } catch (e) { near.classList.remove('is-loading'); toast(e.message); }
     } else location.reload();
@@ -498,7 +498,7 @@
     try {
       const j = await api('/api/bulletin?county=' + encodeURIComponent(b.dataset.bulletin || ''));
       bulletinEl = document.createElement('div'); bulletinEl.className = 'bulletin';
-      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'Ireland') + ' bulletin…</span><button type="button">Stop</button>';
+      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'India') + ' bulletin…</span><button type="button">Stop</button>';
       document.body.appendChild(bulletinEl);
       bulletinEl.querySelector('button').onclick = () => { speechSynthesis.cancel(); bulletinEl.remove(); bulletinEl = null; };
       const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IE/i.test(v.lang)) || voices.find(v => /en-GB/i.test(v.lang)) || null;

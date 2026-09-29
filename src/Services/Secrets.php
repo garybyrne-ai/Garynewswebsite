@@ -21,7 +21,7 @@ final class Secrets
     public const FIELDS = [
         'STRIPE_SECRET_KEY' => ['label' => 'Stripe secret key', 'group' => 'stripe', 'hint' => 'sk_live_… or sk_test_… from Developers → API keys', 'pattern' => '/^(sk|rk)_(live|test)_[A-Za-z0-9]{10,}$/'],
         'STRIPE_WEBHOOK_SECRET' => ['label' => 'Stripe webhook signing secret', 'group' => 'stripe', 'hint' => 'whsec_… shown when you add the webhook endpoint', 'pattern' => '/^whsec_[A-Za-z0-9]{10,}$/'],
-        'STRIPE_PRICE_ME_PLUS' => ['label' => 'Stripe price ID for monthly ME+ (optional)', 'group' => 'stripe', 'hint' => 'price_… — leave blank to bill the price from Settings', 'pattern' => '/^price_[A-Za-z0-9]{6,}$/'],
+        'STRIPE_PRICE_WIRE_PLUS' => ['label' => 'Stripe price ID for monthly Wire+ (optional)', 'group' => 'stripe', 'hint' => 'price_… — leave blank to bill the price from Settings', 'pattern' => '/^price_[A-Za-z0-9]{6,}$/'],
         'PAYPAL_CLIENT_ID' => ['label' => 'PayPal client ID', 'group' => 'paypal', 'hint' => 'From the PayPal developer dashboard → your REST app', 'pattern' => '/^[A-Za-z0-9_\-]{20,}$/'],
         'PAYPAL_CLIENT_SECRET' => ['label' => 'PayPal client secret', 'group' => 'paypal', 'hint' => 'Same app, “Secret key”', 'pattern' => '/^[A-Za-z0-9_\-]{20,}$/'],
         'PAYPAL_WEBHOOK_ID' => ['label' => 'PayPal webhook ID', 'group' => 'paypal', 'hint' => 'Shown after you add the webhook URL to the app', 'pattern' => '/^[A-Z0-9]{10,}$/'],

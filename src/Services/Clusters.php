@@ -7,7 +7,7 @@ use MeNews\Database;
 
 /**
  * Cross-source clustering. Six outlets covering the same story become one card that says
- * "6 outlets covering this" with ME's own one-line framing of who led and who followed.
+ * "6 outlets covering this" with Bharat Wire's own one-line framing of who led and who followed.
  * The visible text is ours; each outlet keeps its headline behind the card.
  *
  * Similarity is token overlap on significant words (Jaccard) plus shared proper nouns,

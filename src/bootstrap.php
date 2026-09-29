@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * ME News Ireland — application bootstrap.
+ * Bharat Wire India — application bootstrap.
  *
  * Registers the PSR-4 autoloader for the MeNews namespace, loads the .env file,
  * configures error handling and exposes a handful of global view helpers.

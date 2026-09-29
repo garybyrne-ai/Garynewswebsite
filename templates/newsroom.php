@@ -23,7 +23,7 @@
       <button data-view="users">People</button>
       <button data-view="ads">Advertising <span class="badge" id="nav-ads-count">0</span></button>
       <button data-view="wire">News wire</button>
-      <button data-view="locations">Irish locations</button>
+      <button data-view="locations">Indian locations</button>
       <button data-view="trust">Corrections &amp; takedowns <span class="badge" id="nav-takedowns-count">0</span></button>
       <button data-view="settings">Settings</button>
       <button data-view="audit">Audit log</button>
@@ -52,7 +52,7 @@
           <div class="form__row"><label>Name<input name="display_name" required minlength="2" maxlength="80"></label><label>Email<input name="email" type="email" required></label></div>
           <div class="form__row" style="grid-template-columns:1fr 1fr 1fr 1fr">
             <label>Role<select name="role"><option value="member">Member</option><option value="contributor">Contributor</option><option value="editor">Editor</option><option value="admin">Admin</option></select></label>
-            <label>Plan<select name="plan"><option value="free">Free</option><option value="ME+">ME+ (complimentary)</option></select></label>
+            <label>Plan<select name="plan"><option value="free">Free</option><option value="Wire+">Wire+ (complimentary)</option></select></label>
             <label>Home county<select name="home_county" data-county-select><option value="">—</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
             <label>Temporary password<input name="password" type="text" autocomplete="off" placeholder="blank = generate one" minlength="8"></label>
           </div>
@@ -77,7 +77,7 @@
       </div>
 
       <div id="view-wire" class="view">
-        <div class="inline" style="justify-content:space-between"><div><h1>News wire</h1><p class="pagehead__blurb">Headlines are pulled from established Irish publishers every <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes and filed to the matching desk editor.</p></div><button class="btn btn--primary" id="wire-refresh" type="button">Refresh wire now</button></div>
+        <div class="inline" style="justify-content:space-between"><div><h1>News wire</h1><p class="pagehead__blurb">Headlines are pulled from established Indian publishers every <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes and filed to the matching desk editor.</p></div><button class="btn btn--primary" id="wire-refresh" type="button">Refresh wire now</button></div>
         <div class="panel" id="wire-schedule"></div>
         <ul class="sources" id="wire-sources"></ul>
         <h2>Recent runs</h2>
@@ -85,8 +85,8 @@
       </div>
 
       <div id="view-locations" class="view">
-        <h1>Irish location database</h1>
-        <div class="panel"><p style="margin-bottom:12px">ME ships with a curated fallback list of towns. Administrators can replace it with the complete official CSO / Tailte Éireann 2022 Urban Areas layer (CC BY 4.0).</p><button class="btn btn--primary" id="loc-refresh" type="button">Import official Irish towns</button><p class="form__result" id="loc-result"></p></div>
+        <h1>Indian location database</h1>
+        <div class="panel"><p style="margin-bottom:12px">Bharat Wire ships with a curated fallback list of towns. Administrators can replace it with the fuller GeoNames India place list (CC BY 4.0).</p><button class="btn btn--primary" id="loc-refresh" type="button">Import official Indian towns</button><p class="form__result" id="loc-result"></p></div>
       </div>
 
       <div id="view-sections" class="view">

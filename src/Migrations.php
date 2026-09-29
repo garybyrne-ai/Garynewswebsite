@@ -68,7 +68,7 @@ final class Migrations
             }
         }
         // Default advertising, membership and content-position settings
-        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('ads_price_cents','2500'),('ads_trial_days','7'),('ads_currency','EUR'),('plus_price_cents','399'),('plus_annual_cents','3900'),('wire_mode','clustered'),('wire_images','1')");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('ads_price_cents','99900'),('ads_trial_days','7'),('ads_currency','INR'),('plus_price_cents','9900'),('plus_annual_cents','99900'),('wire_mode','clustered'),('wire_images','1')");
         // Wire stories are labelled by their source, never "Verified" (that word is reserved for reports our desk checked).
         $pdo->exec("UPDATE stories SET verification_label='Wire' WHERE kind='wire' AND verification_label='Verified'");
         $pdo->exec("UPDATE stories SET signal_json=NULL WHERE signal_json LIKE '%clustered%'");

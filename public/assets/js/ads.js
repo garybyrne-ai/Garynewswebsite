@@ -1,4 +1,4 @@
-/* ME Ads — shared designer used by the member dashboard and the newsroom */
+/* Wire Ads — shared designer used by the member dashboard and the newsroom */
 (function () {
   'use strict';
   const { api, esc, toast } = window.ME;
@@ -89,7 +89,7 @@
     mine.innerHTML = j.ads.length ? j.ads.map(ad => `<article class="adcard" data-id="${ad.id}">
       <div>${ad.preview}</div>
       <div class="adcard__meta">
-        <div class="inline"><span class="adcard__state is-${esc(ad.state_tone)}">${esc(ad.state_label)}</span><span class="chip">${esc(ad.tier_label)}</span>${ad.target_county ? `<span class="chip">${esc(ad.target_town ? ad.target_town + ', ' : '')}Co. ${esc(ad.target_county)}</span>` : '<span class="chip">All Ireland</span>'}</div>
+        <div class="inline"><span class="adcard__state is-${esc(ad.state_tone)}">${esc(ad.state_label)}</span><span class="chip">${esc(ad.tier_label)}</span>${ad.target_county ? `<span class="chip">${esc(ad.target_town ? ad.target_town + ', ' : '')}${esc(ad.target_county)}</span>` : '<span class="chip">All India</span>'}</div>
         <h3>${esc(ad.business_name)} · <span style="color:var(--muted);font-weight:500">${esc(ad.title)}</span></h3>
         ${ad.notes && ad.status === 'rejected' ? `<p class="is-warn" style="font-size:.9rem">Editor: ${esc(ad.notes)}</p>` : ''}
         <div class="adcard__stats"><span><b>${num(ad.impressions)}</b> views</span><span><b>${num(ad.clicks)}</b> clicks</span><span><b>${ad.ctr}%</b> CTR</span><span><b>${ad.impressions_left === null ? '—' : num(ad.impressions_left)}</b> impressions left</span></div>
@@ -154,7 +154,7 @@
     list.innerHTML = j.ads.length ? j.ads.map(ad => `<article class="adcard" data-id="${ad.id}">
       <div>${ad.preview}</div>
       <div class="adcard__meta">
-        <div class="inline"><span class="adcard__state is-${esc(ad.state_tone)}">${esc(ad.state_label)}</span>${ad.is_house ? '<span class="chip chip--plus">House</span>' : ''}<span class="chip">${esc(ad.placement)}</span>${ad.target_county ? `<span class="chip">${esc(ad.target_town ? ad.target_town + ', ' : '')}Co. ${esc(ad.target_county)}</span>` : '<span class="chip">All Ireland</span>'}<span class="mono" style="margin-left:auto;color:var(--muted)">weight ${ad.weight}</span></div>
+        <div class="inline"><span class="adcard__state is-${esc(ad.state_tone)}">${esc(ad.state_label)}</span>${ad.is_house ? '<span class="chip chip--plus">House</span>' : ''}<span class="chip">${esc(ad.placement)}</span>${ad.target_county ? `<span class="chip">${esc(ad.target_town ? ad.target_town + ', ' : '')}${esc(ad.target_county)}</span>` : '<span class="chip">All India</span>'}<span class="mono" style="margin-left:auto;color:var(--muted)">weight ${ad.weight}</span></div>
         <h3>${esc(ad.business_name)} <span style="color:var(--muted);font-weight:500">· ${esc(ad.title)}</span></h3>
         <p class="sub" style="color:var(--muted);font-size:.8rem">${esc(ad.owner_name || '')} ${esc(ad.owner_email || '')} · <a href="${esc(ad.url)}" target="_blank" rel="noopener">${esc(ad.url)}</a> · created ${fmt(ad.created_at)}${ad.is_house ? '' : ' · ' + esc(ad.tier_label) + ' · ' + (ad.impressions_left === null ? '—' : num(ad.impressions_left)) + ' impressions left'}</p>
         ${ad.notes ? `<p class="sub is-warn">Note: ${esc(ad.notes)}</p>` : ''}

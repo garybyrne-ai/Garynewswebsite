@@ -18,19 +18,19 @@ use MeNews\Http\HttpException;
 final class AdPackages
 {
     public const TIERS = [
-        'sidebar' => ['label' => 'Sidebar', 'weight' => 1, 'home' => false, 'banner' => false, 'blurb' => 'Sidebar cards on section, county, story and notices pages'],
-        'site' => ['label' => 'Site-wide', 'weight' => 2, 'home' => false, 'banner' => true, 'blurb' => 'Sidebar cards and banners on section, county and story pages'],
+        'sidebar' => ['label' => 'Sidebar', 'weight' => 1, 'home' => false, 'banner' => false, 'blurb' => 'Sidebar cards on section, state, story and notices pages'],
+        'site' => ['label' => 'Site-wide', 'weight' => 2, 'home' => false, 'banner' => true, 'blurb' => 'Sidebar cards and banners on section, state and story pages'],
         'premium' => ['label' => 'Front page', 'weight' => 3, 'home' => true, 'banner' => true, 'blurb' => 'Every placement at once, including the home page, with priority'],
     ];
 
     /** Bundled defaults, created once on install/upgrade and editable afterwards. */
     private const DEFAULTS = [
-        ['slug' => 'starter', 'name' => 'Starter', 'tagline' => 'Try local advertising', 'price_cents' => 600, 'impressions' => 1000, 'tier' => 'sidebar', 'badge' => '', 'sort' => 1,
-            'features' => ['1,000 impressions', 'Sidebar card on section, county and story pages', 'Target all of Ireland, one county or one town', 'Self-serve designer, six templates', 'Live impressions and clicks']],
-        ['slug' => 'local-reach', 'name' => 'Local Reach', 'tagline' => 'Most popular', 'price_cents' => 900, 'impressions' => 4000, 'tier' => 'site', 'badge' => 'Best value', 'sort' => 2,
-            'features' => ['4,000 impressions', 'Sidebar card and banner on section, county and story pages', 'County or town targeting', 'Self-serve designer, six templates', 'Live impressions and clicks']],
-        ['slug' => 'front-page', 'name' => 'Front Page', 'tagline' => 'Everywhere at once', 'price_cents' => 2000, 'impressions' => 10000, 'tier' => 'premium', 'badge' => 'Maximum reach', 'sort' => 3,
-            'features' => ['10,000 impressions', 'Home page banner and sidebar plus every other placement', 'Priority over other adverts', 'County or town targeting', 'Self-serve designer, six templates', 'Live impressions and clicks']],
+        ['slug' => 'starter', 'name' => 'Starter', 'tagline' => 'Try local advertising', 'price_cents' => 29900, 'impressions' => 1000, 'tier' => 'sidebar', 'badge' => '', 'sort' => 1,
+            'features' => ['1,000 impressions', 'Sidebar card on section, state and story pages', 'Target all of India, one state or one city', 'Self-serve designer, six templates', 'Live impressions and clicks']],
+        ['slug' => 'local-reach', 'name' => 'Local Reach', 'tagline' => 'Most popular', 'price_cents' => 49900, 'impressions' => 4000, 'tier' => 'site', 'badge' => 'Best value', 'sort' => 2,
+            'features' => ['4,000 impressions', 'Sidebar card and banner on section, state and story pages', 'State or city targeting', 'Self-serve designer, six templates', 'Live impressions and clicks']],
+        ['slug' => 'front-page', 'name' => 'Front Page', 'tagline' => 'Everywhere at once', 'price_cents' => 99900, 'impressions' => 10000, 'tier' => 'premium', 'badge' => 'Maximum reach', 'sort' => 3,
+            'features' => ['10,000 impressions', 'Home page banner and sidebar plus every other placement', 'Priority over other adverts', 'State or city targeting', 'Self-serve designer, six templates', 'Live impressions and clicks']],
     ];
 
     public static function seedDefaults(\PDO $pdo): void
@@ -70,7 +70,7 @@ final class AdPackages
 
     public static function money(int $cents): string
     {
-        $symbol = ['EUR' => '€', 'GBP' => '£', 'USD' => '$'][Ads::currency()] ?? Ads::currency() . ' ';
+        $symbol = ['INR' => '₹', 'EUR' => '€', 'GBP' => '£', 'USD' => '$'][Ads::currency()] ?? Ads::currency() . ' ';
         return $symbol . number_format($cents / 100, $cents % 100 === 0 ? 0 : 2);
     }
 

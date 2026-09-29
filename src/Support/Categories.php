@@ -8,11 +8,11 @@ final class Categories
 {
     /** @var array<string,array{slug:string,blurb:string,icon:string}> */
     public const ALL = [
-        'National'  => ['slug' => 'national',  'blurb' => 'Ireland-wide news, politics and public affairs', 'icon' => 'national'],
-        'Local'     => ['slug' => 'local',     'blurb' => 'County-by-county reporting from every corner of the island', 'icon' => 'pin'],
+        'National'  => ['slug' => 'national',  'blurb' => 'India-wide news, politics and public affairs', 'icon' => 'national'],
+        'Local'     => ['slug' => 'local',     'blurb' => 'State-by-state reporting from every corner of the country', 'icon' => 'pin'],
         'Business'  => ['slug' => 'business',  'blurb' => 'Economy, enterprise, jobs and technology', 'icon' => 'briefcase'],
-        'Sport'     => ['slug' => 'sport',     'blurb' => 'GAA, rugby, soccer, racing and everything in between', 'icon' => 'trophy'],
-        'Culture'   => ['slug' => 'culture',   'blurb' => 'Arts, music, screen, books and Irish life', 'icon' => 'culture'],
+        'Sport'     => ['slug' => 'sport',     'blurb' => 'Cricket, kabaddi, football, badminton and everything in between', 'icon' => 'trophy'],
+        'Culture'   => ['slug' => 'culture',   'blurb' => 'Arts, music, screen, books and Indian life', 'icon' => 'culture'],
         'Community' => ['slug' => 'community', 'blurb' => 'Reports from the people who live where it happens', 'icon' => 'community'],
         'Traffic'   => ['slug' => 'traffic',   'blurb' => 'Roads, rail, delays and transport alerts', 'icon' => 'traffic'],
         'Council'   => ['slug' => 'council',   'blurb' => 'Local authorities, planning and civic decisions', 'icon' => 'council'],

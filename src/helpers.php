@@ -55,15 +55,15 @@ function time_ago(?string $iso): string
     return date_irish($iso, 'j M Y');
 }
 
-/** Format an ISO timestamp in Irish local time. */
+/** Format an ISO timestamp in the site's local time (India by default; the name is historical). */
 function date_irish(?string $iso, string $format = 'D j M Y, H:i'): string
 {
     if (!$iso) {
         return '';
     }
     try {
-        $zone = new DateTimeZone(MeNews\Config::get('APP_TIMEZONE', 'Europe/Dublin'));
-        // Naive timestamps (no offset), e.g. funeral or event times typed by a person, are Irish local time.
+        $zone = new DateTimeZone(MeNews\Config::get('APP_TIMEZONE', 'Asia/Kolkata'));
+        // Naive timestamps (no offset), e.g. funeral or event times typed by a person, are local time.
         $dt = new DateTimeImmutable($iso, $zone);
         return $dt->setTimezone($zone)->format($format);
     } catch (Throwable) {
@@ -71,7 +71,7 @@ function date_irish(?string $iso, string $format = 'D j M Y, H:i'): string
     }
 }
 
-/** URL-safe slug from free text (keeps Irish fadas readable by transliterating them). */
+/** URL-safe slug from free text (keeps accented Latin characters readable by transliterating them). */
 function slugify(string $text, int $max = 80): string
 {
     $text = mb_strtolower(trim($text));

@@ -1,7 +1,7 @@
 <div class="container kidspage" data-game="quiz" data-puzzle='<?= e(json_encode($quiz, JSON_UNESCAPED_UNICODE)) ?>'>
   <div class="paper paper--puzzle">
     <?= \MeNews\View::partial('partials/paper-head', ['edition' => $edition, 'longDate' => \MeNews\Support\Daily::longDate($date)]) ?>
-    <div class="puzzle__head"><div><span class="paper__stamp">Quiz</span><h1>Know Your Ireland <small>· five questions</small></h1></div></div>
+    <div class="puzzle__head"><div><span class="paper__stamp">Quiz</span><h1>Know Your India <small>· five questions</small></h1></div></div>
     <form class="quiz" data-quiz>
       <?php foreach ($quiz['questions'] as $q): ?>
         <fieldset class="quiz__q" data-q="<?= (int)$q['n'] - 1 ?>">

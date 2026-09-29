@@ -39,7 +39,7 @@ final class Mailer
 
     public static function from(): string
     {
-        $host = parse_url(Config::baseUrl(), PHP_URL_HOST) ?: 'menews.ie';
+        $host = parse_url(Config::baseUrl(), PHP_URL_HOST) ?: 'bharatwire.in';
         $from = self::setting('from', 'MAIL_FROM', 'news@' . $host);
         return filter_var($from, FILTER_VALIDATE_EMAIL) ? $from : 'news@' . $host;
     }
@@ -112,9 +112,9 @@ final class Mailer
         return '<!doctype html><html><head><meta charset="utf-8"><title>' . e($subject) . '</title></head>'
             . '<body style="margin:0;background:#f3f7f4;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0b1410">'
             . '<div style="max-width:620px;margin:0 auto;padding:24px 16px">'
-            . '<div style="padding:14px 0 18px;font-weight:800;font-size:20px;letter-spacing:-.02em"><span style="color:#139a5c">ME</span> News <span style="font-weight:500;font-size:11px;letter-spacing:.2em;color:#59685f">IRELAND</span></div>'
+            . '<div style="padding:14px 0 18px;font-weight:800;font-size:20px;letter-spacing:-.02em"><span style="color:#139a5c">Bharat</span> Wire <span style="font-weight:500;font-size:11px;letter-spacing:.2em;color:#59685f">INDIA</span></div>'
             . '<div style="background:#fff;border:1px solid #d9e3dc;border-radius:16px;padding:22px 24px;font-size:16px;line-height:1.6">' . $body . '</div>'
-            . '<p style="color:#59685f;font-size:12px;line-height:1.5;padding:16px 4px">ME News Ireland · <a href="' . e($base) . '/privacy" style="color:#59685f">Privacy</a> · <a href="' . e($base) . '/about" style="color:#59685f">How we check things</a></p>'
+            . '<p style="color:#59685f;font-size:12px;line-height:1.5;padding:16px 4px">Bharat Wire India · <a href="' . e($base) . '/privacy" style="color:#59685f">Privacy</a> · <a href="' . e($base) . '/about" style="color:#59685f">How we check things</a></p>'
             . '</div></body></html>';
     }
 

@@ -5,7 +5,7 @@
     <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/notices">Notices</a><span>/</span><a href="/notices/<?= e($n['kind']) ?>"><?= e(\MeNews\Services\Notices::KINDS[$n['kind']]['plural']) ?></a><span>/</span><a href="/notices/<?= e($n['kind']) ?>?county=<?= rawurlencode($n['county']) ?>">Co. <?= e($n['county']) ?></a></nav>
     <div class="article__labels"><span class="chip chip--cat"><?= icon($n['icon']) ?> <?= e($n['kind_label']) ?></span><?php if ($n['promoted']): ?><span class="chip chip--plus">Promoted</span><?php endif; ?><?php if ($n['kind'] === 'pet' && !empty($x['pet_status'])): ?><span class="chip"><?= e(ucfirst($x['pet_status'])) ?></span><?php endif; ?></div>
     <h1 class="article__title"><?= e($n['title']) ?></h1>
-    <p class="article__standfirst"><?= icon('pin') ?> <?= e(($n['town'] ? $n['town'] . ', ' : '') . 'Co. ' . $n['county']) ?><?= $n['address'] ? ' · ' . e($n['address']) : '' ?></p>
+    <p class="article__standfirst"><?= icon('pin') ?> <?= e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) ?><?= $n['address'] ? ' · ' . e($n['address']) : '' ?></p>
   </header>
   <div class="article__grid">
     <div class="article__main">
@@ -40,7 +40,7 @@
       <?php if ($related): ?>
         <section class="panel reveal">
           <header class="panel__head"><span class="kicker">More <?= e(mb_strtolower(\MeNews\Services\Notices::KINDS[$n['kind']]['plural'])) ?> · Co. <?= e($n['county']) ?></span></header>
-          <ul class="noticelist"><?php foreach ($related as $r): ?><li><a href="<?= e($r['url']) ?>"><b><?= e($r['title']) ?></b><small><?= e($r['town'] ?: 'Co. ' . $r['county']) ?><?= $r['funeral_at'] ? ' · ' . e(date_irish($r['funeral_at'], 'D H:i')) : ($r['event_at'] ? ' · ' . e(date_irish($r['event_at'], 'D j M')) : '') ?></small></a></li><?php endforeach; ?></ul>
+          <ul class="noticelist"><?php foreach ($related as $r): ?><li><a href="<?= e($r['url']) ?>"><b><?= e($r['title']) ?></b><small><?= e($r['town'] ?: $r['county']) ?><?= $r['funeral_at'] ? ' · ' . e(date_irish($r['funeral_at'], 'D H:i')) : ($r['event_at'] ? ' · ' . e(date_irish($r['event_at'], 'D j M')) : '') ?></small></a></li><?php endforeach; ?></ul>
         </section>
       <?php endif; ?>
       <section class="panel panel--alerts reveal">

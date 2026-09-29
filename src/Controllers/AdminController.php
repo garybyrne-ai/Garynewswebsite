@@ -218,7 +218,7 @@ final class AdminController
         }
         $verified = (int)($r->post('is_verified') === '1');
         $rep = max(0, min(100, (int)$r->post('reputation', '50')));
-        $plan = $r->post('plan', $target['plan'], 10) === 'ME+' ? 'ME+' : 'free';
+        $plan = $r->post('plan', $target['plan'], 10) === 'Wire+' ? 'Wire+' : 'free';
         Database::query('UPDATE users SET role=?,is_verified=?,reputation=?,title=?,desk=?,plan=? WHERE id=?', [$role, $verified, $rep, $r->post('title', '', 80) ?: null, $r->post('desk', '', 40) ?: null, $plan, $p['id']]);
         if ($plan !== $target['plan']) {
             Audit::log($u['id'], 'user.plan', 'user', $p['id'], $plan . ' (complimentary, set by admin)');
@@ -262,12 +262,12 @@ final class AdminController
         Database::insert('users', [
             'id' => $id, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'display_name' => $name,
             'handle' => AccountController::uniqueHandle($name), 'role' => $role, 'title' => $r->post('title', '', 80) ?: null, 'desk' => $r->post('desk', '', 40) ?: null,
-            'home_county' => in_array($county, Locations::countyNames(), true) ? $county : null, 'plan' => $r->post('plan', 'free', 10) === 'ME+' ? 'ME+' : 'free',
+            'home_county' => in_array($county, Locations::countyNames(), true) ? $county : null, 'plan' => $r->post('plan', 'free', 10) === 'Wire+' ? 'Wire+' : 'free',
             'accent' => (string)random_int(0, 359), 'created_at' => now(),
         ]);
         Database::insert('subscriptions', ['user_id' => $id, 'email' => $email, 'plan' => 'free', 'status' => 'active', 'created_at' => now()]);
         Audit::log($u['id'], 'user.create', 'user', $id, "$email as $role");
-        \MeNews\Services\Mailer::send($email, 'Your ME News account', '<p>Hi ' . e($name) . ',</p><p>' . e($u['display_name']) . ' has created an ME News account for you' . ($role !== 'member' ? ' as <b>' . e($role) . '</b>' : '') . '.</p><p>Sign in at <a href="' . e(absolute_url('/?auth=signin')) . '">' . e(absolute_url('/')) . '</a> with this address and the temporary password your editor gives you, then change it under <b>Security</b> in your dashboard.</p>');
+        \MeNews\Services\Mailer::send($email, 'Your Bharat Wire account', '<p>Hi ' . e($name) . ',</p><p>' . e($u['display_name']) . ' has created an Bharat Wire account for you' . ($role !== 'member' ? ' as <b>' . e($role) . '</b>' : '') . '.</p><p>Sign in at <a href="' . e(absolute_url('/?auth=signin')) . '">' . e(absolute_url('/')) . '</a> with this address and the temporary password your editor gives you, then change it under <b>Security</b> in your dashboard.</p>');
         return Response::json(['ok' => true, 'id' => $id, 'temporary_password' => $generated ? $password : null]);
     }
 
@@ -536,7 +536,7 @@ final class AdminController
         }
         Database::setSetting('mail_last_error', '');
         $m = \MeNews\Services\Mailer::class;
-        $sent = $m::send($to, 'ME News test email', '<p>This is a test from the ME News newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_irish(now())) . ' by ' . e($u['display_name']) . '.</p>');
+        $sent = $m::send($to, 'Bharat Wire test email', '<p>This is a test from the Bharat Wire newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_irish(now())) . ' by ' . e($u['display_name']) . '.</p>');
         $err = (string)Database::setting('mail_last_error', '');
         Audit::log($u['id'], 'mail.test', 'settings', 'mail', $to . ' · ' . ($err ?: 'ok'));
         if ($err !== '') {
@@ -604,7 +604,7 @@ final class AdminController
             if ($k === 'site_url' && $v !== '') {
                 $v = \MeNews\Config::normaliseBase($v);
                 if ($v === '') {
-                    throw new HttpException(400, 'Site address must be a web address such as https://menews.ie');
+                    throw new HttpException(400, 'Site address must be a web address such as https://bharatwire.in');
                 }
             }
             if ($meta['type'] === 'cents') {
@@ -628,17 +628,17 @@ final class AdminController
             'site_url' => ['label' => 'Site address (canonical domain)', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
             'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
             'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'default' => '1'],
-            'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],
-            'plus_annual_cents' => ['label' => 'ME+ annual price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '3900'],
-            'ads_price_cents' => ['label' => 'Advertising monthly price (€)', 'group' => 'Advertising', 'type' => 'cents', 'default' => '2500'],
+            'plus_price_cents' => ['label' => 'Wire+ monthly price (₹)', 'group' => 'Membership', 'type' => 'cents', 'default' => '9900'],
+            'plus_annual_cents' => ['label' => 'Wire+ annual price (₹)', 'group' => 'Membership', 'type' => 'cents', 'default' => '99900'],
+            'ads_price_cents' => ['label' => 'Advertising monthly price (₹)', 'group' => 'Advertising', 'type' => 'cents', 'default' => '99900'],
             'ads_trial_days' => ['label' => 'Advertising free trial (days)', 'group' => 'Advertising', 'type' => 'int', 'default' => '7'],
             'ad_rotate_seconds' => ['label' => 'Advert rotation (seconds per advert)', 'group' => 'Advertising', 'type' => 'int', 'default' => '20'],
             'whatsapp_number' => ['label' => 'WhatsApp reporting number (national)', 'group' => 'Community', 'type' => 'text', 'default' => ''],
             'whatsapp_channel' => ['label' => 'WhatsApp channel link (national)', 'group' => 'Community', 'type' => 'text', 'default' => ''],
             'contact_email' => ['label' => 'Editorial contact email', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
             'owner_name' => ['label' => 'Owner / publisher name', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Gary Byrne'],
-            'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'ME News Ireland'],
-            'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Ireland'],
+            'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Bharat Wire India'],
+            'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'India'],
         ];
         foreach (Locations::countyNames() as $c) {
             $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by county', 'type' => 'text', 'default' => ''];

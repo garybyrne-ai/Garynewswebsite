@@ -1,4 +1,4 @@
-/* ME News Ireland — member dashboard */
+/* Bharat Wire India — member dashboard */
 (function () {
   'use strict';
   const { api, esc, toast } = window.ME;
@@ -23,7 +23,7 @@
     await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAlerts(), loadSaved(), loadAds()]);
     const hash = location.hash.replace('#', '');
     if (hash && $('#view-' + hash)) show(hash);
-    if (qs.get('billing') === 'success') toast('Thank you — ME+ will activate as soon as Stripe confirms payment.');
+    if (qs.get('billing') === 'success') toast('Thank you — Wire+ will activate as soon as Stripe confirms payment.');
     if (qs.get('ad') === 'success' || qs.get('ad') === 'paypal-success') { toast('Thank you — your advertising subscription is being confirmed.'); show('advertising'); }
     if (qs.get('ad') === 'paypal-pending') { toast('PayPal is still confirming your subscription — check back in a minute.'); show('advertising'); }
     if (qs.get('order') === 'paid') { toast('Payment received — your package is ready. Design your advert below.'); show('advertising'); }
@@ -34,7 +34,7 @@
     const a = await api('/api/me/reports');
     const published = a.filter(x => x.status === 'published').length;
     $('#stats').innerHTML = [
-      ['Reports', a.length], ['Published', published], ['Reputation', me.reputation + '/100'], ['Plan', me.plan === 'ME+' ? 'ME+' : 'Free'],
+      ['Reports', a.length], ['Published', published], ['Reputation', me.reputation + '/100'], ['Plan', me.plan === 'Wire+' ? 'Wire+' : 'Free'],
     ].map(([k, v]) => `<div class="stat"><span class="mono">${k}</span><strong>${v}</strong></div>`).join('');
     $('#report-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Report</th><th>Area</th><th>Status</th><th>Safety</th><th>Confidence</th><th>Views</th></tr></thead><tbody>${a.map(x => `<tr><td><b>${x.status === 'published' ? `<a href="/story/${esc(x.slug)}">${esc(x.title)}</a>` : esc(x.title)}</b><span class="sub">${fmt(x.created_at)} · ${esc(x.category)}</span>${x.editorial_note ? `<span class="sub is-warn">Editor: ${esc(x.editorial_note)}</span>` : ''}</td><td>${esc(x.location_name || '')}<span class="sub">${esc(x.county || '')}</span></td><td><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="sub">${esc(x.verification_label)}</span></td><td>${x.safety_score}/100</td><td>${x.trust_score}/100</td><td>${x.views || 0}</td></tr>`).join('')}</tbody></table></div>`
       : '<div class="empty"><div class="empty__glyph">—</div><h3>You have not submitted a report yet.</h3><p>Tap <b>Report</b> in the header when you see something happening near you.</p></div>';
@@ -45,7 +45,7 @@
     const a = await api('/api/me/follows');
     $('#follow-list').innerHTML = a.length ? a.map(x => `<div class="notif inline"><b style="flex:1">${esc(x.location_name || x.county)} <span class="mono">${esc(x.county && x.location_name ? x.county : '')}</span></b><button class="btn btn--ghost btn--sm" data-unfollow="${x.id}">Remove</button></div>`).join('') : '<p class="panel__note">No followed areas yet.</p>';
     $$('[data-unfollow]').forEach(b => b.addEventListener('click', async () => { try { await api('/api/me/follows/' + b.dataset.unfollow, { method: 'DELETE' }); loadFollows(); } catch (e) { toast(e.message); } }));
-    $('#follow-hint').textContent = me.plan === 'ME+' ? `${a.length} of 10 areas used` : `${a.length} of 1 area used — ME+ allows 10`;
+    $('#follow-hint').textContent = me.plan === 'Wire+' ? `${a.length} of 10 areas used` : `${a.length} of 1 area used — Wire+ allows 10`;
   }
   $('#follow-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -82,7 +82,7 @@
     const a = j.subscriptions || [];
     $('#alerts-list').innerHTML = a.length ? a.map(x => `<div class="notif inline"><b style="flex:1">Co. ${esc(x.county)}${x.town ? ' · ' + esc(x.town) : ''} <span class="mono">${esc(x.kind_labels.join(', '))}${x.confirmed ? '' : ' · unconfirmed — check your inbox'}</span></b><button class="btn btn--ghost btn--sm" data-unalert="${x.id}">Remove</button></div>`).join('') : '<p class="panel__note">No county alerts yet.</p>';
     $$('[data-unalert]').forEach(b => b.addEventListener('click', async () => { try { await api('/api/me/alerts/' + b.dataset.unalert, { method: 'DELETE' }); loadAlerts(); } catch (e) { toast(e.message); } }));
-    $('#alerts-hint').textContent = j.plan === 'ME+' ? `${a.length} of ${j.limit} areas used` : `${a.length} of ${j.limit} area used — ME+ allows 10`;
+    $('#alerts-hint').textContent = j.plan === 'Wire+' ? `${a.length} of ${j.limit} areas used` : `${a.length} of ${j.limit} area used — Wire+ allows 10`;
   }
   $('#alerts-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -94,10 +94,10 @@
     const j = await api('/api/billing/status');
     $('#plan-state').innerHTML = `Current plan: <b>${esc(j.plan)}</b>`;
     const btn = $('#checkout-btn');
-    btn.disabled = !j.stripe_configured || j.plan === 'ME+';
-    btn.textContent = j.plan === 'ME+' ? 'ME+ is active' : (j.stripe_configured ? 'Monthly · ' + j.price_label : 'Stripe not configured yet');
-    const yb = $('#checkout-year-btn'); if (yb) { yb.disabled = !j.stripe_configured || j.plan === 'ME+'; yb.textContent = 'Annual · ' + j.annual_label; }
-    const up = qs.get('upgrade'); if (up && j.stripe_configured && j.plan !== 'ME+') { const b = up === 'year' ? yb : btn; if (b) b.click(); }
+    btn.disabled = !j.stripe_configured || j.plan === 'Wire+';
+    btn.textContent = j.plan === 'Wire+' ? 'Wire+ is active' : (j.stripe_configured ? 'Monthly · ' + j.price_label : 'Stripe not configured yet');
+    const yb = $('#checkout-year-btn'); if (yb) { yb.disabled = !j.stripe_configured || j.plan === 'Wire+'; yb.textContent = 'Annual · ' + j.annual_label; }
+    const up = qs.get('upgrade'); if (up && j.stripe_configured && j.plan !== 'Wire+') { const b = up === 'year' ? yb : btn; if (b) b.click(); }
   }
   ['#checkout-btn', '#checkout-year-btn'].forEach(sel => $(sel)?.addEventListener('click', async e => { const f = new FormData(); f.append('interval', e.currentTarget.dataset.interval || 'month'); try { const j = await api('/api/billing/checkout', { method: 'POST', body: f }); location.href = j.url; } catch (err) { toast(err.message); } }));
 

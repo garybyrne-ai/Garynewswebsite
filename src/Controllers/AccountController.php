@@ -71,7 +71,7 @@ final class AccountController
         }
         $u = Database::one('SELECT * FROM users WHERE id=?', [$id]);
         Audit::log($id, 'register', 'user', $id);
-        Notifier::send($id, 'welcome', 'Welcome to ME News', 'Follow your local area and report what is happening around you.');
+        Notifier::send($id, 'welcome', 'Welcome to Bharat Wire', 'Follow your local area and report what is happening around you.');
         return Response::json(['token' => Auth::login($u), 'user' => Auth::publicUser($u)]);
     }
 
@@ -305,9 +305,9 @@ final class AccountController
             if (Database::one("SELECT id FROM follows WHERE user_id=? AND lower(COALESCE(location_name,''))=lower(?) AND lower(COALESCE(county,''))=lower(?)", [$u['id'], $loc, $county])) {
                 return ['ok' => true, 'already_following' => true];
             }
-            $max = $u['plan'] === 'ME+' ? 10 : 1;
+            $max = $u['plan'] === 'Wire+' ? 10 : 1;
             if (Database::count('SELECT COUNT(*) FROM follows WHERE user_id=?', [$u['id']]) >= $max) {
-                throw new HttpException(403, "Your plan allows {$max} followed area" . ($max > 1 ? 's' : '') . '. Upgrade to ME+ for up to 10.');
+                throw new HttpException(403, "Your plan allows {$max} followed area" . ($max > 1 ? 's' : '') . '. Upgrade to Wire+ for up to 10.');
             }
             Database::insert('follows', ['user_id' => $u['id'], 'location_name' => $loc, 'county' => $county, 'created_at' => now()]);
             return ['ok' => true];
@@ -417,7 +417,7 @@ final class AccountController
         $out = TrustEngine::process($id);
         \MeNews\Services\Clusters::assignIncident($id);
         if ($guest && $guest['email']) {
-            \MeNews\Services\Mailer::send($guest['contact'], 'Confirm your report to ME News',
+            \MeNews\Services\Mailer::send($guest['contact'], 'Confirm your report to Bharat Wire',
                 '<p>Thanks, ' . e($guest['name']) . '. One tap to confirm this came from you:</p><p><b>' . e($title) . '</b><br><span style="color:#59685f">' . e($loc . ($county ? ', Co. ' . $county : '')) . '</span></p>'
                 . '<p><a href="' . e(absolute_url('/report/confirm/' . $token)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm my report</a></p>'
                 . '<p style="color:#59685f;font-size:13px">An editor reads every report before it appears. You’ll hear back either way at this address.</p>');
@@ -440,10 +440,10 @@ final class AccountController
         }
         return \MeNews\View::page('confirmed', [
             'user' => Auth::user(), 'nav' => Categories::NAV,
-            'title' => ($s ? 'Report confirmed' : 'Link not found') . ' — ME News Ireland',
+            'title' => ($s ? 'Report confirmed' : 'Link not found') . ' — Bharat Wire India',
             'heading' => $s ? 'Thanks, that’s confirmed.' : 'That link doesn’t match anything.',
             'text' => $s ? 'An editor will read “' . $s['title'] . '” shortly. If it is published you’ll get an email with the link; if not, you’ll get a note saying why.' : 'The link may have been used already or copied incompletely.',
-            'link' => '/', 'linkText' => 'Back to ME News',
+            'link' => '/', 'linkText' => 'Back to Bharat Wire',
         ]);
     }
 
