@@ -48,13 +48,16 @@
     $('#wire-last').textContent = s.wire_last_refresh ? 'Wire updated ' + fmt(s.wire_last_refresh) + (s.wire_stale ? ' (stale)' : '') : 'Wire never refreshed';
   }
 
+  function repeatBadge(x) {
+    return x.repeat_count > 2 ? ` <span class="chip chip--bad" title="${x.repeat_count} from this IP in the last 7 days">⚠ repeat submitter × ${x.repeat_count}</span>` : '';
+  }
   function reviewCard(x) {
     const media = x.media_url ? `<div class="review__media">${x.media_type === 'video' ? `<video controls preload="metadata" src="${x.media_url}"></video>` : `<img src="${x.media_url}" alt="">`}</div>` : '';
     return `<article class="review" data-id="${x.id}">
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
       <h3>${esc(x.title)}</h3>
       <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''}${x.author_user_id ? ` · reputation ${x.reporter_reputation ?? '—'}` : (x.reporter_verified_at ? ' · <span class="is-good">guest, contact confirmed</span>' : ` · <span class="is-bad">guest, not yet confirmed</span> (${esc(x.reporter_contact || '')})`)}${x.latitude ? ' · GPS' : ''}</div>
-      <div class="meta sub mono" title="${esc(x.submitter_user_agent || '')}">${esc(x.submitter_ip || 'no IP recorded')}</div>
+      <div class="meta sub mono" title="${esc(x.submitter_user_agent || '')}">${esc(x.submitter_ip || 'no IP recorded')}${repeatBadge(x)}</div>
       ${x.incident_reports && x.incident_reports.length ? `<div class="trustnote"><b>${x.incident_reports.length + 1} reports of this incident.</b> ${x.incident_reports.map(i => `<a href="#" data-jump="${i.id}">${esc(i.author_name || 'Reporter')} · ${esc(i.location_name || '')} · ${esc(i.status)}</a>`).join(' · ')}</div>` : ''}
       ${media}
       ${x.media_type === 'image' && x.media_url ? `<div class="evidence">
@@ -125,7 +128,7 @@
 
   async function loadComments() {
     const a = await api('/api/admin/comments');
-    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><div class="meta sub mono" title="${esc(x.user_agent || '')}">${esc(x.ip_address || 'no IP recorded')}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
+    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><div class="meta sub mono" title="${esc(x.user_agent || '')}">${esc(x.ip_address || 'no IP recorded')}${repeatBadge(x)}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
   }
   $('#comments-list').addEventListener('click', async e => {
     const d = e.target.dataset.c; if (!d) return;
@@ -318,11 +321,12 @@
         ? `<select name="${k}"><option value="">— keep ${esc(f.masked || 'sandbox')} —</option><option value="sandbox">sandbox</option><option value="live">live</option></select>`
         : `<input name="${k}" type="password" autocomplete="new-password" placeholder="${f.set ? esc(f.masked) + '  (leave blank to keep)' : 'Paste here'}">`}<small class="form__hint">${esc(f.hint)}${f.source === 'panel' ? ` · <a href="#" data-clear="${k}">remove</a>` : ''}</small></label>`;
       const group = name => Object.entries(g.fields).filter(([, f]) => f.group === name).map(field).join('');
-      box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Payment gateways</span><span class="mono">Stripe: <b class="${g.stripe ? 'is-good' : 'is-bad'}">${g.stripe ? 'connected' : 'not connected'}</b> · PayPal: <b class="${g.paypal ? 'is-good' : 'is-bad'}">${g.paypal ? 'connected' : 'not connected'}</b></span></div>
-        <p class="panel__note" style="margin:6px 0 12px">Paste the keys from your Stripe and PayPal dashboards here; they are encrypted before they are stored (key: <code>${esc(g.key_source)}</code>) and never shown again, only the last four characters. Nothing needs to be edited on the server. Add these webhook URLs in each dashboard: <code>${esc(g.webhooks.stripe)}</code> (events: checkout.session.completed, payment_intent.succeeded, charge.refunded, customer.subscription.*) and <code>${esc(g.webhooks.paypal)}</code> (PAYMENT.CAPTURE.COMPLETED, PAYMENT.CAPTURE.REFUNDED, BILLING.SUBSCRIPTION.*).</p>
+      box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Payment gateways</span><span class="mono">Stripe: <b class="${g.stripe ? 'is-good' : 'is-bad'}">${g.stripe ? 'connected' : 'not connected'}</b> · PayPal: <b class="${g.paypal ? 'is-good' : 'is-bad'}">${g.paypal ? 'connected' : 'not connected'}</b> · Razorpay (UPI): <b class="${g.razorpay ? 'is-good' : 'is-bad'}">${g.razorpay ? 'connected' : 'not connected'}</b></span></div>
+        <p class="panel__note" style="margin:6px 0 12px">Paste the keys from your Stripe, PayPal and Razorpay dashboards here; they are encrypted before they are stored (key: <code>${esc(g.key_source)}</code>) and never shown again, only the last four characters. Nothing needs to be edited on the server. Add these webhook URLs in each dashboard: <code>${esc(g.webhooks.stripe)}</code> (events: checkout.session.completed, payment_intent.succeeded, charge.refunded, customer.subscription.*), <code>${esc(g.webhooks.paypal)}</code> (PAYMENT.CAPTURE.COMPLETED, PAYMENT.CAPTURE.REFUNDED, BILLING.SUBSCRIPTION.*) and <code>${esc(g.webhooks.razorpay)}</code> (payment_link.paid, subscription.activated, subscription.charged, subscription.cancelled, subscription.halted). Razorpay is how readers and advertisers pay by UPI — BHIM, Google Pay, PhonePe, Paytm and every other UPI app show up automatically on its hosted checkout, no separate integration needed for each one.</p>
         <form id="gateways-form" class="form">
           <div class="gwgrid"><div><h3 style="margin:0 0 8px">Stripe</h3><div class="settingsgrid">${group('stripe')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="stripe">Test Stripe connection</button></div></div>
-          <div><h3 style="margin:0 0 8px">PayPal</h3><div class="settingsgrid">${group('paypal')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="paypal">Test PayPal connection</button></div></div></div>
+          <div><h3 style="margin:0 0 8px">PayPal</h3><div class="settingsgrid">${group('paypal')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="paypal">Test PayPal connection</button></div></div>
+          <div><h3 style="margin:0 0 8px">Razorpay (UPI/BHIM/GPay/PhonePe)</h3><div class="settingsgrid">${group('razorpay')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="razorpay">Test Razorpay connection</button></div></div></div>
           <div class="form__actions"><button class="btn btn--primary" type="submit">Save gateway keys</button><span class="form__hint">Only fields you fill in are changed.</span></div>
           <p class="form__result" id="gateways-result"></p>
         </form>`;

@@ -30,7 +30,7 @@
         <a class="btn btn--ghost btn--block" href="/dashboard?upgrade=year#membership">Annual · <?= e($annualLabel) ?> <span class="mono" style="margin-left:6px;color:var(--em)">two months free</span></a>
       <?php endif; ?>
     </div>
-    <p class="form__legal"><?= $stripe ? 'Secure checkout via Stripe. Your card details never touch Bharat Wire servers.' : 'Online payment is being connected — email the newsroom and we will set you up.' ?> Prices are set by the newsroom and shown here before you pay.</p>
+    <p class="form__legal"><?php if ($razorpay): ?>Pay by UPI — BHIM, Google Pay, PhonePe, Paytm and every other UPI app — or by card.<?php elseif ($stripe): ?>Secure checkout via Stripe. Your card details never touch Bharat Wire servers.<?php else: ?>Online payment is being connected — email the newsroom and we will set you up.<?php endif; ?> Prices are set by the newsroom and shown here before you pay.</p>
   </div>
 </div>
 

@@ -302,12 +302,30 @@
     if (!navigator.geolocation) return toast('Location is unavailable');
     navigator.geolocation.getCurrentPosition(p => { $('#report-lat').value = p.coords.latitude.toFixed(6); $('#report-lng').value = p.coords.longitude.toFixed(6); toast('GPS added to your report'); }, () => toast('Location permission was not granted'));
   });
+  /** Solve a lightweight, no-third-party proof-of-work challenge (native Web Crypto, no CDN/CSP change). */
+  async function solvePow() {
+    const ch = await api('/api/pow/challenge');
+    const need = '0'.repeat(ch.difficulty);
+    const enc = new TextEncoder();
+    for (let nonce = 0; ; nonce++) {
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(ch.id + ':' + nonce));
+      const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if (hex.startsWith(need)) return { id: ch.id, nonce: String(nonce) };
+    }
+  }
   $('#report-form')?.addEventListener('submit', async e => {
     e.preventDefault();
     const out = $('#report-result'); out.classList.remove('is-error'); out.textContent = 'Uploading privately and running safety checks…';
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
-      const j = await api('/api/report', { method: 'POST', body: new FormData(e.target) });
+      const fd = new FormData(e.target);
+      if (!window.ME.user) {
+        out.textContent = 'Verifying…';
+        const sol = await solvePow();
+        fd.set('pow_id', sol.id); fd.set('pow_nonce', sol.nonce);
+        out.textContent = 'Uploading privately and running safety checks…';
+      }
+      const j = await api('/api/report', { method: 'POST', body: fd });
       out.textContent = j.message || `Thanks — your report is with the newsroom (safety ${j.safety_score}/100, confidence ${j.trust_score}/100). You'll hear back either way.`;
       e.target.reset(); const pv = $('.dropzone__preview'); if (pv) { pv.hidden = true; pv.innerHTML = ''; } setTimeout(closeModals, j.message ? 6000 : 3200);
     } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }

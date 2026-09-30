@@ -17,6 +17,7 @@ use MeNews\Services\Media;
 use MeNews\Services\Moderation;
 use MeNews\Services\Notifier;
 use MeNews\Services\RateLimiter;
+use MeNews\Services\Razorpay;
 use MeNews\Services\Stripe;
 use MeNews\Services\TrustEngine;
 use MeNews\Stories;
@@ -73,7 +74,7 @@ final class AccountController
         $u = Database::one('SELECT * FROM users WHERE id=?', [$id]);
         Audit::log($id, 'register', 'user', $id);
         Notifier::send($id, 'welcome', 'Welcome to Bharat Wire', 'Follow your local area and report what is happening around you.');
-        return Response::json(['token' => Auth::login($u), 'user' => Auth::publicUser($u)]);
+        return Response::json(['token' => Auth::login($u, $r->ip(), $r->userAgent()), 'user' => Auth::publicUser($u)]);
     }
 
     public static function login(Request $r): Response
@@ -108,7 +109,7 @@ final class AccountController
         }
         Database::query('UPDATE users SET last_login_ip=?, last_login_at=? WHERE id=?', [$r->ip(), now(), $u['id']]);
         Audit::log($u['id'], 'login', 'user', $u['id']);
-        return Response::json(['token' => Auth::login($u), 'user' => Auth::publicUser($u)]);
+        return Response::json(['token' => Auth::login($u, $r->ip(), $r->userAgent()), 'user' => Auth::publicUser($u)]);
     }
 
     public static function logout(Request $r): Response
@@ -139,6 +140,28 @@ final class AccountController
         Database::query('UPDATE users SET display_name=?,home_town=?,home_county=?,bio=? WHERE id=?', [$name, $r->post('home_town', '', 80), $r->post('home_county', '', 80), $r->post('bio', '', 500), $u['id']]);
         Audit::log($u['id'], 'profile.update', 'user', $u['id']);
         return Response::json(Auth::publicUser(Database::one('SELECT * FROM users WHERE id=?', [$u['id']])));
+    }
+
+    // ------------------------------------------------------------- sessions / devices
+
+    public static function sessions(Request $r): Response
+    {
+        $u = Auth::require();
+        return Response::json(['sessions' => Auth::sessions($u['id'])]);
+    }
+
+    public static function sessionRevoke(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        $id = (int)$p['id'];
+        if ($id === Auth::sessionId()) {
+            throw new HttpException(400, 'Sign out from this device with the Sign out button, not here');
+        }
+        if (!Auth::revokeSession($u['id'], $id)) {
+            throw new HttpException(404, 'Session not found');
+        }
+        Audit::log($u['id'], 'session.revoke', 'session', (string)$id);
+        return Response::json(['ok' => true, 'sessions' => Auth::sessions($u['id'])]);
     }
 
     // ------------------------------------------------------------- saved stories
@@ -340,6 +363,7 @@ final class AccountController
             RateLimiter::hit($u['id'] . '|report', 20, 3600, 'You have sent a lot of reports this hour. Please try again later.');
         } else {
             RateLimiter::hit($r->ip() . '|report', 6, 3600, 'Too many reports from this connection this hour. Sign in to send more.');
+            \MeNews\Services\ProofOfWork::verify($r->post('pow_id', '', 40), $r->post('pow_nonce', '', 64));
             $name = $r->post('reporter_name', '', 80);
             $contact = mb_strtolower($r->post('reporter_contact', '', 120));
             if (mb_strlen($name) < 2) {
@@ -514,13 +538,17 @@ final class AccountController
     public static function billingStatus(Request $r): Response
     {
         $u = Auth::require();
-        return Response::json(['plan' => $u['plan'], 'stripe_configured' => Stripe::configured(), 'price_label' => \MeNews\Services\Membership::priceLabel(), 'annual_label' => \MeNews\Services\Membership::annualLabel(), 'benefits' => \MeNews\Services\Membership::benefits()]);
+        return Response::json(['plan' => $u['plan'], 'stripe_configured' => Stripe::configured(), 'razorpay_configured' => Razorpay::configured(), 'price_label' => \MeNews\Services\Membership::priceLabel(), 'annual_label' => \MeNews\Services\Membership::annualLabel(), 'benefits' => \MeNews\Services\Membership::benefits()]);
     }
 
     public static function checkout(Request $r): Response
     {
         $u = Auth::require();
-        return Response::json(['url' => Stripe::checkoutUrl($u, $r->post('interval', 'month') === 'year' ? 'year' : 'month')]);
+        $interval = $r->post('interval', 'month') === 'year' ? 'year' : 'month';
+        $url = $r->post('gateway', 'stripe', 10) === 'razorpay'
+            ? Razorpay::subscriptionUrl($u, $interval)
+            : Stripe::checkoutUrl($u, $interval);
+        return Response::json(['url' => $url]);
     }
 
     public static function stripeWebhook(Request $r): Response

@@ -146,6 +146,12 @@ final class ApiController
         return Response::json(['hours' => Stories::pulse(), 'counties' => Stories::countyActivity(8), 'total' => Stories::countPublished(), 'wire_last_refresh' => NewsWire::lastRefresh()]);
     }
 
+    /** A fresh proof-of-work challenge for the guest report form. */
+    public static function powChallenge(Request $r): Response
+    {
+        return Response::json(\MeNews\Services\ProofOfWork::issue());
+    }
+
     public static function ads(Request $r): Response
     {
         if (\MeNews\Services\Membership::adFree(\MeNews\Auth::user())) {

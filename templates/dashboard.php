@@ -78,8 +78,14 @@
         <p>Ad-free reading, death notice and closure alerts for up to ten areas, the 7am email for each, the full archive and the members' state newsletter.</p>
         <div class="price"><b><?= e(\MeNews\Services\Membership::priceLabel()) ?></b><small>or <?= e(\MeNews\Services\Membership::annualLabel()) ?></small></div>
         <p id="plan-state"></p>
-        <div class="form__actions" style="justify-content:flex-start;margin-top:12px"><button class="btn btn--primary" id="checkout-btn" type="button" data-interval="month">Monthly with Stripe</button><button class="btn btn--ghost" id="checkout-year-btn" type="button" data-interval="year">Annual · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button><a class="btn btn--ghost" href="/plus">Compare plans</a></div>
-        <p class="form__legal">Stripe Checkout becomes live when the Stripe secret key is configured in .env. Prices are set in the newsroom.</p>
+        <div class="form__actions" style="justify-content:flex-start;margin-top:12px;flex-wrap:wrap">
+          <button class="btn btn--primary" id="checkout-upi-btn" type="button" data-interval="month" data-gateway="razorpay" hidden>Monthly by UPI · <?= e(\MeNews\Services\Membership::priceLabel()) ?></button>
+          <button class="btn btn--ghost" id="checkout-upi-year-btn" type="button" data-interval="year" data-gateway="razorpay" hidden>Annual by UPI · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button>
+          <button class="btn btn--primary" id="checkout-btn" type="button" data-interval="month" data-gateway="stripe">Monthly with Stripe</button>
+          <button class="btn btn--ghost" id="checkout-year-btn" type="button" data-interval="year" data-gateway="stripe">Annual · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button>
+          <a class="btn btn--ghost" href="/plus">Compare plans</a>
+        </div>
+        <p class="form__legal">UPI (BHIM, Google Pay, PhonePe, Paytm…) opens Razorpay's checkout in a new tab and activates within a minute of payment. Stripe Checkout becomes live when the Stripe secret key is configured. Prices are set in the newsroom.</p>
       </div>
     </div>
 
@@ -107,6 +113,7 @@
         <div class="form__actions"><button class="btn btn--primary" type="submit">Update password</button></div>
       </form>
       <div class="panel"><h2>Session</h2><p style="margin:8px 0">Sessions are stored as SHA-256 hashes and expire automatically. Sign out on shared devices.</p><button class="btn btn--ghost" type="button" data-logout>Sign out everywhere on this device</button></div>
+      <div class="panel"><h2>Signed-in devices</h2><p style="margin:8px 0">Every place you're currently signed in, by IP address and browser. Revoke any you don't recognise.</p><div id="sessions-list"></div></div>
     </div>
   </section>
 </div>

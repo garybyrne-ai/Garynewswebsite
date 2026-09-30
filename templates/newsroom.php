@@ -120,6 +120,9 @@
         <div class="panel" id="maildelivery"></div>
         <div class="panel" id="gateways"></div>
         <form class="form" id="settings-form"><div class="settingsgrid" id="settings-grid"></div><div class="form__actions"><button class="btn btn--primary" type="submit">Save settings</button></div><p class="form__result" id="settings-result"></p></form>
+        <div class="panel" id="ip-export"><h2>Law-enforcement / IT Rules 2021 export</h2><p style="margin:8px 0">Every report, comment, notice, closure, confirmation, session and account registration recorded against one IP address, as a CSV. The export itself is written to the audit log.</p>
+          <form class="form" method="GET" action="/api/admin/export/ip" target="_blank"><label>IP address<input name="ip" placeholder="203.0.113.4" required pattern="[0-9a-fA-F.:]+" style="max-width:260px"></label><div class="form__actions"><button class="btn btn--ghost" type="submit">Download CSV</button></div></form>
+        </div>
       </div>
 
       <div id="view-audit" class="view"><h1>Audit log</h1><div id="audit-list"></div></div>

@@ -14,6 +14,7 @@ use MeNews\Services\Ads;
 use MeNews\Services\RateLimiter;
 use MeNews\Services\Audit;
 use MeNews\Services\PayPal;
+use MeNews\Services\Razorpay;
 use MeNews\Services\Stripe;
 use MeNews\Support\Categories;
 use MeNews\Support\Locations;
@@ -147,7 +148,11 @@ final class AdsController
         $adId = $r->post('ad_id', '', 40) ?: null;
         $order = AdOrders::create($u, $package, $gateway, $adId);
         try {
-            $url = $gateway === 'paypal' ? PayPal::orderUrl($u, $order) : Stripe::orderCheckoutUrl($u, $order);
+            $url = match ($gateway) {
+                'paypal' => PayPal::orderUrl($u, $order),
+                'razorpay' => Razorpay::orderCheckoutUrl($u, $order),
+                default => Stripe::orderCheckoutUrl($u, $order),
+            };
         } catch (\Throwable $e) {
             // No checkout session was opened, so do not leave a dangling pending order behind.
             AdOrders::discard($order['id']);
@@ -167,9 +172,11 @@ final class AdsController
         $orderId = $r->query('order', '', 40);
         $gateway = $r->query('gateway', '', 10);
         try {
-            $order = $gateway === 'paypal'
-                ? PayPal::captureOrder($orderId, $u)
-                : AdOrders::confirmStripe($orderId, $r->query('session_id', '', 120), $u);
+            $order = match ($gateway) {
+                'paypal' => PayPal::captureOrder($orderId, $u),
+                'razorpay' => Razorpay::capturePaymentLink($orderId, $u),
+                default => AdOrders::confirmStripe($orderId, $r->query('session_id', '', 120), $u),
+            };
             $state = in_array($order['status'], ['paid', 'running'], true) ? 'paid' : 'pending';
         } catch (\Throwable $e) {
             error_log('Ad order return: ' . $e->getMessage());
@@ -293,6 +300,11 @@ final class AdsController
         return Response::json(PayPal::webhook($r->body(), $headers));
     }
 
+    public static function razorpayWebhook(Request $r): Response
+    {
+        return Response::json(Razorpay::webhook($r->body(), $r->header('X-Razorpay-Signature'), $r->header('X-Razorpay-Event-Id')));
+    }
+
     // ------------------------------------------------------------ newsroom
 
     private static function staff(): array
@@ -397,7 +409,7 @@ final class AdsController
 
     public static function packages(Request $r): Response
     {
-        return Response::json(['packages' => AdPackages::all(), 'tiers' => AdPackages::TIERS, 'currency' => Ads::currency(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured()]);
+        return Response::json(['packages' => AdPackages::all(), 'tiers' => AdPackages::TIERS, 'currency' => Ads::currency(), 'stripe' => Stripe::adsConfigured(), 'paypal' => PayPal::configured(), 'razorpay' => Razorpay::configured() && Ads::currency() === 'INR']);
     }
 
     public static function adminPackages(Request $r): Response

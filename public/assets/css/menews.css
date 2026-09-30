@@ -143,6 +143,7 @@ p{margin:0}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 .7rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface)}
 .chip--cat{color:var(--cy);border-color:color-mix(in srgb,var(--cy) 40%,transparent)}
 .chip--cat:hover{background:color-mix(in srgb,var(--cy) 15%,transparent)}
+.chip--bad{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 40%,transparent);background:color-mix(in srgb,var(--hot) 12%,transparent)}
 .chip--label i{width:6px;height:6px;border-radius:50%;background:var(--muted)}
 .chip--label.is-community-report i{background:var(--am)}
 .chip--label.is-developing i{background:var(--hot);animation:pulse 1.8s infinite}

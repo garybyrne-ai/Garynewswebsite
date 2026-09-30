@@ -1,4 +1,4 @@
-<?php use MeNews\Services\Ads; $pr = $pricing; $gateways = ($pr['stripe'] ? 1 : 0) + ($pr['paypal'] ? 1 : 0); ?>
+<?php use MeNews\Services\Ads; $pr = $pricing; $gateways = ($pr['stripe'] ? 1 : 0) + ($pr['paypal'] ? 1 : 0) + ($pr['razorpay'] ? 1 : 0); ?>
 <section class="container pagehead pagehead--center">
   <span class="kicker">Advertise with Bharat Wire</span>
   <h1 class="pagehead__title">Buy impressions. Design your ad. <em>Be seen across India.</em></h1>
@@ -25,7 +25,8 @@
           <?php elseif ($gateways === 0): ?>
             <span class="form__legal">Online payment is being connected. Email the newsroom and we can set your package up manually.</span>
           <?php else: ?>
-            <?php if ($pr['stripe']): ?><button class="btn btn--primary btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="stripe">Pay by card · <?= e($p['price_label']) ?></button><?php endif; ?>
+            <?php if ($pr['razorpay']): ?><button class="btn btn--primary btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="razorpay">Pay by UPI (BHIM / GPay / PhonePe) · <?= e($p['price_label']) ?></button><?php endif; ?>
+            <?php if ($pr['stripe']): ?><button class="btn <?= $pr['razorpay'] ? 'btn--ghost' : 'btn--primary' ?> btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="stripe">Pay by card · <?= e($p['price_label']) ?></button><?php endif; ?>
             <?php if ($pr['paypal']): ?><button class="btn btn--ghost btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="paypal">PayPal</button><?php endif; ?>
           <?php endif; ?>
         </div>
@@ -46,7 +47,7 @@
   </div>
 
   <div class="steps" style="margin:34px 0">
-    <div class="step reveal"><span class="mono">01</span><h3>Choose a package</h3><p>Pay once by card<?= $pr['paypal'] ? ' or PayPal' : '' ?>. Your package is credited to your account the moment payment clears.</p></div>
+    <div class="step reveal"><span class="mono">01</span><h3>Choose a package</h3><p>Pay once<?= $pr['razorpay'] ? ' by UPI (BHIM, Google Pay, PhonePe…)' : '' ?><?= $pr['stripe'] ? ' by card' : '' ?><?= $pr['paypal'] ? ' or PayPal' : '' ?>. Your package is credited to your account the moment payment clears.</p></div>
     <div class="step reveal"><span class="mono">02</span><h3>Design</h3><p>The designer unlocks: pick a template, add your headline, offer, logo and colours, and target India, a state or a town.</p></div>
     <div class="step reveal"><span class="mono">03</span><h3>Review</h3><p>An editor checks it against the guidelines below, usually within a day. Advertising never touches editorial decisions.</p></div>
     <div class="step reveal"><span class="mono">04</span><h3>Run</h3><p>Impressions are paced across a month and counted live in your dashboard. When they are used up, top up the same ad with another package.</p></div>

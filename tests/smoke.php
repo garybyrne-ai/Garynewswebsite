@@ -245,8 +245,20 @@ http('POST', '/api/auth/logout');
 [$s] = http('GET', '/api/me');
 check('logout clears session', $s === 401);
 
+/** Solve the same proof-of-work challenge the browser solves with Web Crypto (native SHA-256 here). */
+function solvePow(): array
+{
+    [, $ch] = http('GET', '/api/pow/challenge');
+    $need = str_repeat('0', (int)$ch['difficulty']);
+    for ($nonce = 0; ; $nonce++) {
+        if (str_starts_with(hash('sha256', $ch['id'] . ':' . $nonce), $need)) {
+            return ['pow_id' => $ch['id'], 'pow_nonce' => (string)$nonce];
+        }
+    }
+}
+
 echo "\nGuest reporting (no account)\n";
-[$s, $g] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => "Smoke test guest report {$stamp}. Nothing is happening, this is automated.", 'location_name' => 'Nashik', 'county' => 'Maharashtra', 'reporter_name' => 'Smoke Guest', 'reporter_contact' => "guest-{$stamp}@example.in"]);
+[$s, $g] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => "Smoke test guest report {$stamp}. Nothing is happening, this is automated.", 'location_name' => 'Nashik', 'county' => 'Maharashtra', 'reporter_name' => 'Smoke Guest', 'reporter_contact' => "guest-{$stamp}@example.in"] + solvePow());
 check('guest report accepted without sign-in', $s === 200 && in_array($g['status'] ?? '', ['review', 'hold'], true) && str_contains($g['message'] ?? '', 'confirmation'));
 $guestId = $g['id'] ?? '';
 [$s] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => 'Too short', 'location_name' => 'Nashik']);

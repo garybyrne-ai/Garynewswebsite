@@ -30,6 +30,16 @@ final class Migrations
             'ip_address' => 'TEXT',
             'user_agent' => 'TEXT',
         ],
+        'sessions' => [
+            'ip_address' => 'TEXT',
+            'user_agent' => 'TEXT',
+            'last_seen_at' => 'TEXT',
+        ],
+        'subscriptions' => [
+            'gateway' => 'TEXT',
+            'razorpay_customer_id' => 'TEXT',
+            'razorpay_subscription_id' => 'TEXT',
+        ],
         'comments' => [
             'ip_address' => 'TEXT',
             'user_agent' => 'TEXT',
@@ -105,5 +115,9 @@ final class Migrations
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_stories_submitter_ip ON stories(submitter_ip)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_comments_ip ON comments(ip_address)");
         $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('pii_retention_days','180')");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS razorpay_events (id TEXT PRIMARY KEY, created_at TEXT NOT NULL)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS pow_challenges (id TEXT PRIMARY KEY, difficulty INTEGER NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL)");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('pow_difficulty','5')");
     }
 }

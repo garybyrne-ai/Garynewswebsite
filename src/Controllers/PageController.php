@@ -381,6 +381,7 @@ final class PageController
             'isPlus' => \MeNews\Services\Membership::isPlus(Auth::user()),
             'archiveDays' => \MeNews\Services\Membership::archiveDays(),
             'stripe' => \MeNews\Services\Stripe::configured(),
+            'razorpay' => \MeNews\Services\Razorpay::configured(),
             'memberCount' => Database::count("SELECT COUNT(*) FROM users WHERE plan='Wire+'"),
             'bodyClass' => 'page-plus',
         ]));

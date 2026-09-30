@@ -20,7 +20,7 @@
     $('#hello').textContent = 'Hello, ' + me.display_name.split(' ')[0];
     $('#p-name').value = me.display_name; $('#p-town').value = me.home_town || ''; $('#p-county').value = me.home_county || ''; $('#p-bio').value = me.bio || '';
     window.ME.loadCounties().then(() => { $('#p-county').value = me.home_county || ''; });
-    await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAlerts(), loadSaved(), loadAds()]);
+    await Promise.all([loadReports(), loadBilling(), loadNotifications(), loadFollows(), loadAlerts(), loadSaved(), loadAds(), loadSessions()]);
     const hash = location.hash.replace('#', '');
     if (hash && $('#view-' + hash)) show(hash);
     if (qs.get('billing') === 'success') toast('Thank you — Wire+ will activate as soon as Stripe confirms payment.');
@@ -97,9 +97,23 @@
     btn.disabled = !j.stripe_configured || j.plan === 'Wire+';
     btn.textContent = j.plan === 'Wire+' ? 'Wire+ is active' : (j.stripe_configured ? 'Monthly · ' + j.price_label : 'Stripe not configured yet');
     const yb = $('#checkout-year-btn'); if (yb) { yb.disabled = !j.stripe_configured || j.plan === 'Wire+'; yb.textContent = 'Annual · ' + j.annual_label; }
-    const up = qs.get('upgrade'); if (up && j.stripe_configured && j.plan !== 'Wire+') { const b = up === 'year' ? yb : btn; if (b) b.click(); }
+    const ub = $('#checkout-upi-btn'), uyb = $('#checkout-upi-year-btn');
+    if (ub) { ub.hidden = !j.razorpay_configured; ub.disabled = j.plan === 'Wire+'; }
+    if (uyb) { uyb.hidden = !j.razorpay_configured; uyb.disabled = j.plan === 'Wire+'; }
+    const up = qs.get('upgrade'); if (up && j.plan !== 'Wire+') {
+      const b = j.razorpay_configured ? (up === 'year' ? uyb : ub) : (j.stripe_configured ? (up === 'year' ? yb : btn) : null);
+      if (b) b.click();
+    }
   }
-  ['#checkout-btn', '#checkout-year-btn'].forEach(sel => $(sel)?.addEventListener('click', async e => { const f = new FormData(); f.append('interval', e.currentTarget.dataset.interval || 'month'); try { const j = await api('/api/billing/checkout', { method: 'POST', body: f }); location.href = j.url; } catch (err) { toast(err.message); } }));
+  ['#checkout-btn', '#checkout-year-btn', '#checkout-upi-btn', '#checkout-upi-year-btn'].forEach(sel => $(sel)?.addEventListener('click', async e => {
+    const gateway = e.currentTarget.dataset.gateway || 'stripe';
+    const f = new FormData(); f.append('interval', e.currentTarget.dataset.interval || 'month'); f.append('gateway', gateway);
+    try {
+      const j = await api('/api/billing/checkout', { method: 'POST', body: f });
+      if (gateway === 'razorpay') { window.open(j.url, '_blank', 'noopener'); toast('Complete the UPI mandate in the new tab — Wire+ activates within a minute of payment.'); }
+      else { location.href = j.url; }
+    } catch (err) { toast(err.message); }
+  }));
 
   $('#profile-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -110,6 +124,23 @@
     try { await api('/api/me/password', { method: 'POST', body: new FormData(e.target) }); toast('Password updated'); e.target.reset(); } catch (err) { toast(err.message); }
   });
   async function loadAds() { if (window.ME.loadAds) window.ME.loadAds(); }
+
+  async function loadSessions() {
+    const box = $('#sessions-list'); if (!box) return;
+    const j = await api('/api/me/sessions');
+    box.innerHTML = j.sessions.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>IP address</th><th>Browser</th><th>Last active</th><th>Signed in</th><th></th></tr></thead><tbody>${j.sessions.map(s => `<tr>
+      <td class="mono">${esc(s.ip_address || '—')}</td>
+      <td class="sub" title="${esc(s.user_agent || '')}">${esc((s.user_agent || '').slice(0, 60)) || '—'}</td>
+      <td>${s.last_seen_at ? fmt(s.last_seen_at) : '—'}</td>
+      <td>${fmt(s.created_at)}</td>
+      <td>${s.is_current ? '<span class="chip chip--plus">This device</span>' : `<button class="btn btn--ghost btn--sm" data-revoke-session="${s.id}">Revoke</button>`}</td>
+    </tr>`).join('')}</tbody></table></div>` : '<p class="panel__note">No other active sessions.</p>';
+  }
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-revoke-session]'); if (!b) return;
+    if (!confirm('Sign that device out now?')) return;
+    try { await api('/api/me/sessions/' + b.dataset.revokeSession + '/revoke', { method: 'POST' }); toast('Signed out'); loadSessions(); } catch (err) { toast(err.message); }
+  });
 
   async function loadNotifications() {
     const a = await api('/api/me/notifications');
