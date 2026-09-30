@@ -6,7 +6,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const LABELS = window.NEWSROOM.labels, CATS = window.NEWSROOM.categories, COUNTIES = window.NEWSROOM.counties;
   let me = null;
-  const fmt = iso => iso ? new Date(iso).toLocaleString('en-IE', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+  const fmt = iso => iso ? new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
   const opts = (list, sel) => list.map(x => `<option ${x === sel ? 'selected' : ''}>${esc(x)}</option>`).join('');
   const fd = obj => { const f = new FormData(); Object.entries(obj).forEach(([k, v]) => f.append(k, v)); return f; };
 

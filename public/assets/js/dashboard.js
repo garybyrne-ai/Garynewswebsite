@@ -6,7 +6,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   let me = null;
   const qs = new URLSearchParams(location.search);
-  const fmt = iso => new Date(iso).toLocaleString('en-IE', { dateStyle: 'medium', timeStyle: 'short' });
+  const fmt = iso => new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
 
   function show(id) {
     $$('.view').forEach(v => v.classList.toggle('is-active', v.id === 'view-' + id));

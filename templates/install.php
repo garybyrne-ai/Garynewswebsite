@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en-IE" data-theme="dark">
+<html lang="en-IN" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,7 +13,7 @@
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="gridlines" aria-hidden="true"></div>
 <main class="install">
-  <a class="brand" href="/" style="margin-bottom:18px"><svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg><span class="brand__word"><b>Bharat</b> Wire<small>India</small></span></a>
+  <a class="brand" href="/" style="margin-bottom:18px"><svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><g fill="none" stroke="url(#bg1)" stroke-width="4.5" stroke-linecap="round"><path d="M18 27a20 20 0 0 1 28 0"/><path d="M23.5 33.5a12 12 0 0 1 17 0"/></g><circle cx="32" cy="40" r="3.4" fill="url(#bg1)"/></svg><span class="brand__word"><b>Bharat</b> Wire<small>India</small></span></a>
 
   <?php if ($result): ?>
     <section class="panel">

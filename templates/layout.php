@@ -53,7 +53,7 @@ $more = [
 <meta property="og:image" content="<?= e($ogImage) ?>">
 <meta property="og:type" content="<?= isset($story) ? 'article' : 'website' ?>">
 <meta property="og:url" content="<?= e($canonical ?: absolute_url($path)) ?>">
-<meta property="og:locale" content="en_IE">
+<meta property="og:locale" content="en_IN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?= e($title) ?>">
 <meta name="twitter:description" content="<?= e($description) ?>">
@@ -69,6 +69,11 @@ $more = [
 <?php endif; ?>
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bharat Wire">
 <link rel="alternate" type="application/rss+xml" title="Bharat Wire India" href="/feed.xml">
 <link rel="alternate" type="application/atom+xml" title="Bharat Wire India (Atom)" href="/feed.atom">
 <link rel="alternate" type="application/feed+json" title="Bharat Wire India (JSON Feed)" href="/feed.json">
@@ -104,7 +109,7 @@ $more = [
 <header class="topbar notranslate">
   <div class="container topbar__in">
     <a class="brand" href="/" aria-label="Bharat Wire India home">
-      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg>
+      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><g fill="none" stroke="url(#bg1)" stroke-width="4.5" stroke-linecap="round"><path d="M18 27a20 20 0 0 1 28 0"/><path d="M23.5 33.5a12 12 0 0 1 17 0"/></g><circle cx="32" cy="40" r="3.4" fill="url(#bg1)"/></svg>
       <span class="brand__word"><b>Bharat</b> Wire<small>India</small></span>
     </a>
     <button class="countychip" type="button" data-open-county aria-haspopup="dialog" title="<?= e($myCounty ? t('Change your state') : t('Choose your state')) ?>">

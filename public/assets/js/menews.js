@@ -19,6 +19,12 @@
   window.ME.api = api;
   window.ME.esc = esc;
 
+  /* Register the service worker unconditionally so the site installs as an app
+     even before push is configured — push subscription (below) reuses this registration. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
+  }
+
   /* ---------- toast ---------- */
   let toastTimer;
   function toast(msg) {

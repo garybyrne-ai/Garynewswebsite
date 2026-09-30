@@ -6,9 +6,9 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const designer = $('#ad-designer'); if (!designer) return;
   const form = $('[data-ad-form]', designer), admin = form.dataset.admin === '1';
-  const fmt = iso => iso ? new Date(iso).toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+  const fmt = iso => iso ? new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   let pricing = { stripe: false, paypal: false, packages: [], tiers: {} };
-  const num = n => Number(n || 0).toLocaleString('en-IE');
+  const num = n => Number(n || 0).toLocaleString('en-IN');
   let previewTimer;
 
   async function preview() {
