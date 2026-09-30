@@ -37,6 +37,8 @@ final class Icons
         'trophy' => '<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/><path d="M12 14v3M8 20h8M10 17h4v3h-4z"/>',
         'briefcase' => '<rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M9 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5v2M3 12.5h18"/>',
         'culture' => '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+        'cpu' => '<rect x="7" y="7" width="10" height="10" rx="1.5"/><rect x="10" y="10" width="4" height="4"/><path d="M10 7V4M14 7V4M10 20v-3M14 20v-3M7 10H4M7 14H4M20 10h-3M20 14h-3"/>',
+        'clapperboard' => '<rect x="3.5" y="9" width="17" height="11" rx="1.5"/><path d="M3.5 9l1.2-4h15l1.3 4z"/><path d="M7 5l1.5 4M12 5l1.5 4M17 5l1 4"/>',
         'community' => '<circle cx="12" cy="7" r="3.2"/><path d="M5 20a7 7 0 0 1 14 0"/><path d="M3.5 12.5a2.5 2.5 0 1 0 0-.1M20.5 12.5a2.5 2.5 0 1 0 0-.1"/>',
         'traffic' => '<path d="M5 13 6.8 7.5A2 2 0 0 1 8.7 6h6.6a2 2 0 0 1 1.9 1.5L19 13"/><rect x="3.5" y="13" width="17" height="5" rx="1.5"/><path d="M6 18v2M18 18v2M7 15.5h.5M16.5 15.5h.5"/>',
         'council' => '<path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2.5 10 12 4l9.5 6z"/>',

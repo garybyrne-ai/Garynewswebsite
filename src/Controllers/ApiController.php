@@ -152,6 +152,37 @@ final class ApiController
         return Response::json(\MeNews\Services\ProofOfWork::issue());
     }
 
+    // ------------------------------------------------------------ web push
+
+    public static function pushConfig(Request $r): Response
+    {
+        return Response::json(['configured' => \MeNews\Services\Push::configured(), 'publicKey' => \MeNews\Services\Push::publicKey()]);
+    }
+
+    public static function pushSubscribe(Request $r): Response
+    {
+        $sub = json_decode($r->body(), true);
+        if (!is_array($sub)) {
+            throw new HttpException(400, 'Invalid subscription');
+        }
+        $county = $r->query('county', '', 80) ?: null;
+        if ($county && !in_array($county, Locations::countyNames(), true)) {
+            $county = null;
+        }
+        $u = \MeNews\Auth::user();
+        \MeNews\Services\Push::subscribe($sub, $u['id'] ?? null, $county, $r->userAgent());
+        return Response::json(['ok' => true]);
+    }
+
+    public static function pushUnsubscribe(Request $r): Response
+    {
+        $endpoint = (string)(json_decode($r->body(), true)['endpoint'] ?? '');
+        if ($endpoint !== '') {
+            \MeNews\Services\Push::unsubscribe($endpoint);
+        }
+        return Response::json(['ok' => true]);
+    }
+
     public static function ads(Request $r): Response
     {
         if (\MeNews\Services\Membership::adFree(\MeNews\Auth::user())) {

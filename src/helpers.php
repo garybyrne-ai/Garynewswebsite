@@ -133,7 +133,7 @@ function views_label(int $views, int $threshold = 100): string
     return (string)((int)floor($views / 100) * 100) . '+';
 }
 
-/** Possessive form for county names ("Dublin's", "Laois'"). */
+/** Possessive form for county names ("Mumbai's", "Odisha's"). */
 function possessive(string $name): string
 {
     return $name . (str_ends_with($name, 's') ? '’' : '’s');

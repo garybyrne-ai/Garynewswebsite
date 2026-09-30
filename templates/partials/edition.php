@@ -11,6 +11,6 @@
     </ul>
     <p class="panel__note mono">Weather via Open-Meteo · updated <?= e(time_ago($weather['updated'])) ?></p>
   <?php endif; ?>
-  <div class="edition__focal"><span class="mono">Focal an lae</span><b><?= e($focal['irish']) ?></b><span><?= e($focal['english']) ?> · <em><?= e($focal['say']) ?></em></span></div>
+  <div class="edition__focal"><span class="mono">Shabd of the day</span><b><?= e($focal['irish']) ?></b><span><?= e($focal['english']) ?> · <em><?= e($focal['say']) ?></em></span></div>
   <a class="btn btn--ghost btn--block" href="/kids/crossword">Today's crossword →</a>
 </section>

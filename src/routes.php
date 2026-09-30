@@ -103,6 +103,9 @@ return static function (Router $r): void {
     $r->get('/cron/wire', [Api::class, 'cronWire']);
     $r->get('/api/pulse', [Api::class, 'pulse']);
     $r->get('/api/pow/challenge', [Api::class, 'powChallenge']);
+    $r->get('/api/push/config', [Api::class, 'pushConfig']);
+    $r->post('/api/push/subscribe', [Api::class, 'pushSubscribe']);
+    $r->post('/api/push/unsubscribe', [Api::class, 'pushUnsubscribe']);
     $r->get('/advertise', [AdsC::class, 'advertisePage']);
     $r->get('/api/ads', [Api::class, 'ads']);
     $r->get('/api/ads/pricing', [AdsC::class, 'pricing']);
@@ -177,6 +180,8 @@ return static function (Router $r): void {
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/decision', [Admin::class, 'decision']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/rerun-safety', [Admin::class, 'rerun']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/edit', [Admin::class, 'edit']);
+    $r->post('/api/admin/stories/{id:[a-f0-9]+}/push', [Admin::class, 'pushStory']);
+    $r->get('/api/admin/push', [Admin::class, 'pushStatus']);
     $r->get('/api/admin/mail', [Admin::class, 'mail']);
     $r->post('/api/admin/mail', [Admin::class, 'saveMail']);
     $r->post('/api/admin/mail/test', [Admin::class, 'testMail']);

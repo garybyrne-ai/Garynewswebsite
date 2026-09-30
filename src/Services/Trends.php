@@ -32,16 +32,46 @@ final class Trends
         'Jammu and Kashmir' => 'JK', 'Ladakh' => 'LA', 'Lakshadweep' => 'LD', 'Puducherry' => 'PY',
     ];
 
+    /** Stop words short/common enough that matching on them alone would return junk. */
+    private const STOPWORDS = ['this', 'that', 'with', 'from', 'have', 'will', 'says', 'over', 'after', 'india', 'news', 'their', 'about', 'into'];
+
     /**
      * Trending searches for a state (or nationally if none/unmapped), each with the first
-     * linked news story where Google supplied one.
-     * @return array<int, array{query:string,traffic:string,news_title:?string,news_url:?string,news_source:?string,picture:?string}>
+     * linked news story where Google supplied one, and an `internal_url` — the click target we
+     * actually send readers to. It always stays on this site: our own story on the topic when
+     * we have one, otherwise our own search results for the query, never straight to the
+     * external outlet. The external story is still named (for the reader's own context) and
+     * linked separately, small, for anyone who wants to go there on purpose afterwards.
+     * @return array<int, array{query:string,traffic:string,news_title:?string,news_url:?string,news_source:?string,picture:?string,internal_url:string}>
      */
     public static function forState(?string $state, int $limit = 8): array
     {
         $code = $state ? (self::STATE_CODES[$state] ?? null) : null;
         $geo = $code ? 'IN-' . $code : 'IN';
-        return self::fetch($geo, $limit);
+        $rows = self::fetch($geo, $limit);
+        foreach ($rows as &$row) {
+            $row['internal_url'] = self::internalLink($row['query'], $row['news_title']);
+        }
+        return $rows;
+    }
+
+    /** Our own coverage of a trend if we have any, else our own search page for it — never a third-party URL. */
+    private static function internalLink(string $query, ?string $newsTitle): string
+    {
+        $hit = \MeNews\Stories::feed(['q' => $query], 1);
+        if ($hit) {
+            return $hit[0]['url'];
+        }
+        foreach (array_filter([$newsTitle, $query]) as $text) {
+            $words = array_filter(preg_split('/\s+/u', mb_strtolower((string)$text)) ?: [], static fn($w) => mb_strlen($w) >= 4 && !in_array($w, self::STOPWORDS, true));
+            foreach (array_slice($words, 0, 3) as $word) {
+                $hit = \MeNews\Stories::feed(['q' => $word], 1);
+                if ($hit) {
+                    return $hit[0]['url'];
+                }
+            }
+        }
+        return '/search?q=' . rawurlencode($query);
     }
 
     private static function fetch(string $geo, int $limit): array

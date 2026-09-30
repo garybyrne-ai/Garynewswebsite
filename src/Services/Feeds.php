@@ -84,7 +84,7 @@ final class Feeds
         $x = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $x .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/"><channel>';
         $x .= '<title>' . e($feed['title']) . '</title><link>' . e(absolute_url('/')) . '</link><description>' . e($feed['blurb'] ?? self::TAGLINE) . '</description>';
-        $x .= '<language>en-ie</language><copyright>' . e(self::SITE) . '</copyright><generator>Bharat Wire ' . e(ME_VERSION) . '</generator><ttl>15</ttl>';
+        $x .= '<language>en-in</language><copyright>' . e(self::SITE) . '</copyright><generator>Bharat Wire ' . e(ME_VERSION) . '</generator><ttl>15</ttl>';
         $x .= '<atom:link href="' . e($self) . '" rel="self" type="application/rss+xml"/>';
         $x .= '<lastBuildDate>' . self::rfc822($rows[0]['time'] ?? now()) . '</lastBuildDate>';
         $x .= '<image><url>' . e(absolute_url('/assets/img/logo-512.png')) . '</url><title>' . e($feed['title']) . '</title><link>' . e(absolute_url('/')) . '</link></image>';
@@ -108,7 +108,7 @@ final class Feeds
     {
         $rows = self::items($feed['filters'], $limit);
         $self = absolute_url(str_replace('.xml', '.atom', $feed['path']));
-        $x = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-IE">';
+        $x = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-IN">';
         $x .= '<title>' . e($feed['title']) . '</title><subtitle>' . e($feed['blurb'] ?? self::TAGLINE) . '</subtitle><id>' . e(absolute_url('/')) . '</id>';
         $x .= '<link rel="alternate" type="text/html" href="' . e(absolute_url('/')) . '"/><link rel="self" type="application/atom+xml" href="' . e($self) . '"/>';
         $x .= '<updated>' . self::iso($rows[0]['time'] ?? now()) . '</updated><generator uri="' . e(absolute_url('/')) . '" version="' . e(ME_VERSION) . '">Bharat Wire</generator>';
@@ -132,7 +132,7 @@ final class Feeds
         return [
             'version' => 'https://jsonfeed.org/version/1.1',
             'title' => $feed['title'], 'home_page_url' => absolute_url('/'), 'feed_url' => absolute_url(str_replace('.xml', '.json', $feed['path'])),
-            'description' => $feed['blurb'] ?? self::TAGLINE, 'icon' => absolute_url('/assets/img/logo-512.png'), 'favicon' => absolute_url('/assets/img/favicon.svg'), 'language' => 'en-IE',
+            'description' => $feed['blurb'] ?? self::TAGLINE, 'icon' => absolute_url('/assets/img/logo-512.png'), 'favicon' => absolute_url('/assets/img/favicon.svg'), 'language' => 'en-IN',
             'authors' => [['name' => self::SITE, 'url' => absolute_url('/')]],
             'items' => array_map(static fn($s) => array_filter([
                 'id' => absolute_url($s['url']), 'url' => absolute_url($s['url']), 'external_url' => $s['kind'] === 'wire' ? $s['source_url'] : null,
@@ -161,7 +161,7 @@ final class Feeds
     {
         return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"><ShortName>Bharat Wire</ShortName><LongName>' . e(self::SITE) . '</LongName><Description>Search Indian local news, notices and community reports.</Description>'
             . '<Url type="text/html" template="' . e(absolute_url('/search')) . '?q={searchTerms}"/><Url type="application/rss+xml" template="' . e(absolute_url('/feed.xml')) . '"/>'
-            . '<Image height="16" width="16" type="image/svg+xml">' . e(absolute_url('/assets/img/favicon.svg')) . '</Image><Language>en-ie</Language><InputEncoding>UTF-8</InputEncoding></OpenSearchDescription>';
+            . '<Image height="16" width="16" type="image/svg+xml">' . e(absolute_url('/assets/img/favicon.svg')) . '</Image><Language>en-in</Language><InputEncoding>UTF-8</InputEncoding></OpenSearchDescription>';
     }
 
     public static function robots(): string

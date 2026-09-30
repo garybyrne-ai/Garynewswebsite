@@ -53,9 +53,9 @@
   /* ---------- HUD clock (Indian time) ---------- */
   const clock = $('#hud-clock'), dateEl = $('#hud-date');
   if (clock) {
-    const tf = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    const df = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    const tick = () => { const d = new Date(); clock.textContent = tf.format(d); if (dateEl) dateEl.textContent = df.format(d) + ' · Dublin'; };
+    const tf = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const df = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const tick = () => { const d = new Date(); clock.textContent = tf.format(d); if (dateEl) dateEl.textContent = df.format(d) + ' · IST'; };
     tick(); setInterval(tick, 1000);
   }
 
@@ -365,6 +365,53 @@
   /* ---------- near me (geolocation) ---------- */
   const setCookie = (k, v, days) => { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=' + (days * 86400) + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : ''); };
   const delCookie = k => { document.cookie = k + '=;path=/;max-age=0;SameSite=Lax'; };
+  const getCookie = k => { const m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : ''; };
+
+  /* ---------- breaking news push notifications ---------- */
+  (async function initPush() {
+    const btn = $('#push-toggle');
+    if (!btn || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
+    let cfg;
+    try { cfg = await api('/api/push/config'); } catch (e) { return; }
+    if (!cfg.configured) return;
+    function toUint8(base64) {
+      const padding = '='.repeat((4 - base64.length % 4) % 4);
+      const raw = atob((base64 + padding).replace(/-/g, '+').replace(/_/g, '/'));
+      return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+    }
+    function paint(subscribed) {
+      btn.hidden = false;
+      btn.classList.toggle('is-active', subscribed);
+      btn.setAttribute('aria-pressed', String(subscribed));
+      btn.title = subscribed ? 'Breaking news alerts on — tap to turn off' : 'Get breaking news alerts';
+    }
+    let reg, existing;
+    try {
+      reg = await navigator.serviceWorker.register('/sw.js');
+      existing = await reg.pushManager.getSubscription();
+    } catch (e) { return; }
+    paint(!!existing);
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const current = await reg.pushManager.getSubscription();
+        if (current) {
+          await api('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: current.endpoint }), headers: { 'Content-Type': 'application/json' } });
+          await current.unsubscribe();
+          paint(false);
+          toast('Breaking news alerts turned off');
+        } else {
+          if (Notification.permission === 'denied') { toast('Notifications are blocked in your browser settings'); return; }
+          const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toUint8(cfg.publicKey) });
+          const county = getCookie('me_county');
+          await api('/api/push/subscribe' + (county ? '?county=' + encodeURIComponent(county) : ''), { method: 'POST', body: JSON.stringify(sub.toJSON()), headers: { 'Content-Type': 'application/json' } });
+          paint(true);
+          toast(county ? 'Breaking news alerts on for ' + county : 'Breaking news alerts on');
+        }
+      } catch (err) { toast(err.message || 'Could not update alerts'); }
+      btn.disabled = false;
+    });
+  })();
   const dismissed = () => { try { return (Number(localStorage.getItem('me_loc_dismissed') || 0)) > Date.now(); } catch (e) { return false; } };
   const locbar = null;
   /* county picker: one tap on first visit, no permission needed */

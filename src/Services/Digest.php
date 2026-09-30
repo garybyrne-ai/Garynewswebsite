@@ -27,7 +27,7 @@ final class Digest
         $weather = Weather::today();
         $city = null;
         if ($weather && $county) {
-            // Nearest forecast city to the county centroid (Wicklow → Dublin, Kerry → Cork, Donegal → Letterkenny…)
+            // Nearest forecast city to the state centroid (Haryana → Delhi, Goa → Mumbai, Sikkim → Guwahati…)
             $centre = \MeNews\Support\Geo::county($county);
             $best = PHP_FLOAT_MAX;
             foreach ($weather['cities'] as $i => $c) {
@@ -90,7 +90,7 @@ final class Digest
             }
             $h .= '</ul>';
         }
-        $h .= '<p style="margin-top:22px;color:#33423a"><b>Focal an lae:</b> <i>' . e($d['focal']['irish']) . '</i> — ' . e($d['focal']['english']) . '</p>';
+        $h .= '<p style="margin-top:22px;color:#33423a"><b>Shabd of the day:</b> <i>' . e($d['focal']['irish']) . '</i> — ' . e($d['focal']['english']) . '</p>';
         $h .= '<p style="margin-top:18px"><a href="' . e($base . '/county/' . slugify($county)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:700">All of ' . e($county) . ' →</a> &nbsp; <a href="' . e($base . '/#community') . '" style="color:#d92645;font-weight:700;text-decoration:none">Report something</a></p>';
         if ($token !== 'preview') {
             $h .= '<p style="color:#59685f;font-size:12px;margin-top:22px">You asked for the ' . e($county) . ' morning email. <a href="' . e($base . '/alerts/unsubscribe/' . $token) . '" style="color:#59685f">Unsubscribe</a></p>';
@@ -214,6 +214,6 @@ final class Digest
             $lines[] = 'Coming up: ' . implode('; ', array_map(static fn($n) => $n['title'] . ' on ' . date_irish($n['event_at'], 'l'), array_slice($d['events'], 0, 3))) . '.';
         }
         $lines[] = 'And today’s Hindi word is ' . $d['focal']['irish'] . ', meaning ' . $d['focal']['english'] . '. That’s the bulletin. Report what you can see at Bharat Wire.';
-        return ['county' => $county, 'lines' => $lines, 'text' => implode(' ', $lines), 'lang' => 'en-IE'];
+        return ['county' => $county, 'lines' => $lines, 'text' => implode(' ', $lines), 'lang' => 'en-IN'];
     }
 }

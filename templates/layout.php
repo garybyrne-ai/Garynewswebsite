@@ -123,6 +123,7 @@ $more = [
         </div>
       </div>
       <button class="iconbtn" id="theme-toggle" type="button" aria-label="<?= e(t('Toggle light and dark theme')) ?>"><span class="sun"><?= icon('sun') ?></span><span class="moon"><?= icon('moon') ?></span></button>
+      <button class="iconbtn" id="push-toggle" type="button" hidden aria-pressed="false" aria-label="<?= e(t('Get breaking news alerts')) ?>" title="<?= e(t('Get breaking news alerts')) ?>"><?= icon('bell') ?></button>
       <button class="btn btn--hot btn--report" type="button" data-open-report><?= icon('report') ?><span><?= e(t('Report')) ?></span></button>
       <?php if ($user): ?>
         <div class="account">

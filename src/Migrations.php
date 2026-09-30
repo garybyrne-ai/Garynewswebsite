@@ -9,6 +9,7 @@ final class Migrations
     /** table => column => definition */
     private const COLUMNS = [
         'stories' => [
+            'pushed_at' => 'TEXT',
             'votes_total' => 'INTEGER NOT NULL DEFAULT 0',
             'signal_json' => 'TEXT',
             'cluster_id' => 'TEXT',
@@ -121,5 +122,18 @@ final class Migrations
         $pdo->exec("CREATE TABLE IF NOT EXISTS pow_challenges (id TEXT PRIMARY KEY, difficulty INTEGER NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL)");
         $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('pow_difficulty','5')");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_stories_language ON stories(language)");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (
+            id TEXT PRIMARY KEY,
+            user_id TEXT,
+            endpoint TEXT UNIQUE NOT NULL,
+            p256dh TEXT NOT NULL,
+            auth TEXT NOT NULL,
+            county TEXT,
+            user_agent TEXT,
+            created_at TEXT NOT NULL,
+            last_sent_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_push_county ON push_subscriptions(county)");
     }
 }

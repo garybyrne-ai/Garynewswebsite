@@ -107,7 +107,7 @@
       <td><select data-label>${opts(LABELS, x.verification_label)}</select></td>
       <td><span class="status ${esc(x.status)}">${esc(x.status)}</span></td>
       <td><input type="checkbox" data-featured ${x.is_featured ? 'checked' : ''}></td>
-      <td class="actions"><button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
+      <td class="actions"><button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}${x.status === 'published' ? (x.pushed_at ? `<span class="sub" title="${fmt(x.pushed_at)}">✓ Pushed</span>` : '<button class="btn btn--hot btn--sm" data-push title="Send a breaking-news push notification">🔔 Push</button>') : ''}</td></tr>`).join('')}</tbody></table></div>`;
   }
   ['stories-q', 'stories-kind', 'stories-status'].forEach(id => $('#' + id).addEventListener('change', loadStories));
   $('#stories-q').addEventListener('input', () => { clearTimeout(window._sq); window._sq = setTimeout(loadStories, 300); });
@@ -122,6 +122,10 @@
         await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: 'unpublish', label: $('[data-label]', row).value, note: 'Unpublished from the newsroom' }) }); toast('Unpublished'); loadStories(); summary();
       } else if (e.target.hasAttribute('data-republish')) {
         await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: 'publish', label: $('[data-label]', row).value, note: '' }) }); toast('Published'); loadStories(); summary();
+      } else if (e.target.hasAttribute('data-push')) {
+        if (!confirm('Send a breaking-news push notification for this story to subscribers now? This cannot be undone.')) return;
+        const j = await api('/api/admin/stories/' + id + '/push', { method: 'POST', body: new FormData() });
+        toast(`Pushed to ${j.sent} subscriber${j.sent === 1 ? '' : 's'}${j.failed ? ', ' + j.failed + ' failed' : ''}`); loadStories();
       }
     } catch (err) { toast(err.message); }
   });
@@ -342,8 +346,15 @@
       });
     } catch (e) { box.hidden = true; }
   }
+  async function loadPush() {
+    const box = $('#push-status'); if (!box) return;
+    try {
+      const j = await api('/api/admin/push');
+      box.innerHTML = `<h2>Breaking-news push notifications</h2><p style="margin:8px 0">Standard Web Push — no app, no third-party service. Send one from the "Push" button on any published story in Stories. State-scoped: readers following a state get pushes for that state's stories plus nationally-subscribed readers.</p><p class="mono">Status: <b class="${j.configured ? 'is-good' : 'is-bad'}">${j.configured ? 'ready' : 'not available (composer install needed)'}</b> · ${j.subscribers} subscriber${j.subscribers === 1 ? '' : 's'}</p>`;
+    } catch (e) { box.hidden = true; }
+  }
   async function loadSettings() {
-    loadMail(); loadGateways();
+    loadMail(); loadGateways(); loadPush();
     try {
       const s = await api('/api/admin/settings');
       const groups = {};

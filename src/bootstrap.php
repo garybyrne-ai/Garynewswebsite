@@ -25,6 +25,13 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+// Composer packages (currently just minishlink/web-push, for RFC 8291 web push encryption — not
+// something worth hand-rolling). Optional at the file level so a deploy that hasn't run
+// `composer install` yet still boots; Services/Push.php checks class_exists() before using it.
+if (is_file(ME_ROOT . '/vendor/autoload.php')) {
+    require ME_ROOT . '/vendor/autoload.php';
+}
+
 require __DIR__ . '/helpers.php';
 
 MeNews\Config::load(getenv('ME_NEWS_ENV_FILE') ?: ME_ROOT . '/.env');

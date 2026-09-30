@@ -351,6 +351,28 @@ final class AdminController
         return Response::json(['ok' => true]);
     }
 
+    /** Send a breaking-news push for a published story. Editor-triggered, never automatic. */
+    public static function pushStory(Request $r, array $p): Response
+    {
+        $u = self::staff();
+        $story = Database::one("SELECT id,slug,title,summary,county,status,pushed_at FROM stories WHERE id=?", [$p['id']]);
+        if (!$story) {
+            throw new HttpException(404, 'Story not found');
+        }
+        if ($story['status'] !== 'published') {
+            throw new HttpException(409, 'Only published stories can be pushed');
+        }
+        $result = \MeNews\Services\Push::sendToStory($story);
+        Audit::log($u['id'], 'story.push', 'story', $story['id'], $story['title'] . ' · sent ' . $result['sent']);
+        return Response::json(['ok' => true] + $result);
+    }
+
+    public static function pushStatus(Request $r): Response
+    {
+        self::staff();
+        return Response::json(['configured' => \MeNews\Services\Push::configured(), 'subscribers' => \MeNews\Services\Push::subscriberCount()]);
+    }
+
     /**
      * A structured CSV of one IP address's activity across the app — for compliance with
      * IT Rules 2021 takedown/traceability requests from law enforcement. Admin-only; the
@@ -402,7 +424,7 @@ final class AdminController
         $u = Auth::require(['admin']);
         set_time_limit(300);
         $rows = Locations::refreshOfficial();
-        Audit::log($u['id'], 'locations.refresh', 'locations', 'ireland', (string)count($rows));
+        Audit::log($u['id'], 'locations.refresh', 'locations', 'india', (string)count($rows));
         return Response::json(['ok' => true, 'count' => count($rows), 'source' => 'CSO/Tailte Éireann 2022']);
     }
 
