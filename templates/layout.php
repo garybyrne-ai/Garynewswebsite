@@ -163,7 +163,7 @@ $more = [
   </nav>
 </header>
 
-<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate. The original is in English.')) ?> <a href="/lang/en-GB?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
+<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate.')) ?> <a href="/lang/en-GB?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
 <main id="main" class="<?= $isApp ? 'app' : 'site' ?>">
 <?= $content ?>
 </main>
@@ -179,6 +179,10 @@ $more = [
     <div class="footer__col">
       <h4><?= e(t('Sections')) ?></h4>
       <?php foreach (array_slice($nav, 0, 8) as $name): ?><a href="/section/<?= e(Categories::slug($name)) ?>"><?= e(t($name)) ?></a><?php endforeach; ?>
+    </div>
+    <div class="footer__col">
+      <h4><?= e(t('News in your language')) ?></h4>
+      <?php foreach (\MeNews\Support\Languages::NAMES as $code => [$label, $native]): if ($code === 'en' || $code === 'ur') continue; ?><a href="/language/<?= e($code) ?>"><?= e($native) ?> <small class="sub"><?= e($label) ?></small></a><?php endforeach; ?>
     </div>
     <div class="footer__col">
       <h4><?= e(t('Local layer')) ?></h4>
@@ -310,7 +314,7 @@ $more = [
 <script src="/assets/js/menews.js?v=<?= e(ME_ASSETS) ?>" defer></script>
 <?php if ($gt): ?>
 <div id="google_translate_element" class="notranslate" hidden></div>
-<script>function meGoogleTranslate(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'<?= e(Lang::googleCodes()) ?>',autoDisplay:false},'google_translate_element');}catch(e){}}</script>
+<script>function meGoogleTranslate(){try{new google.translate.TranslateElement({pageLanguage:'auto',includedLanguages:'<?= e(Lang::googleCodes()) ?>',autoDisplay:false},'google_translate_element');}catch(e){}}</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=meGoogleTranslate" defer></script>
 <?php endif; ?>
 <script src="/assets/vendor/leaflet/leaflet.js" defer></script>

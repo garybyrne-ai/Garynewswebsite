@@ -230,6 +230,7 @@ final class NewsWire
             'county' => $county,
             'province' => $county ? Locations::provinceFor($county) : null,
             'location_name' => $town ?? $county,
+            'language' => $source['language'] ?? 'en',
             'published_at' => gmdate('Y-m-d\TH:i:s', $published) . '+00:00',
         ];
     }
@@ -393,6 +394,7 @@ final class NewsWire
             'source_author' => $story['source_author'],
             'external_id' => $story['external_id'],
             'title_hash' => $hash,
+            'language' => $story['language'] ?? 'en',
             'trust_score' => 90 + (crc32($story['external_id']) % 7),
             'safety_score' => 99,
             'status' => 'published',

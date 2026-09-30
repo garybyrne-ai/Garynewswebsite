@@ -17,7 +17,7 @@ final class Stories
     }
 
     /**
-     * Published stories. Filters: q, category, county, location, kind, author, exclude, featured.
+     * Published stories. Filters: q, category, county, language, location, kind, author, exclude, featured.
      */
     public static function feed(array $f = [], int $limit = 40, int $offset = 0): array
     {
@@ -34,6 +34,10 @@ final class Stories
         if (!empty($f['county'])) {
             $sql .= ' AND s.county LIKE ?';
             $args[] = $f['county'];
+        }
+        if (!empty($f['language'])) {
+            $sql .= ' AND s.language=?';
+            $args[] = $f['language'];
         }
         if (!empty($f['location'])) {
             $sql .= ' AND (s.location_name LIKE ? OR s.local_area LIKE ? OR s.county LIKE ?)';
@@ -80,6 +84,10 @@ final class Stories
         if (!empty($f['county'])) {
             $sql .= ' AND s.county LIKE ?';
             $args[] = $f['county'];
+        }
+        if (!empty($f['language'])) {
+            $sql .= ' AND s.language=?';
+            $args[] = $f['language'];
         }
         if (!empty($f['q'])) {
             $sql .= ' AND (s.title LIKE ? OR s.summary LIKE ? OR s.body LIKE ? OR s.location_name LIKE ? OR s.county LIKE ?)';

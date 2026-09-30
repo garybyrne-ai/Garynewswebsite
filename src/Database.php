@@ -15,7 +15,7 @@ use RuntimeException;
 final class Database
 {
     /** Bump whenever database/schema.sql or Migrations gains something an existing install needs. */
-    public const SCHEMA_VERSION = 10;
+    public const SCHEMA_VERSION = 11;
 
     private static ?PDO $pdo = null;
 

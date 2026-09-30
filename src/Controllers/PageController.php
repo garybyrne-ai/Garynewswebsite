@@ -129,6 +129,38 @@ final class PageController
         ]));
     }
 
+    /** Browse wire stories originally published in one Indian language, across every source. */
+    public static function language(Request $r, array $p): Response
+    {
+        $code = $p['code'];
+        if (!\MeNews\Support\Languages::valid($code) || $code === 'en') {
+            throw new HttpException(404, 'Unknown language');
+        }
+        $page = $r->int('page', 1, 1, 200);
+        $per = 24;
+        $cutoff = \MeNews\Services\Membership::archiveCutoff(Auth::user());
+        $rows = Stories::feed(['language' => $code, 'since' => $cutoff], $per, ($page - 1) * $per);
+        $total = Stories::countPublished(['language' => $code, 'since' => $cutoff]);
+        $native = \MeNews\Support\Languages::native($code);
+        $label = \MeNews\Support\Languages::label($code);
+        return View::page('listing', self::base([
+            'title' => $label . ' (' . $native . ') news — Bharat Wire India',
+            'description' => 'Stories originally published in ' . $label . ', from across India, gathered on Bharat Wire.',
+            'heading' => $native,
+            'kicker' => 'Language · ' . $label,
+            'blurb' => 'Stories originally reported in ' . $label . ' by their own publishers, shown as published — use the language switcher in the header to translate the site chrome, or Google Translate on any story, into a language of your choice.',
+            'icon' => 'globe',
+            'rows' => $rows,
+            'page' => $page,
+            'pages' => (int)max(1, ceil($total / $per)),
+            'total' => $total,
+            'basePath' => '/language/' . $code,
+            'trending' => Stories::trending(5),
+            'ads' => self::ads('', '', 6, 'section'),
+            'banner' => self::banner('', '', 'section'),
+        ]));
+    }
+
     public static function county(Request $r, array $p): Response
     {
         $county = null;

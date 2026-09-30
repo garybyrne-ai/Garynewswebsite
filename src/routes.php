@@ -16,6 +16,7 @@ return static function (Router $r): void {
     // ---- Pages
     $r->get('/', [Page::class, 'home']);
     $r->get('/section/{slug:[a-z-]+}', [Page::class, 'category']);
+    $r->get('/language/{code:[a-z][a-z]}', [Page::class, 'language']);
     $r->get('/county/{slug:[a-z-]+}', [Page::class, 'county']);
     $r->get('/county/{slug:[a-z-]+}/map', [Page::class, 'countyMap']);
     $r->get('/story/{slug:[a-z0-9-]+}', [Page::class, 'story']);
