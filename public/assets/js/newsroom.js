@@ -54,6 +54,7 @@
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
       <h3>${esc(x.title)}</h3>
       <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''}${x.author_user_id ? ` · reputation ${x.reporter_reputation ?? '—'}` : (x.reporter_verified_at ? ' · <span class="is-good">guest, contact confirmed</span>' : ` · <span class="is-bad">guest, not yet confirmed</span> (${esc(x.reporter_contact || '')})`)}${x.latitude ? ' · GPS' : ''}</div>
+      <div class="meta sub mono" title="${esc(x.submitter_user_agent || '')}">${esc(x.submitter_ip || 'no IP recorded')}</div>
       ${x.incident_reports && x.incident_reports.length ? `<div class="trustnote"><b>${x.incident_reports.length + 1} reports of this incident.</b> ${x.incident_reports.map(i => `<a href="#" data-jump="${i.id}">${esc(i.author_name || 'Reporter')} · ${esc(i.location_name || '')} · ${esc(i.status)}</a>`).join(' · ')}</div>` : ''}
       ${media}
       ${x.media_type === 'image' && x.media_url ? `<div class="evidence">
@@ -96,7 +97,7 @@
   async function loadStories() {
     const q = $('#stories-q').value, kind = $('#stories-kind').value, status = $('#stories-status').value;
     const a = await api(`/api/admin/stories?q=${encodeURIComponent(q)}&kind=${kind}&status=${status}&limit=150`);
-    $('#stories-table').innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>Story</th><th>Section</th><th>County</th><th>Label</th><th>Status</th><th>Featured</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
+    $('#stories-table').innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>Story</th><th>Section</th><th>State</th><th>Label</th><th>Status</th><th>Featured</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
       <td><b>${x.status === 'published' ? `<a href="${esc(x.url)}" target="_blank">${esc(x.title)}</a>` : esc(x.title)}</b><span class="sub">${esc(x.kind)} · ${esc(x.source_name || x.author_name || '')} · ${fmt(x.published_at || x.created_at)} · ${x.views} views</span></td>
       <td><select data-cat>${opts(CATS, x.category)}</select></td>
       <td><select data-county><option value="">—</option>${opts(COUNTIES, x.county)}</select></td>
@@ -124,7 +125,7 @@
 
   async function loadComments() {
     const a = await api('/api/admin/comments');
-    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
+    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><div class="meta sub mono" title="${esc(x.user_agent || '')}">${esc(x.ip_address || 'no IP recorded')}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
   }
   $('#comments-list').addEventListener('click', async e => {
     const d = e.target.dataset.c; if (!d) return;
@@ -214,7 +215,8 @@
     $('#notices-queue').innerHTML = a.length ? a.map(n => `<article class="review" data-id="${n.id}">
       <div class="inline"><span class="status ${esc(n.status)}">${esc(n.status)}</span><span class="chip chip--cat">${esc(n.kind)}</span>${n.plan === 'promoted' ? '<span class="chip chip--plus">Promoted</span>' : ''}<span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(n.created_at)}</span></div>
       <h3>${esc(n.title)}</h3>
-      <div class="meta">${esc(n.town || '')}${n.county ? ', Co. ' + esc(n.county) : ''} · ${esc(n.contact_org || n.contact_name || '')}${n.verified_at ? ' · <span class="is-good">email confirmed</span>' : ' · <span class="is-bad">not confirmed yet</span>'}</div>
+      <div class="meta">${esc(n.town || '')}${n.county ? ', ' + esc(n.county) : ''} · ${esc(n.contact_org || n.contact_name || '')}${n.verified_at ? ' · <span class="is-good">email confirmed</span>' : ' · <span class="is-bad">not confirmed yet</span>'}</div>
+      <div class="meta sub mono" title="${esc(n.user_agent || '')}">${esc(n.ip_address || 'no IP recorded')}</div>
       ${n.funeral_at ? `<p><b>Funeral</b> ${esc(n.funeral_at)} ${esc(n.funeral_venue || '')}</p>` : ''}${n.event_at ? `<p><b>When</b> ${esc(n.event_at)} ${esc(n.venue || '')}</p>` : ''}
       ${n.reposing ? `<p><b>Reposing</b> ${esc(n.reposing)}</p>` : ''}<p>${esc(n.body || '')}</p>${n.family_message ? `<p><i>${esc(n.family_message)}</i></p>` : ''}
       <label class="form-label">Editor note (emailed to the sender)<textarea data-note rows="2">${esc(n.editorial_note || '')}</textarea></label>
@@ -230,9 +232,10 @@
   /* ---- closures ---- */
   async function loadClosures() {
     const a = await api('/api/admin/closures');
-    $('#closures-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>School</th><th>Closed</th><th>Reason</th><th>Contact</th><th>Status</th><th></th></tr></thead><tbody>${a.map(c => `<tr data-id="${c.id}">
-      <td><b>${esc(c.school)}</b><span class="sub">${esc(c.town || '')} Co. ${esc(c.county)}</span></td><td>${esc(c.closed_on)}${c.reopens_on ? ' → ' + esc(c.reopens_on) : ''}</td><td>${esc(c.reason || '')}</td>
+    $('#closures-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>School</th><th>Closed</th><th>Reason</th><th>Contact</th><th>Submitted from</th><th>Status</th><th></th></tr></thead><tbody>${a.map(c => `<tr data-id="${c.id}">
+      <td><b>${esc(c.school)}</b><span class="sub">${esc(c.town || '')} ${esc(c.county)}</span></td><td>${esc(c.closed_on)}${c.reopens_on ? ' → ' + esc(c.reopens_on) : ''}</td><td>${esc(c.reason || '')}</td>
       <td>${esc(c.contact_name || '')} <span class="sub">${esc(c.contact_role || '')} · ${esc(c.contact_email)}${c.verified_at ? ' · confirmed' : ' · unconfirmed'}</span></td>
+      <td class="mono" title="${esc(c.user_agent || '')}">${esc(c.ip_address || '—')}</td>
       <td><span class="status ${esc(c.status)}">${esc(c.status)}</span></td>
       <td class="actions">${c.status !== 'published' ? '<button class="btn btn--good btn--sm" data-cl="publish">Publish</button>' : '<button class="btn btn--warn btn--sm" data-cl="unpublish">Remove</button>'}<button class="btn btn--hot btn--sm" data-cl="reject">Reject</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><div class="empty__glyph">—</div><h3>No closures submitted.</h3></div>';
   }

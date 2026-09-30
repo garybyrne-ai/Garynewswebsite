@@ -107,7 +107,7 @@ final class Notices
      * Accept a submission from the public form. Returns the row. The submitter gets an email
      * with a confirmation link; editors see it in the notices queue once confirmed.
      */
-    public static function submit(array $in, ?array $user, string $ip): array
+    public static function submit(array $in, ?array $user, string $ip, string $userAgent = ''): array
     {
         $kind = $in['kind'] ?? '';
         if (!isset(self::KINDS[$kind])) {
@@ -155,12 +155,13 @@ final class Notices
             'contact_phone' => mb_substr(trim((string)($in['contact_phone'] ?? '')), 0, 40),
             'submitted_by' => $user['id'] ?? null, 'verify_token' => $token, 'verified_at' => $user ? now() : null,
             'plan' => 'free', 'extra_json' => json_encode($extra, JSON_UNESCAPED_UNICODE),
+            'ip_address' => $ip, 'user_agent' => mb_substr($userAgent, 0, 300),
         ];
         Database::insert('notices', $row);
         $base = rtrim(Config::get('PUBLIC_BASE_URL', ''), '/');
         if (!$user) {
             Mailer::send($email, 'Confirm your ' . strtolower(self::KINDS[$kind]['label']) . ' on Bharat Wire',
-                '<p>Thanks for sending a ' . e(strtolower(self::KINDS[$kind]['label'])) . ' for <b>' . e($title) . '</b> (Co. ' . e($county) . ').</p>'
+                '<p>Thanks for sending a ' . e(strtolower(self::KINDS[$kind]['label'])) . ' for <b>' . e($title) . '</b> (' . e($county) . ').</p>'
                 . '<p>Tap to confirm it came from you. An editor then checks it and it goes live, usually within a few hours:</p>'
                 . '<p><a href="' . e($base . '/notices/confirm/' . $token) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm this notice</a></p>'
                 . '<p style="color:#59685f;font-size:13px">If you did not send this, ignore the email and nothing will be published.</p>');
@@ -220,14 +221,14 @@ final class Notices
             if ($s['town'] && $n['town'] && strcasecmp($s['town'], $n['town']) !== 0 && $kindKey === 'deaths') {
                 continue; // town-scoped subscription
             }
-            Mailer::send($s['email'], ($n['kind'] === 'death' ? 'Death notice: ' : 'New notice: ') . $n['title'] . ' · Co. ' . $n['county'],
+            Mailer::send($s['email'], ($n['kind'] === 'death' ? 'Death notice: ' : 'New notice: ') . $n['title'] . ' · ' . $n['county'],
                 '<p><span style="color:#59685f;font-size:12px;letter-spacing:.1em;text-transform:uppercase">' . e(self::KINDS[$n['kind']]['label']) . ' · ' . e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) . '</span></p>'
                 . '<h2 style="margin:6px 0 10px;font-size:22px">' . e($n['title']) . '</h2>'
                 . ($n['funeral_at'] ? '<p><b>Funeral:</b> ' . e(date_irish($n['funeral_at'], 'l j F, H:i')) . ($n['funeral_venue'] ? ', ' . e($n['funeral_venue']) : '') . '</p>' : '')
                 . ($n['reposing'] ? '<p><b>Reposing:</b> ' . e($n['reposing']) . '</p>' : '')
                 . '<p>' . nl2br(e(excerpt($n['body'], 400))) . '</p>'
                 . '<p><a href="' . e($url) . '" style="color:#139a5c;font-weight:700">Read the full notice →</a></p>'
-                . '<p style="color:#59685f;font-size:12px">You asked for ' . e($kindKey) . ' alerts for Co. ' . e($n['county']) . '. <a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
+                . '<p style="color:#59685f;font-size:12px">You asked for ' . e($kindKey) . ' alerts for ' . e($n['county']) . '. <a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
         }
     }
 

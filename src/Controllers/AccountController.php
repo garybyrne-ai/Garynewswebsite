@@ -60,6 +60,7 @@ final class AccountController
                     'display_name' => $name, 'handle' => self::uniqueHandle($name),
                     'home_town' => $r->post('home_town', '', 80), 'home_county' => $r->post('home_county', '', 80),
                     'accent' => (string)random_int(0, 359), 'created_at' => now(),
+                    'registration_ip' => $r->ip(), 'registration_user_agent' => $r->userAgent(),
                 ]);
                 Database::insert('subscriptions', ['user_id' => $id, 'email' => $email, 'plan' => 'free', 'status' => 'active', 'created_at' => now()]);
             });
@@ -105,6 +106,7 @@ final class AccountController
         if (password_needs_rehash($u['password_hash'], PASSWORD_DEFAULT)) {
             Database::query('UPDATE users SET password_hash=? WHERE id=?', [password_hash($password, PASSWORD_DEFAULT), $u['id']]);
         }
+        Database::query('UPDATE users SET last_login_ip=?, last_login_at=? WHERE id=?', [$r->ip(), now(), $u['id']]);
         Audit::log($u['id'], 'login', 'user', $u['id']);
         return Response::json(['token' => Auth::login($u), 'user' => Auth::publicUser($u)]);
     }
@@ -409,6 +411,7 @@ final class AccountController
             'status' => 'processing', 'verification_label' => 'Community Report',
             'reporter_contact' => $guest['contact'] ?? null, 'reporter_verified_at' => $u ? now() : null, 'verify_token' => $token,
             'image_hash' => $inspect['hash'], 'exif_json' => $inspect['exif'] ? json_encode($inspect['exif']) : null,
+            'submitter_ip' => $r->ip(), 'submitter_user_agent' => $r->userAgent(),
         ], $coords));
         if ($u) {
             Database::query('UPDATE users SET reports_filed=reports_filed+1 WHERE id=?', [$u['id']]);
@@ -418,7 +421,7 @@ final class AccountController
         \MeNews\Services\Clusters::assignIncident($id);
         if ($guest && $guest['email']) {
             \MeNews\Services\Mailer::send($guest['contact'], 'Confirm your report to Bharat Wire',
-                '<p>Thanks, ' . e($guest['name']) . '. One tap to confirm this came from you:</p><p><b>' . e($title) . '</b><br><span style="color:#59685f">' . e($loc . ($county ? ', Co. ' . $county : '')) . '</span></p>'
+                '<p>Thanks, ' . e($guest['name']) . '. One tap to confirm this came from you:</p><p><b>' . e($title) . '</b><br><span style="color:#59685f">' . e($loc . ($county ? ', ' . $county : '')) . '</span></p>'
                 . '<p><a href="' . e(absolute_url('/report/confirm/' . $token)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm my report</a></p>'
                 . '<p style="color:#59685f;font-size:13px">An editor reads every report before it appears. You’ll hear back either way at this address.</p>');
             $out['message'] = 'Thanks — check your email for a one-tap confirmation. An editor then reads it, and you’ll hear back either way.';
@@ -467,7 +470,7 @@ final class AccountController
             if (Database::one('SELECT id FROM confirmations WHERE story_id=? AND (voter_key=? OR (user_id IS NOT NULL AND user_id=?))', [$s['id'], $key, $u['id'] ?? '-'])) {
                 throw new HttpException(409, 'You already confirmed this story');
             }
-            Database::insert('confirmations', ['story_id' => $s['id'], 'user_id' => $u['id'] ?? null, 'voter_key' => $key, 'created_at' => now(), 'confirmer_name' => $u['display_name'] ?? 'Reader', 'note' => $r->post('note', '', 500)]);
+            Database::insert('confirmations', ['story_id' => $s['id'], 'user_id' => $u['id'] ?? null, 'voter_key' => $key, 'created_at' => now(), 'confirmer_name' => $u['display_name'] ?? 'Reader', 'note' => $r->post('note', '', 500), 'ip_address' => $r->ip(), 'user_agent' => $r->userAgent()]);
             $n = Stories::confirmations($s['id']);
             $label = $s['kind'] === 'community' && $n >= 3 && $s['verification_label'] === 'Community Report' ? 'Corroborated' : $s['verification_label'];
             Database::query('UPDATE stories SET corroborations=?,trust_score=MIN(95,trust_score+3),verification_label=?,updated_at=? WHERE id=?', [$n, $label, now(), $s['id']]);
@@ -484,6 +487,7 @@ final class AccountController
     {
         $u = Auth::require();
         RateLimiter::hit($u['id'] . '|comment', 40, 3600, 'Slow down a little — too many comments this hour.');
+        RateLimiter::hit($r->ip() . '|comment', 60, 3600, 'Too many comments from this connection this hour.');
         $s = Database::one("SELECT id,author_user_id FROM stories WHERE id=? AND status='published'", [$p['id']]);
         if (!$s) {
             throw new HttpException(404, 'Story not found');
@@ -500,7 +504,7 @@ final class AccountController
             $mod = ['provider' => 'unavailable', 'flagged' => true];
             $status = 'review';
         }
-        Database::insert('comments', ['story_id' => $s['id'], 'user_id' => $u['id'], 'created_at' => now(), 'author' => $u['display_name'], 'body' => $body, 'status' => $status, 'moderation_json' => json_encode($mod)]);
+        Database::insert('comments', ['story_id' => $s['id'], 'user_id' => $u['id'], 'created_at' => now(), 'author' => $u['display_name'], 'body' => $body, 'status' => $status, 'moderation_json' => json_encode($mod), 'ip_address' => $r->ip(), 'user_agent' => $r->userAgent()]);
         Audit::log($u['id'], 'comment.create', 'story', $s['id'], $status);
         return Response::json(['ok' => true, 'status' => $status, 'comments' => Stories::comments($s['id'])]);
     }

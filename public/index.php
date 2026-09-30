@@ -20,9 +20,11 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 header('X-Frame-Options: SAMEORIGIN');
 header('Permissions-Policy: camera=(), microphone=(), geolocation=(self), payment=()');
 header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
-// Templates carry inline scripts and styles, so the policy locks down the vectors that matter most:
-// no framing by other sites, no <base> hijack, no plugins, and forms only post to us or the payment gateways.
-header("Content-Security-Policy: frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https://checkout.stripe.com https://www.paypal.com https://www.sandbox.paypal.com");
+// Templates carry inline scripts and styles (no build step to hash/nonce them against), so the
+// policy trades a strict script-src for an explicit default-src allowlist instead: nothing loads,
+// connects to, frames, or is framed by anywhere not named here. Covers our own assets, the
+// self-hosted map tiles, Stripe/PayPal checkout, and Google Translate (article-body translation).
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.paypal.com https://www.paypalobjects.com https://translate.google.com https://translate.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.stripe.com https://translate.googleapis.com; frame-src https://js.stripe.com https://checkout.stripe.com https://www.paypal.com https://www.sandbox.paypal.com https://translate.google.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self' https://checkout.stripe.com https://www.paypal.com https://www.sandbox.paypal.com");
 
 $request = new Request();
 if ($request->isSecure()) {

@@ -91,7 +91,7 @@ final class Digest
             $h .= '</ul>';
         }
         $h .= '<p style="margin-top:22px;color:#33423a"><b>Focal an lae:</b> <i>' . e($d['focal']['irish']) . '</i> — ' . e($d['focal']['english']) . '</p>';
-        $h .= '<p style="margin-top:18px"><a href="' . e($base . '/county/' . slugify($county)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:700">All of Co. ' . e($county) . ' →</a> &nbsp; <a href="' . e($base . '/#community') . '" style="color:#d92645;font-weight:700;text-decoration:none">Report something</a></p>';
+        $h .= '<p style="margin-top:18px"><a href="' . e($base . '/county/' . slugify($county)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:700">All of ' . e($county) . ' →</a> &nbsp; <a href="' . e($base . '/#community') . '" style="color:#d92645;font-weight:700;text-decoration:none">Report something</a></p>';
         if ($token !== 'preview') {
             $h .= '<p style="color:#59685f;font-size:12px;margin-top:22px">You asked for the ' . e($county) . ' morning email. <a href="' . e($base . '/alerts/unsubscribe/' . $token) . '" style="color:#59685f">Unsubscribe</a></p>';
         }

@@ -32,7 +32,7 @@
     <?php else: ?>
       <div class="reportcta">
         <div class="reportcta__text">
-          <h3>No <?= $meta ? mb_strtolower(e($meta['plural'])) : 'notices' ?> <?= $county ? 'for Co. ' . e($county) : '' ?> yet.</h3>
+          <h3>No <?= $meta ? mb_strtolower(e($meta['plural'])) : 'notices' ?> <?= $county ? 'for ' . e($county) : '' ?> yet.</h3>
           <p><?= $kind === 'death' || $kind === '' ? 'Funeral directors and families can place a death notice in two minutes, free. It is confirmed by email, checked by an editor and emailed to everyone in the state who asked for alerts.' : ($meta['who'] ?? 'Anyone') . ' can place one in two minutes. It is confirmed by email and checked by an editor before it appears.' ?></p>
           <div class="form__actions" style="justify-content:flex-start"><a class="btn btn--hot" href="/notices/submit<?= $kind ? '?kind=' . e($kind) : '' ?>"><?= icon('plus') ?> Place a notice</a></div>
         </div>

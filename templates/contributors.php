@@ -15,7 +15,7 @@
           <p class="profile__title"><?= e($c['title']) ?></p>
           <p><?= e($c['bio']) ?></p>
           <div class="profile__meta mono">
-            <span><?= icon('pin') ?> <?= e($c['home_town']) ?>, Co. <?= e($c['home_county']) ?></span>
+            <span><?= icon('pin') ?> <?= e($c['home_town']) ?>, <?= e($c['home_county']) ?></span>
             <span><?= (int)$c['reported'] ?> original <?= $c['reported'] === 1 ? 'report' : 'reports' ?></span>
             <span><?= (int)$c['curated'] ?> wire stories curated</span>
             <span>Reputation <?= (int)$c['reputation'] ?>/100</span>

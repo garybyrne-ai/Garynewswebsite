@@ -80,7 +80,7 @@
   async function loadAlerts() {
     const j = await api('/api/me/alerts');
     const a = j.subscriptions || [];
-    $('#alerts-list').innerHTML = a.length ? a.map(x => `<div class="notif inline"><b style="flex:1">Co. ${esc(x.county)}${x.town ? ' · ' + esc(x.town) : ''} <span class="mono">${esc(x.kind_labels.join(', '))}${x.confirmed ? '' : ' · unconfirmed — check your inbox'}</span></b><button class="btn btn--ghost btn--sm" data-unalert="${x.id}">Remove</button></div>`).join('') : '<p class="panel__note">No county alerts yet.</p>';
+    $('#alerts-list').innerHTML = a.length ? a.map(x => `<div class="notif inline"><b style="flex:1">${esc(x.county)}${x.town ? ' · ' + esc(x.town) : ''} <span class="mono">${esc(x.kind_labels.join(', '))}${x.confirmed ? '' : ' · unconfirmed — check your inbox'}</span></b><button class="btn btn--ghost btn--sm" data-unalert="${x.id}">Remove</button></div>`).join('') : '<p class="panel__note">No state alerts yet.</p>';
     $$('[data-unalert]').forEach(b => b.addEventListener('click', async () => { try { await api('/api/me/alerts/' + b.dataset.unalert, { method: 'DELETE' }); loadAlerts(); } catch (e) { toast(e.message); } }));
     $('#alerts-hint').textContent = j.plan === 'Wire+' ? `${a.length} of ${j.limit} areas used` : `${a.length} of ${j.limit} area used — Wire+ allows 10`;
   }

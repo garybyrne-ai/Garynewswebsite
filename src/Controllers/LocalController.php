@@ -73,7 +73,7 @@ final class LocalController
         $related = Notices::recent(['kind' => $n['kind'], 'county' => $n['county']], 6);
         $related = array_values(array_filter($related, static fn($x) => $x['id'] !== $n['id']));
         return View::page('notice', self::base([
-            'title' => $n['title'] . ' · ' . $n['kind_label'] . ' · Co. ' . $n['county'] . ' — Bharat Wire India',
+            'title' => $n['title'] . ' · ' . $n['kind_label'] . ' · ' . $n['county'] . ' — Bharat Wire India',
             'description' => excerpt($n['body'] ?: ($n['kind_label'] . ' for ' . $n['title'] . ', ' . ($n['town'] ?: $n['county'])), 180),
             'notice' => $n, 'related' => array_slice($related, 0, 5),
             'jsonld' => Notices::eventJsonLd($n),
@@ -95,7 +95,7 @@ final class LocalController
 
     public static function submit(Request $r): Response
     {
-        $row = Notices::submit($_POST, Auth::user(), $r->ip());
+        $row = Notices::submit($_POST, Auth::user(), $r->ip(), $r->userAgent());
         return Response::json([
             'ok' => true, 'id' => $row['id'], 'status' => $row['status'],
             'message' => $row['verified_at'] ? 'Thanks. Your notice is with an editor and usually goes live within a few hours.' : 'Thanks. Check your email for a one-tap confirmation link; an editor then publishes the notice, usually within a few hours.',
@@ -135,7 +135,7 @@ final class LocalController
     public static function subscribe(Request $r): Response
     {
         $out = Alerts::subscribe($_POST + ['kinds' => (array)($_POST['kinds'] ?? [])], Auth::user(), $r->ip());
-        $out['message'] = $out['confirmed'] ? 'Done — you’re signed up for Co. ' . $out['county'] . '.' : 'Check your inbox for a one-tap confirmation link.';
+        $out['message'] = $out['confirmed'] ? 'Done — you’re signed up for ' . $out['county'] . '.' : 'Check your inbox for a one-tap confirmation link.';
         return Response::json($out);
     }
 
@@ -144,7 +144,7 @@ final class LocalController
         $s = Alerts::confirmSubscription($p['token']);
         return View::page('confirmed', self::base([
             'title' => 'Alerts confirmed — Bharat Wire India',
-            'heading' => $s ? 'You’re set up for Co. ' . $s['county'] . '.' : 'That link doesn’t match anything.',
+            'heading' => $s ? 'You’re set up for ' . $s['county'] . '.' : 'That link doesn’t match anything.',
             'text' => $s ? 'You’ll get: ' . implode(', ', array_map(static fn($k) => strtolower(Alerts::KINDS[$k] ?? $k), explode(',', $s['kinds']))) . '. Every email has a one-tap unsubscribe.' : 'The link may have been used already.',
             'link' => '/alerts' . ($s ? '?county=' . rawurlencode($s['county']) : ''), 'linkText' => 'Alerts for your county',
         ]));
@@ -156,14 +156,14 @@ final class LocalController
         return View::page('confirmed', self::base([
             'title' => 'Unsubscribed — Bharat Wire India',
             'heading' => $s ? 'Unsubscribed.' : 'That link doesn’t match anything.',
-            'text' => $s ? 'No more emails for Co. ' . $s['county'] . '. Changed your mind? Sign up again any time.' : '',
+            'text' => $s ? 'No more emails for ' . $s['county'] . '. Changed your mind? Sign up again any time.' : '',
             'link' => '/', 'linkText' => 'Back to Bharat Wire',
         ]));
     }
 
     public static function submitClosure(Request $r): Response
     {
-        $out = Alerts::submitClosure($_POST, $r->ip());
+        $out = Alerts::submitClosure($_POST, $r->ip(), $r->userAgent());
         $out['message'] = 'Thanks. Confirm from the school email we just sent and the closure goes live immediately.';
         return Response::json($out);
     }
@@ -174,7 +174,7 @@ final class LocalController
         return View::page('confirmed', self::base([
             'title' => 'Closure confirmed — Bharat Wire India',
             'heading' => $c ? $c['school'] . ' is now listed as closed.' : 'That link doesn’t match anything.',
-            'text' => $c ? 'Parents in Co. ' . $c['county'] . ' who asked for closure alerts have been emailed. Email us if the school reopens earlier than planned.' : '',
+            'text' => $c ? 'Parents in ' . $c['county'] . ' who asked for closure alerts have been emailed. Email us if the school reopens earlier than planned.' : '',
             'link' => '/alerts' . ($c ? '?county=' . rawurlencode($c['county']) : ''), 'linkText' => 'See the closures list',
         ]));
     }

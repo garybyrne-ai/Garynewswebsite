@@ -7,7 +7,7 @@
     <p class="profile__title"><?= e($c['title']) ?></p>
     <p class="pagehead__blurb"><?= e($c['bio']) ?></p>
     <div class="profile__meta mono">
-      <?php if ($c['home_town']): ?><span><?= icon('pin') ?> <?= e($c['home_town']) ?>, Co. <?= e($c['home_county']) ?></span><?php endif; ?>
+      <?php if ($c['home_town']): ?><span><?= icon('pin') ?> <?= e($c['home_town']) ?>, <?= e($c['home_county']) ?></span><?php endif; ?>
       <span><?= (int)$c['reported'] ?> original <?= $c['reported'] === 1 ? 'report' : 'reports' ?></span>
       <span><?= (int)$c['curated'] ?> wire stories curated</span>
       <span>Reputation <?= (int)$c['reputation'] ?>/100</span>

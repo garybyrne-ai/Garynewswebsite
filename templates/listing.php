@@ -16,6 +16,8 @@
   <a class="countystrip__item" href="/notices/event?county=<?= rawurlencode($county) ?>"><?= icon('calendar') ?><span><b><?= $cs['events'] ? e($cs['events'][0]['title']) : "What's on in " . e($county) ?></b><small><?= $cs['events'] ? e(date_irish($cs['events'][0]['event_at'], 'D j M')) . ' · more events →' : 'Add your event, free →' ?></small></span></a>
   <a class="countystrip__item" href="/county/<?= e($cs['slug']) ?>/map"><?= icon('map') ?><span><b><?= e($county) ?> on the map</b><small><?= $cs['towns'] ? 'Busiest: ' . e(implode(', ', array_map(static fn($t) => $t['location_name'], array_slice($cs['towns'], 0, 3)))) : 'Every story placed' ?> →</small></span></a>
   <?php if (!empty($cs['whatsapp'])): ?><a class="countystrip__item" href="<?= e($cs['whatsapp']) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><b>WhatsApp channel</b><small>Join the <?= e($county) ?> channel →</small></span></a><?php endif; ?>
+  <?php if (!empty($stateWeather)): $sw = $stateWeather; ?><span class="countystrip__item countystrip__item--static"><?= icon('sun') ?><span><b><?= (int)$sw['temp'] ?>°C <?= e($sw['label']) ?></b><small>H:<?= (int)$sw['max'] ?>° L:<?= (int)$sw['min'] ?>° near <?= e($stateProfile['capital'] ?? $county) ?></small></span></span><?php endif; ?>
+  <?php if (!empty($stateProfile)): $sp = $stateProfile; ?><span class="countystrip__item countystrip__item--static"><?= icon('sparkle') ?><span><b><?= e($sp['festival']) ?> · <?= e($sp['language']) ?></b><small><?= e($sp['known_for']) ?></small></span></span><?php endif; ?>
 </div>
 <?php endif; ?>
 <div class="container layout">

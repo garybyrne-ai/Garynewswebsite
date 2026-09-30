@@ -420,7 +420,7 @@ final class AdminController
     public static function closures(Request $r): Response
     {
         self::staff();
-        return Response::json(Database::all('SELECT id,created_at,status,school,county,town,closed_on,reopens_on,reason,contact_name,contact_role,contact_email,verified_at,published_at FROM closures ORDER BY created_at DESC LIMIT 200'));
+        return Response::json(Database::all('SELECT id,created_at,status,school,county,town,closed_on,reopens_on,reason,contact_name,contact_role,contact_email,verified_at,published_at,ip_address,user_agent FROM closures ORDER BY created_at DESC LIMIT 200'));
     }
 
     public static function closureDecision(Request $r, array $p): Response
@@ -639,10 +639,11 @@ final class AdminController
             'owner_name' => ['label' => 'Owner / publisher name', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Gary Byrne'],
             'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Bharat Wire India'],
             'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'India'],
+            'pii_retention_days' => ['label' => 'IP/device log retention (days) — scripts/purge-pii.php', 'group' => 'Security', 'type' => 'int', 'default' => '180'],
         ];
         foreach (Locations::countyNames() as $c) {
-            $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by county', 'type' => 'text', 'default' => ''];
-            $keys['whatsapp_channel_' . slugify($c)] = ['label' => $c . ' WhatsApp channel link', 'group' => 'WhatsApp channels by county', 'type' => 'text', 'default' => ''];
+            $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by state', 'type' => 'text', 'default' => ''];
+            $keys['whatsapp_channel_' . slugify($c)] = ['label' => $c . ' WhatsApp channel link', 'group' => 'WhatsApp channels by state', 'type' => 'text', 'default' => ''];
         }
         return $keys;
     }

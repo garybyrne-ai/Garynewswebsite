@@ -147,7 +147,7 @@ final class PageController
         $province = Locations::provinceFor($county);
         $towns = array_values(array_unique(array_column(array_filter(Locations::all(), static fn($t) => $t['county'] === $county), 'town')));
         $week = Database::count("SELECT COUNT(*) FROM stories WHERE status='published' AND county=? AND COALESCE(published_at,created_at)>?", [$county, gmdate('Y-m-d\TH:i:s', time() - 7 * 86400) . '+00:00']);
-        $topTowns = Database::all("SELECT location_name, COUNT(*) AS n FROM stories WHERE status='published' AND county=? AND location_name IS NOT NULL AND location_name NOT LIKE 'Co. %' AND COALESCE(published_at,created_at)>? GROUP BY location_name ORDER BY n DESC LIMIT 6", [$county, gmdate('Y-m-d\TH:i:s', time() - 30 * 86400) . '+00:00']);
+        $topTowns = Database::all("SELECT location_name, COUNT(*) AS n FROM stories WHERE status='published' AND county=? AND location_name IS NOT NULL AND COALESCE(published_at,created_at)>? GROUP BY location_name ORDER BY n DESC LIMIT 6", [$county, gmdate('Y-m-d\TH:i:s', time() - 30 * 86400) . '+00:00']);
         $deaths = \MeNews\Services\Notices::recent(['county' => $county, 'kind' => 'death'], 4);
         $events = \MeNews\Services\Notices::recent(['county' => $county, 'kind' => 'event', 'upcoming' => true], 3);
         $warning = \MeNews\Services\Alerts::headline($county);
@@ -173,6 +173,8 @@ final class PageController
             'banner' => self::banner($county, '', 'county'),
             'county' => $county,
             'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
+            'stateProfile' => \MeNews\Support\StateProfile::get($county),
+            'stateWeather' => \MeNews\Services\Weather::forState($county),
             'feedLinks' => [['/feed/county/' . $p['slug'] . '.xml', $county]],
             'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'Bharat Wire India', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'India']]],
         ]));

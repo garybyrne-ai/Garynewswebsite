@@ -51,7 +51,7 @@
   <?php endif; ?>
 
   <?php if (!$board): ?>
-    <div class="empty"><div class="empty__glyph"><?= icon('signal') ?></div><h3>No votes <?= $window === 'today' ? 'yet today' : 'in this window' ?><?= $county ? ' from Co. ' . e($county) : '' ?>.</h3><p>Be the first: open any story and tap a signal, or vote straight from the cards below.</p></div>
+    <div class="empty"><div class="empty__glyph"><?= icon('signal') ?></div><h3>No votes <?= $window === 'today' ? 'yet today' : 'in this window' ?><?= $county ? ' from ' . e($county) : '' ?>.</h3><p>Be the first: open any story and tap a signal, or vote straight from the cards below.</p></div>
   <?php endif; ?>
 
   <?php if ($warmup): ?>
@@ -93,6 +93,6 @@ Signal  = ( Σ weights + 2×confirmations + 0.5×comments + 2×votes in last 3 h
         <li><b>No dark patterns.</b> Votes are rate-limited, never bought, and advertising can't touch the board.</li>
       </ul>
     </div>
-    <?php if ($st['counties']): ?><div class="how__counties mono"><span>Voting today:</span><?php foreach ($st['counties'] as $c): ?><a href="/signal?window=<?= e($window) ?>&county=<?= rawurlencode($c['county']) ?>">Co. <?= e($c['county']) ?> <b><?= (int)$c['n'] ?></b></a><?php endforeach; ?></div><?php endif; ?>
+    <?php if ($st['counties']): ?><div class="how__counties mono"><span>Voting today:</span><?php foreach ($st['counties'] as $c): ?><a href="/signal?window=<?= e($window) ?>&county=<?= rawurlencode($c['county']) ?>"><?= e($c['county']) ?> <b><?= (int)$c['n'] ?></b></a><?php endforeach; ?></div><?php endif; ?>
   </section>
 </div>

@@ -28,7 +28,7 @@
           <?php endforeach; ?>
         </div>
       <?php else: ?>
-        <div class="empty"><div class="empty__glyph"><?= icon('sun') ?></div><h3>Nothing in force<?= $county ? ' for Co. ' . e($county) : '' ?>.</h3><p>Sign up below and you’ll hear the moment that changes.</p></div>
+        <div class="empty"><div class="empty__glyph"><?= icon('sun') ?></div><h3>Nothing in force<?= $county ? ' for ' . e($county) : '' ?>.</h3><p>Sign up below and you’ll hear the moment that changes.</p></div>
       <?php endif; ?>
     </section>
 
@@ -40,7 +40,7 @@
           <tbody><?php foreach ($closures as $c): ?><tr><td><b><?= e($c['school']) ?></b><?= $c['verified_at'] ? ' <span class="chip chip--label is-verified" title="Confirmed from the school’s email"><i></i>Confirmed</span>' : '' ?></td><td><?= e(($c['town'] ? $c['town'] . ', ' : '') . $c['county']) ?></td><td><?= e(date('D j M', strtotime($c['closed_on']) ?: time())) ?></td><td><?= $c['reopens_on'] ? e(date('D j M', strtotime($c['reopens_on']) ?: time())) : '—' ?></td><td><?= e($c['reason'] ?: '') ?></td></tr><?php endforeach; ?></tbody>
         </table></div>
       <?php else: ?>
-        <div class="empty"><div class="empty__glyph"><?= icon('school') ?></div><h3>No closures reported<?= $county ? ' in Co. ' . e($county) : '' ?>.</h3><p>Principals: add yours below in under a minute. Parents: sign up for closure alerts and you’ll know before the school run.</p></div>
+        <div class="empty"><div class="empty__glyph"><?= icon('school') ?></div><h3>No closures reported<?= $county ? ' in ' . e($county) : '' ?>.</h3><p>Principals: add yours below in under a minute. Parents: sign up for closure alerts and you’ll know before the school run.</p></div>
       <?php endif; ?>
       <form class="form panel" id="closure-form" data-closure style="margin-top:22px">
         <span class="kicker"><?= icon('school') ?> Principals &amp; boards of management: report a closure</span>

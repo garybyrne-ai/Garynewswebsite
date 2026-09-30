@@ -163,7 +163,7 @@ final class Alerts
         return Database::all("SELECT id,school,county,town,closed_on,reopens_on,reason,contact_role,verified_at,published_at FROM closures WHERE status='published' AND closed_on BETWEEN ? AND ?" . ($county ? ' AND county=?' : '') . ' ORDER BY closed_on DESC, county, school', $county ? [$from, $to, $county] : [$from, $to]);
     }
 
-    public static function submitClosure(array $in, string $ip): array
+    public static function submitClosure(array $in, string $ip, string $userAgent = ''): array
     {
         RateLimiter::hit($ip . '|closure', 10, 3600, 'Too many submissions. Try again later.');
         $school = trim((string)($in['school'] ?? ''));
@@ -190,6 +190,7 @@ final class Alerts
             'reopens_on' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($in['reopens_on'] ?? '')) ? $in['reopens_on'] : null,
             'reason' => mb_substr(trim((string)($in['reason'] ?? '')), 0, 300), 'contact_name' => mb_substr(trim((string)($in['contact_name'] ?? '')), 0, 100),
             'contact_role' => mb_substr(trim((string)($in['contact_role'] ?? 'Principal')), 0, 60), 'contact_email' => $email, 'verify_token' => $token,
+            'ip_address' => $ip, 'user_agent' => mb_substr($userAgent, 0, 300),
         ]);
         Mailer::send($email, 'Confirm the closure of ' . $school, '<p>Tap to confirm that <b>' . e($school) . '</b> is closed on <b>' . e(date('l j F', strtotime($day) ?: time())) . '</b>' . ($in['reason'] ?? '' ? ' (' . e($in['reason']) . ')' : '') . '. It appears on the Bharat Wire closures list as soon as you confirm, and an editor can remove it if anything looks wrong.</p>'
             . '<p><a href="' . e(absolute_url('/alerts/closures/confirm/' . $token)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm closure</a></p>');

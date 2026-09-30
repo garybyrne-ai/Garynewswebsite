@@ -20,7 +20,7 @@ $jsonld = $isWire ? null : [
 
 <article class="container article" data-story-id="<?= e($story['id']) ?>">
   <header class="article__head">
-    <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Around Me</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>">Co. <?= e($story['county']) ?></a><?php endif; ?></nav>
+    <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Around Me</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>"><?= e($story['county']) ?></a><?php endif; ?></nav>
     <div class="article__labels"><?= $isWire ? '<a class="chip chip--label is-wire" href="/about#labels" title="How we check things"><i></i>Wire · ' . e($story['source_name']) . '</a>' : Ui::label($story['verification_label']) ?><?= Ui::categoryChip($story['category']) ?><?= $cluster && $cluster['count'] > 1 ? '<a class="chip chip--cluster" href="#coverage">' . icon('layers') . ' ' . (int)$cluster['count'] . ' outlets covering this</a>' : '' ?><?= !$isWire && (int)($story['corroborations'] ?? 0) >= 3 ? '<span class="chip chip--label is-corroborated"><i></i>Corroborated ×' . (int)$story['corroborations'] . '</span>' : '' ?></div>
     <h1 class="article__title"><?= e($story['title']) ?></h1>
     <?php if ($story['summary']): ?><p class="article__standfirst"><?= e($story['summary']) ?></p><?php endif; ?>
@@ -38,7 +38,7 @@ $jsonld = $isWire ? null : [
         <time datetime="<?= e($story['time']) ?>"><?= e(date_irish($story['time'])) ?></time>
         <span>·</span><span><?= e(time_ago($story['time'])) ?></span>
         <?php if (views_label((int)$story['views']) !== ''): ?><span>·</span><span><?= e(views_label((int)$story['views'])) ?> reads</span><?php endif; ?>
-        <?php if ($story['location_name']): ?><span>·</span><span><?= icon('pin') ?> <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', Co. ' . e($story['county']) : '' ?></span><?php endif; ?>
+        <?php if ($story['location_name']): ?><span>·</span><span><?= icon('pin') ?> <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', ' . e($story['county']) : '' ?></span><?php endif; ?>
       </div>
     </div>
   </header>

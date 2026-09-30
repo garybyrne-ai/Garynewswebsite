@@ -36,10 +36,10 @@ foreach ($counties as $c) {
         <?= ($s['distance_km'] ?? null) !== null ? str_replace('<div class="card__foot">', '<div class="card__foot"><span class="card__km">' . e(number_format((float)$s['distance_km'], $s['distance_km'] < 10 ? 1 : 0)) . ' km</span>', $card) : $card ?>
       <?php endforeach; ?>
     </div>
-    <?php if ($compact && $loc['county']): ?><p class="near__more"><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>">All of Co. <?= e($loc['county']) ?> →</a><span class="mono">·</span><a class="mono" href="/notices?county=<?= rawurlencode((string)$loc['county']) ?>">Deaths &amp; notices →</a><span class="mono">·</span><a class="mono" href="/alerts?county=<?= rawurlencode((string)$loc['county']) ?>">Alerts →</a><span class="mono">·</span><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>/map">Map →</a></p><?php endif; ?>
+    <?php if ($compact && $loc['county']): ?><p class="near__more"><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>">All of <?= e($loc['county']) ?> →</a><span class="mono">·</span><a class="mono" href="/notices?county=<?= rawurlencode((string)$loc['county']) ?>">Deaths &amp; notices →</a><span class="mono">·</span><a class="mono" href="/alerts?county=<?= rawurlencode((string)$loc['county']) ?>">Alerts →</a><span class="mono">·</span><a class="mono" href="/county/<?= e(slugify((string)$loc['county'])) ?>/map">Map →</a></p><?php endif; ?>
     <?php if ($notices): ?>
       <div class="near__notices">
-        <span class="kicker"><?= icon('candle') ?> Recent deaths · Co. <?= e($loc['county']) ?></span>
+        <span class="kicker"><?= icon('candle') ?> Recent deaths · <?= e($loc['county']) ?></span>
         <ul class="noticelist noticelist--row"><?php foreach ($notices as $n): ?><li><a href="<?= e($n['url']) ?>"><b><?= e($n['title']) ?></b><small><?= e($n['town'] ?: $n['county']) ?><?= $n['funeral_at'] ? ' · ' . e(date_irish($n['funeral_at'], 'D H:i')) : '' ?></small></a></li><?php endforeach; ?></ul>
       </div>
     <?php endif; ?>
