@@ -13,9 +13,15 @@ final class StateProfile
         return self::$data ??= json_decode((string)file_get_contents(ME_ROOT . '/config/states.json'), true, 512, JSON_THROW_ON_ERROR);
     }
 
-    /** @return array{capital:string,language:string,festival:string,known_for:string}|null */
+    /** @return array{capital:string,language:string,native_name?:string,festival:string,known_for:string}|null */
     public static function get(string $state): ?array
     {
         return self::data()[$state] ?? null;
+    }
+
+    /** India's unified national emergency numbers (same everywhere — see config/states.json _emergency.note). */
+    public static function emergencyNumbers(): array
+    {
+        return self::data()['_emergency']['numbers'] ?? [];
     }
 }

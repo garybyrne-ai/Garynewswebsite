@@ -12,6 +12,17 @@
   </form>
 </section>
 
+<section class="container">
+  <div class="panel reveal" style="margin-bottom:24px">
+    <header class="panel__head"><span class="kicker"><?= icon('alert') ?> Emergency numbers — free, from any phone, anywhere in India</span></header>
+    <div class="helplines">
+      <?php foreach (\MeNews\Support\StateProfile::emergencyNumbers() as $n): ?>
+        <div class="helplines__item"><b class="mono"><?= e($n['number']) ?></b><small><?= e($n['label']) ?></small></div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+
 <div class="container layout">
   <div class="layout__main">
     <section class="block reveal">

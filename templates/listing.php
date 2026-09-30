@@ -1,7 +1,7 @@
 <?php use MeNews\Ui; ?>
 <section class="container pagehead">
   <span class="kicker"><?= e($kicker) ?></span>
-  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon($icon) ?></span><?= e($heading) ?></h1>
+  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon($icon) ?></span><?= e($heading) ?><?php if (!empty($stateProfile['native_name'])): ?> <span class="pagehead__native"><?= e($stateProfile['native_name']) ?></span><?php endif; ?></h1>
   <p class="pagehead__blurb"><?= e($blurb) ?></p>
   <?php if (isset($q)): ?>
     <form class="search search--big" action="/search" role="search"><input type="search" name="q" value="<?= e($q) ?>" placeholder="Search stories, towns, counties…" aria-label="Search" autofocus><button type="submit">Search</button></form>

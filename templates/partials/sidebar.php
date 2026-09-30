@@ -59,6 +59,17 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
   </section>
   <?php endif; ?>
 
+  <?php $festivals = $county ? \MeNews\Support\Festivals::upcomingForState($county, 4) : \MeNews\Support\Festivals::upcomingNational(4); if ($festivals): ?>
+  <section class="panel reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('calendar') ?> Festivals &amp; holidays<?= $county ? ' · ' . e($county) : '' ?></span></header>
+    <ul class="noticelist">
+      <?php foreach ($festivals as $f): ?>
+        <li><div><b><?= e($f['name']) ?></b><small><?= $f['date'] ? e(date_irish($f['date'], 'D j M')) . ($f['in_days'] === 0 ? ' · today' : ($f['in_days'] === 1 ? ' · tomorrow' : ' · in ' . (int)$f['in_days'] . ' days')) : 'Date varies — check locally' ?></small></div></li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
   <section class="panel panel--alerts reveal">
     <header class="panel__head"><span class="kicker"><?= icon('mail') ?> Your 7am morning</span></header>
     <p class="panel__note" style="margin:0 0 10px">Five stories, the weather, deaths and what's on for <?= e($county ?: 'your state') ?>, in your inbox at seven.</p>
