@@ -64,5 +64,5 @@
       <div class="empty"><div class="empty__glyph"><?= icon('clock') ?></div><h3>Nothing published here yet.</h3><p>The wire refreshes every few minutes. Try another section or state, or search for a town.</p></div>
     <?php endif; ?>
   </div>
-  <?= \MeNews\View::partial('partials/sidebar', ['trending' => $trending ?? [], 'ads' => $ads ?? []]) ?>
+  <?= \MeNews\View::partial('partials/sidebar', ['trending' => $trending ?? [], 'ads' => $ads ?? [], 'county' => $county ?? null]) ?>
 </div>

@@ -59,6 +59,25 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
   </section>
   <?php endif; ?>
 
+  <?php $trends = \MeNews\Services\Trends::forState($county, 6); if ($trends): ?>
+  <section class="panel panel--trends reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('flame') ?> Trending searches<?= $county ? ' · ' . e($county) : ' · India' ?></span><span class="mono panel__hint">Google Trends</span></header>
+    <ol class="trendlist">
+      <?php foreach ($trends as $i => $tr): ?>
+        <li>
+          <span class="trendlist__n mono"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
+          <div class="trendlist__body">
+            <div class="trendlist__q"><b><?= e($tr['query']) ?></b><?php if ($tr['traffic']): ?><span class="trendlist__traffic mono"><?= e($tr['traffic']) ?></span><?php endif; ?></div>
+            <?php if ($tr['news_title'] && $tr['news_url']): ?><a class="trendlist__news" href="<?= e($tr['news_url']) ?>" target="_blank" rel="noopener"><?= e(excerpt($tr['news_title'], 70)) ?><small><?= e($tr['news_source'] ?? '') ?></small></a><?php endif; ?>
+          </div>
+          <?php if ($i === 0 && $tr['picture']): ?><img class="trendlist__pic" src="<?= e($tr['picture']) ?>" alt="" loading="lazy" referrerpolicy="no-referrer"><?php endif; ?>
+        </li>
+      <?php endforeach; ?>
+    </ol>
+    <p class="panel__note">Real-time search demand from Google Trends<?= $county ? ' in ' . e($county) : ' across India' ?> — the closest free, public signal to "what people are searching about" since Facebook, Instagram and X don't publish one.</p>
+  </section>
+  <?php endif; ?>
+
   <?php $liveMatches = \MeNews\Services\Cricket::configured() ? \MeNews\Services\Cricket::liveMatches() : []; if ($liveMatches): ?>
   <section class="panel reveal">
     <header class="panel__head"><span class="kicker"><?= icon('trophy') ?> Live cricket</span></header>
