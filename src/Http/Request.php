@@ -71,9 +71,31 @@ final class Request
         return is_string($v) ? $v : '';
     }
 
+    /**
+     * Visitor IP. Trusts X-Forwarded-For only when TRUST_PROXY_HEADERS=true (set this when
+     * the app sits behind a reverse proxy/load balancer you control — Cloudways, Cloudflare,
+     * nginx — that itself sets/overwrites the header; never enable it if the app is reachable
+     * directly, or a client can simply forge its own IP for every logged action).
+     */
     public function ip(): string
     {
-        return (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        if (\MeNews\Config::bool('TRUST_PROXY_HEADERS', false)) {
+            $forwarded = (string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
+            if ($forwarded !== '') {
+                $first = trim(explode(',', $forwarded)[0]);
+                if (filter_var($first, FILTER_VALIDATE_IP)) {
+                    $ip = $first;
+                }
+            }
+        }
+        return $ip;
+    }
+
+    /** Browser/client User-Agent string, truncated to a sane storage length. */
+    public function userAgent(): string
+    {
+        return mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 300);
     }
 
     public function isSecure(): bool

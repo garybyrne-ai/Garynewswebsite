@@ -13,31 +13,37 @@ use SimpleXMLElement;
 use Throwable;
 
 /**
- * The ME News wire pulls headlines from established Irish publishers (RSS) into the
+ * The Bharat Wire news wire pulls headlines from established Indian publishers (RSS) into the
  * stories table as `kind = wire`. Only the headline, standfirst, image reference, byline and
  * publication time are stored; every story links back to the original publisher.
  *
- * Wire stories are assigned to the ME contributor whose desk matches the section so the
- * newsroom has a named person responsible for each part of the feed.
+ * Wire stories are assigned to the Bharat Wire contributor whose desk matches the section so
+ * the newsroom has a named person responsible for each part of the feed.
  */
 final class NewsWire
 {
     private const WORLD_TAGS = ['uk', 'world', 'us', 'europe', 'middle east', 'asia', 'africa', 'americas', 'australia', 'international', 'uk news', 'us news', 'world news'];
 
-    /** Strong signals that a story is about somewhere other than Ireland. */
-    private const WORLD_RE = '/\b(trump|white house|washington|congress|pentagon|kremlin|putin|zelensky|ukraine|russia|gaza|israel|hamas|iran|tehran|beijing|china|taiwan|india|pakistan|nato|united nations|downing street|westminster|starmer|farage|reform uk|labour party|tories|tory|conservative party|house of commons|scotland|scottish|wales|welsh|england|english government|british government|bank of england|ons|uk gdp|uk economy|nhs|australia|australian|canada|canadian|new zealand|france|french|germany|german|spain|spanish|italy|italian|brussels|european commission|eu summit|macron|merz|nfl|nba|mlb|super bowl|premier league|champions league|wimbledon|us open|french open|australian open|masters|ryder cup|formula one|f1|grand prix|olympic)\b/iu';
-    private const IRISH_RE = '/\b(taoiseach|tánaiste|dáil|seanad|oireachtas|garda|gardaí|hse|rté|fianna fáil|fine gael|sinn féin|aontú|leinster house|áras|president higgins|irish (?:government|economy|exports|firms?|company|companies|jobs|workers|farmers|schools?|hospitals?)|cso|revenue commissioners|central bank of ireland|esb|eir|ryanair|aer lingus|dubliner|irish|ireland|mary lou|mcdonald|micheál martin|micheal martin|simon harris|president connolly|minister|\btds?\b|councillors?|dublin|cork|galway|limerick|waterford|belfast|donegal|kerry|mayo|meath|kildare|wicklow|wexford|tipperary|clare|louth|sligo|leitrim|roscommon|offaly|laois|kilkenny|carlow|westmeath|longford|cavan|monaghan)\b/iu';
+    /** Strong signals that a story is about somewhere other than India. */
+    private const WORLD_RE = '/\b(trump|white house|washington|us congress|pentagon|kremlin|putin|zelensky|ukraine|russia|gaza|israel|hamas|iran|tehran|beijing|taiwan|nato|united nations|downing street|westminster|10 downing street|starmer|uk government|british government|bank of england|house of commons|scotland|scottish|wales|welsh|nhs|australia|australian|canada|canadian|new zealand|france|french|germany|german|spain|spanish|italy|italian|brussels|european commission|eu summit|macron|merz|nfl|nba|mlb|super bowl|premier league|champions league|europa league|wimbledon|us open golf|french open|australian open|the masters|ryder cup|formula one|f1 grand prix|olympic games)\b/iu';
+    private const INDIA_RE = '/\b(pm modi|narendra modi|president murmu|draupadi murmu|lok sabha|rajya sabha|parliament of india|supreme court of india|high court|cbi|enforcement directorate|\bed\b|rbi|sebi|niti aayog|bjp|indian national congress|congress party|aap|trinamool|shiv sena|dmk|aiadmk|jdu|rjd|isro|indian army|indian navy|indian air force|indian government|indian economy|indian exports|indian firms?|indian companies|indian jobs|indian farmers|indian railways|gst council|union budget|reserve bank of india|sensex|nifty|bse|nse|chief minister|governor|\bmp\b|\bmla\b|indian|india|delhi|mumbai|bengaluru|bangalore|chennai|kolkata|hyderabad|pune|ahmedabad|jaipur|lucknow|chandigarh|andhra pradesh|arunachal pradesh|assam|bihar|chhattisgarh|goa|gujarat|haryana|himachal pradesh|jharkhand|karnataka|kerala|madhya pradesh|maharashtra|manipur|meghalaya|mizoram|nagaland|odisha|punjab|rajasthan|sikkim|tamil nadu|telangana|tripura|uttar pradesh|uttarakhand|west bengal|jammu and kashmir|ladakh|puducherry)\b/iu';
     /** A single strong term is enough for Sport; weak terms need two of them. */
-    private const SPORT_STRONG_RE = '/\b(gaa|hurling|camogie|all-ireland|league of ireland|premier league|champions league|europa league|fai cup|rugby|six nations|leinster rugby|munster rugby|connacht rugby|ulster rugby|gaelic games|ladies football|lgfa|nfl|nba|mlb|nhl|super bowl|wimbledon|ryder cup|cheltenham|galway races|tour de france|grand slam|match report|player ratings|kick-?off|us open|french open|australian open|open championship|the masters|jockey|snooker|darts|olympic|paralympic|tennis|cricket|marathon|formula one|f1|grand prix|world cup|euro 2028|nations league|croke park|aviva stadium|thomond park|ireland (?:beat|lose|win|v |vs)|inter-?county|intercounty|man united|man utd|liverpool fc|arsenal|chelsea|celtic|rangers|shamrock rovers|bohemians|st patrick\'s athletic|derry city|dundalk fc|katie taylor|rory mcilroy|shane lowry)\b/iu';
-    private const SPORT_WEAK_RE = '/\b(final|semi-final|quarter-final|championship|goals?|scored|scorer|manager|coach|striker|midfielder|defender|goalkeeper|racing|golf|boxing|bout|title fight|athletics|swimming|cycling|motorsport|fixtures|results|squad|captain|clash|derby|replay|penalty|penalties|injury time|second half|first half|extra time|referee|umpire|title race|points table|relegation|promotion|play-?offs?|trophy|medal|podium|underage|minor|under-\d+|u\d+s?)\b/iu';
-    private const BUSINESS_RE = '/\b(gdp|inflation|interest rates?|ecb|central bank|shares|stock market|iseq|ftse|dow jones|nasdaq|profits?|revenue|earnings|takeover|acquisition|merger|ipo|investors?|start-?up|venture capital|exports?|imports?|tariffs?|trade deal|recession|budget \d{4}|corporation tax|multinational|pharma|tech giant|apple|google|meta|microsoft|amazon|intel|pfizer|price of|prices|oil|crude|barrel|opec|per litre|mortgage|property of the week|home of the week|on the market|for sale|asking price|house prices|property market|rents?|landlords?|retail sales|consumer|employment figures|unemployment|jobs announced|redundanc)\b/iu';
-    private const CULTURE_RE = '/\b(film|movie|cinema|netflix|series|season \d|episode|album|single|tour dates|concert|gig|festival|theatre|play|novel|book|author|booker|oscar|bafta|ifta|emmy|grammy|eurovision|late late|rté player|podcast|exhibition|gallery|museum|art|artist|actor|actress|singer|band|dj|comedian|documentary|streaming)\b/iu';
+    private const SPORT_STRONG_RE = '/\b(cricket|ipl|bcci|t20|test match|odi|ranji trophy|world cup|premier league|champions league|europa league|isl|indian super league|i-league|kabaddi|pro kabaddi|hockey india|badminton|pv sindhu|neeraj chopra|virat kohli|rohit sharma|ms dhoni|nfl|nba|mlb|nhl|super bowl|wimbledon|ryder cup|tour de france|grand slam|match report|player ratings|kick-?off|us open|french open|australian open|open championship|the masters|jockey|snooker|darts|olympic|paralympic|asian games|commonwealth games|tennis|marathon|formula one|f1|grand prix|nations league|india (?:beat|lose|win|v |vs)|man united|man utd|liverpool fc|arsenal|chelsea|real madrid|barcelona)\b/iu';
+    private const SPORT_WEAK_RE = '/\b(final|semi-final|quarter-final|championship|goals?|scored|scorer|manager|coach|striker|midfielder|defender|goalkeeper|racing|golf|boxing|bout|title fight|athletics|swimming|cycling|motorsport|fixtures|results|squad|captain|clash|derby|replay|penalty|penalties|injury time|second half|first half|extra time|referee|umpire|title race|points table|relegation|promotion|play-?offs?|trophy|medal|podium|wicket|century|innings|bowler|batsman|batter|run rate|under-\d+|u\d+s?)\b/iu';
+    private const BUSINESS_RE = '/\b(gdp|inflation|interest rates?|rbi|repo rate|central bank|shares|stock market|sensex|nifty|bse|nse|dow jones|nasdaq|profits?|revenue|earnings|takeover|acquisition|merger|ipo|investors?|start-?up|venture capital|exports?|imports?|tariffs?|trade deal|recession|union budget|gst|corporate tax|multinational|pharma|reliance|adani|tata group|price of|prices|oil|crude|barrel|opec|per litre|mortgage|property of the week|on the market|for sale|asking price|house prices|property market|rents?|landlords?|retail sales|consumer|employment figures|unemployment|jobs announced|layoffs)\b/iu';
+    private const CULTURE_RE = '/\b(album|single|tour dates|concert|gig|festival|mela|theatre|play|novel|book|author|grammy|podcast|exhibition|gallery|museum|art|artist|singer|band|dj|comedian)\b/iu';
+    /** Bollywood/television/entertainment — distinct from Culture (arts/books/music/theatre). */
+    private const ENTERTAINMENT_RE = '/\b(film|movie|cinema|netflix|prime video|hotstar|series|season \d|episode|oscar|bafta|filmfare|iifa|national film award|bollywood|tollywood|kollywood|sandalwood|mollywood|ott|actor|actress|celebrity|box office|trailer|teaser|documentary|streaming|tv show|reality show|soap opera|serial)\b/iu';
+    /** Technology — gadgets, software, AI, startups' products, not general business/markets. */
+    private const TECH_RE = '/\b(smartphone|iphone|android|ios update|app store|play store|launched a new|chipset|processor|semiconductor|artificial intelligence|\bai\b|machine learning|chatbot|large language model|software update|app update|cybersecurity|data breach|hacked|hackers?|data centre|cloud computing|5g|6g|wi-?fi|satellite internet|electric vehicle|\bev\b|battery tech|robotics|drone (?:delivery|startup)|quantum computing|tech giant|apple|google|meta platforms|microsoft|amazon web services|infosys|tcs|wipro|byju|paytm|zomato|swiggy|ola electric|flipkart|gadget|laptop|tablet|wearable|smartwatch|nvidia|intel|qualcomm|spacex|starlink)\b/iu';
+    /** Defence technology and the armed forces. */
+    private const DEFENCE_RE = '/\b(drdo|hal\b|bharat electronics|\bbel\b|brahmos|agni missile|akash missile|tejas jet|rafale|indian army|indian navy|indian air force|\bias\b|\bins\b (?:vikrant|vikramaditya)|submarine|fighter jet|missile test|missile system|air defence|defence ministry|ministry of defence|defence budget|defence deal|defence procurement|arms deal|military exercise|border security force|\bbsf\b|indo-pak border|line of control|\bloc\b|line of actual control|\blac\b|army chief|navy chief|air chief marshal|chief of defence staff|paramilitary|special forces|para commandos|garud commandos|marcos|nsg commandos|radar system|surveillance drone|combat drone|unmanned aerial|artillery|howitzer|warship|aircraft carrier|stealth frigate|anti-tank|counter-terror operation)\b/iu';
 
     /** Editorial desk → contributor handle. */
     private const DESKS = [
-        'National' => 'aoife', 'World' => 'aoife', 'Council' => 'tadhg',
-        'Sport' => 'cian', 'Culture' => 'saoirse', "What's On" => 'saoirse',
-        'Business' => 'niamh', 'Local' => 'tadhg', 'Traffic' => 'tadhg', 'Community' => 'tadhg',
+        'National' => 'aisha', 'World' => 'aisha', 'Council' => 'rohan', 'Defence' => 'aisha',
+        'Sport' => 'arjun', 'Culture' => 'meera', "What's On" => 'meera', 'Entertainment' => 'meera',
+        'Business' => 'priya', 'Technology' => 'priya', 'Local' => 'rohan', 'Traffic' => 'rohan', 'Community' => 'rohan',
     ];
 
     public static function sources(): array
@@ -207,15 +213,12 @@ final class NewsWire
         $county = $place['county'];
         $town = $place['town'];
         if ($county === null && !empty($source['county'])) {
-            // Local outlets (Dublin Live, Cork Beo) default to their county unless the story is plainly national.
-            if (preg_match('/\b(taoiseach|tánaiste|government|dáil|minister|cabinet|nationwide|met éireann|met eireann|social welfare|budget \d{4}|hse|garda commissioner|across ireland|in ireland|irish people)\b/iu', $text)) {
+            // Local outlets (a city edition of a national paper) default to their state unless the story is plainly national.
+            if (preg_match('/\b(prime minister|pm modi|lok sabha|rajya sabha|parliament|cabinet|nationwide|union budget|imd warning|supreme court of india|cbi director|across india|in india|indian citizens)\b/iu', $text)) {
                 $category = $category === 'Local' ? 'National' : $category;
             } else {
                 $county = $source['county'];
             }
-        }
-        if ($category === 'National' && $county && preg_match('/\b(?:Co\.?|County)\s+' . preg_quote($county, '/') . '\b/u', $text)) {
-            $category = 'Local';
         }
 
         return [
@@ -232,7 +235,8 @@ final class NewsWire
             'category' => $category,
             'county' => $county,
             'province' => $county ? Locations::provinceFor($county) : null,
-            'location_name' => $town ?? ($county ? 'Co. ' . $county : null),
+            'location_name' => $town ?? $county,
+            'language' => $source['language'] ?? 'en',
             'published_at' => gmdate('Y-m-d\TH:i:s', $published) . '+00:00',
         ];
     }
@@ -252,13 +256,19 @@ final class NewsWire
             if (in_array($tag, self::WORLD_TAGS, true)) {
                 return 'World';
             }
-            if (in_array($tag, ['business', 'irish business', 'technology', 'property', 'personal finance', 'markets'], true)) {
+            if (in_array($tag, ['technology', 'tech', 'gadgets', 'ai', 'startups'], true)) {
+                $category = 'Technology';
+            } elseif (in_array($tag, ['business', 'indian business', 'property', 'personal finance', 'markets'], true)) {
                 $category = 'Business';
-            } elseif (in_array($tag, ['regional', 'dublin news', 'local news', 'cork news', 'munster', 'connacht', 'leinster', 'ulster'], true)) {
+            } elseif (in_array($tag, ['regional', 'delhi news', 'local news', 'mumbai news', 'north india', 'south india', 'east india', 'west india'], true)) {
                 $category = 'Local';
-            } elseif (in_array($tag, ['entertainment', 'culture', 'arts', 'music', 'tv & radio', 'movies', 'film', 'books', 'lifestyle', 'life & style'], true)) {
+            } elseif (in_array($tag, ['entertainment', 'movies', 'film', 'bollywood', 'tv & radio'], true)) {
+                $category = 'Entertainment';
+            } elseif (in_array($tag, ['culture', 'arts', 'music', 'books', 'lifestyle', 'life & style'], true)) {
                 $category = 'Culture';
-            } elseif (in_array($tag, ['gaa', 'rugby', 'soccer', 'football', 'hurling', 'racing', 'golf', 'athletics', 'sport', 'boxing', 'other sports'], true) && $category !== 'Sport') {
+            } elseif (in_array($tag, ['defence', 'defense', 'military'], true)) {
+                $category = 'Defence';
+            } elseif (in_array($tag, ['cricket', 'rugby', 'soccer', 'football', 'hockey', 'kabaddi', 'racing', 'golf', 'athletics', 'sport', 'boxing', 'other sports'], true) && $category !== 'Sport') {
                 $category = 'Sport';
             }
         }
@@ -266,30 +276,45 @@ final class NewsWire
         $t = mb_strtolower($text);
         $sportFeed = ($source['category'] ?? '') === 'Sport' || $category === 'Sport';
         // Sport first: an NFL game or a tennis final is Sport, wherever it happened.
-        $notSport = preg_match('/\b(garda|gardaí|court|crash|collision|council|planning|died|death|funeral|hospital|€|bank|tax|budget|minister|dáil|election|concert|gig|tour dates|album|singer|announces .{0,20}dates)\b/iu', $title);
+        $notSport = preg_match('/\b(police|court|crash|collision|council|planning|died|death|funeral|hospital|₹|bank|tax|budget|minister|parliament|election|concert|gig|tour dates|album|singer|announces .{0,20}dates)\b/iu', $title);
         if (!$sportFeed && !$notSport && (preg_match(self::SPORT_STRONG_RE, $title) || preg_match_all(self::SPORT_WEAK_RE, $title) >= 2)) {
             $category = 'Sport';
         }
-        // World: strong foreign markers in the headline and no Irish anchor.
-        if (in_array($category, ['National', 'Local', 'Business', 'Culture'], true) && preg_match(self::WORLD_RE, $title) && !preg_match(self::IRISH_RE, $title)) {
+        $notCrimeOrPolitics = !preg_match('/\b(police|court|crash|died|killed|arrested|minister|parliament|election)\b/iu', $title);
+        // Defence: checked before World, since border/neighbour stories would otherwise misfire as foreign news.
+        if (in_array($category, ['National', 'Local', 'World'], true) && preg_match(self::DEFENCE_RE, $title)) {
+            return 'Defence';
+        }
+        // World: strong foreign markers in the headline and no India anchor.
+        if (in_array($category, ['National', 'Local', 'Business', 'Technology', 'Culture', 'Entertainment'], true) && preg_match(self::WORLD_RE, $title) && !preg_match(self::INDIA_RE, $title)) {
             return 'World';
         }
         if (in_array($category, ['National', 'Local'], true)) {
-            if (!str_contains($t, 'air traffic') && preg_match('/\b(m50|m7|m8|m9|m11|n11|n4|n7|motorway|road closed|road closure|road traffic|traffic updates|traffic chaos|traffic delays|gridlock|the dart|luas|irish rail|bus éireann|dublin bus|road crash|road collision|multi-vehicle|road safety authority|rsa)\b/u', $t)) {
+            if (!str_contains($t, 'air traffic') && preg_match('/\b(metro|local train|highway|expressway|flyover|nh-?\d+|toll plaza|road closed|road closure|road traffic|traffic updates|traffic jam|traffic chaos|traffic delays|gridlock|road accident|road crash|road collision|multi-vehicle)\b/u', $t)) {
                 return 'Traffic';
             }
-            if (preg_match('/\b((?:city|county) council|councillors?|county hall|planning permission|an bord pleanála|local authority|city hall|planning application|an coimisiún pleanála)\b/u', $t)) {
+            if (preg_match('/\b(municipal corporation|municipal council|civic body|zilla parishad|gram panchayat|panchayat|district magistrate|collector\'s office|urban development authority|master plan|building permission|encroachment drive|planning permission|local authority)\b/u', $t)) {
                 return 'Council';
             }
-            if (preg_match('/\b(festival|gig|concert|exhibition|fleadh|parade|things to do|what\'s on|line-?up announced|tickets go on sale)\b/u', $t)) {
+            if (preg_match('/\b(festival|mela|gig|concert|exhibition|parade|things to do|what\'s on|line-?up announced|tickets go on sale)\b/u', $t)) {
                 return "What's On";
             }
-            if (preg_match(self::BUSINESS_RE, $title) && !preg_match('/\b(garda|court|crash|died|killed)\b/iu', $title)) {
+            if (preg_match(self::TECH_RE, $title) && $notCrimeOrPolitics) {
+                return 'Technology';
+            }
+            if (preg_match(self::BUSINESS_RE, $title) && $notCrimeOrPolitics) {
                 return 'Business';
+            }
+            if (preg_match(self::ENTERTAINMENT_RE, $title)) {
+                return 'Entertainment';
             }
             if (preg_match(self::CULTURE_RE, $title) && preg_match('/\b(review|stars?|premiere|releases?|tour|lineup|line-up|wins|nominated|interview)\b/iu', $title)) {
                 return 'Culture';
             }
+        }
+        // A Business-desk story that's really about gadgets/software, not markets.
+        if ($category === 'Business' && preg_match(self::TECH_RE, $title) && !preg_match(self::BUSINESS_RE, $title)) {
+            return 'Technology';
         }
         return Categories::valid($category) ? $category : 'National';
     }
@@ -379,7 +404,7 @@ final class NewsWire
             'updated_at' => now(),
             'published_at' => $story['published_at'],
             'author_user_id' => $contributor['id'] ?? null,
-            'author_name' => $contributor['display_name'] ?? 'ME Wire Desk',
+            'author_name' => $contributor['display_name'] ?? 'Bharat Wire Desk',
             'title' => $story['title'],
             'summary' => $story['summary'],
             'body' => null,
@@ -396,6 +421,7 @@ final class NewsWire
             'source_author' => $story['source_author'],
             'external_id' => $story['external_id'],
             'title_hash' => $hash,
+            'language' => $story['language'] ?? 'en',
             'trust_score' => 90 + (crc32($story['external_id']) % 7),
             'safety_score' => 99,
             'status' => 'published',
@@ -414,7 +440,7 @@ final class NewsWire
     private static function contributorFor(string $category): ?array
     {
         static $cache = [];
-        $handle = self::DESKS[$category] ?? 'tadhg';
+        $handle = self::DESKS[$category] ?? 'rohan';
         if (!array_key_exists($handle, $cache)) {
             $cache[$handle] = Database::one("SELECT id,display_name FROM users WHERE handle=? AND role='contributor'", [$handle])
                 ?? Database::one("SELECT id,display_name FROM users WHERE role='contributor' ORDER BY created_at LIMIT 1");

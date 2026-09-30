@@ -6,7 +6,7 @@ use MeNews\Support\Visitor;
 use MeNews\Support\Lang;
 
 $user = $user ?? null;
-$title = $title ?? 'ME News Ireland';
+$title = $title ?? 'Bharat Wire India';
 $description = $description ?? t('Your Community. Your News. Live.');
 $lang = Lang::current();
 $gt = Lang::googleCode();
@@ -34,8 +34,8 @@ $primary = [
 ];
 $more = [
     'Sections' => [['/section/business', 'Business'], ['/section/culture', 'Culture'], ['/section/council', 'Council'], ['/section/community', 'Community reports'], ['/section/traffic', 'Traffic']],
-    'ME News' => [['/signal', 'The Signal · most-voted'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/kids', 'ME Óg · Kids & puzzles'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'ME+ membership']],
-    'About' => [['/about', 'How ME works'], ['/about#sources', 'Our sources'], ['/corrections', 'Corrections'], ['/ownership', 'Who owns ME'], ['/advertise', 'Advertise'], ['/feeds', 'RSS & feeds'], ['/privacy', 'Privacy & cookies']],
+    'Bharat Wire' => [['/signal', 'The Signal · most-voted'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/kids', 'Wire Junior · Kids & puzzles'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'Wire+ membership']],
+    'About' => [['/about', 'How Bharat Wire works'], ['/about#sources', 'Our sources'], ['/corrections', 'Corrections'], ['/ownership', 'Who owns Bharat Wire'], ['/advertise', 'Advertise'], ['/feeds', 'RSS & feeds'], ['/privacy', 'Privacy & cookies']],
 ];
 ?><!doctype html>
 <html lang="<?= e(Lang::htmlLang()) ?>" data-theme="light" style="--day-shift:<?= \MeNews\Support\Daily::hueShift() ?>deg">
@@ -47,13 +47,13 @@ $more = [
 <?php if ($robots): ?><meta name="robots" content="<?= e($robots) ?>"><?php endif; ?>
 <?php if ($canonical): ?><link rel="canonical" href="<?= e($canonical) ?>"><?php endif; ?>
 <meta name="theme-color" content="#139a5c">
-<meta property="og:site_name" content="ME News Ireland">
+<meta property="og:site_name" content="Bharat Wire India">
 <meta property="og:title" content="<?= e($title) ?>">
 <meta property="og:description" content="<?= e($description) ?>">
 <meta property="og:image" content="<?= e($ogImage) ?>">
 <meta property="og:type" content="<?= isset($story) ? 'article' : 'website' ?>">
 <meta property="og:url" content="<?= e($canonical ?: absolute_url($path)) ?>">
-<meta property="og:locale" content="en_IE">
+<meta property="og:locale" content="en_IN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?= e($title) ?>">
 <meta name="twitter:description" content="<?= e($description) ?>">
@@ -63,19 +63,24 @@ $more = [
 <meta property="article:modified_time" content="<?= e($story['updated_at'] ?: $story['time']) ?>">
 <meta property="article:section" content="<?= e($story['category']) ?>">
 <meta property="article:publisher" content="<?= e(absolute_url('/')) ?>">
-<?php foreach (array_filter([$story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, $story['category']]) as $tag): ?><meta property="article:tag" content="<?= e($tag) ?>"><?php endforeach; ?>
-<meta name="news_keywords" content="<?= e(implode(', ', array_filter([$story['category'], $story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, 'Ireland']))) ?>">
-<?php if ($story['kind'] !== 'wire'): ?><meta name="author" content="<?= e($story['author_name'] ?: 'ME News community') ?>"><?php endif; ?>
+<?php foreach (array_filter([$story['county'] ?: null, $story['location_name'] ?: null, $story['category']]) as $tag): ?><meta property="article:tag" content="<?= e($tag) ?>"><?php endforeach; ?>
+<meta name="news_keywords" content="<?= e(implode(', ', array_filter([$story['category'], $story['county'] ?: null, $story['location_name'] ?: null, 'India']))) ?>">
+<?php if ($story['kind'] !== 'wire'): ?><meta name="author" content="<?= e($story['author_name'] ?: 'Bharat Wire community') ?>"><?php endif; ?>
 <?php endif; ?>
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="alternate" type="application/rss+xml" title="ME News Ireland" href="/feed.xml">
-<link rel="alternate" type="application/atom+xml" title="ME News Ireland (Atom)" href="/feed.atom">
-<link rel="alternate" type="application/feed+json" title="ME News Ireland (JSON Feed)" href="/feed.json">
-<link rel="alternate" type="application/rss+xml" title="ME News Ireland — original reporting" href="/feed/community.xml">
-<?php foreach ($feedLinks as [$href, $label]): ?><link rel="alternate" type="application/rss+xml" title="ME News Ireland — <?= e($label) ?>" href="<?= e($href) ?>"><?php endforeach; ?>
-<link rel="search" type="application/opensearchdescription+xml" title="ME News" href="/opensearch.xml">
-<meta name="application-name" content="ME News Ireland">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bharat Wire">
+<link rel="alternate" type="application/rss+xml" title="Bharat Wire India" href="/feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Bharat Wire India (Atom)" href="/feed.atom">
+<link rel="alternate" type="application/feed+json" title="Bharat Wire India (JSON Feed)" href="/feed.json">
+<link rel="alternate" type="application/rss+xml" title="Bharat Wire India — original reporting" href="/feed/community.xml">
+<?php foreach ($feedLinks as [$href, $label]): ?><link rel="alternate" type="application/rss+xml" title="Bharat Wire India — <?= e($label) ?>" href="<?= e($href) ?>"><?php endforeach; ?>
+<link rel="search" type="application/opensearchdescription+xml" title="Bharat Wire" href="/opensearch.xml">
+<meta name="application-name" content="Bharat Wire India">
 <link rel="preload" href="/assets/fonts/Sora.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
 <?php if (str_contains($bodyClass, 'page-kids') || str_contains($bodyClass, 'page-home')): ?><link rel="preload" href="/assets/fonts/Fraunces.woff2" as="font" type="font/woff2" crossorigin><?php endif; ?>
@@ -96,19 +101,19 @@ $more = [
       <span class="hud__sep">·</span>
       <span id="wire-status" data-last="<?= e($wireLast ?? '') ?>"><?= !empty($wireLast) ? e(t('Updated')) . ' ' . e(time_ago($wireLast)) : e(t('Wire standing by')) ?></span>
     </div>
-    <div class="hud__mid"><span id="hud-clock">--:--:--</span><span class="hud__sep">·</span><span id="hud-date">Ireland</span></div>
+    <div class="hud__mid"><span id="hud-clock">--:--:--</span><span class="hud__sep">·</span><span id="hud-date">India</span><?php $pc = \MeNews\Support\Panchang::forNow(); ?><span class="hud__sep">·</span><span title="Panchang (computed, Lahiri ayanamsa) — a guide, not an official almanac"><?= e(trim($pc['paksha'] . ' ' . $pc['tithi'])) ?> · <?= e($pc['nakshatra']) ?></span></div>
     <div class="hud__right"><a href="/alerts" id="hud-alerts"><?= icon('alert') ?> <?= e(t('Alerts')) ?></a><span class="hud__sep">·</span><a href="/notices"><?= e(t('Notices')) ?></a><span class="hud__sep">·</span><a href="/about"><?= e(t('How we check things')) ?></a></div>
   </div>
 </div>
 
 <header class="topbar notranslate">
   <div class="container topbar__in">
-    <a class="brand" href="/" aria-label="ME News Ireland home">
-      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><path d="M14 46V18l10 14 10-14v28" fill="none" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 20h10M40 32h10M40 44h10" stroke="url(#bg1)" stroke-width="5" stroke-linecap="round"/></svg>
-      <span class="brand__word"><b>ME</b> News<small>Ireland</small></span>
+    <a class="brand" href="/" aria-label="Bharat Wire India home">
+      <svg class="brand__mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#0f8a52"/><stop offset=".55" stop-color="#26c072"/><stop offset="1" stop-color="#8ae8b3"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#bg1)" stroke-width="2"/><g fill="none" stroke="url(#bg1)" stroke-width="4.5" stroke-linecap="round"><path d="M18 27a20 20 0 0 1 28 0"/><path d="M23.5 33.5a12 12 0 0 1 17 0"/></g><circle cx="32" cy="40" r="3.4" fill="url(#bg1)"/></svg>
+      <span class="brand__word"><b>Bharat</b> Wire<small>India</small></span>
     </a>
-    <button class="countychip" type="button" data-open-county aria-haspopup="dialog" title="<?= e($myCounty ? t('Change your county') : t('Choose your county')) ?>">
-      <?= icon('pin') ?><span class="countychip__label"><?= $myCounty ? e($myCounty) : e(t('Your county')) ?></span><?= icon('chevron', 'countychip__caret') ?>
+    <button class="countychip" type="button" data-open-county aria-haspopup="dialog" title="<?= e($myCounty ? t('Change your state') : t('Choose your state')) ?>">
+      <?= icon('pin') ?><span class="countychip__label"><?= $myCounty ? e($myCounty) : e(t('Your state')) ?></span><?= icon('chevron', 'countychip__caret') ?>
     </button>
     <form class="search" action="/search" role="search">
       <input type="search" name="q" placeholder="<?= e(t('Search stories, towns, counties…')) ?>" value="<?= e($q ?? '') ?>" aria-label="<?= e(t('Search')) ?>">
@@ -123,6 +128,7 @@ $more = [
         </div>
       </div>
       <button class="iconbtn" id="theme-toggle" type="button" aria-label="<?= e(t('Toggle light and dark theme')) ?>"><span class="sun"><?= icon('sun') ?></span><span class="moon"><?= icon('moon') ?></span></button>
+      <button class="iconbtn" id="push-toggle" type="button" hidden aria-pressed="false" aria-label="<?= e(t('Get breaking news alerts')) ?>" title="<?= e(t('Get breaking news alerts')) ?>"><?= icon('bell') ?></button>
       <button class="btn btn--hot btn--report" type="button" data-open-report><?= icon('report') ?><span><?= e(t('Report')) ?></span></button>
       <?php if ($user): ?>
         <div class="account">
@@ -144,13 +150,13 @@ $more = [
   </div>
   <nav class="sections" aria-label="Sections">
     <div class="container sections__in">
-      <a href="<?= $myCounty ? '/county/' . e($countySlug) : '/near' ?>" class="sections__county <?= $active('/near') ?: ($myCounty && $path === '/county/' . $countySlug ? 'is-active' : '') ?>"><?= icon('pin') ?> <?= $myCounty ? e($myCounty) : e(t('Your county')) ?></a>
+      <a href="<?= $myCounty ? '/county/' . e($countySlug) : '/near' ?>" class="sections__county <?= $active('/near') ?: ($myCounty && $path === '/county/' . $countySlug ? 'is-active' : '') ?>"><?= icon('pin') ?> <?= $myCounty ? e($myCounty) : e(t('Your state')) ?></a>
       <?php foreach ($primary as [$href, $label, $ic]): ?>
         <a href="<?= e($href) ?>" class="<?= $active($href, $href === '/notices') ?>"><?= e(t($label)) ?></a>
       <?php endforeach; ?>
       <a href="/signal" class="sections__signal <?= $active('/signal') ?>"><?= icon('signal') ?> <?= e(t('Signal')) ?></a>
       <a href="/advertise" class="sections__advertise <?= $active('/advertise') ?>"><?= icon('megaphone') ?> <?= e(t('Advertise')) ?></a>
-      <a href="/plus" class="sections__plus <?= $active('/plus') ?>"><?= icon('star') ?> ME+<?= $user && ($user['plan'] ?? '') === 'ME+' ? ' <span class="sections__plus-tag">' . e(t('member')) . '</span>' : '' ?></a>
+      <a href="/plus" class="sections__plus <?= $active('/plus') ?>"><?= icon('star') ?> Wire+<?= $user && ($user['plan'] ?? '') === 'Wire+' ? ' <span class="sections__plus-tag">' . e(t('member')) . '</span>' : '' ?></a>
       <div class="moremenu" data-more>
         <button type="button" class="moremenu__btn" aria-expanded="false" aria-controls="more-panel"><?= e(t('More')) ?> <?= icon('chevron') ?></button>
         <div class="moremenu__panel" id="more-panel" hidden>
@@ -163,7 +169,7 @@ $more = [
   </nav>
 </header>
 
-<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate. The original is in English.')) ?> <a href="/lang/en-GB?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
+<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate.')) ?> <a href="/lang/en-IN?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
 <main id="main" class="<?= $isApp ? 'app' : 'site' ?>">
 <?= $content ?>
 </main>
@@ -172,8 +178,8 @@ $more = [
 <footer class="footer notranslate">
   <div class="container footer__in">
     <div class="footer__brand">
-      <div class="brand__word brand__word--lg"><b>ME</b> News<small>Ireland</small></div>
-      <p><?= e(t('Your Community. Your News. Live.')) ?><br>The local layer Ireland lost: deaths and notices, school closures and weather warnings, council decisions, club sport and what your neighbours are seeing, county by county.</p>
+      <div class="brand__word brand__word--lg"><b>Bharat</b> Wire<small>India</small></div>
+      <p><?= e(t('Your Community. Your News. Live.')) ?><br>The local layer India lost: deaths and notices, school closures and weather warnings, municipal decisions, club sport and what your neighbours are seeing, state by state.</p>
       <p class="footer__small">Wire headlines link to their original publishers, who retain all rights. Wire stories are labelled <em>Wire</em>; <em>Verified</em> is reserved for reports our desk has checked.</p>
     </div>
     <div class="footer__col">
@@ -181,14 +187,19 @@ $more = [
       <?php foreach (array_slice($nav, 0, 8) as $name): ?><a href="/section/<?= e(Categories::slug($name)) ?>"><?= e(t($name)) ?></a><?php endforeach; ?>
     </div>
     <div class="footer__col">
+      <h4><?= e(t('News in your language')) ?></h4>
+      <?php foreach (\MeNews\Support\Languages::NAMES as $code => [$label, $native]): if ($code === 'en' || $code === 'ur') continue; ?><a href="/language/<?= e($code) ?>"><?= e($native) ?> <small class="sub"><?= e($label) ?></small></a><?php endforeach; ?>
+    </div>
+    <div class="footer__col">
       <h4><?= e(t('Local layer')) ?></h4>
       <a href="/notices"><?= e(t('Deaths & notices')) ?></a>
       <a href="/alerts"><?= e(t('Weather & school alerts')) ?></a>
       <a href="/signal"><?= e(t('The Signal · most-voted')) ?></a>
       <a href="/map"><?= e(t('Live map')) ?></a>
-      <a href="/kids"><?= e(t('ME Óg · Kids & puzzles')) ?></a>
-      <a href="/plus"><?= e(t('ME+ membership')) ?></a>
-      <a href="/advertise"><?= e(t('Advertise with ME')) ?></a>
+      <a href="/kids"><?= e(t('Wire Junior · Kids & puzzles')) ?></a>
+      <a href="/plus"><?= e(t('Wire+ membership')) ?></a>
+      <a href="/advertise"><?= e(t('Advertise with Bharat Wire')) ?></a>
+      <a href="/schemes"><?= e(t('Government schemes directory')) ?></a>
       <a href="/feeds">RSS</a>
     </div>
     <div class="footer__col">
@@ -203,7 +214,7 @@ $more = [
     </div>
   </div>
   <div class="container footer__bar">
-    <span class="footer__copy">&copy; <?= date('Y') ?> ME News Ireland</span>
+    <span class="footer__copy">&copy; <?= date('Y') ?> Bharat Wire India</span>
     <a class="crest" href="https://www.crestwebmedia.com" target="_blank" rel="noopener" aria-label="Made by Crest Web Media (opens in a new tab)">
       <span class="crest__ring" aria-hidden="true"></span>
       <span class="crest__in">
@@ -214,11 +225,11 @@ $more = [
       </span>
     </a>
   </div>
-  <div class="footer__watermark" aria-hidden="true">ME</div>
+  <div class="footer__watermark" aria-hidden="true">BW</div>
 </footer>
 
 <nav class="bottombar notranslate" aria-label="Quick navigation">
-  <a href="<?= $myCounty ? '/county/' . e($countySlug) : '#' ?>" <?= $myCounty ? '' : 'data-open-county' ?> class="<?= $myCounty && $path === '/county/' . $countySlug ? 'is-active' : '' ?>"><?= icon('pin') ?><span><?= $myCounty ? e(mb_strimwidth($myCounty, 0, 9, '…')) : e(t('County')) ?></span></a>
+  <a href="<?= $myCounty ? '/county/' . e($countySlug) : '#' ?>" <?= $myCounty ? '' : 'data-open-county' ?> class="<?= $myCounty && $path === '/county/' . $countySlug ? 'is-active' : '' ?>"><?= icon('pin') ?><span><?= $myCounty ? e(mb_strimwidth($myCounty, 0, 9, '…')) : e(t('State')) ?></span></a>
   <a href="/signal" class="<?= $active('/signal') ?>"><?= icon('signal') ?><span><?= e(t('Signal')) ?></span></a>
   <button type="button" class="bottombar__report" data-open-report><?= icon('report') ?><span><?= e(t('Report')) ?></span></button>
   <a href="/search" class="<?= $active('/search') ?>"><?= icon('search') ?><span><?= e(t('Search')) ?></span></a>
@@ -229,23 +240,23 @@ $more = [
 <!-- Mobile drawer -->
 <div class="drawer notranslate" id="drawer" hidden>
   <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
-    <header class="modal__head"><span class="brand__word"><b>ME</b> News</span><button class="iconbtn" type="button" data-close-drawer aria-label="Close"><?= icon('close') ?></button></header>
+    <header class="modal__head"><span class="brand__word"><b>Bharat</b> Wire</span><button class="iconbtn" type="button" data-close-drawer aria-label="Close"><?= icon('close') ?></button></header>
     <div class="drawer__body">
-      <a class="drawer__county" href="#" data-open-county><?= icon('pin') ?> <b><?= $myCounty ? e($myCounty) : e(t('Choose your county')) ?></b><small><?= e(t('Local stories, deaths, alerts')) ?></small></a>
+      <a class="drawer__county" href="#" data-open-county><?= icon('pin') ?> <b><?= $myCounty ? e($myCounty) : e(t('Choose your state')) ?></b><small><?= e(t('Local stories, deaths, alerts')) ?></small></a>
       <div class="drawer__group"><h4 class="mono"><?= e(t('Sections')) ?></h4><?php foreach ($primary as [$href, $label]): ?><a href="<?= e($href) ?>"><?= e(t($label)) ?></a><?php endforeach; ?><?php foreach ($more['Sections'] as [$href, $label]): ?><a href="<?= e($href) ?>"><?= e(t($label)) ?></a><?php endforeach; ?></div>
-      <?php foreach (['ME News', 'About'] as $g): ?><div class="drawer__group"><h4 class="mono"><?= e(t($g)) ?></h4><?php foreach ($more[$g] as [$href, $label]): ?><a href="<?= e($href) ?>"><?= e(t($label)) ?></a><?php endforeach; ?></div><?php endforeach; ?>
+      <?php foreach (['Bharat Wire', 'About'] as $g): ?><div class="drawer__group"><h4 class="mono"><?= e(t($g)) ?></h4><?php foreach ($more[$g] as [$href, $label]): ?><a href="<?= e($href) ?>"><?= e(t($label)) ?></a><?php endforeach; ?></div><?php endforeach; ?>
       <div class="drawer__group"><h4 class="mono"><?= e(t('Language')) ?></h4><div class="drawer__langs"><?php foreach (Lang::LANGS as $code => [$label, $native, $g, $flag]): ?><a href="/lang/<?= e($code) ?>?back=<?= rawurlencode($backPath) ?>" class="<?= $code === $lang ? 'is-active' : '' ?>" lang="<?= e($code) ?>"><?= $flag ?> <?= e($native) ?></a><?php endforeach; ?></div></div>
       <div class="drawer__group"><?php if ($user): ?><a href="/dashboard"><?= e(t('My dashboard')) ?></a><?php if ($isStaff): ?><a href="/newsroom"><?= e(t('Newsroom')) ?></a><?php endif; ?><button type="button" data-logout><?= e(t('Sign out')) ?></button><?php else: ?><button type="button" data-open-auth="signin"><?= e(t('Sign in')) ?></button><button type="button" data-open-auth="register"><?= e(t('Create account')) ?></button><?php endif; ?></div>
     </div>
   </div>
 </div>
 
-<!-- County picker -->
+<!-- State picker -->
 <div class="modal modal--sheet" id="county-modal" role="dialog" aria-modal="true" aria-labelledby="county-title" hidden>
   <div class="modal__box modal__box--wide">
     <header class="modal__head"><h2 id="county-title"><?= icon('pin') ?> <?= e(t('Where are you?')) ?></h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
     <div class="modal__body">
-      <p class="modal__lede">One tap and ME leads with your county: local stories, deaths and notices, school closures and weather warnings. Stored only on this device.</p>
+      <p class="modal__lede">One tap and Bharat Wire leads with your state: local stories, deaths and notices, school closures and weather warnings. Stored only on this device.</p>
       <div class="countygrid">
         <?php foreach (Locations::provinces() as $province => $counties): ?>
           <div class="countygrid__prov"><h4 class="mono"><?= e($province) ?></h4><div class="countygrid__list"><?php foreach ($counties as $c): ?><button type="button" class="countybtn <?= $myCounty === $c ? 'is-active' : '' ?>" data-county="<?= e($c) ?>"><?= e($c) ?></button><?php endforeach; ?></div></div>
@@ -253,7 +264,7 @@ $more = [
       </div>
       <div class="form__actions form__actions--split">
         <button class="btn btn--ghost" type="button" data-locate-me><?= icon('gps') ?> Use my location instead</button>
-        <span><?php if ($myCounty): ?><button class="btn btn--ghost" type="button" data-forget-location>Forget my county</button><?php endif; ?><button class="btn btn--dark" type="button" data-county-later>Not now</button></span>
+        <span><?php if ($myCounty): ?><button class="btn btn--ghost" type="button" data-forget-location>Forget my state</button><?php endif; ?><button class="btn btn--dark" type="button" data-county-later>Not now</button></span>
       </div>
     </div>
   </div>
@@ -262,7 +273,7 @@ $more = [
 <!-- Auth modal -->
 <div class="modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title" hidden>
   <div class="modal__box">
-    <header class="modal__head"><h2 id="auth-title">Sign in to ME News</h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
+    <header class="modal__head"><h2 id="auth-title">Sign in to Bharat Wire</h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
     <div class="modal__body">
       <div class="tabs mono" role="tablist"><button type="button" class="is-active" data-auth-tab="signin" role="tab">Sign in</button><button type="button" data-auth-tab="register" role="tab">Create account</button></div>
       <form id="signin-form" class="form" data-auth-view="signin">
@@ -273,8 +284,8 @@ $more = [
       <form id="register-form" class="form" data-auth-view="register" hidden>
         <label>Your name<input name="display_name" required minlength="2" autocomplete="name"></label>
         <div class="form__row">
-          <label>Home town<input name="home_town" list="all-locations" autocomplete="off" placeholder="e.g. Bray"></label>
-          <label>County<select name="home_county" data-county-select><option value="">Select county</option></select></label>
+          <label>Home town<input name="home_town" list="all-locations" autocomplete="off" placeholder="e.g. Koregaon Park"></label>
+          <label>State<select name="home_county" data-county-select><option value="">Select state</option></select></label>
         </div>
         <label>Email<input name="email" type="email" autocomplete="email" required></label>
         <label>Password (8+ characters)<input name="password" type="password" minlength="8" autocomplete="new-password" required></label>
@@ -309,7 +320,7 @@ $more = [
 <script src="/assets/js/menews.js?v=<?= e(ME_ASSETS) ?>" defer></script>
 <?php if ($gt): ?>
 <div id="google_translate_element" class="notranslate" hidden></div>
-<script>function meGoogleTranslate(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'<?= e(Lang::googleCodes()) ?>',autoDisplay:false},'google_translate_element');}catch(e){}}</script>
+<script>function meGoogleTranslate(){try{new google.translate.TranslateElement({pageLanguage:'auto',includedLanguages:'<?= e(Lang::googleCodes()) ?>',autoDisplay:false},'google_translate_element');}catch(e){}}</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=meGoogleTranslate" defer></script>
 <?php endif; ?>
 <script src="/assets/vendor/leaflet/leaflet.js" defer></script>

@@ -60,12 +60,19 @@ final class Auth
         if ($token === '' || !Database::installed()) {
             return null;
         }
-        $u = Database::one(
-            'SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?',
-            [hash('sha256', $token), now()]
+        $hash = hash('sha256', $token);
+        $row = Database::one(
+            'SELECT u.*, s.last_seen_at AS session_last_seen_at FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?',
+            [$hash, now()]
         );
-        if ($u) {
-            self::$user = $u;
+        if ($row) {
+            $lastSeen = $row['session_last_seen_at'];
+            unset($row['session_last_seen_at']);
+            self::$user = $row;
+            // Throttled so a busy session does not write on every single request.
+            if ($lastSeen === null || strtotime((string)$lastSeen) < time() - 300) {
+                Database::query('UPDATE sessions SET last_seen_at=? WHERE token_hash=?', [now(), $hash]);
+            }
         }
         return self::$user;
     }
@@ -92,7 +99,7 @@ final class Auth
     }
 
     /** Create a session for a user and return the raw token. Also sets the cookie. */
-    public static function login(array $user): string
+    public static function login(array $user, string $ip = '', string $userAgent = ''): string
     {
         $token = bin2hex(random_bytes(40));
         $days = max(1, Config::int('SESSION_DAYS', 30));
@@ -101,6 +108,7 @@ final class Auth
             'token_hash' => hash('sha256', $token),
             'created_at' => now(),
             'expires_at' => gmdate('Y-m-d\TH:i:s', time() + $days * 86400) . '+00:00',
+            'ip_address' => $ip, 'user_agent' => mb_substr($userAgent, 0, 300), 'last_seen_at' => now(),
         ]);
         Database::query('UPDATE users SET last_seen_at=? WHERE id=?', [now(), $user['id']]);
         Database::query('DELETE FROM sessions WHERE expires_at<?', [now()]);
@@ -113,6 +121,34 @@ final class Auth
     {
         $token = self::token();
         Database::query('DELETE FROM sessions WHERE user_id=? AND token_hash<>?', [$userId, $token !== '' ? hash('sha256', $token) : '']);
+    }
+
+    /** This request's own session row id, for marking it "this device" in the device list. */
+    public static function sessionId(): ?int
+    {
+        $token = self::token();
+        if ($token === '') {
+            return null;
+        }
+        $id = Database::value('SELECT id FROM sessions WHERE token_hash=?', [hash('sha256', $token)]);
+        return $id !== null ? (int)$id : null;
+    }
+
+    /** The member's own active sessions (device list), most recently active first. */
+    public static function sessions(string $userId): array
+    {
+        $current = self::sessionId();
+        $rows = Database::all('SELECT id,created_at,expires_at,ip_address,user_agent,last_seen_at FROM sessions WHERE user_id=? ORDER BY COALESCE(last_seen_at,created_at) DESC', [$userId]);
+        foreach ($rows as &$row) {
+            $row['is_current'] = $row['id'] === $current;
+        }
+        return $rows;
+    }
+
+    /** Sign out one of the member's own sessions by id (the device list "revoke" button). */
+    public static function revokeSession(string $userId, int $sessionId): bool
+    {
+        return Database::query('DELETE FROM sessions WHERE id=? AND user_id=?', [$sessionId, $userId])->rowCount() > 0;
     }
 
     public static function logout(): void

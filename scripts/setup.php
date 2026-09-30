@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Install or upgrade ME News Ireland.
+ * Install or upgrade Bharat Wire India.
  *
  *   php scripts/setup.php            create storage, database, schema and the administrator
  *   php scripts/setup.php --seed     also seed the five contributors and the news wire
@@ -45,7 +45,7 @@ try {
     if (in_array('--seed', $argv, true)) {
         require __DIR__ . '/seed.php';
     } elseif ($fresh) {
-        echo "\nNext: php scripts/seed.php   (adds the contributors and today's Irish news)\n";
+        echo "\nNext: php scripts/seed.php   (adds the contributors and today's Indian news)\n";
     }
 } catch (Throwable $e) {
     fwrite(STDERR, 'Setup failed: ' . $e->getMessage() . "\n");

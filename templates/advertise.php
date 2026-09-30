@@ -1,7 +1,7 @@
-<?php use MeNews\Services\Ads; $pr = $pricing; $gateways = ($pr['stripe'] ? 1 : 0) + ($pr['paypal'] ? 1 : 0); ?>
+<?php use MeNews\Services\Ads; $pr = $pricing; $gateways = ($pr['stripe'] ? 1 : 0) + ($pr['paypal'] ? 1 : 0) + ($pr['razorpay'] ? 1 : 0); ?>
 <section class="container pagehead pagehead--center">
-  <span class="kicker">Advertise with ME</span>
-  <h1 class="pagehead__title">Buy impressions. Design your ad. <em>Be seen across Ireland.</em></h1>
+  <span class="kicker">Advertise with Bharat Wire</span>
+  <h1 class="pagehead__title">Buy impressions. Design your ad. <em>Be seen across India.</em></h1>
   <p class="pagehead__blurb">Pick a package, pay once, and the designer unlocks. Your ad runs in sidebars and banners until every impression you bought has been shown, paced over the month so it is seen day after day. No subscription, no surprises.</p>
   <?php if ($cancelled): ?><p class="form__result is-error" style="text-align:center">Checkout was cancelled — nothing was charged.</p><?php endif; ?>
   <?php if ($topup): ?><p class="form__result" style="text-align:center">Topping up <b><?= e($topup['business_name']) ?></b> — the package you buy is added straight to that advert.</p><?php endif; ?>
@@ -25,7 +25,8 @@
           <?php elseif ($gateways === 0): ?>
             <span class="form__legal">Online payment is being connected. Email the newsroom and we can set your package up manually.</span>
           <?php else: ?>
-            <?php if ($pr['stripe']): ?><button class="btn btn--primary btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="stripe">Pay by card · <?= e($p['price_label']) ?></button><?php endif; ?>
+            <?php if ($pr['razorpay']): ?><button class="btn btn--primary btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="razorpay">Pay by UPI (BHIM / GPay / PhonePe) · <?= e($p['price_label']) ?></button><?php endif; ?>
+            <?php if ($pr['stripe']): ?><button class="btn <?= $pr['razorpay'] ? 'btn--ghost' : 'btn--primary' ?> btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="stripe">Pay by card · <?= e($p['price_label']) ?></button><?php endif; ?>
             <?php if ($pr['paypal']): ?><button class="btn btn--ghost btn--block" type="button" data-buy="<?= e($p['id']) ?>" data-gateway="paypal">PayPal</button><?php endif; ?>
           <?php endif; ?>
         </div>
@@ -41,13 +42,13 @@
     <div>
       <span class="kicker">Banner · sections, articles and (Front Page package) the home page</span>
       <div class="adv-demo__banner"><?= Ads::render($demo, 'banner', true) ?></div>
-      <p class="panel__note">Six templates, your colours, your logo or photo. Every ad is reviewed by the newsroom before it goes live and is always labelled Sponsored. Members on ME+ read ad-free, so every impression you buy lands on a reader who sees adverts.</p>
+      <p class="panel__note">Six templates, your colours, your logo or photo. Every ad is reviewed by the newsroom before it goes live and is always labelled Sponsored. Members on Wire+ read ad-free, so every impression you buy lands on a reader who sees adverts.</p>
     </div>
   </div>
 
   <div class="steps" style="margin:34px 0">
-    <div class="step reveal"><span class="mono">01</span><h3>Choose a package</h3><p>Pay once by card<?= $pr['paypal'] ? ' or PayPal' : '' ?>. Your package is credited to your account the moment payment clears.</p></div>
-    <div class="step reveal"><span class="mono">02</span><h3>Design</h3><p>The designer unlocks: pick a template, add your headline, offer, logo and colours, and target Ireland, a county or a town.</p></div>
+    <div class="step reveal"><span class="mono">01</span><h3>Choose a package</h3><p>Pay once<?= $pr['razorpay'] ? ' by UPI (BHIM, Google Pay, PhonePe…)' : '' ?><?= $pr['stripe'] ? ' by card' : '' ?><?= $pr['paypal'] ? ' or PayPal' : '' ?>. Your package is credited to your account the moment payment clears.</p></div>
+    <div class="step reveal"><span class="mono">02</span><h3>Design</h3><p>The designer unlocks: pick a template, add your headline, offer, logo and colours, and target India, a state or a town.</p></div>
     <div class="step reveal"><span class="mono">03</span><h3>Review</h3><p>An editor checks it against the guidelines below, usually within a day. Advertising never touches editorial decisions.</p></div>
     <div class="step reveal"><span class="mono">04</span><h3>Run</h3><p>Impressions are paced across a month and counted live in your dashboard. When they are used up, top up the same ad with another package.</p></div>
   </div>
@@ -57,7 +58,7 @@
       <span class="kicker">Where each tier appears</span>
       <ul>
         <?php foreach ($tiers as $k => $t): ?><li><b><?= e($t['label']) ?></b> — <?= e($t['blurb']) ?></li><?php endforeach; ?>
-        <li>Never in the kids' section, never for ME+ members, and never inside editorial text.</li>
+        <li>Never in the kids' section, never for Wire+ members, and never inside editorial text.</li>
       </ul>
       <p class="form__legal"><?= (int)$liveCount ?> advert<?= $liveCount === 1 ? '' : 's' ?> running right now. Prices include VAT where applicable. Impressions are counted server-side each time your ad is placed on a page.</p>
     </div>
@@ -67,7 +68,7 @@
         <li>Be honest and specific: what you offer, where, from how much.</li>
         <li>Your own business only — no affiliate links or redirects.</li>
         <li>No gambling, tobacco, vapes, adult content or political ads.</li>
-        <li>Prices in euro, Irish English, no misleading urgency.</li>
+        <li>Prices in rupees, Indian English, no misleading urgency.</li>
         <li>Landing page must work on a phone.</li>
       </ul>
       <p class="panel__note">Need an invoice or a bank transfer? The newsroom can credit a package to your account manually.</p>

@@ -1,88 +1,88 @@
 {
- "_comment": "Free things for kids and families across Ireland.",
+ "_comment": "Free things for kids and families across India.",
  "items": [
   {
-   "name": "National Museum of Ireland",
-   "blurb": "Free entry at all four sites: Archaeology, Natural History (the 'Dead Zoo'), Decorative Arts and Country Life in Mayo.",
-   "url": "https://www.museum.ie",
-   "where": "Dublin & Castlebar",
-   "tag": "Museums"
-  },
-  {
-   "name": "National Gallery of Ireland",
-   "blurb": "Free entry, family trails and a great café. Look for the Jack B. Yeats room.",
-   "url": "https://www.nationalgallery.ie",
-   "where": "Dublin",
-   "tag": "Art"
-  },
-  {
-   "name": "Chester Beatty",
-   "blurb": "Free museum of manuscripts and treasures from around the world, inside Dublin Castle's gardens.",
-   "url": "https://chesterbeatty.ie",
-   "where": "Dublin",
-   "tag": "Museums"
-  },
-  {
-   "name": "National Botanic Gardens",
-   "blurb": "Free glasshouses, squirrels and a river walk in Glasnevin.",
-   "url": "https://botanicgardens.ie",
-   "where": "Dublin",
-   "tag": "Outdoors"
-  },
-  {
-   "name": "Heritage Ireland free first Wednesdays",
-   "blurb": "Many OPW heritage sites — castles, abbeys and gardens — are free on the first Wednesday of every month.",
-   "url": "https://heritageireland.ie",
+   "name": "ASI monuments — free for under-15s",
+   "blurb": "Children under 15 get free entry at every Archaeological Survey of India monument — forts, tombs and ancient sites across the country.",
+   "url": "https://asi.nic.in",
    "where": "Nationwide",
    "tag": "Heritage"
   },
   {
-   "name": "Your local library",
-   "blurb": "Free membership, free books, free events, free Wi-Fi. Ask about Summer Stars and Spring into Storytime.",
-   "url": "https://www.librariesireland.ie",
-   "where": "Every county",
-   "tag": "Reading"
-  },
-  {
-   "name": "Cúla4",
-   "blurb": "TG4's free Irish-language channel and app for kids — cartoons, games and songs as Gaeilge.",
-   "url": "https://www.cula4.com",
-   "where": "Online",
-   "tag": "Gaeilge"
-  },
-  {
-   "name": "RTÉjr",
-   "blurb": "Free shows, podcasts and games from RTÉ's kids' channel.",
-   "url": "https://www.rte.ie/rtejr/",
-   "where": "Online",
-   "tag": "Screen"
-  },
-  {
-   "name": "CoderDojo",
-   "blurb": "Free volunteer-led coding clubs for 7–17 year olds. It started in Cork in 2011 and is now worldwide.",
-   "url": "https://coderdojo.com",
+   "name": "Gurdwara langar",
+   "blurb": "Every Sikh gurdwara serves a free vegetarian meal, the langar, to anyone who visits — no questions asked.",
+   "url": "https://www.sgpc.net",
    "where": "Nationwide",
-   "tag": "Tech"
+   "tag": "Food & culture"
   },
   {
-   "name": "junior parkrun",
-   "blurb": "Free 2 km timed runs for 4–14 year olds every Sunday morning.",
-   "url": "https://www.parkrun.ie",
-   "where": "Nationwide",
+   "name": "India Gate lawns",
+   "blurb": "Free green space in the heart of Delhi — picnics, kite flying and ice-cream carts after sunset.",
+   "url": "https://www.delhitourism.gov.in",
+   "where": "Delhi",
    "tag": "Outdoors"
   },
   {
-   "name": "Ask About Ireland",
-   "blurb": "Free learning resources about Irish history, geography and nature from Ireland's libraries.",
-   "url": "https://www.askaboutireland.ie",
+   "name": "Marine Drive",
+   "blurb": "Mumbai's free seafront promenade, best at sunset with the Queen's Necklace of lights switching on.",
+   "url": "https://www.maharashtratourism.gov.in",
+   "where": "Mumbai",
+   "tag": "Outdoors"
+  },
+  {
+   "name": "Cubbon Park",
+   "blurb": "300 free acres of gardens, walking trails and old trees right in the middle of Bengaluru.",
+   "url": "https://karnatakatourism.org",
+   "where": "Bengaluru",
+   "tag": "Outdoors"
+  },
+  {
+   "name": "Lodi Gardens",
+   "blurb": "Free Mughal-era tombs and gardens, a favourite spot for morning walks and picnics.",
+   "url": "https://www.delhitourism.gov.in",
+   "where": "Delhi",
+   "tag": "Heritage"
+  },
+  {
+   "name": "Your local public library",
+   "blurb": "Free membership at most government libraries, from state central libraries to district reading rooms. Ask about story sessions for kids.",
+   "url": "https://www.nationallibrary.gov.in",
+   "where": "Every state",
+   "tag": "Reading"
+  },
+  {
+   "name": "parkrun India",
+   "blurb": "Free, timed 5 km runs and walks every Saturday morning, open to every age and pace.",
+   "url": "https://www.parkrun.com/india",
+   "where": "A growing list of cities",
+   "tag": "Outdoors"
+  },
+  {
+   "name": "National Digital Library of India",
+   "blurb": "Free online access to millions of books, videos and courses for school and college students.",
+   "url": "https://ndl.iitkgp.ac.in",
    "where": "Online",
    "tag": "Learning"
   },
   {
-   "name": "Phoenix Park",
-   "blurb": "Europe's largest enclosed city park: wild deer, the Visitor Centre and Ashtown Castle are free.",
-   "url": "https://phoenixpark.ie",
-   "where": "Dublin",
+   "name": "Prasar Bharati / DD kids shows",
+   "blurb": "India's free-to-air public broadcaster carries cartoons, stories and cultural programmes for children.",
+   "url": "https://prasarbharati.gov.in",
+   "where": "Online & terrestrial TV",
+   "tag": "Screen"
+  },
+  {
+   "name": "Atal Tinkering Labs",
+   "blurb": "Free hands-on STEM labs — 3D printers, robotics kits and more — set up in thousands of schools nationwide.",
+   "url": "https://aim.gov.in",
+   "where": "Nationwide",
+   "tag": "Tech"
+  },
+  {
+   "name": "India's public beaches",
+   "blurb": "Free to walk, paddle and build sandcastles, from Goa's shores to Chennai's Marina Beach and Kerala's coast.",
+   "url": "https://www.incredibleindia.gov.in",
+   "where": "Nationwide",
    "tag": "Outdoors"
   }
  ]

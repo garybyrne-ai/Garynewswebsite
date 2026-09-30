@@ -1,20 +1,20 @@
 <?php use MeNews\Ui; ?>
 <div class="container appshell">
   <nav class="appnav" aria-label="Dashboard">
-    <div class="appnav__head"><?= Ui::avatar($user, 'sm') ?><span><b><?= e($user['display_name']) ?></b><small><?= e($user['plan'] === 'ME+' ? 'ME+ member' : 'Free member') ?></small></span></div>
+    <div class="appnav__head"><?= Ui::avatar($user, 'sm') ?><span><b><?= e($user['display_name']) ?></b><small><?= e($user['plan'] === 'Wire+' ? 'Wire+ member' : 'Free member') ?></small></span></div>
     <button class="is-active" data-view="overview">Overview</button>
     <button data-view="reports">My reports <span class="badge" id="nav-reports-count">0</span></button>
     <button data-view="profile">Reporter profile</button>
     <button data-view="saved">Saved stories <span class="badge" id="nav-saved-count" hidden>0</span></button>
     <button data-view="follows">Followed areas</button>
-    <button data-view="membership">ME+ membership</button>
+    <button data-view="membership">Wire+ membership</button>
     <button data-view="advertising">Local advertising</button>
     <button data-view="notifications">Notifications <span class="badge" id="nav-notif-count" hidden>0</span></button>
     <button data-view="security">Security</button>
   </nav>
   <section>
     <div id="view-overview" class="view is-active">
-      <span class="kicker">My ME News</span>
+      <span class="kicker">My Bharat Wire</span>
       <h1 id="hello">Hello</h1>
       <p class="pagehead__blurb">Track your reports, reputation, membership and local activity.</p>
       <div class="stats" id="stats"></div>
@@ -52,34 +52,40 @@
       <p class="pagehead__blurb">Local alerts arrive when an editor publishes a report in a place you follow. <span class="mono" id="follow-hint"></span></p>
       <form id="follow-form" class="form panel">
         <div class="form__row">
-          <label>Town / area<input name="location_name" list="all-locations" placeholder="e.g. Bray" autocomplete="off"></label>
-          <label>County<select name="county" data-county-select><option value="">Any county</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+          <label>Town / area<input name="location_name" list="all-locations" placeholder="e.g. Koregaon Park" autocomplete="off"></label>
+          <label>State<select name="county" data-county-select><option value="">Any state</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
         </div>
         <div class="form__actions"><button class="btn btn--primary" type="submit">Follow area</button></div>
       </form>
       <div class="panel" id="follow-list"></div>
-      <h2 style="margin-top:28px">Email alerts by county</h2>
-      <p class="pagehead__blurb">Death notices, school closures, Met Éireann warnings and the 7am morning email, sent to <b><?= e($user['email']) ?></b>. <span class="mono" id="alerts-hint"></span></p>
+      <h2 style="margin-top:28px">Email alerts by state</h2>
+      <p class="pagehead__blurb">Death notices, school closures, severe weather warnings and the 7am morning email, sent to <b><?= e($user['email']) ?></b>. <span class="mono" id="alerts-hint"></span></p>
       <form id="alerts-form" class="form panel">
         <div class="form__row">
-          <label>County<select name="county" data-county-select required><option value="">Choose a county</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
-          <label>Town (optional)<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Bray"></label>
+          <label>State<select name="county" data-county-select required><option value="">Choose a state</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+          <label>Town (optional)<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Koregaon Park"></label>
         </div>
         <div class="checks"><?php foreach (\MeNews\Services\Alerts::KINDS as $k => $label): ?><label class="check"><input type="checkbox" name="kinds[]" value="<?= e($k) ?>" <?= in_array($k, ['deaths', 'closures', 'warnings', 'daily'], true) ? 'checked' : '' ?>><span><?= e($label) ?></span></label><?php endforeach; ?></div>
-        <div class="form__actions"><button class="btn btn--primary" type="submit">Add county alerts</button></div>
+        <div class="form__actions"><button class="btn btn--primary" type="submit">Add state alerts</button></div>
       </form>
       <div class="panel" id="alerts-list"></div>
     </div>
 
     <div id="view-membership" class="view">
       <div class="panel panel--plus">
-        <span class="chip chip--plus">ME+</span>
-        <h2 style="margin-top:10px">ME+ membership</h2>
-        <p>Ad-free reading, death notice and closure alerts for up to ten areas, the 7am email for each, the full archive and the members' county newsletter.</p>
+        <span class="chip chip--plus">Wire+</span>
+        <h2 style="margin-top:10px">Wire+ membership</h2>
+        <p>Ad-free reading, death notice and closure alerts for up to ten areas, the 7am email for each, the full archive and the members' state newsletter.</p>
         <div class="price"><b><?= e(\MeNews\Services\Membership::priceLabel()) ?></b><small>or <?= e(\MeNews\Services\Membership::annualLabel()) ?></small></div>
         <p id="plan-state"></p>
-        <div class="form__actions" style="justify-content:flex-start;margin-top:12px"><button class="btn btn--primary" id="checkout-btn" type="button" data-interval="month">Monthly with Stripe</button><button class="btn btn--ghost" id="checkout-year-btn" type="button" data-interval="year">Annual · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button><a class="btn btn--ghost" href="/plus">Compare plans</a></div>
-        <p class="form__legal">Stripe Checkout becomes live when the Stripe secret key is configured in .env. Prices are set in the newsroom.</p>
+        <div class="form__actions" style="justify-content:flex-start;margin-top:12px;flex-wrap:wrap">
+          <button class="btn btn--primary" id="checkout-upi-btn" type="button" data-interval="month" data-gateway="razorpay" hidden>Monthly by UPI · <?= e(\MeNews\Services\Membership::priceLabel()) ?></button>
+          <button class="btn btn--ghost" id="checkout-upi-year-btn" type="button" data-interval="year" data-gateway="razorpay" hidden>Annual by UPI · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button>
+          <button class="btn btn--primary" id="checkout-btn" type="button" data-interval="month" data-gateway="stripe">Monthly with Stripe</button>
+          <button class="btn btn--ghost" id="checkout-year-btn" type="button" data-interval="year" data-gateway="stripe">Annual · <?= e(\MeNews\Services\Membership::annualLabel()) ?></button>
+          <a class="btn btn--ghost" href="/plus">Compare plans</a>
+        </div>
+        <p class="form__legal">UPI (BHIM, Google Pay, PhonePe, Paytm…) opens Razorpay's checkout in a new tab and activates within a minute of payment. Stripe Checkout becomes live when the Stripe secret key is configured. Prices are set in the newsroom.</p>
       </div>
     </div>
 
@@ -107,6 +113,7 @@
         <div class="form__actions"><button class="btn btn--primary" type="submit">Update password</button></div>
       </form>
       <div class="panel"><h2>Session</h2><p style="margin:8px 0">Sessions are stored as SHA-256 hashes and expire automatically. Sign out on shared devices.</p><button class="btn btn--ghost" type="button" data-logout>Sign out everywhere on this device</button></div>
+      <div class="panel"><h2>Signed-in devices</h2><p style="margin:8px 0">Every place you're currently signed in, by IP address and browser. Revoke any you don't recognise.</p><div id="sessions-list"></div></div>
     </div>
   </section>
 </div>

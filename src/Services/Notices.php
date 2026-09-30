@@ -22,7 +22,7 @@ final class Notices
         'job' => ['label' => 'Local job', 'plural' => 'Local jobs', 'icon' => 'briefcase', 'blurb' => 'Vacancies from local employers, cheaper than the big boards.', 'who' => 'Local employers', 'days' => 30],
         'planning' => ['label' => 'Planning notice', 'plural' => 'Planning & statutory', 'icon' => 'building', 'blurb' => 'Planning applications, statutory and public notices.', 'who' => 'Developers, solicitors, councils', 'days' => 42],
         'pet' => ['label' => 'Lost & found pet', 'plural' => 'Lost & found', 'icon' => 'paw', 'blurb' => 'Lost, found and reunited pets.', 'who' => 'Anyone', 'days' => 21],
-        'result' => ['label' => 'Club result', 'plural' => 'Club sport', 'icon' => 'trophy', 'blurb' => 'Club fixtures, results and notes from GAA, soccer, rugby and more.', 'who' => 'Club PROs', 'days' => 14],
+        'result' => ['label' => 'Club result', 'plural' => 'Club sport', 'icon' => 'trophy', 'blurb' => 'Club fixtures, results and notes from cricket, kabaddi, football and more.', 'who' => 'Club secretaries', 'days' => 14],
     ];
 
     public static function kind(string $k): ?array
@@ -107,7 +107,7 @@ final class Notices
      * Accept a submission from the public form. Returns the row. The submitter gets an email
      * with a confirmation link; editors see it in the notices queue once confirmed.
      */
-    public static function submit(array $in, ?array $user, string $ip): array
+    public static function submit(array $in, ?array $user, string $ip, string $userAgent = ''): array
     {
         $kind = $in['kind'] ?? '';
         if (!isset(self::KINDS[$kind])) {
@@ -155,12 +155,13 @@ final class Notices
             'contact_phone' => mb_substr(trim((string)($in['contact_phone'] ?? '')), 0, 40),
             'submitted_by' => $user['id'] ?? null, 'verify_token' => $token, 'verified_at' => $user ? now() : null,
             'plan' => 'free', 'extra_json' => json_encode($extra, JSON_UNESCAPED_UNICODE),
+            'ip_address' => $ip, 'user_agent' => mb_substr($userAgent, 0, 300),
         ];
         Database::insert('notices', $row);
         $base = rtrim(Config::get('PUBLIC_BASE_URL', ''), '/');
         if (!$user) {
-            Mailer::send($email, 'Confirm your ' . strtolower(self::KINDS[$kind]['label']) . ' on ME News',
-                '<p>Thanks for sending a ' . e(strtolower(self::KINDS[$kind]['label'])) . ' for <b>' . e($title) . '</b> (Co. ' . e($county) . ').</p>'
+            Mailer::send($email, 'Confirm your ' . strtolower(self::KINDS[$kind]['label']) . ' on Bharat Wire',
+                '<p>Thanks for sending a ' . e(strtolower(self::KINDS[$kind]['label'])) . ' for <b>' . e($title) . '</b> (' . e($county) . ').</p>'
                 . '<p>Tap to confirm it came from you. An editor then checks it and it goes live, usually within a few hours:</p>'
                 . '<p><a href="' . e($base . '/notices/confirm/' . $token) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700">Confirm this notice</a></p>'
                 . '<p style="color:#59685f;font-size:13px">If you did not send this, ignore the email and nothing will be published.</p>');
@@ -199,10 +200,10 @@ final class Notices
         if ($status === 'published' && !$wasPublished) {
             self::notify($n);
             if ($n['contact_email']) {
-                Mailer::send($n['contact_email'], 'Your notice is live on ME News', '<p><b>' . e($n['title']) . '</b> is now published: <a href="' . e(absolute_url('/notices/' . $n['kind'] . '/' . $n['slug'])) . '">view it here</a>.</p>' . ($note ? '<p>Editor’s note: ' . e($note) . '</p>' : ''));
+                Mailer::send($n['contact_email'], 'Your notice is live on Bharat Wire', '<p><b>' . e($n['title']) . '</b> is now published: <a href="' . e(absolute_url('/notices/' . $n['kind'] . '/' . $n['slug'])) . '">view it here</a>.</p>' . ($note ? '<p>Editor’s note: ' . e($note) . '</p>' : ''));
             }
         } elseif ($status === 'rejected' && $n['contact_email']) {
-            Mailer::send($n['contact_email'], 'About your notice on ME News', '<p>We were not able to publish <b>' . e($n['title']) . '</b>.</p>' . ($note ? '<p>' . e($note) . '</p>' : '') . '<p>Reply to this email if you think we got it wrong.</p>');
+            Mailer::send($n['contact_email'], 'About your notice on Bharat Wire', '<p>We were not able to publish <b>' . e($n['title']) . '</b>.</p>' . ($note ? '<p>' . e($note) . '</p>' : '') . '<p>Reply to this email if you think we got it wrong.</p>');
         }
         return ['ok' => true, 'status' => $status, 'plan' => $plan];
     }
@@ -220,14 +221,14 @@ final class Notices
             if ($s['town'] && $n['town'] && strcasecmp($s['town'], $n['town']) !== 0 && $kindKey === 'deaths') {
                 continue; // town-scoped subscription
             }
-            Mailer::send($s['email'], ($n['kind'] === 'death' ? 'Death notice: ' : 'New notice: ') . $n['title'] . ' · Co. ' . $n['county'],
-                '<p><span style="color:#59685f;font-size:12px;letter-spacing:.1em;text-transform:uppercase">' . e(self::KINDS[$n['kind']]['label']) . ' · ' . e(($n['town'] ? $n['town'] . ', ' : '') . 'Co. ' . $n['county']) . '</span></p>'
+            Mailer::send($s['email'], ($n['kind'] === 'death' ? 'Death notice: ' : 'New notice: ') . $n['title'] . ' · ' . $n['county'],
+                '<p><span style="color:#59685f;font-size:12px;letter-spacing:.1em;text-transform:uppercase">' . e(self::KINDS[$n['kind']]['label']) . ' · ' . e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) . '</span></p>'
                 . '<h2 style="margin:6px 0 10px;font-size:22px">' . e($n['title']) . '</h2>'
-                . ($n['funeral_at'] ? '<p><b>Funeral:</b> ' . e(date_irish($n['funeral_at'], 'l j F, H:i')) . ($n['funeral_venue'] ? ', ' . e($n['funeral_venue']) : '') . '</p>' : '')
+                . ($n['funeral_at'] ? '<p><b>Funeral:</b> ' . e(date_in($n['funeral_at'], 'l j F, H:i')) . ($n['funeral_venue'] ? ', ' . e($n['funeral_venue']) : '') . '</p>' : '')
                 . ($n['reposing'] ? '<p><b>Reposing:</b> ' . e($n['reposing']) . '</p>' : '')
                 . '<p>' . nl2br(e(excerpt($n['body'], 400))) . '</p>'
                 . '<p><a href="' . e($url) . '" style="color:#139a5c;font-weight:700">Read the full notice →</a></p>'
-                . '<p style="color:#59685f;font-size:12px">You asked for ' . e($kindKey) . ' alerts for Co. ' . e($n['county']) . '. <a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
+                . '<p style="color:#59685f;font-size:12px">You asked for ' . e($kindKey) . ' alerts for ' . e($n['county']) . '. <a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
         }
     }
 
@@ -241,10 +242,10 @@ final class Notices
             '@context' => 'https://schema.org', '@type' => 'Event', 'name' => $n['title'], 'startDate' => $n['event_at'],
             'endDate' => $n['event_end'] ?: $n['event_at'], 'description' => excerpt($n['body'], 300),
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode', 'eventStatus' => 'https://schema.org/EventScheduled',
-            'location' => ['@type' => 'Place', 'name' => $n['venue'] ?: ($n['town'] ?: 'Co. ' . $n['county']), 'address' => ['@type' => 'PostalAddress', 'addressLocality' => $n['town'] ?: '', 'addressRegion' => 'County ' . $n['county'], 'addressCountry' => 'IE']],
+            'location' => ['@type' => 'Place', 'name' => $n['venue'] ?: ($n['town'] ?: $n['county']), 'address' => ['@type' => 'PostalAddress', 'addressLocality' => $n['town'] ?: '', 'addressRegion' => $n['county'], 'addressCountry' => 'IN']],
             'organizer' => ['@type' => 'Organization', 'name' => $n['contact_org'] ?: $n['contact_name'] ?: 'Community'],
             'url' => absolute_url($n['url']),
-        ] + ($n['price'] ? ['offers' => ['@type' => 'Offer', 'price' => preg_replace('/[^\d.]/', '', $n['price']) ?: '0', 'priceCurrency' => 'EUR', 'url' => $n['url'] ? $n['url'] : absolute_url($n['url'])]] : []);
+        ] + ($n['price'] ? ['offers' => ['@type' => 'Offer', 'price' => preg_replace('/[^\d.]/', '', $n['price']) ?: '0', 'priceCurrency' => 'INR', 'url' => $n['url'] ? $n['url'] : absolute_url($n['url'])]] : []);
     }
 
     public static function expire(): int

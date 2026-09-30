@@ -65,7 +65,7 @@ final class AdOrders
     /** Start a pending order for a package. Returns the row. */
     public static function create(array $user, array $package, string $gateway, ?string $adId = null): array
     {
-        if (!in_array($gateway, ['stripe', 'paypal'], true)) {
+        if (!in_array($gateway, ['stripe', 'paypal', 'razorpay'], true)) {
             throw new HttpException(400, 'Choose a payment method');
         }
         if ($adId !== null) {

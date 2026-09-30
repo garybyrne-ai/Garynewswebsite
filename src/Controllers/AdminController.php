@@ -65,7 +65,9 @@ final class AdminController
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
         $rows = Database::all($sql . ' ORDER BY s.created_at DESC LIMIT ' . $r->int('limit', 120, 1, 400), $args);
+        $repeats = self::repeatCounts('stories', 'submitter_ip', array_column($rows, 'submitter_ip'));
         foreach ($rows as &$s) {
+            $s['repeat_count'] = $s['submitter_ip'] ? ($repeats[$s['submitter_ip']] ?? 0) : 0;
             $s['moderation'] = json_decode($s['moderation_json'] ?? '{}', true) ?: new \stdClass();
             $s['media_url'] = $s['media_original'] ? '/api/admin/stories/' . $s['id'] . '/preview' : null;
             $s['url'] = '/story/' . $s['slug'];
@@ -80,6 +82,22 @@ final class AdminController
             unset($s['moderation_json'], $s['exif_json'], $s['verify_token']);
         }
         return Response::json($rows);
+    }
+
+    /** How many rows each IP has filed in `table` over the last N days (abuse/repeat-submitter signal). */
+    private static function repeatCounts(string $table, string $col, array $ips, int $days = 7): array
+    {
+        $ips = array_values(array_unique(array_filter($ips)));
+        if (!$ips) {
+            return [];
+        }
+        $placeholders = implode(',', array_fill(0, count($ips), '?'));
+        $cutoff = gmdate('Y-m-d\TH:i:s', time() - $days * 86400) . '+00:00';
+        $out = [];
+        foreach (Database::all("SELECT {$col} AS ip, COUNT(*) AS n FROM {$table} WHERE {$col} IN ({$placeholders}) AND created_at>? GROUP BY {$col}", [...$ips, $cutoff]) as $row) {
+            $out[$row['ip']] = (int)$row['n'];
+        }
+        return $out;
     }
 
     /** Other stories carrying the same or a near-identical image (average-hash distance ≤ 6). */
@@ -218,7 +236,7 @@ final class AdminController
         }
         $verified = (int)($r->post('is_verified') === '1');
         $rep = max(0, min(100, (int)$r->post('reputation', '50')));
-        $plan = $r->post('plan', $target['plan'], 10) === 'ME+' ? 'ME+' : 'free';
+        $plan = $r->post('plan', $target['plan'], 10) === 'Wire+' ? 'Wire+' : 'free';
         Database::query('UPDATE users SET role=?,is_verified=?,reputation=?,title=?,desk=?,plan=? WHERE id=?', [$role, $verified, $rep, $r->post('title', '', 80) ?: null, $r->post('desk', '', 40) ?: null, $plan, $p['id']]);
         if ($plan !== $target['plan']) {
             Audit::log($u['id'], 'user.plan', 'user', $p['id'], $plan . ' (complimentary, set by admin)');
@@ -262,12 +280,12 @@ final class AdminController
         Database::insert('users', [
             'id' => $id, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'display_name' => $name,
             'handle' => AccountController::uniqueHandle($name), 'role' => $role, 'title' => $r->post('title', '', 80) ?: null, 'desk' => $r->post('desk', '', 40) ?: null,
-            'home_county' => in_array($county, Locations::countyNames(), true) ? $county : null, 'plan' => $r->post('plan', 'free', 10) === 'ME+' ? 'ME+' : 'free',
+            'home_county' => in_array($county, Locations::countyNames(), true) ? $county : null, 'plan' => $r->post('plan', 'free', 10) === 'Wire+' ? 'Wire+' : 'free',
             'accent' => (string)random_int(0, 359), 'created_at' => now(),
         ]);
         Database::insert('subscriptions', ['user_id' => $id, 'email' => $email, 'plan' => 'free', 'status' => 'active', 'created_at' => now()]);
         Audit::log($u['id'], 'user.create', 'user', $id, "$email as $role");
-        \MeNews\Services\Mailer::send($email, 'Your ME News account', '<p>Hi ' . e($name) . ',</p><p>' . e($u['display_name']) . ' has created an ME News account for you' . ($role !== 'member' ? ' as <b>' . e($role) . '</b>' : '') . '.</p><p>Sign in at <a href="' . e(absolute_url('/?auth=signin')) . '">' . e(absolute_url('/')) . '</a> with this address and the temporary password your editor gives you, then change it under <b>Security</b> in your dashboard.</p>');
+        \MeNews\Services\Mailer::send($email, 'Your Bharat Wire account', '<p>Hi ' . e($name) . ',</p><p>' . e($u['display_name']) . ' has created an Bharat Wire account for you' . ($role !== 'member' ? ' as <b>' . e($role) . '</b>' : '') . '.</p><p>Sign in at <a href="' . e(absolute_url('/?auth=signin')) . '">' . e(absolute_url('/')) . '</a> with this address and the temporary password your editor gives you, then change it under <b>Security</b> in your dashboard.</p>');
         return Response::json(['ok' => true, 'id' => $id, 'temporary_password' => $generated ? $password : null]);
     }
 
@@ -308,7 +326,12 @@ final class AdminController
     public static function comments(Request $r): Response
     {
         self::staff();
-        return Response::json(Database::all("SELECT c.*, s.title, s.slug FROM comments c JOIN stories s ON s.id=c.story_id WHERE c.status='review' ORDER BY c.created_at DESC LIMIT 200"));
+        $rows = Database::all("SELECT c.*, s.title, s.slug FROM comments c JOIN stories s ON s.id=c.story_id WHERE c.status='review' ORDER BY c.created_at DESC LIMIT 200");
+        $repeats = self::repeatCounts('comments', 'ip_address', array_column($rows, 'ip_address'));
+        foreach ($rows as &$c) {
+            $c['repeat_count'] = $c['ip_address'] ? ($repeats[$c['ip_address']] ?? 0) : 0;
+        }
+        return Response::json($rows);
     }
 
     public static function itemDecision(Request $r, array $p): Response
@@ -328,12 +351,80 @@ final class AdminController
         return Response::json(['ok' => true]);
     }
 
+    /** Send a breaking-news push for a published story. Editor-triggered, never automatic. */
+    public static function pushStory(Request $r, array $p): Response
+    {
+        $u = self::staff();
+        $story = Database::one("SELECT id,slug,title,summary,county,status,pushed_at FROM stories WHERE id=?", [$p['id']]);
+        if (!$story) {
+            throw new HttpException(404, 'Story not found');
+        }
+        if ($story['status'] !== 'published') {
+            throw new HttpException(409, 'Only published stories can be pushed');
+        }
+        $result = \MeNews\Services\Push::sendToStory($story);
+        Audit::log($u['id'], 'story.push', 'story', $story['id'], $story['title'] . ' · sent ' . $result['sent']);
+        return Response::json(['ok' => true] + $result);
+    }
+
+    public static function pushStatus(Request $r): Response
+    {
+        self::staff();
+        return Response::json(['configured' => \MeNews\Services\Push::configured(), 'subscribers' => \MeNews\Services\Push::subscriberCount()]);
+    }
+
+    /**
+     * A structured CSV of one IP address's activity across the app — for compliance with
+     * IT Rules 2021 takedown/traceability requests from law enforcement. Admin-only; the
+     * export itself is audit-logged so there is a record of who pulled which IP and when.
+     */
+    public static function exportIpActivity(Request $r): Response
+    {
+        $u = Auth::require(['admin']);
+        $ip = trim($r->query('ip', '', 45));
+        if ($ip === '' || !filter_var($ip, FILTER_VALIDATE_IP)) {
+            throw new HttpException(400, 'Enter a valid IP address');
+        }
+        $rows = [['type', 'id', 'created_at', 'ip_address', 'user_agent', 'summary']];
+        foreach (Database::all('SELECT id,created_at,submitter_ip,submitter_user_agent,title,author_name,status FROM stories WHERE submitter_ip=? ORDER BY created_at DESC', [$ip]) as $s) {
+            $rows[] = ['report', $s['id'], $s['created_at'], $s['submitter_ip'], $s['submitter_user_agent'], $s['title'] . ' — ' . $s['author_name'] . ' (' . $s['status'] . ')'];
+        }
+        foreach (Database::all('SELECT id,created_at,ip_address,user_agent,author,body,status FROM comments WHERE ip_address=? ORDER BY created_at DESC', [$ip]) as $c) {
+            $rows[] = ['comment', $c['id'], $c['created_at'], $c['ip_address'], $c['user_agent'], $c['author'] . ': ' . mb_substr((string)$c['body'], 0, 140) . ' (' . $c['status'] . ')'];
+        }
+        foreach (Database::all('SELECT id,created_at,ip_address,user_agent,kind,title,status FROM notices WHERE ip_address=? ORDER BY created_at DESC', [$ip]) as $n) {
+            $rows[] = ['notice', $n['id'], $n['created_at'], $n['ip_address'], $n['user_agent'], $n['kind'] . ' — ' . $n['title'] . ' (' . $n['status'] . ')'];
+        }
+        foreach (Database::all('SELECT id,created_at,ip_address,user_agent,school,status FROM closures WHERE ip_address=? ORDER BY created_at DESC', [$ip]) as $c) {
+            $rows[] = ['closure', $c['id'], $c['created_at'], $c['ip_address'], $c['user_agent'], $c['school'] . ' (' . $c['status'] . ')'];
+        }
+        foreach (Database::all('SELECT id,created_at,ip_address,user_agent,story_id FROM confirmations WHERE ip_address=? ORDER BY created_at DESC', [$ip]) as $c) {
+            $rows[] = ['confirmation', $c['id'], $c['created_at'], $c['ip_address'], $c['user_agent'], 'confirmed story ' . $c['story_id']];
+        }
+        foreach (Database::all('SELECT id,created_at,ip_address,user_agent FROM sessions WHERE ip_address=? ORDER BY created_at DESC', [$ip]) as $s) {
+            $rows[] = ['login_session', $s['id'], $s['created_at'], $s['ip_address'], $s['user_agent'], 'session created'];
+        }
+        foreach (Database::all('SELECT id,email,display_name,created_at,registration_ip,registration_user_agent FROM users WHERE registration_ip=? ORDER BY created_at DESC', [$ip]) as $u2) {
+            $rows[] = ['registration', $u2['id'], $u2['created_at'], $u2['registration_ip'], $u2['registration_user_agent'], $u2['email'] . ' (' . $u2['display_name'] . ')'];
+        }
+        $out = fopen('php://temp', 'r+');
+        foreach ($rows as $row) {
+            fputcsv($out, $row);
+        }
+        rewind($out);
+        $csv = stream_get_contents($out);
+        fclose($out);
+        Audit::log($u['id'], 'ip.export', 'ip', $ip, (count($rows) - 1) . ' rows');
+        return Response::text($csv, 'text/csv; charset=utf-8')
+            ->withHeader('Content-Disposition', 'attachment; filename="ip-activity-' . preg_replace('/[^a-z0-9.:]/i', '_', $ip) . '-' . gmdate('Ymd-His') . '.csv"');
+    }
+
     public static function refreshLocations(Request $r): Response
     {
         $u = Auth::require(['admin']);
         set_time_limit(300);
         $rows = Locations::refreshOfficial();
-        Audit::log($u['id'], 'locations.refresh', 'locations', 'ireland', (string)count($rows));
+        Audit::log($u['id'], 'locations.refresh', 'locations', 'india', (string)count($rows));
         return Response::json(['ok' => true, 'count' => count($rows), 'source' => 'CSO/Tailte Éireann 2022']);
     }
 
@@ -420,7 +511,7 @@ final class AdminController
     public static function closures(Request $r): Response
     {
         self::staff();
-        return Response::json(Database::all('SELECT id,created_at,status,school,county,town,closed_on,reopens_on,reason,contact_name,contact_role,contact_email,verified_at,published_at FROM closures ORDER BY created_at DESC LIMIT 200'));
+        return Response::json(Database::all('SELECT id,created_at,status,school,county,town,closed_on,reopens_on,reason,contact_name,contact_role,contact_email,verified_at,published_at,ip_address,user_agent FROM closures ORDER BY created_at DESC LIMIT 200'));
     }
 
     public static function closureDecision(Request $r, array $p): Response
@@ -454,8 +545,8 @@ final class AdminController
         Auth::require(['admin']);
         return Response::json([
             'fields' => \MeNews\Services\Secrets::status(),
-            'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(),
-            'webhooks' => ['stripe' => absolute_url('/api/stripe/webhook'), 'paypal' => absolute_url('/api/paypal/webhook')],
+            'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(), 'razorpay' => \MeNews\Services\Razorpay::configured(),
+            'webhooks' => ['stripe' => absolute_url('/api/stripe/webhook'), 'paypal' => absolute_url('/api/paypal/webhook'), 'razorpay' => absolute_url('/api/razorpay/webhook')],
             'key_source' => \MeNews\Config::get('APP_KEY') !== '' ? 'APP_KEY' : 'storage/data/.secret_key',
         ]);
     }
@@ -536,7 +627,7 @@ final class AdminController
         }
         Database::setSetting('mail_last_error', '');
         $m = \MeNews\Services\Mailer::class;
-        $sent = $m::send($to, 'ME News test email', '<p>This is a test from the ME News newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_irish(now())) . ' by ' . e($u['display_name']) . '.</p>');
+        $sent = $m::send($to, 'Bharat Wire test email', '<p>This is a test from the Bharat Wire newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_in(now())) . ' by ' . e($u['display_name']) . '.</p>');
         $err = (string)Database::setting('mail_last_error', '');
         Audit::log($u['id'], 'mail.test', 'settings', 'mail', $to . ' · ' . ($err ?: 'ok'));
         if ($err !== '') {
@@ -571,7 +662,7 @@ final class AdminController
         if ($changed) {
             Audit::log($u['id'], 'gateways.update', 'settings', 'gateways', implode(', ', $changed));
         }
-        return Response::json(['ok' => true, 'changed' => $changed, 'fields' => \MeNews\Services\Secrets::status(), 'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured()]);
+        return Response::json(['ok' => true, 'changed' => $changed, 'fields' => \MeNews\Services\Secrets::status(), 'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(), 'razorpay' => \MeNews\Services\Razorpay::configured()]);
     }
 
     public static function testGateway(Request $r): Response
@@ -604,7 +695,7 @@ final class AdminController
             if ($k === 'site_url' && $v !== '') {
                 $v = \MeNews\Config::normaliseBase($v);
                 if ($v === '') {
-                    throw new HttpException(400, 'Site address must be a web address such as https://menews.ie');
+                    throw new HttpException(400, 'Site address must be a web address such as https://bharatwire.in');
                 }
             }
             if ($meta['type'] === 'cents') {
@@ -628,21 +719,25 @@ final class AdminController
             'site_url' => ['label' => 'Site address (canonical domain)', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
             'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
             'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'default' => '1'],
-            'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],
-            'plus_annual_cents' => ['label' => 'ME+ annual price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '3900'],
-            'ads_price_cents' => ['label' => 'Advertising monthly price (€)', 'group' => 'Advertising', 'type' => 'cents', 'default' => '2500'],
+            'plus_price_cents' => ['label' => 'Wire+ monthly price (₹)', 'group' => 'Membership', 'type' => 'cents', 'default' => '9900'],
+            'plus_annual_cents' => ['label' => 'Wire+ annual price (₹)', 'group' => 'Membership', 'type' => 'cents', 'default' => '99900'],
+            'ads_price_cents' => ['label' => 'Advertising monthly price (₹)', 'group' => 'Advertising', 'type' => 'cents', 'default' => '99900'],
             'ads_trial_days' => ['label' => 'Advertising free trial (days)', 'group' => 'Advertising', 'type' => 'int', 'default' => '7'],
             'ad_rotate_seconds' => ['label' => 'Advert rotation (seconds per advert)', 'group' => 'Advertising', 'type' => 'int', 'default' => '20'],
             'whatsapp_number' => ['label' => 'WhatsApp reporting number (national)', 'group' => 'Community', 'type' => 'text', 'default' => ''],
             'whatsapp_channel' => ['label' => 'WhatsApp channel link (national)', 'group' => 'Community', 'type' => 'text', 'default' => ''],
             'contact_email' => ['label' => 'Editorial contact email', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
             'owner_name' => ['label' => 'Owner / publisher name', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Gary Byrne'],
-            'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'ME News Ireland'],
-            'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Ireland'],
+            'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Bharat Wire India'],
+            'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'India'],
+            'pii_retention_days' => ['label' => 'IP/device log retention (days) — scripts/purge-pii.php', 'group' => 'Security', 'type' => 'int', 'default' => '180'],
+            'waqi_token' => ['label' => 'WAQI air-quality token (free at aqicn.org/data-platform/token)', 'group' => 'Live data', 'type' => 'text', 'default' => ''],
+            'agmarknet_api_key' => ['label' => 'data.gov.in API key for mandi prices (free at data.gov.in/user/register)', 'group' => 'Live data', 'type' => 'text', 'default' => ''],
+            'cricket_api_key' => ['label' => 'Cricket score API key (optional — no reliable free provider, see README)', 'group' => 'Live data', 'type' => 'text', 'default' => ''],
         ];
         foreach (Locations::countyNames() as $c) {
-            $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by county', 'type' => 'text', 'default' => ''];
-            $keys['whatsapp_channel_' . slugify($c)] = ['label' => $c . ' WhatsApp channel link', 'group' => 'WhatsApp channels by county', 'type' => 'text', 'default' => ''];
+            $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by state', 'type' => 'text', 'default' => ''];
+            $keys['whatsapp_channel_' . slugify($c)] = ['label' => $c . ' WhatsApp channel link', 'group' => 'WhatsApp channels by state', 'type' => 'text', 'default' => ''];
         }
         return $keys;
     }

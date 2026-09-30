@@ -21,11 +21,14 @@ final class Secrets
     public const FIELDS = [
         'STRIPE_SECRET_KEY' => ['label' => 'Stripe secret key', 'group' => 'stripe', 'hint' => 'sk_live_… or sk_test_… from Developers → API keys', 'pattern' => '/^(sk|rk)_(live|test)_[A-Za-z0-9]{10,}$/'],
         'STRIPE_WEBHOOK_SECRET' => ['label' => 'Stripe webhook signing secret', 'group' => 'stripe', 'hint' => 'whsec_… shown when you add the webhook endpoint', 'pattern' => '/^whsec_[A-Za-z0-9]{10,}$/'],
-        'STRIPE_PRICE_ME_PLUS' => ['label' => 'Stripe price ID for monthly ME+ (optional)', 'group' => 'stripe', 'hint' => 'price_… — leave blank to bill the price from Settings', 'pattern' => '/^price_[A-Za-z0-9]{6,}$/'],
+        'STRIPE_PRICE_WIRE_PLUS' => ['label' => 'Stripe price ID for monthly Wire+ (optional)', 'group' => 'stripe', 'hint' => 'price_… — leave blank to bill the price from Settings', 'pattern' => '/^price_[A-Za-z0-9]{6,}$/'],
         'PAYPAL_CLIENT_ID' => ['label' => 'PayPal client ID', 'group' => 'paypal', 'hint' => 'From the PayPal developer dashboard → your REST app', 'pattern' => '/^[A-Za-z0-9_\-]{20,}$/'],
         'PAYPAL_CLIENT_SECRET' => ['label' => 'PayPal client secret', 'group' => 'paypal', 'hint' => 'Same app, “Secret key”', 'pattern' => '/^[A-Za-z0-9_\-]{20,}$/'],
         'PAYPAL_WEBHOOK_ID' => ['label' => 'PayPal webhook ID', 'group' => 'paypal', 'hint' => 'Shown after you add the webhook URL to the app', 'pattern' => '/^[A-Z0-9]{10,}$/'],
         'PAYPAL_MODE' => ['label' => 'PayPal mode', 'group' => 'paypal', 'hint' => 'sandbox while testing, live when ready', 'pattern' => '/^(sandbox|live)$/'],
+        'RAZORPAY_KEY_ID' => ['label' => 'Razorpay key ID', 'group' => 'razorpay', 'hint' => 'rzp_live_… or rzp_test_… from Settings → API Keys', 'pattern' => '/^rzp_(live|test)_[A-Za-z0-9]{10,}$/'],
+        'RAZORPAY_KEY_SECRET' => ['label' => 'Razorpay key secret', 'group' => 'razorpay', 'hint' => 'Shown once when the key ID is generated', 'pattern' => '/^[A-Za-z0-9]{10,}$/'],
+        'RAZORPAY_WEBHOOK_SECRET' => ['label' => 'Razorpay webhook secret', 'group' => 'razorpay', 'hint' => 'The secret you set when adding the webhook URL in the Razorpay dashboard', 'pattern' => '/^\S[\s\S]{4,255}$/'],
         'SMTP_PASS' => ['label' => 'SMTP password', 'group' => 'mail', 'hint' => 'The password or API key your mail host gave you', 'pattern' => '/^\S[\s\S]{2,255}$/'],
         'BREVO_API_KEY' => ['label' => 'Brevo API key', 'group' => 'mail', 'hint' => 'xkeysib-… from Brevo → SMTP & API → API keys', 'pattern' => '/^xkeysib-[A-Za-z0-9._\-]{10,}$/'],
     ];
@@ -168,6 +171,15 @@ final class Secrets
                 throw new HttpException(400, 'PayPal rejected the credentials: ' . ($res['error_description'] ?? $res['error'] ?? 'unknown error'));
             }
             return ['ok' => true, 'message' => 'PayPal connected (' . self::get('PAYPAL_MODE', 'sandbox') . ' mode' . (self::get('PAYPAL_WEBHOOK_ID') === '' ? ', webhook ID still missing' : '') . ')'];
+        }
+        if ($gateway === 'razorpay') {
+            $id = self::get('RAZORPAY_KEY_ID');
+            $secret = self::get('RAZORPAY_KEY_SECRET');
+            if ($id === '' || $secret === '') {
+                throw new HttpException(400, 'Enter the Razorpay key ID and secret first');
+            }
+            $res = Remote::json('https://api.razorpay.com/v1/payment_links?count=1', null, ['Authorization: Basic ' . base64_encode($id . ':' . $secret)], 'json', 20);
+            return ['ok' => true, 'message' => 'Razorpay connected (' . (str_contains($id, '_live_') ? 'live' : 'test') . ' mode' . (self::get('RAZORPAY_WEBHOOK_SECRET') === '' ? ', webhook secret still missing' : '') . ')'];
         }
         if ($gateway === 'brevo') {
             $key = self::get('BREVO_API_KEY');

@@ -13,11 +13,11 @@ use MeNews\Support\Categories;
 use MeNews\Support\Daily;
 use MeNews\View;
 
-/** ME Óg — the kids' section: daily puzzles, Irish word of the day and free things to do. */
+/** Wire Junior — the kids' section: daily puzzles, Hindi word of the day and free things to do. */
 final class KidsController
 {
     /** Stories a young reader can enjoy: What's On, Culture and Sport, minus anything grim. */
-    private const BLOCK = '/\b(dies?|died|death|dead|killed?|kill|murder|crash|collision|assault|rape|abuse|drugs?|cocaine|court|jail|prison|gardaí|garda|stab|shoot|shot|gun|knife|body|missing|injur|hospital|fatal|war|bomb|attack|threat|scam|fraud|suicide|overdose|arrest|charged|guilty|victim|racis|misogyn|cancer|tragedy|tragic|drown|drumcree|orange order|parade permission|protest|controvers|sectarian|loyalist|paramilitar|politic|election|minister|government|tax|strike|row over|anger|outrage|slam|blast|fury|feud|dispute|ban|lawsuit|sue|divorce|split|cheat|scandal|betting|gambl|alcohol|drink|vape|smok)/iu';
+    private const BLOCK = '/\b(dies?|died|death|dead|killed?|kill|murder|crash|collision|assault|rape|abuse|drugs?|cocaine|court|jail|prison|police|stab|shoot|shot|gun|knife|body|missing|injur|hospital|fatal|war|bomb|attack|threat|scam|fraud|suicide|overdose|arrest|charged|guilty|victim|racis|misogyn|cancer|tragedy|tragic|drown|communal|curfew|riot|protest|controvers|sectarian|politic|election|minister|government|tax|strike|row over|anger|outrage|slam|blast|fury|feud|dispute|ban|lawsuit|sue|divorce|split|cheat|scandal|betting|gambl|alcohol|drink|vape|smok)/iu';
 
     public static function youngReaders(int $limit = 6): array
     {
@@ -56,8 +56,8 @@ final class KidsController
     {
         $today = Daily::date();
         return View::page('kids', self::base([
-            'title' => 'ME Óg — kids, puzzles and free things to do — ME News Ireland',
-            'description' => "Daily crossword, word search, Ireland quiz, the Irish word of the day and free things for kids across Ireland.",
+            'title' => 'Wire Junior — kids, puzzles and free things to do — Bharat Wire India',
+            'description' => "Daily crossword, word search, India quiz, the Hindi word of the day and free things for kids across India.",
             'crossword' => Puzzles::crossword($today, 'junior'),
             'wordsearch' => Puzzles::wordsearch($today),
             'quiz' => Puzzles::quiz($today),
@@ -72,8 +72,8 @@ final class KidsController
         $level = $r->query('level', 'junior', 10) === 'adult' ? 'adult' : 'junior';
         $puzzle = Puzzles::crossword($date, $level);
         return View::page('kids-crossword', self::base([
-            'title' => 'Daily crossword No. ' . $puzzle['edition'] . ' (' . $puzzle['label'] . ') — ME Óg',
-            'description' => 'A new Irish-flavoured crossword every day, in junior and grown-up sizes.',
+            'title' => 'Daily crossword No. ' . $puzzle['edition'] . ' (' . $puzzle['label'] . ') — Wire Junior',
+            'description' => 'A new India-flavoured crossword every day, in junior and grown-up sizes.',
             'puzzle' => $puzzle, 'date' => $date, 'level' => $level, 'levels' => Puzzles::LEVELS, 'archive' => Puzzles::archive(14),
         ]));
     }
@@ -83,8 +83,8 @@ final class KidsController
         $date = self::date($r, $p);
         $puzzle = Puzzles::wordsearch($date);
         return View::page('kids-wordsearch', self::base([
-            'title' => 'Daily word search: ' . $puzzle['theme'] . ' — ME Óg',
-            'description' => 'Find ten hidden Irish words in today\'s word search.',
+            'title' => 'Daily word search: ' . $puzzle['theme'] . ' — Wire Junior',
+            'description' => 'Find ten hidden words in today\'s word search.',
             'puzzle' => $puzzle, 'date' => $date, 'archive' => Puzzles::archive(14),
         ]));
     }
@@ -93,8 +93,8 @@ final class KidsController
     {
         $date = self::date($r, $p);
         return View::page('kids-quiz', self::base([
-            'title' => 'Know Your Ireland quiz — ME Óg',
-            'description' => 'Five questions about Ireland every day.',
+            'title' => 'Know Your India quiz — Wire Junior',
+            'description' => 'Five questions about India every day.',
             'quiz' => Puzzles::quiz($date), 'date' => $date, 'archive' => Puzzles::archive(14),
         ]));
     }
@@ -102,7 +102,7 @@ final class KidsController
     public static function county(Request $r): Response
     {
         return View::page('kids-county', self::base([
-            'title' => 'Find the County — ME Óg',
+            'title' => 'Find the State — Wire Junior',
             'description' => 'Can you find all 26 counties on the map?',
             'game' => Puzzles::countyGame(Daily::date()),
         ]));

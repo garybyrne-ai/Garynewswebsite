@@ -109,13 +109,13 @@ final class ApiController
         $place = \MeNews\Support\Geo::nearest($lat, $lng);
         $radius = $r->int('radius', 40, 5, 200);
         $limit = $r->int('limit', 12, 1, 40);
-        $stories = $place['in_ireland'] ? Stories::near($lat, $lng, $radius, $limit, $place['county']) : [];
-        if ($place['in_ireland'] && count($stories) < 4 && $radius < 80) {
+        $stories = $place['in_india'] ? Stories::near($lat, $lng, $radius, $limit, $place['county']) : [];
+        if ($place['in_india'] && count($stories) < 4 && $radius < 80) {
             $radius = 80;
             $stories = Stories::near($lat, $lng, $radius, $limit, $place['county']);
         }
-        $title = $place['in_ireland'] ? ($place['town'] ? $place['town'] . ', Co. ' . $place['county'] : 'Co. ' . $place['county']) : 'Outside Ireland';
-        $locality = ['mode' => $place['in_ireland'] ? 'gps' : 'abroad', 'place' => $place, 'stories' => $stories, 'radius' => $radius, 'county' => $place['county'], 'title' => $title, 'position' => ['lat' => $lat, 'lng' => $lng]];
+        $title = $place['in_india'] ? ($place['town'] ? $place['town'] . ', ' . $place['county'] : $place['county']) : 'Outside India';
+        $locality = ['mode' => $place['in_india'] ? 'gps' : 'abroad', 'place' => $place, 'stories' => $stories, 'radius' => $radius, 'county' => $place['county'], 'title' => $title, 'position' => ['lat' => $lat, 'lng' => $lng]];
         return Response::json([
             'place' => $place, 'title' => $title, 'radius' => $radius, 'items' => $stories,
             'county_url' => $place['county'] ? '/county/' . slugify($place['county']) : null,
@@ -146,10 +146,47 @@ final class ApiController
         return Response::json(['hours' => Stories::pulse(), 'counties' => Stories::countyActivity(8), 'total' => Stories::countPublished(), 'wire_last_refresh' => NewsWire::lastRefresh()]);
     }
 
+    /** A fresh proof-of-work challenge for the guest report form. */
+    public static function powChallenge(Request $r): Response
+    {
+        return Response::json(\MeNews\Services\ProofOfWork::issue());
+    }
+
+    // ------------------------------------------------------------ web push
+
+    public static function pushConfig(Request $r): Response
+    {
+        return Response::json(['configured' => \MeNews\Services\Push::configured(), 'publicKey' => \MeNews\Services\Push::publicKey()]);
+    }
+
+    public static function pushSubscribe(Request $r): Response
+    {
+        $sub = json_decode($r->body(), true);
+        if (!is_array($sub)) {
+            throw new HttpException(400, 'Invalid subscription');
+        }
+        $county = $r->query('county', '', 80) ?: null;
+        if ($county && !in_array($county, Locations::countyNames(), true)) {
+            $county = null;
+        }
+        $u = \MeNews\Auth::user();
+        \MeNews\Services\Push::subscribe($sub, $u['id'] ?? null, $county, $r->userAgent());
+        return Response::json(['ok' => true]);
+    }
+
+    public static function pushUnsubscribe(Request $r): Response
+    {
+        $endpoint = (string)(json_decode($r->body(), true)['endpoint'] ?? '');
+        if ($endpoint !== '') {
+            \MeNews\Services\Push::unsubscribe($endpoint);
+        }
+        return Response::json(['ok' => true]);
+    }
+
     public static function ads(Request $r): Response
     {
         if (\MeNews\Services\Membership::adFree(\MeNews\Auth::user())) {
-            return Response::json([]); // ME+ is ad-free everywhere, including client-side slots
+            return Response::json([]); // Wire+ is ad-free everywhere, including client-side slots
         }
         $page = in_array($r->query('page', 'other', 12), ['home', 'section', 'story', 'county', 'notices', 'other'], true) ? $r->query('page', 'other', 12) : 'other';
         $rows = \MeNews\Services\Ads::pick($r->query('placement', 'sidebar') === 'banner' ? 'banner' : 'sidebar', $r->query('county', '', 60), $r->query('town', '', 80), $r->int('limit', 2, 1, 4), [], $page);

@@ -9,6 +9,7 @@ final class Migrations
     /** table => column => definition */
     private const COLUMNS = [
         'stories' => [
+            'pushed_at' => 'TEXT',
             'votes_total' => 'INTEGER NOT NULL DEFAULT 0',
             'signal_json' => 'TEXT',
             'cluster_id' => 'TEXT',
@@ -22,9 +23,36 @@ final class Migrations
             'exif_json' => 'TEXT',
             'corroborations' => 'INTEGER NOT NULL DEFAULT 0',
             'cluster_checked' => 'INTEGER NOT NULL DEFAULT 0',
+            'submitter_ip' => 'TEXT',
+            'submitter_user_agent' => 'TEXT',
+            'language' => "TEXT NOT NULL DEFAULT 'en'",
         ],
         'confirmations' => [
             'voter_key' => 'TEXT',
+            'ip_address' => 'TEXT',
+            'user_agent' => 'TEXT',
+        ],
+        'sessions' => [
+            'ip_address' => 'TEXT',
+            'user_agent' => 'TEXT',
+            'last_seen_at' => 'TEXT',
+        ],
+        'subscriptions' => [
+            'gateway' => 'TEXT',
+            'razorpay_customer_id' => 'TEXT',
+            'razorpay_subscription_id' => 'TEXT',
+        ],
+        'comments' => [
+            'ip_address' => 'TEXT',
+            'user_agent' => 'TEXT',
+        ],
+        'notices' => [
+            'ip_address' => 'TEXT',
+            'user_agent' => 'TEXT',
+        ],
+        'closures' => [
+            'ip_address' => 'TEXT',
+            'user_agent' => 'TEXT',
         ],
         'users' => [
             'reports_filed' => 'INTEGER NOT NULL DEFAULT 0',
@@ -32,6 +60,10 @@ final class Migrations
             'last_monthly_at' => 'TEXT',
             'failed_logins' => 'INTEGER NOT NULL DEFAULT 0',
             'locked_until' => 'TEXT',
+            'registration_ip' => 'TEXT',
+            'registration_user_agent' => 'TEXT',
+            'last_login_ip' => 'TEXT',
+            'last_login_at' => 'TEXT',
         ],
         'ads' => [
             'design_json' => 'TEXT',
@@ -68,7 +100,7 @@ final class Migrations
             }
         }
         // Default advertising, membership and content-position settings
-        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('ads_price_cents','2500'),('ads_trial_days','7'),('ads_currency','EUR'),('plus_price_cents','399'),('plus_annual_cents','3900'),('wire_mode','clustered'),('wire_images','1')");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('ads_price_cents','99900'),('ads_trial_days','7'),('ads_currency','INR'),('plus_price_cents','9900'),('plus_annual_cents','99900'),('wire_mode','clustered'),('wire_images','1')");
         // Wire stories are labelled by their source, never "Verified" (that word is reserved for reports our desk checked).
         $pdo->exec("UPDATE stories SET verification_label='Wire' WHERE kind='wire' AND verification_label='Verified'");
         $pdo->exec("UPDATE stories SET signal_json=NULL WHERE signal_json LIKE '%clustered%'");
@@ -81,5 +113,27 @@ final class Migrations
         \MeNews\Services\AdPackages::seedDefaults($pdo);
         $pdo->exec("UPDATE ads SET tier='premium' WHERE is_house=1 AND tier<>'premium'");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_confirmations_voter ON confirmations(story_id, voter_key)");
+        // Lets the newsroom spot one IP filing many reports/comments/notices (abuse patterns).
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_stories_submitter_ip ON stories(submitter_ip)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_comments_ip ON comments(ip_address)");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('pii_retention_days','180')");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS razorpay_events (id TEXT PRIMARY KEY, created_at TEXT NOT NULL)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS pow_challenges (id TEXT PRIMARY KEY, difficulty INTEGER NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL)");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('pow_difficulty','5')");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_stories_language ON stories(language)");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (
+            id TEXT PRIMARY KEY,
+            user_id TEXT,
+            endpoint TEXT UNIQUE NOT NULL,
+            p256dh TEXT NOT NULL,
+            auth TEXT NOT NULL,
+            county TEXT,
+            user_agent TEXT,
+            created_at TEXT NOT NULL,
+            last_sent_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_push_county ON push_subscriptions(county)");
     }
 }

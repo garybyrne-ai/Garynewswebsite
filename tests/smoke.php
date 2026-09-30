@@ -56,8 +56,8 @@ function check(string $name, bool $ok, string $detail = ''): void
     }
 }
 
-echo "ME News smoke test → {$base}\n\nPublic pages\n";
-foreach (['/', '/section/national', '/section/sport', '/county/dublin', '/search?q=cork', '/map', '/near', '/signal', '/signal?window=rising', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/tadhg', '/about', '/plus', '/newsroom', '/notices', '/notices/death', '/notices/submit', '/alerts', '/alerts?county=Wicklow', '/poll', '/corrections', '/ownership', '/privacy', '/moderation', '/county/wicklow/map', '/api/alerts?county=Cork', '/api/bulletin?county=Cork', '/sitemap.xml', '/news-sitemap.xml', '/feed.xml', '/feed.atom', '/feed.json', '/feed/community.xml', '/feed/section/sport.xml', '/feed/county/wicklow.atom', '/feeds', '/opensearch.xml', '/robots.txt', '/assets/img/logo-512.png', '/assets/img/og.png', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
+echo "Bharat Wire smoke test → {$base}\n\nPublic pages\n";
+foreach (['/', '/section/national', '/section/sport', '/county/maharashtra', '/search?q=mumbai', '/map', '/near', '/signal', '/signal?window=rising', '/advertise', '/kids', '/kids/crossword', '/kids/crossword?level=adult', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/contributors/rohan', '/about', '/plus', '/newsroom', '/notices', '/notices/death', '/notices/submit', '/alerts', '/alerts?county=Maharashtra', '/poll', '/corrections', '/ownership', '/privacy', '/moderation', '/county/maharashtra/map', '/api/alerts?county=Gujarat', '/api/bulletin?county=Gujarat', '/sitemap.xml', '/news-sitemap.xml', '/feed.xml', '/feed.atom', '/feed.json', '/feed/community.xml', '/feed/section/sport.xml', '/feed/county/maharashtra.atom', '/feeds', '/opensearch.xml', '/robots.txt', '/assets/img/logo-512.png', '/assets/img/og.png', '/assets/css/menews.css', '/assets/vendor/leaflet/leaflet.js', '/assets/fonts/Sora.woff2'] as $p) {
     [$s, $html] = http('GET', $p, [], [], false);
     check("GET {$p}", $s === 200 && strlen($html) > 20, "HTTP {$s}");
 }
@@ -82,16 +82,16 @@ $mapPts = json_decode(html_entity_decode($mm[1] ?? '[]', ENT_QUOTES), true) ?: [
 check('home page map ships points and counties', $s === 200 && count($mapPts) > 5 && !empty($mapPts[0]['latitude']) && str_contains($mapHtml, 'data-counties='));
 [$s, $mapApi] = http('GET', '/api/map?limit=20');
 check('map API returns located stories', $s === 200 && count($mapApi['points'] ?? []) > 0 && count($mapApi['counties'] ?? []) > 0);
-foreach (['pl' => 'Twoje hrabstwo', 'ga' => 'Do chontae', 'de' => 'Dein County', 'uk' => 'Ваше графство', 'ru' => 'Ваше графство'] as $code => $word) {
+foreach (['hi' => 'आपका राज्य', 'bn' => 'আপনার রাজ্য', 'te' => 'మీ రాష్ట్రం', 'mr' => 'तुमचे राज्य', 'ta' => 'உங்கள் மாநிலம்', 'ur' => 'آپ کی ریاست'] as $code => $word) {
     $ch = curl_init($base . '/');
     curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIE => 'me_lang=' . $code, CURLOPT_TIMEOUT => 30]);
     $html = (string)curl_exec($ch);
     check("language {$code} translates the chrome and loads Google Translate", str_contains($html, 'lang="' . $code . '"') && str_contains($html, $word) && str_contains($html, 'translate_a/element.js'));
 }
-$ch = curl_init($base . '/lang/pl?back=/section/sport');
+$ch = curl_init($base . '/lang/hi?back=/section/sport');
 curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_TIMEOUT => 30]);
 $hdr = (string)curl_exec($ch);
-check('language switch sets both cookies and redirects back', str_contains($hdr, 'me_lang=pl') && str_contains($hdr, 'googtrans=/en/pl') && str_contains($hdr, 'Location: /section/sport'));
+check('language switch sets both cookies and redirects back', str_contains($hdr, 'me_lang=hi') && str_contains($hdr, 'googtrans=/en/hi') && str_contains($hdr, 'Location: /section/sport'));
 [$s] = http('GET', '/lang/xx', [], [], false);
 check('unknown language is a 404', $s === 404);
 [$s] = http('GET', '/dashboard', [], [], false);
@@ -110,9 +110,9 @@ check('story by slug', $s === 200 && ($story['id'] ?? '') === ($first['id'] ?? '
 check('story page renders', $s === 200 && str_contains($html, htmlspecialchars($first['source_name'] ?? '', ENT_QUOTES)));
 check('wire page canonicalises to the publisher and is noindex', ($first['kind'] ?? '') !== 'wire' || (str_contains($html, 'rel="canonical" href="' . htmlspecialchars($first['source_url'] ?? '', ENT_QUOTES)) && str_contains($html, 'noindex')));
 [$s, $c] = http('GET', '/api/counties');
-check('counties', $s === 200 && count($c) === 26);
-[$s, $l] = http('GET', '/api/locations?q=bray');
-check('locations search', $s === 200 && ($l[0]['town'] ?? '') === 'Bray');
+check('counties', $s === 200 && count($c) === 36);
+[$s, $l] = http('GET', '/api/locations?q=mumbai');
+check('locations search', $s === 200 && ($l[0]['town'] ?? '') === 'Mumbai');
 [$s, $cats] = http('GET', '/api/categories');
 check('categories', $s === 200 && count($cats) >= 9);
 [$s, $p] = http('GET', '/api/pulse');
@@ -133,10 +133,10 @@ check('daily word search', $s === 200 && count($ws['words'] ?? []) >= 8 && count
 check('daily quiz', $s === 200 && count($qz['questions'] ?? []) === 5);
 [$s, $cg] = http('GET', '/api/kids/county');
 check('county game', $s === 200 && count($cg['rounds'] ?? []) === 10);
-[$s, $near] = http('GET', '/api/near?lat=53.203&lng=-6.099&limit=6');
-check('near-me API resolves Bray, Co. Wicklow', $s === 200 && ($near['place']['town'] ?? '') === 'Bray' && ($near['place']['county'] ?? '') === 'Wicklow' && count($near['items'] ?? []) >= 3, ($near['title'] ?? '?') . ', ' . count($near['items'] ?? []) . ' stories within ' . ($near['radius'] ?? '?') . ' km');
+[$s, $near] = http('GET', '/api/near?lat=19.0728&lng=72.8826&limit=6');
+check('near-me API resolves Mumbai, Maharashtra', $s === 200 && ($near['place']['town'] ?? '') === 'Mumbai' && ($near['place']['county'] ?? '') === 'Maharashtra' && count($near['items'] ?? []) >= 3, ($near['title'] ?? '?') . ', ' . count($near['items'] ?? []) . ' stories within ' . ($near['radius'] ?? '?') . ' km');
 [$s, $far] = http('GET', '/api/near?lat=51.5&lng=-0.12');
-check('near-me API flags positions outside Ireland', $s === 200 && empty($far['place']['in_ireland']));
+check('near-me API flags positions outside India', $s === 200 && empty($far['place']['in_india']));
 [$s] = http('GET', '/api/near?lat=999&lng=0');
 check('near-me API validates coordinates', $s === 400);
 [$s, $html] = http('GET', '/near', [], [], false);
@@ -164,8 +164,8 @@ check('cron endpoint rejects a bad key', $s === 403);
 check('wire refresh endpoint', $s === 200 && array_key_exists('ran', $w), $w['ran'] ? 'ran, ' . ($w['inserted'] ?? 0) . ' new' : 'fresh, skipped');
 
 echo "\nAccounts\n";
-$email = "smoke-{$stamp}@example.ie";
-[$s, $reg] = http('POST', '/api/auth/register', ['email' => $email, 'password' => 'smoke-test-123', 'display_name' => 'Smoke Tester', 'home_town' => 'Bray', 'home_county' => 'Wicklow']);
+$email = "smoke-{$stamp}@example.in";
+[$s, $reg] = http('POST', '/api/auth/register', ['email' => $email, 'password' => 'smoke-test-123', 'display_name' => 'Smoke Tester', 'home_town' => 'Mumbai', 'home_county' => 'Maharashtra']);
 check('register', $s === 200 && !empty($reg['token']), $email);
 $token = $reg['token'] ?? '';
 [$s, $me] = http('GET', '/api/me');
@@ -174,15 +174,15 @@ check('cookie session', $s === 200 && ($me['email'] ?? '') === $email);
 check('bearer session', $s === 200 && ($me2['email'] ?? '') === $email);
 [$s] = http('POST', '/api/me/profile', ['display_name' => 'Smoke Tester', 'bio' => 'Testing'], ['X-Requested-With: none']);
 check('CSRF guard blocks cookie POST without header', $s === 403 || $s === 200, "HTTP {$s}");
-[$s, $f] = http('POST', '/api/me/follows', ['location_name' => 'Greystones', 'county' => 'Wicklow']);
+[$s, $f] = http('POST', '/api/me/follows', ['location_name' => 'Pune', 'county' => 'Maharashtra']);
 check('follow an area', $s === 200 && ($f['ok'] ?? false));
-[$s, $f] = http('POST', '/api/me/follows', ['location_name' => 'Arklow', 'county' => 'Wicklow']);
+[$s, $f] = http('POST', '/api/me/follows', ['location_name' => 'Nashik', 'county' => 'Maharashtra']);
 check('free plan limit enforced', $s === 403);
 [$s, $fl] = http('GET', '/api/me/follows');
 check('list follows', $s === 200 && count($fl) === 1);
 
 echo "\nCommunity reporting\n";
-[$s, $rep] = http('POST', '/api/report', ['title' => "Smoke test report {$stamp}", 'body' => 'A short factual description written by the automated smoke test. Nothing is happening.', 'location_name' => 'Bray', 'county' => 'Wicklow', 'category' => 'Community', 'latitude' => '53.2', 'longitude' => '-6.1']);
+[$s, $rep] = http('POST', '/api/report', ['title' => "Smoke test report {$stamp}", 'body' => 'A short factual description written by the automated smoke test. Nothing is happening.', 'location_name' => 'Mumbai', 'county' => 'Maharashtra', 'category' => 'Community', 'latitude' => '19.07', 'longitude' => '72.88']);
 check('submit report', $s === 200 && in_array($rep['status'] ?? '', ['review', 'published'], true), 'status ' . ($rep['status'] ?? '?') . ', safety ' . ($rep['safety_score'] ?? '?'));
 $reportId = $rep['id'] ?? '';
 [$s, $mine] = http('GET', '/api/me/reports');
@@ -195,25 +195,25 @@ check('confirm a story', $s === 200 && ($cf['confirmations'] ?? 0) >= 1);
 check('double confirmation rejected', $s === 409);
 
 echo "\nThe local layer\n";
-[$s, $nt] = http('POST', '/api/notices', ['kind' => 'death', 'title' => "Smoke Test Notice {$stamp}", 'county' => 'Wicklow', 'town' => 'Rathdrum', 'funeral_at' => date('Y-m-d\TH:i', time() + 2 * 86400), 'body' => 'Peacefully. Smoke test.', 'contact_name' => 'Smoke Tester', 'contact_email' => "smoke-{$stamp}@example.ie"]);
+[$s, $nt] = http('POST', '/api/notices', ['kind' => 'death', 'title' => "Smoke Test Notice {$stamp}", 'county' => 'Maharashtra', 'town' => 'Thane', 'funeral_at' => date('Y-m-d\TH:i', time() + 2 * 86400), 'body' => 'Peacefully. Smoke test.', 'contact_name' => 'Smoke Tester', 'contact_email' => "smoke-{$stamp}@example.in"]);
 check('place a death notice while signed in', $s === 200 && ($nt['status'] ?? '') === 'review');
 $noticeId = $nt['id'] ?? '';
-[$s, $sub] = http('POST', '/api/alerts/subscribe', ['email' => "smoke-{$stamp}@example.ie", 'county' => 'Wicklow', 'kinds' => ['deaths', 'daily']]);
-check('subscribe to county alerts', $s === 200 && ($sub['county'] ?? '') === 'Wicklow');
-[$s, $cl] = http('POST', '/api/alerts/closure', ['school' => "Smoke NS {$stamp}", 'county' => 'Wicklow', 'closed_on' => date('Y-m-d'), 'reason' => 'Smoke test', 'contact_name' => 'A Principal', 'contact_email' => "principal-{$stamp}@example.ie"]);
+[$s, $sub] = http('POST', '/api/alerts/subscribe', ['email' => "smoke-{$stamp}@example.in", 'county' => 'Maharashtra', 'kinds' => ['deaths', 'daily']]);
+check('subscribe to county alerts', $s === 200 && ($sub['county'] ?? '') === 'Maharashtra');
+[$s, $cl] = http('POST', '/api/alerts/closure', ['school' => "Smoke NS {$stamp}", 'county' => 'Maharashtra', 'closed_on' => date('Y-m-d'), 'reason' => 'Smoke test', 'contact_name' => 'A Principal', 'contact_email' => "principal-{$stamp}@example.in"]);
 check('principal submits a closure', $s === 200 && ($cl['status'] ?? '') === 'review');
 [$s, $pollPage] = http('GET', '/poll', [], [], false);
 preg_match('/data-poll="([a-f0-9]+)"/', $pollPage, $pm);
 [$s, $pv] = http('POST', '/api/poll/vote', ['poll_id' => $pm[1] ?? 'x', 'option' => '0']);
 check('vote in the weekly poll', $s === 200 && ($pv['mine'] ?? null) === 0 && ($pv['results']['total'] ?? 0) >= 1);
-[$s, $td] = http('POST', '/api/takedown', ['url' => '/story/x', 'reason' => 'inaccurate', 'contact' => "smoke-{$stamp}@example.ie", 'detail' => 'Smoke test']);
+[$s, $td] = http('POST', '/api/takedown', ['url' => '/story/x', 'reason' => 'inaccurate', 'contact' => "smoke-{$stamp}@example.in", 'detail' => 'Smoke test']);
 check('takedown request accepted', $s === 200 && !empty($td['ok']));
 [$s, $pv] = http('POST', '/api/ads/preview', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'template' => 'paper']);
 check('ad designer preview renders', $s === 200 && str_contains($pv['sidebar'] ?? '', 'ad--sidebar') && str_contains($pv['banner'] ?? '', 'ad--banner'));
 [$s, $pk] = http('GET', '/api/ads/packages');
 $packages = $pk['packages'] ?? [];
-check('ad packages are public', $s === 200 && count($packages) >= 3 && ($packages[0]['price_label'] ?? '') === '€6' && (int)($packages[0]['impressions'] ?? 0) === 1000, implode(' · ', array_map(static fn($p) => $p['name'] . ' ' . $p['price_label'] . '/' . $p['impressions'], $packages)));
-[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'url' => 'https://example.ie', 'submit' => '1']);
+check('ad packages are public', $s === 200 && count($packages) >= 3 && ($packages[0]['price_label'] ?? '') === '₹299' && (int)($packages[0]['impressions'] ?? 0) === 1000, implode(' · ', array_map(static fn($p) => $p['name'] . ' ' . $p['price_label'] . '/' . $p['impressions'], $packages)));
+[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'url' => 'https://example.in', 'submit' => '1']);
 check('designer is locked until a package is bought', $s === 402, $adRes['detail'] ?? '');
 [$s, $co] = http('POST', '/api/ads/packages/' . ($packages[0]['id'] ?? 'x') . '/checkout', ['gateway' => 'stripe']);
 check('checkout needs a configured gateway or a valid package', in_array($s, [200, 503], true), "HTTP {$s}");
@@ -221,7 +221,7 @@ check('checkout needs a configured gateway or a valid package', in_array($s, [20
 check('member cannot read package admin', $s === 403);
 [$s] = http('POST', '/api/admin/ads/orders', ['action' => 'grant', 'email' => $email, 'package_id' => $packages[0]['id'] ?? 'x']);
 check('member cannot grant themselves a package', $s === 403);
-[$s, $al] = http('POST', '/api/me/alerts', ['county' => 'Kerry', 'kinds' => ['deaths']]);
+[$s, $al] = http('POST', '/api/me/alerts', ['county' => 'Karnataka', 'kinds' => ['deaths']]);
 check('free plan alerts limited to one county', $s === 403, $al['detail'] ?? '');
 [$s, $al] = http('GET', '/api/me/alerts');
 check('member lists their alert subscriptions', $s === 200 && count($al['subscriptions'] ?? []) === 1 && ($al['limit'] ?? 0) === 1);
@@ -245,23 +245,35 @@ http('POST', '/api/auth/logout');
 [$s] = http('GET', '/api/me');
 check('logout clears session', $s === 401);
 
+/** Solve the same proof-of-work challenge the browser solves with Web Crypto (native SHA-256 here). */
+function solvePow(): array
+{
+    [, $ch] = http('GET', '/api/pow/challenge');
+    $need = str_repeat('0', (int)$ch['difficulty']);
+    for ($nonce = 0; ; $nonce++) {
+        if (str_starts_with(hash('sha256', $ch['id'] . ':' . $nonce), $need)) {
+            return ['pow_id' => $ch['id'], 'pow_nonce' => (string)$nonce];
+        }
+    }
+}
+
 echo "\nGuest reporting (no account)\n";
-[$s, $g] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => "Smoke test guest report {$stamp}. Nothing is happening, this is automated.", 'location_name' => 'Arklow', 'county' => 'Wicklow', 'reporter_name' => 'Smoke Guest', 'reporter_contact' => "guest-{$stamp}@example.ie"]);
+[$s, $g] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => "Smoke test guest report {$stamp}. Nothing is happening, this is automated.", 'location_name' => 'Nashik', 'county' => 'Maharashtra', 'reporter_name' => 'Smoke Guest', 'reporter_contact' => "guest-{$stamp}@example.in"] + solvePow());
 check('guest report accepted without sign-in', $s === 200 && in_array($g['status'] ?? '', ['review', 'hold'], true) && str_contains($g['message'] ?? '', 'confirmation'));
 $guestId = $g['id'] ?? '';
-[$s] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => 'Too short', 'location_name' => 'Arklow']);
+[$s] = http('POST', '/api/report', ['category' => 'Traffic', 'body' => 'Too short', 'location_name' => 'Nashik']);
 check('guest report needs a name and contact', $s === 400);
 [$s, $cf] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/confirm', []);
 check('anonymous "I saw this too" counts once per device', $s === 200 || $s === 409);
 
 echo "\nNewsroom\n";
-[$s, $login] = http('POST', '/api/auth/login', ['email' => $env['ADMIN_EMAIL'] ?? 'admin@menews.ie', 'password' => $env['ADMIN_PASSWORD'] ?? '']);
+[$s, $login] = http('POST', '/api/auth/login', ['email' => $env['ADMIN_EMAIL'] ?? 'admin@bharatwire.in', 'password' => $env['ADMIN_PASSWORD'] ?? '']);
 check('admin login', $s === 200 && ($login['user']['role'] ?? '') === 'admin');
 [$s, $nq] = http('GET', '/api/admin/notices?status=review');
 check('notices queue lists the notice', $s === 200 && in_array($noticeId, array_column($nq, 'id'), true));
 [$s, $nd] = http('POST', '/api/admin/notices/' . $noticeId, ['decision' => 'publish']);
 check('publish notice', $s === 200 && ($nd['status'] ?? '') === 'published');
-[$s, $html] = http('GET', '/notices?county=Wicklow', [], [], false);
+[$s, $html] = http('GET', '/notices?county=Maharashtra', [], [], false);
 check('published notice appears in the county list', $s === 200 && str_contains($html, "Smoke Test Notice {$stamp}"));
 [$s] = http('POST', '/api/admin/notices/' . $noticeId, ['decision' => 'reject', 'note' => 'Smoke cleanup']);
 check('reject notice (cleanup)', $s === 200);
@@ -295,7 +307,7 @@ if ($failClosed) {
     [$s, $pub] = http('GET', '/api/story/' . $reportId);
     check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
 }
-[$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Community', 'county' => 'Wicklow', 'label' => 'Verified', 'is_featured' => '1', 'location_name' => 'Bray']);
+[$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Community', 'county' => 'Maharashtra', 'label' => 'Verified', 'is_featured' => '1', 'location_name' => 'Mumbai']);
 check('feature a story', $s === 200);
 [$s, $html] = http('GET', '/', [], [], false);
 check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
@@ -308,7 +320,7 @@ $member = ['Authorization: Bearer ' . bearerToken($email, 'smoke-test-123')];
 check('admin grants a paid package', $s === 200 && ($gr['order']['status'] ?? '') === 'paid' && ($gr['order']['tier'] ?? '') === 'premium', $gr['detail'] ?? '');
 [$s, $mineAds] = http('GET', '/api/me/ads', [], $member);
 check('paid package appears as a credit', $s === 200 && count($mineAds['credits'] ?? []) === 1);
-[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'body' => 'Baked daily.', 'cta' => 'Find us', 'url' => 'https://example.ie', 'target_county' => 'Wicklow', 'template' => 'paper', 'submit' => '1', 'order_id' => $mineAds['credits'][0]['id'] ?? ''], $member);
+[$s, $adRes] = http('POST', '/api/me/ads', ['business_name' => 'Smoke Bakery', 'title' => 'Fresh bread every morning', 'body' => 'Baked daily.', 'cta' => 'Find us', 'url' => 'https://example.in', 'target_county' => 'Maharashtra', 'template' => 'paper', 'submit' => '1', 'order_id' => $mineAds['credits'][0]['id'] ?? ''], $member);
 $ad = $adRes['ad'] ?? [];
 check('design + submit advert with the credit', $s === 200 && ($ad['status'] ?? '') === 'review' && ($ad['tier'] ?? '') === 'premium', $ad['state_label'] ?? ($adRes['detail'] ?? '?'));
 [$s] = http('POST', '/api/me/ads', ['business_name' => 'Bad', 'title' => 'Nope', 'url' => 'not-a-url'], $member);
@@ -317,7 +329,7 @@ check('credit is consumed: a second advert is locked', $s === 402);
 check('ads review queue', $s === 200 && in_array($ad['id'] ?? '-', array_column($ads['ads'] ?? [], 'id'), true), count($ads['ads'] ?? []) . ' waiting');
 [$s, $dec] = http('POST', '/api/admin/ads/' . ($ad['id'] ?? 'x'), ['decision' => 'approve']);
 check('approve advert starts the impressions', $s === 200 && ($dec['ad']['plan_status'] ?? '') === 'credits' && !empty($dec['ad']['live']) && (int)($dec['ad']['impressions_left'] ?? 0) === (int)$premium['impressions'], $dec['ad']['state_label'] ?? '');
-[$s, $plusAds] = http('GET', '/api/ads?county=Wicklow&limit=4&page=home');
+[$s, $plusAds] = http('GET', '/api/ads?county=Maharashtra&limit=4&page=home');
 check('staff always see adverts even on ME+', $s === 200 && count($plusAds) > 0);
 [$s, $homeHtml] = http('GET', '/', [], ['Authorization: Bearer not-a-session'], false);
 check('home page ad slots are rotating rotors', $s === 200 && str_contains($homeHtml, 'data-adrotor') && str_contains($homeHtml, 'data-interval="20000"'));
@@ -326,9 +338,9 @@ check('browser impression beacon counts a shown advert', $s === 200 && ($imp['co
 [$s, $imp2] = http('POST', '/api/ads/impression', ['ids' => $ad['id'] ?? 'x'], ['Authorization: Bearer not-a-session']);
 check('the same viewer is not counted twice within a minute', $s === 200 && ($imp2['counted'] ?? 1) === 0);
 $anon = ['Authorization: Bearer not-a-session'];
-[$s, $served] = http('GET', '/api/ads?county=Wicklow&limit=4&page=home', [], $anon);
+[$s, $served] = http('GET', '/api/ads?county=Maharashtra&limit=4&page=home', [], $anon);
 check('approved premium advert is served on the home page in its county', $s === 200 && in_array('Smoke Bakery', array_column($served, 'business_name'), true));
-[$s, $servedElse] = http('GET', '/api/ads?county=Kerry&limit=4', [], $anon);
+[$s, $servedElse] = http('GET', '/api/ads?county=Karnataka&limit=4', [], $anon);
 check('county-targeted advert is not served elsewhere', $s === 200 && !in_array('Smoke Bakery', array_column($servedElse, 'business_name'), true));
 [$s, $mineAds] = http('GET', '/api/me/ads', [], $member);
 check('impressions are counted down per serve', $s === 200 && (int)($mineAds['ads'][0]['impressions_left'] ?? 0) < (int)$premium['impressions'] && ($mineAds['orders'][0]['status'] ?? '') === 'running', ($mineAds['ads'][0]['impressions_left'] ?? '?') . ' left');
@@ -363,10 +375,10 @@ check('mail settings are admin-only and hide credentials', $s === 200 && in_arra
 check('Brevo key is validated', $s === 400);
 [$s] = http('POST', '/api/admin/mail', ['transport' => 'smtp', 'from' => 'not-an-address']);
 check('sender address is validated', $s === 400);
-[$s, $ms] = http('POST', '/api/admin/mail', ['transport' => 'smtp', 'from' => "smoke-{$stamp}@example.ie", 'from_name' => 'ME News', 'smtp_host' => 'smtp-relay.brevo.com', 'smtp_port' => '587', 'smtp_secure' => 'tls', 'SMTP_PASS' => 'smoke-test-password']);
+[$s, $ms] = http('POST', '/api/admin/mail', ['transport' => 'smtp', 'from' => "smoke-{$stamp}@example.in", 'from_name' => 'Bharat Wire', 'smtp_host' => 'smtp-relay.brevo.com', 'smtp_port' => '587', 'smtp_secure' => 'tls', 'SMTP_PASS' => 'smoke-test-password']);
 check('SMTP settings save with an encrypted password', $s === 200 && ($ms['smtp_host'] ?? '') === 'smtp-relay.brevo.com' && ($ms['secrets']['SMTP_PASS']['source'] ?? '') === 'panel' && !str_contains(json_encode($ms), 'smoke-test-password'));
 [$s] = http('POST', '/api/admin/mail', ['transport' => 'log']);
-[$s, $mt] = http('POST', '/api/admin/mail/test', ['to' => "smoke-{$stamp}@example.ie"]);
+[$s, $mt] = http('POST', '/api/admin/mail/test', ['to' => "smoke-{$stamp}@example.in"]);
 check('test email runs through the chosen transport', $s === 200 && !empty($mt['ok']));
 [$s, $gw] = http('GET', '/api/admin/gateways');
 check('gateway status is admin-only and never returns values', $s === 200 && isset($gw['fields']['STRIPE_SECRET_KEY']) && !isset($gw['fields']['STRIPE_SECRET_KEY']['value']));
@@ -378,12 +390,12 @@ check('gateway keys saved from the newsroom and Stripe reads as connected', $s =
 check('advert pricing sees the newsroom-entered key', $s === 200 && !empty($pr['stripe']));
 [$s, $gc] = http('POST', '/api/admin/gateways', ['clear_STRIPE_SECRET_KEY' => '1', 'clear_STRIPE_WEBHOOK_SECRET' => '1']);
 check('gateway keys can be removed again', $s === 200 && empty($gc['stripe']));
-[$s, $nu] = http('POST', '/api/admin/users', ['email' => "smoke-editor-{$stamp}@example.ie", 'display_name' => 'Smoke Editor', 'role' => 'editor', 'home_county' => 'Cork']);
+[$s, $nu] = http('POST', '/api/admin/users', ['email' => "smoke-editor-{$stamp}@example.in", 'display_name' => 'Smoke Editor', 'role' => 'editor', 'home_county' => 'Gujarat']);
 check('admin creates an account', $s === 200 && !empty($nu['id']) && strlen($nu['temporary_password'] ?? '') >= 8);
-check('new account can sign in', bearerToken("smoke-editor-{$stamp}@example.ie", $nu['temporary_password'] ?? '') !== '');
+check('new account can sign in', bearerToken("smoke-editor-{$stamp}@example.in", $nu['temporary_password'] ?? '') !== '');
 [$s] = http('POST', '/api/admin/users/' . ($nu['id'] ?? 'x') . '/delete', ['confirm' => 'wrong']);
 check('deleting an account needs the email typed', $s === 400);
-[$s] = http('POST', '/api/admin/users/' . ($nu['id'] ?? 'x') . '/delete', ['confirm' => "smoke-editor-{$stamp}@example.ie"]);
+[$s] = http('POST', '/api/admin/users/' . ($nu['id'] ?? 'x') . '/delete', ['confirm' => "smoke-editor-{$stamp}@example.in"]);
 check('admin deletes an account', $s === 200);
 [$s, $users] = http('GET', '/api/admin/users?q=smoke');
 check('user search', $s === 200 && count($users) >= 1);

@@ -1,0 +1,41 @@
+{
+  "_note": "Fixed-date entries recur exactly every year. Lunisolar/Hijri entries (kind: table) are approximate community calendar dates for 2026-2027 only, since exact tithi/moon-sighting dates are announced yearly — refresh this table for 2028 onward. Treat them as a guide, not an official gazette.",
+  "national": [
+    { "key": "republic_day", "name": "Republic Day", "kind": "fixed", "month": 1, "day": 26 },
+    { "key": "makar_sankranti", "name": "Makar Sankranti", "kind": "fixed", "month": 1, "day": 14 },
+    { "key": "baisakhi", "name": "Baisakhi", "kind": "fixed", "month": 4, "day": 14 },
+    { "key": "independence_day", "name": "Independence Day", "kind": "fixed", "month": 8, "day": 15 },
+    { "key": "gandhi_jayanti", "name": "Gandhi Jayanti", "kind": "fixed", "month": 10, "day": 2 },
+    { "key": "christmas", "name": "Christmas", "kind": "fixed", "month": 12, "day": 25 },
+    { "key": "good_friday", "name": "Good Friday", "kind": "easter", "offset_days": -2 },
+    { "key": "holi", "name": "Holi", "kind": "table", "dates": { "2026": "03-04", "2027": "03-23" } },
+    { "key": "eid_fitr", "name": "Eid al-Fitr", "kind": "table", "dates": { "2026": "03-20", "2027": "03-09" } },
+    { "key": "ram_navami", "name": "Ram Navami", "kind": "table", "dates": { "2026": "03-27", "2027": "03-16" } },
+    { "key": "eid_adha", "name": "Eid al-Adha (Bakrid)", "kind": "table", "dates": { "2026": "05-27", "2027": "05-16" } },
+    { "key": "raksha_bandhan", "name": "Raksha Bandhan", "kind": "table", "dates": { "2026": "08-28", "2027": "08-17" } },
+    { "key": "janmashtami", "name": "Janmashtami", "kind": "table", "dates": { "2026": "09-04", "2027": "08-24" } },
+    { "key": "ganesh_chaturthi", "name": "Ganesh Chaturthi", "kind": "table", "dates": { "2026": "09-14", "2027": "09-03" } },
+    { "key": "dussehra", "name": "Dussehra", "kind": "table", "dates": { "2026": "10-20", "2027": "10-09" } },
+    { "key": "diwali", "name": "Diwali", "kind": "table", "dates": { "2026": "11-08", "2027": "10-29" } },
+    { "key": "chhath_puja", "name": "Chhath Puja", "kind": "table", "dates": { "2026": "11-15", "2027": "11-04" } },
+    { "key": "guru_nanak_jayanti", "name": "Guru Nanak Jayanti", "kind": "table", "dates": { "2026": "11-24", "2027": "11-13" } }
+  ],
+  "byFestivalName": {
+    "Ugadi": { "kind": "table", "dates": { "2026": "03-19", "2027": "03-08" } },
+    "Gudi Padwa": { "kind": "table", "dates": { "2026": "03-19", "2027": "03-08" } },
+    "Navratri": { "kind": "table", "dates": { "2026": "10-11", "2027": "09-30" } },
+    "Mysuru Dasara": { "kind": "table", "dates": { "2026": "10-20", "2027": "10-09" } },
+    "Kullu Dussehra": { "kind": "table", "dates": { "2026": "10-20", "2027": "10-09" } },
+    "Bastar Dussehra": { "kind": "table", "dates": { "2026": "10-20", "2027": "10-09" } },
+    "Durga Puja": { "kind": "table", "dates": { "2026": "10-17", "2027": "10-06" } },
+    "Onam": { "kind": "table", "dates": { "2026": "08-26", "2027": "09-14" } },
+    "Pongal": { "kind": "fixed", "month": 1, "day": 14 },
+    "Bihu": { "kind": "fixed", "month": 4, "day": 14 },
+    "Vishu": { "kind": "fixed", "month": 4, "day": 14 },
+    "Nariyal Purnima": { "kind": "table", "dates": { "2026": "08-28", "2027": "08-17" } },
+    "Bathukamma": { "kind": "table", "dates": { "2026": "10-11", "2027": "09-30" } },
+    "Chhath Puja": { "kind": "table", "dates": { "2026": "11-15", "2027": "11-04" } },
+    "Diwali": { "kind": "table", "dates": { "2026": "11-08", "2027": "10-29" } },
+    "Kumbh Mela": { "kind": "periodic", "note": "Held roughly every 3-4 years at rotating sites (Prayagraj, Haridwar, Ujjain, Nashik) — not annual" }
+  }
+}

@@ -89,10 +89,10 @@ final class Installer
             $id = uuid();
             Database::insert('users', [
                 'id' => $id, 'email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-                'display_name' => 'ME News Administrator', 'handle' => 'newsroom', 'role' => 'admin', 'is_verified' => 1, 'plan' => 'ME+',
+                'display_name' => 'Bharat Wire Administrator', 'handle' => 'newsroom', 'role' => 'admin', 'is_verified' => 1, 'plan' => 'Wire+',
                 'title' => 'Managing Editor', 'desk' => 'National', 'accent' => '158', 'reputation' => 100, 'created_at' => now(),
             ]);
-            Database::insert('subscriptions', ['user_id' => $id, 'email' => $email, 'plan' => 'ME+', 'status' => 'active', 'created_at' => now()]);
+            Database::insert('subscriptions', ['user_id' => $id, 'email' => $email, 'plan' => 'Wire+', 'status' => 'active', 'created_at' => now()]);
             return 'created';
         }
         if ($reset) {
@@ -123,11 +123,11 @@ final class Installer
             $id = uuid();
             Database::insert('users', [
                 'id' => $id, 'email' => $c['email'], 'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-                'display_name' => $c['display_name'], 'handle' => $c['handle'], 'role' => 'contributor', 'is_verified' => 1, 'plan' => 'ME+',
+                'display_name' => $c['display_name'], 'handle' => $c['handle'], 'role' => 'contributor', 'is_verified' => 1, 'plan' => 'Wire+',
                 'title' => $c['title'], 'desk' => $c['desk'], 'home_town' => $c['home_town'], 'home_county' => $c['home_county'],
                 'bio' => $c['bio'], 'accent' => $c['accent'], 'reputation' => $c['reputation'], 'created_at' => now(),
             ]);
-            Database::insert('subscriptions', ['user_id' => $id, 'email' => $c['email'], 'plan' => 'ME+', 'status' => 'active', 'created_at' => now()]);
+            Database::insert('subscriptions', ['user_id' => $id, 'email' => $c['email'], 'plan' => 'Wire+', 'status' => 'active', 'created_at' => now()]);
             $out[$c['display_name']] = $password;
         }
         return $out;

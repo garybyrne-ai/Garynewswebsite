@@ -1,1018 +1,1302 @@
 {
-    "counties": {
-        "Carlow": [
-            52.6906,
-            -6.8249
-        ],
-        "Cavan": [
-            54.035,
-            -7.2937
-        ],
-        "Clare": [
-            52.8573,
-            -8.9374
-        ],
-        "Cork": [
-            51.9175,
-            -8.586
-        ],
-        "Donegal": [
-            54.9208,
-            -7.9524
-        ],
-        "Dublin": [
-            53.4065,
-            -6.2867
-        ],
-        "Galway": [
-            53.3435,
-            -8.8734
-        ],
-        "Kerry": [
-            52.1453,
-            -9.5174
-        ],
-        "Kildare": [
-            53.1545,
-            -6.8184
-        ],
-        "Kilkenny": [
-            52.5687,
-            -7.189
-        ],
-        "Laois": [
-            52.9985,
-            -7.398
-        ],
-        "Leitrim": [
-            54.1402,
-            -8.0525
-        ],
-        "Limerick": [
-            52.5188,
-            -8.7958
-        ],
-        "Longford": [
-            53.732,
-            -7.6953
-        ],
-        "Louth": [
-            53.9063,
-            -6.5321
-        ],
-        "Mayo": [
-            53.9087,
-            -9.2981
-        ],
-        "Meath": [
-            53.6498,
-            -6.5884
-        ],
-        "Monaghan": [
-            54.1611,
-            -6.9464
-        ],
-        "Offaly": [
-            53.1362,
-            -7.8103
-        ],
-        "Roscommon": [
-            53.6983,
-            -8.2183
-        ],
-        "Sligo": [
-            54.193,
-            -8.7305
-        ],
-        "Tipperary": [
-            52.6848,
-            -7.8981
-        ],
-        "Waterford": [
-            52.1509,
-            -7.6578
-        ],
-        "Westmeath": [
-            53.5578,
-            -7.3479
-        ],
-        "Wexford": [
-            52.4602,
-            -6.6065
-        ],
-        "Wicklow": [
-            52.9582,
-            -6.3814
-        ]
-    },
-    "towns": {
-        "Abbeyfeale|Limerick": [
-            52.3848,
-            -9.3015
-        ],
-        "Abbeyleix|Laois": [
-            52.9145,
-            -7.3482
-        ],
-        "Adare|Limerick": [
-            52.5637,
-            -8.7924
-        ],
-        "Ardee|Louth": [
-            53.8553,
-            -6.5389
-        ],
-        "Arklow|Wicklow": [
-            52.7982,
-            -6.154
-        ],
-        "Ashbourne|Meath": [
-            53.5116,
-            -6.3982
-        ],
-        "Athboy|Meath": [
-            53.6165,
-            -6.9032
-        ],
-        "Athenry|Galway": [
-            53.3014,
-            -8.7489
-        ],
-        "Athlone|Westmeath": [
-            53.4228,
-            -7.9426
-        ],
-        "Athy|Kildare": [
-            52.9924,
-            -6.9836
-        ],
-        "Aughrim|Wicklow": [
-            52.8551,
-            -6.329
-        ],
-        "Bailieborough|Cavan": [
-            53.9169,
-            -6.9707
-        ],
-        "Balbriggan|Dublin": [
-            53.6119,
-            -6.1823
-        ],
-        "Ballaghaderreen|Roscommon": [
-            53.9014,
-            -8.5789
-        ],
-        "Ballinamore|Leitrim": [
-            54.0527,
-            -7.8003
-        ],
-        "Ballinasloe|Galway": [
-            53.3303,
-            -8.2214
-        ],
-        "Ballina|Mayo": [
-            54.1143,
-            -9.1532
-        ],
-        "Ballincollig|Cork": [
-            51.8883,
-            -8.5918
-        ],
-        "Ballinrobe|Mayo": [
-            53.6241,
-            -9.2221
-        ],
-        "Ballybay|Monaghan": [
-            54.1289,
-            -6.903
-        ],
-        "Ballybofey|Donegal": [
-            54.7991,
-            -7.7819
-        ],
-        "Ballybunion|Kerry": [
-            52.5112,
-            -9.6701
-        ],
-        "Ballyhaunis|Mayo": [
-            53.7617,
-            -8.7585
-        ],
-        "Ballyjamesduff|Cavan": [
-            53.8639,
-            -7.2062
-        ],
-        "Ballymahon|Longford": [
-            53.5617,
-            -7.7617
-        ],
-        "Ballymote|Sligo": [
-            54.0885,
-            -8.5155
-        ],
-        "Ballyshannon|Donegal": [
-            54.502,
-            -8.1898
-        ],
-        "Baltinglass|Wicklow": [
-            52.9402,
-            -6.7084
-        ],
-        "Banagher|Offaly": [
-            53.1899,
-            -7.9869
-        ],
-        "Bandon|Cork": [
-            51.7462,
-            -8.7369
-        ],
-        "Bantry|Cork": [
-            51.6798,
-            -9.4524
-        ],
-        "Belmullet|Mayo": [
-            54.2241,
-            -9.9872
-        ],
-        "Belturbet|Cavan": [
-            54.1007,
-            -7.444
-        ],
-        "Bettystown|Meath": [
-            53.6983,
-            -6.2444
-        ],
-        "Birr|Offaly": [
-            53.1057,
-            -7.7572
-        ],
-        "Blackrock|Dublin": [
-            53.3019,
-            -6.1788
-        ],
-        "Blackrock|Louth": [
-            53.9621,
-            -6.3664
-        ],
-        "Blanchardstown|Dublin": [
-            53.3845,
-            -6.3829
-        ],
-        "Blarney|Cork": [
-            51.9325,
-            -8.5681
-        ],
-        "Blessington|Wicklow": [
-            53.1726,
-            -6.5331
-        ],
-        "Booterstown|Dublin": [
-            53.31,
-            -6.1952
-        ],
-        "Borris|Carlow": [
-            52.5988,
-            -6.9202
-        ],
-        "Boyle|Roscommon": [
-            53.9907,
-            -8.2665
-        ],
-        "Bray|Wicklow": [
-            53.2015,
-            -6.1105
-        ],
-        "Bunclody|Wexford": [
-            52.6551,
-            -6.6521
-        ],
-        "Buncrana|Donegal": [
-            55.1354,
-            -7.4531
-        ],
-        "Bundoran|Donegal": [
-            54.4789,
-            -8.2783
-        ],
-        "Cabinteely|Dublin": [
-            53.2613,
-            -6.1506
-        ],
-        "Cahersiveen|Kerry": [
-            51.9472,
-            -10.2238
-        ],
-        "Cahir|Tipperary": [
-            52.3779,
-            -7.9226
-        ],
-        "Callan|Kilkenny": [
-            52.5446,
-            -7.3901
-        ],
-        "Carlingford|Louth": [
-            54.0411,
-            -6.1865
-        ],
-        "Carlow|Carlow": [
-            52.8408,
-            -6.9261
-        ],
-        "Carndonagh|Donegal": [
-            55.2513,
-            -7.2611
-        ],
-        "Carrick-on-Shannon|Leitrim": [
-            53.9441,
-            -8.0953
-        ],
-        "Carrick-on-Suir|Tipperary": [
-            52.3492,
-            -7.4131
-        ],
-        "Carrickmacross|Monaghan": [
-            53.977,
-            -6.7194
-        ],
-        "Carrigaline|Cork": [
-            51.815,
-            -8.3923
-        ],
-        "Cashel|Tipperary": [
-            52.5167,
-            -7.8879
-        ],
-        "Castlebar|Mayo": [
-            53.8568,
-            -9.298
-        ],
-        "Castleblayney|Monaghan": [
-            54.1202,
-            -6.7404
-        ],
-        "Castlecomer|Kilkenny": [
-            52.8061,
-            -7.2106
-        ],
-        "Castleconnell|Limerick": [
-            52.7131,
-            -8.4979
-        ],
-        "Castleisland|Kerry": [
-            52.2312,
-            -9.4637
-        ],
-        "Castleknock|Dublin": [
-            53.373,
-            -6.3625
-        ],
-        "Castlerea|Roscommon": [
-            53.7616,
-            -8.4858
-        ],
-        "Cavan|Cavan": [
-            53.9911,
-            -7.3603
-        ],
-        "Celbridge|Kildare": [
-            53.3383,
-            -6.5396
-        ],
-        "Charlestown|Mayo": [
-            53.9642,
-            -8.7942
-        ],
-        "Clane|Kildare": [
-            53.2912,
-            -6.6861
-        ],
-        "Clara|Offaly": [
-            53.3398,
-            -7.6164
-        ],
-        "Claremorris|Mayo": [
-            53.7197,
-            -8.9988
-        ],
-        "Clifden|Galway": [
-            53.4885,
-            -10.0211
-        ],
-        "Clonakilty|Cork": [
-            51.6232,
-            -8.8914
-        ],
-        "Clondalkin|Dublin": [
-            53.322,
-            -6.3943
-        ],
-        "Clones|Monaghan": [
-            54.1792,
-            -7.2321
-        ],
-        "Clonmel|Tipperary": [
-            52.3611,
-            -7.6992
-        ],
-        "Clontarf|Dublin": [
-            53.3608,
-            -6.1969
-        ],
-        "Cobh|Cork": [
-            51.8502,
-            -8.2951
-        ],
-        "Collooney|Sligo": [
-            54.1837,
-            -8.4925
-        ],
-        "Cootehill|Cavan": [
-            54.0725,
-            -7.0823
-        ],
-        "Cork City|Cork": [
-            51.8898,
-            -8.4654
-        ],
-        "Courtown|Wexford": [
-            52.6448,
-            -6.2278
-        ],
-        "Dalkey|Dublin": [
-            53.2755,
-            -6.1026
-        ],
-        "Dingle|Kerry": [
-            52.1415,
-            -10.2895
-        ],
-        "Donabate|Dublin": [
-            53.4857,
-            -6.1513
-        ],
-        "Donegal Town|Donegal": [
-            54.6538,
-            -8.1103
-        ],
-        "Drogheda|Louth": [
-            53.715,
-            -6.3524
-        ],
-        "Drumshanbo|Leitrim": [
-            54.0467,
-            -8.0402
-        ],
-        "Dublin City Centre|Dublin": [
-            53.3488,
-            -6.2432
-        ],
-        "Duleek|Meath": [
-            53.6563,
-            -6.4147
-        ],
-        "Dunboyne|Meath": [
-            53.4194,
-            -6.476
-        ],
-        "Dundalk|Louth": [
-            54.0046,
-            -6.4009
-        ],
-        "Dungarvan|Waterford": [
-            52.0897,
-            -7.621
-        ],
-        "Dungloe|Donegal": [
-            54.9507,
-            -8.3597
-        ],
-        "Dunleer|Louth": [
-            53.8316,
-            -6.3951
-        ],
-        "Dún Laoghaire|Dublin": [
-            53.2923,
-            -6.136
-        ],
-        "Edenderry|Offaly": [
-            53.3434,
-            -7.0489
-        ],
-        "Edgeworthstown|Longford": [
-            53.6888,
-            -7.6031
-        ],
-        "Enfield|Meath": [
-            53.4162,
-            -6.8342
-        ],
-        "Enniscorthy|Wexford": [
-            52.5046,
-            -6.5663
-        ],
-        "Enniscrone|Sligo": [
-            54.2132,
-            -9.0935
-        ],
-        "Enniskerry|Wicklow": [
-            53.1927,
-            -6.1704
-        ],
-        "Ennistymon|Clare": [
-            52.9401,
-            -9.2934
-        ],
-        "Ennis|Clare": [
-            52.8435,
-            -8.9837
-        ],
-        "Ferbane|Offaly": [
-            53.2716,
-            -7.8278
-        ],
-        "Fermoy|Cork": [
-            52.1382,
-            -8.2752
-        ],
-        "Finglas|Dublin": [
-            53.3892,
-            -6.2969
-        ],
-        "Foxford|Mayo": [
-            53.9829,
-            -9.1365
-        ],
-        "Foxrock|Dublin": [
-            53.2668,
-            -6.1838
-        ],
-        "Galway City|Galway": [
-            53.2842,
-            -9.0378
-        ],
-        "Glasthule|Dublin": [
-            53.2872,
-            -6.1234
-        ],
-        "Gorey|Wexford": [
-            52.6712,
-            -6.292
-        ],
-        "Gort|Galway": [
-            53.0672,
-            -8.8142
-        ],
-        "Graiguenamanagh|Kilkenny": [
-            52.552,
-            -6.9914
-        ],
-        "Granard|Longford": [
-            53.7794,
-            -7.491
-        ],
-        "Greystones|Wicklow": [
-            53.1449,
-            -6.0632
-        ],
-        "Howth|Dublin": [
-            53.3858,
-            -6.0651
-        ],
-        "Kells|Meath": [
-            53.7272,
-            -6.8768
-        ],
-        "Kenmare|Kerry": [
-            51.8791,
-            -9.584
-        ],
-        "Kilbeggan|Westmeath": [
-            53.3695,
-            -7.5027
-        ],
-        "Kilcock|Kildare": [
-            53.399,
-            -6.6689
-        ],
-        "Kilcoole|Wicklow": [
-            53.1069,
-            -6.041
-        ],
-        "Kildare|Kildare": [
-            53.1568,
-            -6.9117
-        ],
-        "Kilkee|Clare": [
-            52.6792,
-            -9.6442
-        ],
-        "Kilkenny|Kilkenny": [
-            52.6506,
-            -7.2514
-        ],
-        "Killaloe|Clare": [
-            52.8051,
-            -8.4459
-        ],
-        "Killarney|Kerry": [
-            52.0596,
-            -9.5053
-        ],
-        "Killiney|Dublin": [
-            53.2554,
-            -6.113
-        ],
-        "Killorglin|Kerry": [
-            52.1062,
-            -9.7868
-        ],
-        "Killybegs|Donegal": [
-            54.6362,
-            -8.4443
-        ],
-        "Kilmallock|Limerick": [
-            52.4006,
-            -8.5712
-        ],
-        "Kilrush|Clare": [
-            52.6397,
-            -9.4833
-        ],
-        "Kingscourt|Cavan": [
-            53.905,
-            -6.8047
-        ],
-        "Kinnegad|Westmeath": [
-            53.4548,
-            -7.1012
-        ],
-        "Kinsale|Cork": [
-            51.7057,
-            -8.523
-        ],
-        "Lahinch|Clare": [
-            52.9321,
-            -9.3459
-        ],
-        "Lanesborough|Longford": [
-            53.6729,
-            -7.9896
-        ],
-        "Laytown|Meath": [
-            53.6795,
-            -6.2428
-        ],
-        "Leighlinbridge|Carlow": [
-            52.736,
-            -6.9766
-        ],
-        "Leixlip|Kildare": [
-            53.3645,
-            -6.4897
-        ],
-        "Letterkenny|Donegal": [
-            54.9518,
-            -7.7354
-        ],
-        "Lifford|Donegal": [
-            54.8327,
-            -7.4835
-        ],
-        "Limerick City|Limerick": [
-            52.6486,
-            -8.4523
-        ],
-        "Lismore|Waterford": [
-            52.1368,
-            -7.9331
-        ],
-        "Listowel|Kerry": [
-            52.4472,
-            -9.4847
-        ],
-        "Longford|Longford": [
-            53.7278,
-            -7.7964
-        ],
-        "Loughrea|Galway": [
-            53.1982,
-            -8.5691
-        ],
-        "Lucan|Dublin": [
-            53.3567,
-            -6.4502
-        ],
-        "Macroom|Cork": [
-            51.905,
-            -8.9599
-        ],
-        "Malahide|Dublin": [
-            53.4508,
-            -6.1537
-        ],
-        "Mallow|Cork": [
-            52.1389,
-            -8.6551
-        ],
-        "Manorhamilton|Leitrim": [
-            54.304,
-            -8.1754
-        ],
-        "Maynooth|Kildare": [
-            53.383,
-            -6.5923
-        ],
-        "Midleton|Cork": [
-            51.9212,
-            -8.1757
-        ],
-        "Mitchelstown|Cork": [
-            52.2595,
-            -8.2378
-        ],
-        "Moate|Westmeath": [
-            53.3962,
-            -7.7241
-        ],
-        "Mohill|Leitrim": [
-            53.9218,
-            -7.8653
-        ],
-        "Monaghan|Monaghan": [
-            54.2486,
-            -6.9689
-        ],
-        "Monasterevin|Kildare": [
-            53.1427,
-            -7.0635
-        ],
-        "Mountmellick|Laois": [
-            53.1175,
-            -7.3252
-        ],
-        "Mountrath|Laois": [
-            53.0012,
-            -7.4743
-        ],
-        "Moville|Donegal": [
-            55.1889,
-            -7.0405
-        ],
-        "Muine Bheag|Carlow": [
-            52.7018,
-            -6.9567
-        ],
-        "Mullingar|Westmeath": [
-            53.5258,
-            -7.3413
-        ],
-        "Naas|Kildare": [
-            53.2215,
-            -6.6574
-        ],
-        "Navan|Meath": [
-            53.6531,
-            -6.684
-        ],
-        "Nenagh|Tipperary": [
-            52.8619,
-            -8.1967
-        ],
-        "New Ross|Wexford": [
-            52.3956,
-            -6.9446
-        ],
-        "Newbridge|Kildare": [
-            53.1801,
-            -6.7982
-        ],
-        "Newcastle West|Limerick": [
-            52.4489,
-            -9.0529
-        ],
-        "Newtownmountkennedy|Wicklow": [
-            53.0895,
-            -6.111
-        ],
-        "Oranmore|Galway": [
-            53.2755,
-            -8.9473
-        ],
-        "Oughterard|Galway": [
-            53.4258,
-            -9.3195
-        ],
-        "Palmerstown|Dublin": [
-            53.356,
-            -6.3705
-        ],
-        "Portarlington|Laois": [
-            53.1622,
-            -7.1911
-        ],
-        "Portlaoise|Laois": [
-            53.034,
-            -7.3001
-        ],
-        "Portlaw|Waterford": [
-            52.3036,
-            -7.3432
-        ],
-        "Portmarnock|Dublin": [
-            53.4177,
-            -6.1513
-        ],
-        "Portumna|Galway": [
-            53.0923,
-            -8.2193
-        ],
-        "Ranelagh|Dublin": [
-            53.3252,
-            -6.2551
-        ],
-        "Rathdrum|Wicklow": [
-            52.9305,
-            -6.2261
-        ],
-        "Rathkeale|Limerick": [
-            52.5236,
-            -8.9377
-        ],
-        "Rathmines|Dublin": [
-            53.3265,
-            -6.2649
-        ],
-        "Rathvilly|Carlow": [
-            52.8808,
-            -6.6945
-        ],
-        "Ratoath|Meath": [
-            53.5073,
-            -6.4641
-        ],
-        "Roscommon|Roscommon": [
-            53.6312,
-            -8.1907
-        ],
-        "Roscrea|Tipperary": [
-            52.9552,
-            -7.799
-        ],
-        "Rosslare|Wexford": [
-            52.2736,
-            -6.3869
-        ],
-        "Saggart|Dublin": [
-            53.2588,
-            -6.4443
-        ],
-        "Sallins|Kildare": [
-            53.249,
-            -6.6657
-        ],
-        "Sandycove|Dublin": [
-            53.2859,
-            -6.1156
-        ],
-        "Scariff|Clare": [
-            52.9155,
-            -8.5396
-        ],
-        "Shankill|Dublin": [
-            53.2367,
-            -6.117
-        ],
-        "Shannon|Clare": [
-            52.6913,
-            -8.6186
-        ],
-        "Sixmilebridge|Clare": [
-            52.7381,
-            -8.7858
-        ],
-        "Skerries|Dublin": [
-            53.574,
-            -6.1192
-        ],
-        "Skibbereen|Cork": [
-            51.5478,
-            -9.2662
-        ],
-        "Sligo|Sligo": [
-            54.2721,
-            -8.4751
-        ],
-        "Stillorgan|Dublin": [
-            53.2888,
-            -6.1983
-        ],
-        "Stradbally|Laois": [
-            53.0161,
-            -7.15
-        ],
-        "Strandhill|Sligo": [
-            54.27,
-            -8.5943
-        ],
-        "Stranorlar|Donegal": [
-            54.8045,
-            -7.7692
-        ],
-        "Strokestown|Roscommon": [
-            53.7766,
-            -8.1022
-        ],
-        "Swinford|Mayo": [
-            53.9435,
-            -8.9498
-        ],
-        "Swords|Dublin": [
-            53.4595,
-            -6.2192
-        ],
-        "Tallaght|Dublin": [
-            53.2878,
-            -6.3624
-        ],
-        "Tallow|Waterford": [
-            52.0675,
-            -7.9967
-        ],
-        "Templemore|Tipperary": [
-            52.7947,
-            -7.8339
-        ],
-        "Templeogue|Dublin": [
-            53.2979,
-            -6.3043
-        ],
-        "Thomastown|Kilkenny": [
-            52.5232,
-            -7.1489
-        ],
-        "Thurles|Tipperary": [
-            52.6767,
-            -7.8219
-        ],
-        "Tipperary|Tipperary": [
-            52.4735,
-            -8.1614
-        ],
-        "Tralee|Kerry": [
-            52.2692,
-            -9.7057
-        ],
-        "Tramore|Waterford": [
-            52.1836,
-            -7.1496
-        ],
-        "Trim|Meath": [
-            53.5543,
-            -6.7898
-        ],
-        "Tuam|Galway": [
-            53.5148,
-            -8.8513
-        ],
-        "Tubbercurry|Sligo": [
-            54.0539,
-            -8.7306
-        ],
-        "Tullamore|Offaly": [
-            53.2744,
-            -7.4927
-        ],
-        "Tullow|Carlow": [
-            52.8031,
-            -6.7377
-        ],
-        "Urlingford|Kilkenny": [
-            52.7242,
-            -7.5727
-        ],
-        "Virginia|Cavan": [
-            53.8351,
-            -7.0832
-        ],
-        "Waterford City|Waterford": [
-            52.263,
-            -7.115
-        ],
-        "Westport|Mayo": [
-            53.8001,
-            -9.5202
-        ],
-        "Wexford|Wexford": [
-            52.3368,
-            -6.4601
-        ],
-        "Wicklow|Wicklow": [
-            52.9802,
-            -6.0414
-        ],
-        "Youghal|Cork": [
-            51.9495,
-            -7.8432
-        ]
-    }
+  "states": {
+    "Andaman and Nicobar Islands": [
+      11.6661,
+      92.7464
+    ],
+    "Andhra Pradesh": [
+      17.7331,
+      83.3162
+    ],
+    "Arunachal Pradesh": [
+      27.0869,
+      93.6099
+    ],
+    "Assam": [
+      26.1356,
+      91.8007
+    ],
+    "Bihar": [
+      25.5941,
+      85.1356
+    ],
+    "Chandigarh": [
+      30.7363,
+      76.7884
+    ],
+    "Chhattisgarh": [
+      21.2333,
+      81.6333
+    ],
+    "Dadra and Nagar Haveli and Daman and Diu": [
+      20.4143,
+      72.8324
+    ],
+    "Delhi": [
+      28.6214,
+      77.2148
+    ],
+    "Goa": [
+      15.4957,
+      73.8262
+    ],
+    "Gujarat": [
+      23.2167,
+      72.6833
+    ],
+    "Haryana": [
+      28.4112,
+      77.3132
+    ],
+    "Himachal Pradesh": [
+      31.1044,
+      77.1666
+    ],
+    "Jammu and Kashmir": [
+      34.0857,
+      74.8055
+    ],
+    "Jharkhand": [
+      23.3432,
+      85.3094
+    ],
+    "Karnataka": [
+      12.9719,
+      77.5937
+    ],
+    "Kerala": [
+      8.4855,
+      76.9492
+    ],
+    "Ladakh": [
+      34.5577,
+      76.1262
+    ],
+    "Lakshadweep": [
+      10.5669,
+      72.642
+    ],
+    "Madhya Pradesh": [
+      23.2547,
+      77.4029
+    ],
+    "Maharashtra": [
+      19.0728,
+      72.8826
+    ],
+    "Manipur": [
+      24.8081,
+      93.9442
+    ],
+    "Meghalaya": [
+      25.5689,
+      91.8831
+    ],
+    "Mizoram": [
+      23.7289,
+      92.7179
+    ],
+    "Nagaland": [
+      25.6747,
+      94.111
+    ],
+    "Odisha": [
+      20.2724,
+      85.8338
+    ],
+    "Puducherry": [
+      11.9338,
+      79.8298
+    ],
+    "Punjab": [
+      30.912,
+      75.8538
+    ],
+    "Rajasthan": [
+      26.9196,
+      75.7878
+    ],
+    "Sikkim": [
+      27.3257,
+      88.6122
+    ],
+    "Tamil Nadu": [
+      13.0878,
+      80.2785
+    ],
+    "Telangana": [
+      17.384,
+      78.4564
+    ],
+    "Tripura": [
+      23.8361,
+      91.2794
+    ],
+    "Uttar Pradesh": [
+      26.8393,
+      80.9231
+    ],
+    "Uttarakhand": [
+      30.3244,
+      78.0339
+    ],
+    "West Bengal": [
+      22.5626,
+      88.363
+    ]
+  },
+  "towns": {
+    "Agartala|Tripura": [
+      23.8361,
+      91.2794
+    ],
+    "Agatti|Lakshadweep": [
+      10.8352,
+      72.1822
+    ],
+    "Agra|Uttar Pradesh": [
+      27.1833,
+      78.0167
+    ],
+    "Ahmedabad|Gujarat": [
+      23.0258,
+      72.5873
+    ],
+    "Aizawl|Mizoram": [
+      23.7289,
+      92.7179
+    ],
+    "Ajmer|Rajasthan": [
+      26.4521,
+      74.6387
+    ],
+    "Alappuzha|Kerala": [
+      9.49,
+      76.3264
+    ],
+    "Aligarh|Uttar Pradesh": [
+      27.8815,
+      78.0746
+    ],
+    "Along|Arunachal Pradesh": [
+      28.1695,
+      94.8006
+    ],
+    "Alwar|Rajasthan": [
+      27.5625,
+      76.625
+    ],
+    "Amini|Lakshadweep": [
+      11.1141,
+      72.7191
+    ],
+    "Amli|Dadra and Nagar Haveli and Daman and Diu": [
+      20.2833,
+      73.0167
+    ],
+    "Amritsar|Punjab": [
+      31.6223,
+      74.8753
+    ],
+    "Anantnag|Jammu and Kashmir": [
+      33.7307,
+      75.1542
+    ],
+    "Andrott|Lakshadweep": [
+      10.8119,
+      73.6741
+    ],
+    "Ariyankuppam|Puducherry": [
+      11.8953,
+      79.8071
+    ],
+    "Arrah|Bihar": [
+      25.5563,
+      84.6633
+    ],
+    "Asansol|West Bengal": [
+      23.6833,
+      86.9833
+    ],
+    "Atawa|Chandigarh": [
+      30.7275,
+      76.7511
+    ],
+    "Baddi|Himachal Pradesh": [
+      30.9578,
+      76.7914
+    ],
+    "Bajwara|Chandigarh": [
+      30.7328,
+      76.7626
+    ],
+    "Ballari|Karnataka": [
+      15.142,
+      76.924
+    ],
+    "Bamboo Flat|Andaman and Nicobar Islands": [
+      11.7,
+      92.7167
+    ],
+    "Baramula|Jammu and Kashmir": [
+      34.209,
+      74.3428
+    ],
+    "Bathinda|Punjab": [
+      30.2075,
+      74.9389
+    ],
+    "Behlana|Chandigarh": [
+      30.6781,
+      76.8006
+    ],
+    "Belagavi|Karnataka": [
+      15.8521,
+      74.5045
+    ],
+    "Belonia|Tripura": [
+      23.2518,
+      91.4541
+    ],
+    "Bengaluru|Karnataka": [
+      12.9719,
+      77.5937
+    ],
+    "Bhagalpur|Bihar": [
+      25.2445,
+      86.9718
+    ],
+    "Bhatpara|West Bengal": [
+      22.8664,
+      88.4011
+    ],
+    "Bhavnagar|Gujarat": [
+      21.7629,
+      72.1533
+    ],
+    "Bhetia|Jharkhand": [
+      22.7932,
+      86.141
+    ],
+    "Bhilai|Chhattisgarh": [
+      21.2092,
+      81.4285
+    ],
+    "Bhilwara|Rajasthan": [
+      25.3471,
+      74.6408
+    ],
+    "Bhopal|Madhya Pradesh": [
+      23.2547,
+      77.4029
+    ],
+    "Bhubaneswar|Odisha": [
+      20.2724,
+      85.8338
+    ],
+    "Bihar Sharif|Bihar": [
+      25.2008,
+      85.5239
+    ],
+    "Bijwari Bakhta|Chandigarh": [
+      30.7407,
+      76.7504
+    ],
+    "Bikaner|Rajasthan": [
+      28.0176,
+      73.3149
+    ],
+    "Bilaspur|Chhattisgarh": [
+      22.08,
+      82.1554
+    ],
+    "Bilimora|Gujarat": [
+      20.7696,
+      72.9613
+    ],
+    "Bisalgarh|Tripura": [
+      23.676,
+      91.2832
+    ],
+    "Bokaro|Jharkhand": [
+      23.6693,
+      86.1516
+    ],
+    "Brahmapur|Odisha": [
+      19.3115,
+      84.7929
+    ],
+    "Campbell Bay|Andaman and Nicobar Islands": [
+      7.0083,
+      93.8942
+    ],
+    "Chalunka|Ladakh": [
+      34.8202,
+      76.9421
+    ],
+    "Chandigarh|Chandigarh": [
+      30.7363,
+      76.7884
+    ],
+    "Chennai|Tamil Nadu": [
+      13.0878,
+      80.2785
+    ],
+    "Choglamsar|Ladakh": [
+      34.1116,
+      77.5879
+    ],
+    "Chumukedima|Nagaland": [
+      25.8248,
+      93.7759
+    ],
+    "Churachandpur|Manipur": [
+      24.3335,
+      93.67
+    ],
+    "Coimbatore|Tamil Nadu": [
+      11.0055,
+      76.9661
+    ],
+    "Curchorem|Goa": [
+      15.2635,
+      74.1088
+    ],
+    "Cuttack|Odisha": [
+      20.465,
+      85.8793
+    ],
+    "Dabhel|Dadra and Nagar Haveli and Daman and Diu": [
+      20.4095,
+      72.8834
+    ],
+    "Daman|Dadra and Nagar Haveli and Daman and Diu": [
+      20.4143,
+      72.8324
+    ],
+    "Darbhanga|Bihar": [
+      26.1522,
+      85.8971
+    ],
+    "Dariya|Chandigarh": [
+      30.6986,
+      76.8176
+    ],
+    "Davangere|Karnataka": [
+      14.4669,
+      75.9269
+    ],
+    "Dehradun|Uttarakhand": [
+      30.3244,
+      78.0339
+    ],
+    "Delhi|Delhi": [
+      28.6519,
+      77.2315
+    ],
+    "Deoghar|Jharkhand": [
+      24.4898,
+      86.699
+    ],
+    "Dewas|Madhya Pradesh": [
+      22.9658,
+      76.0553
+    ],
+    "Dhanbad|Jharkhand": [
+      23.7976,
+      86.4299
+    ],
+    "Dharamsala|Himachal Pradesh": [
+      32.2201,
+      76.3201
+    ],
+    "Dharmanagar|Tripura": [
+      24.3667,
+      92.1667
+    ],
+    "Dibrugarh|Assam": [
+      27.4799,
+      94.9084
+    ],
+    "Diglipur|Andaman and Nicobar Islands": [
+      13.2667,
+      93.0
+    ],
+    "Dimapur|Nagaland": [
+      25.9117,
+      93.7217
+    ],
+    "Dispur|Assam": [
+      26.1356,
+      91.8007
+    ],
+    "Diu|Dadra and Nagar Haveli and Daman and Diu": [
+      20.7141,
+      70.9822
+    ],
+    "Durgapur|West Bengal": [
+      23.5158,
+      87.308
+    ],
+    "Durg|Chhattisgarh": [
+      21.1915,
+      81.2762
+    ],
+    "Faridabad|Haryana": [
+      28.4112,
+      77.3132
+    ],
+    "Gandhinagar|Gujarat": [
+      23.2167,
+      72.6833
+    ],
+    "Gangtok|Sikkim": [
+      27.3257,
+      88.6122
+    ],
+    "Garacharma|Andaman and Nicobar Islands": [
+      11.6137,
+      92.7036
+    ],
+    "Gaya|Bihar": [
+      24.7969,
+      85.0038
+    ],
+    "Ghaziabad|Uttar Pradesh": [
+      28.6654,
+      77.4391
+    ],
+    "Gundupalaiyam|Puducherry": [
+      11.941,
+      79.8029
+    ],
+    "Guntur|Andhra Pradesh": [
+      16.2997,
+      80.4573
+    ],
+    "Gurugram|Haryana": [
+      28.4601,
+      77.0263
+    ],
+    "Guwahati|Assam": [
+      26.1844,
+      91.7458
+    ],
+    "Gwalior|Madhya Pradesh": [
+      26.2298,
+      78.1734
+    ],
+    "Gyalshing|Sikkim": [
+      27.2895,
+      88.2576
+    ],
+    "Haldwani|Uttarakhand": [
+      29.2225,
+      79.5286
+    ],
+    "Haridwar|Uttarakhand": [
+      29.9479,
+      78.1603
+    ],
+    "Hisar|Haryana": [
+      29.1539,
+      75.7229
+    ],
+    "Hoshiarpur|Punjab": [
+      31.5372,
+      75.9127
+    ],
+    "Howrah|West Bengal": [
+      22.5769,
+      88.3186
+    ],
+    "Hubballi|Karnataka": [
+      15.3478,
+      75.1338
+    ],
+    "Hyderabad|Telangana": [
+      17.384,
+      78.4564
+    ],
+    "Imphal|Manipur": [
+      24.8081,
+      93.9442
+    ],
+    "Indore|Madhya Pradesh": [
+      22.7179,
+      75.8333
+    ],
+    "Itanagar|Arunachal Pradesh": [
+      27.0869,
+      93.6099
+    ],
+    "Jabalpur|Madhya Pradesh": [
+      23.167,
+      79.9501
+    ],
+    "Jagdalpur|Chhattisgarh": [
+      19.0814,
+      82.0213
+    ],
+    "Jaipur|Rajasthan": [
+      26.9196,
+      75.7878
+    ],
+    "Jalandhar|Punjab": [
+      31.3256,
+      75.5792
+    ],
+    "Jammu|Jammu and Kashmir": [
+      32.7353,
+      74.8617
+    ],
+    "Jamnagar|Gujarat": [
+      22.4729,
+      70.0667
+    ],
+    "Jamshedpur|Jharkhand": [
+      22.8028,
+      86.1855
+    ],
+    "Jining|Arunachal Pradesh": [
+      28.2163,
+      94.8539
+    ],
+    "Jodhpur|Rajasthan": [
+      26.2684,
+      73.0059
+    ],
+    "Jorethang|Sikkim": [
+      27.107,
+      88.3233
+    ],
+    "Jorhat|Assam": [
+      26.7575,
+      94.2031
+    ],
+    "Jowai|Meghalaya": [
+      25.436,
+      92.1913
+    ],
+    "Kadmat|Lakshadweep": [
+      11.2247,
+      72.7748
+    ],
+    "Kailashahar|Tripura": [
+      24.332,
+      92.0039
+    ],
+    "Kakching|Manipur": [
+      24.4982,
+      93.9813
+    ],
+    "Kakinada|Andhra Pradesh": [
+      16.9604,
+      82.2381
+    ],
+    "Kalaburagi|Karnataka": [
+      17.3358,
+      76.8376
+    ],
+    "Kalka|Himachal Pradesh": [
+      30.8398,
+      76.9407
+    ],
+    "Kallakurichi|Tamil Nadu": [
+      11.7338,
+      78.9592
+    ],
+    "Kalpeni|Lakshadweep": [
+      10.0826,
+      73.6432
+    ],
+    "Kanayannur|Kerala": [
+      9.9667,
+      76.2667
+    ],
+    "Kanpur|Uttar Pradesh": [
+      26.4652,
+      80.3498
+    ],
+    "Karaikal|Puducherry": [
+      10.9167,
+      79.8333
+    ],
+    "Karawalnagar|Delhi": [
+      28.7271,
+      77.2705
+    ],
+    "Kargil|Ladakh": [
+      34.5577,
+      76.1262
+    ],
+    "Karimnagar|Telangana": [
+      18.4392,
+      79.1286
+    ],
+    "Karnal|Haryana": [
+      29.692,
+      76.9845
+    ],
+    "Karol Bagh|Delhi": [
+      28.6514,
+      77.1907
+    ],
+    "Kashipur|Uttarakhand": [
+      29.214,
+      78.9569
+    ],
+    "Kathua|Jammu and Kashmir": [
+      32.3694,
+      75.5254
+    ],
+    "Kavaratti|Lakshadweep": [
+      10.5669,
+      72.642
+    ],
+    "Keirao Bitra|Manipur": [
+      24.7111,
+      93.9746
+    ],
+    "Khali Kachigam|Dadra and Nagar Haveli and Daman and Diu": [
+      20.3833,
+      72.8667
+    ],
+    "Khowai|Tripura": [
+      24.0796,
+      91.5997
+    ],
+    "Khuda Alisher|Chandigarh": [
+      30.7747,
+      76.8118
+    ],
+    "Kiltan|Lakshadweep": [
+      11.4858,
+      73.0038
+    ],
+    "Kirari Sulemannagar|Delhi": [
+      28.6974,
+      77.0648
+    ],
+    "Kochi|Kerala": [
+      9.9399,
+      76.2602
+    ],
+    "Kohima|Nagaland": [
+      25.6747,
+      94.111
+    ],
+    "Kolasib|Mizoram": [
+      24.2239,
+      92.6787
+    ],
+    "Kolkata|West Bengal": [
+      22.5626,
+      88.363
+    ],
+    "Kollam|Kerala": [
+      8.8811,
+      76.5847
+    ],
+    "Korba|Chhattisgarh": [
+      22.3458,
+      82.6963
+    ],
+    "Kota|Rajasthan": [
+      25.1825,
+      75.8391
+    ],
+    "Kozhikode|Kerala": [
+      11.248,
+      75.7804
+    ],
+    "Kukatpally|Telangana": [
+      17.4849,
+      78.4138
+    ],
+    "Kunnimangalam|Puducherry": [
+      12.0735,
+      75.2412
+    ],
+    "Kurnool|Andhra Pradesh": [
+      15.8289,
+      78.036
+    ],
+    "Kurumbapet|Puducherry": [
+      11.9398,
+      79.7713
+    ],
+    "Lal Bahadur Nagar|Telangana": [
+      17.3477,
+      78.5576
+    ],
+    "Lawngtlai|Mizoram": [
+      22.5325,
+      92.899
+    ],
+    "Leh|Ladakh": [
+      34.165,
+      77.584
+    ],
+    "Lucknow|Uttar Pradesh": [
+      26.8393,
+      80.9231
+    ],
+    "Ludhiana|Punjab": [
+      30.912,
+      75.8538
+    ],
+    "Lunglei|Mizoram": [
+      22.8925,
+      92.7422
+    ],
+    "Madayi|Puducherry": [
+      12.0343,
+      75.2378
+    ],
+    "Madgaon|Goa": [
+      15.275,
+      73.9579
+    ],
+    "Madurai|Tamil Nadu": [
+      9.919,
+      78.1195
+    ],
+    "Maheshtala|West Bengal": [
+      22.5086,
+      88.2532
+    ],
+    "Mandi|Himachal Pradesh": [
+      31.7119,
+      76.9327
+    ],
+    "Mangaluru|Karnataka": [
+      12.9172,
+      74.856
+    ],
+    "Mangan|Sikkim": [
+      27.5097,
+      88.5221
+    ],
+    "Mango|Jharkhand": [
+      22.8275,
+      86.2164
+    ],
+    "Mankachar|Meghalaya": [
+      25.5335,
+      89.8637
+    ],
+    "Mapusa|Goa": [
+      15.5915,
+      73.809
+    ],
+    "Mauli Jagran|Chandigarh": [
+      30.6919,
+      76.8259
+    ],
+    "Mawlai-Mawiong|Meghalaya": [
+      25.6232,
+      91.8817
+    ],
+    "Mayabandar|Andaman and Nicobar Islands": [
+      12.9095,
+      92.9035
+    ],
+    "Mayang Imphal|Manipur": [
+      24.61,
+      93.8887
+    ],
+    "Meerut|Uttar Pradesh": [
+      28.98,
+      77.7064
+    ],
+    "Minicoy|Lakshadweep": [
+      8.289,
+      73.0617
+    ],
+    "Mohali|Punjab": [
+      30.68,
+      76.7221
+    ],
+    "Mokokchung|Nagaland": [
+      26.3248,
+      94.5183
+    ],
+    "Mon|Nagaland": [
+      26.7358,
+      95.0584
+    ],
+    "Mormugao|Goa": [
+      15.3891,
+      73.8149
+    ],
+    "Mulugu|Telangana": [
+      18.191,
+      79.943
+    ],
+    "Mumbai|Maharashtra": [
+      19.0728,
+      72.8826
+    ],
+    "Muzaffarpur|Bihar": [
+      26.1226,
+      85.3906
+    ],
+    "Mysuru|Karnataka": [
+      12.2979,
+      76.6393
+    ],
+    "Nagaon|Assam": [
+      26.35,
+      92.6667
+    ],
+    "Nagpur|Maharashtra": [
+      21.1463,
+      79.0849
+    ],
+    "Nahan|Himachal Pradesh": [
+      30.5603,
+      77.2943
+    ],
+    "Naharlagun|Arunachal Pradesh": [
+      27.1047,
+      93.6952
+    ],
+    "Najafgarh|Delhi": [
+      28.6092,
+      76.9798
+    ],
+    "Nambol|Manipur": [
+      24.6956,
+      93.8197
+    ],
+    "Namchi|Sikkim": [
+      27.1649,
+      88.3638
+    ],
+    "Namsai|Arunachal Pradesh": [
+      27.669,
+      95.864
+    ],
+    "Nani Daman|Dadra and Nagar Haveli and Daman and Diu": [
+      20.4143,
+      72.8324
+    ],
+    "Narela|Delhi": [
+      28.8527,
+      77.0929
+    ],
+    "Naroli|Dadra and Nagar Haveli and Daman and Diu": [
+      20.2735,
+      72.9417
+    ],
+    "Nashik|Maharashtra": [
+      19.9973,
+      73.791
+    ],
+    "Navi Mumbai|Maharashtra": [
+      19.0368,
+      73.0158
+    ],
+    "Nellore|Andhra Pradesh": [
+      14.4499,
+      79.987
+    ],
+    "New Delhi|Delhi": [
+      28.6214,
+      77.2148
+    ],
+    "Ngur|Mizoram": [
+      23.538,
+      93.3732
+    ],
+    "Nizamabad|Telangana": [
+      18.6715,
+      78.0988
+    ],
+    "Nongstoin|Meghalaya": [
+      25.517,
+      91.2648
+    ],
+    "Nongthymmai|Meghalaya": [
+      25.5637,
+      91.9064
+    ],
+    "Nowrangapur|Odisha": [
+      19.2311,
+      82.5483
+    ],
+    "Padam|Ladakh": [
+      33.4666,
+      76.8849
+    ],
+    "Palakkad|Kerala": [
+      10.7732,
+      76.6537
+    ],
+    "Panipat|Haryana": [
+      29.3875,
+      76.9682
+    ],
+    "Panjim|Goa": [
+      15.4957,
+      73.8262
+    ],
+    "Pasighat|Arunachal Pradesh": [
+      28.0663,
+      95.3268
+    ],
+    "Pathankot|Punjab": [
+      32.2748,
+      75.6529
+    ],
+    "Patiala|Punjab": [
+      30.3362,
+      76.3922
+    ],
+    "Patna|Bihar": [
+      25.5941,
+      85.1356
+    ],
+    "Phusro|Jharkhand": [
+      23.7564,
+      86.0051
+    ],
+    "Pimpri-Chinchwad|Maharashtra": [
+      18.6187,
+      73.8037
+    ],
+    "Pimpri|Maharashtra": [
+      18.6229,
+      73.807
+    ],
+    "Pituk|Ladakh": [
+      34.1391,
+      77.536
+    ],
+    "Ponda|Goa": [
+      15.4034,
+      74.0152
+    ],
+    "Port Blair|Andaman and Nicobar Islands": [
+      11.6661,
+      92.7464
+    ],
+    "Prayagraj|Uttar Pradesh": [
+      25.4448,
+      81.8432
+    ],
+    "Prothrapur|Andaman and Nicobar Islands": [
+      11.618,
+      92.7244
+    ],
+    "Puducherry|Puducherry": [
+      11.9338,
+      79.8298
+    ],
+    "Punasa|Madhya Pradesh": [
+      22.2351,
+      76.3933
+    ],
+    "Pune|Maharashtra": [
+      18.5196,
+      73.8554
+    ],
+    "Puri|Odisha": [
+      19.7982,
+      85.8249
+    ],
+    "Purnia|Bihar": [
+      25.7789,
+      87.4742
+    ],
+    "Raigarh|Chhattisgarh": [
+      21.8976,
+      83.3966
+    ],
+    "Raipur|Chhattisgarh": [
+      21.2333,
+      81.6333
+    ],
+    "Raj-Nandgaon|Chhattisgarh": [
+      21.0969,
+      81.0289
+    ],
+    "Rajamahendravaram|Andhra Pradesh": [
+      17.0052,
+      81.7778
+    ],
+    "Rajkot|Gujarat": [
+      22.2916,
+      70.7932
+    ],
+    "Ramgundam|Telangana": [
+      18.8008,
+      79.4521
+    ],
+    "Ramnagar|Uttarakhand": [
+      29.3925,
+      79.1283
+    ],
+    "Ranchi|Jharkhand": [
+      23.3432,
+      85.3094
+    ],
+    "Rangat|Andaman and Nicobar Islands": [
+      12.506,
+      92.9155
+    ],
+    "Rangpo|Sikkim": [
+      27.1773,
+      88.5336
+    ],
+    "Rasapudipalem|Andhra Pradesh": [
+      17.7331,
+      83.3162
+    ],
+    "Raurkela Industrial Township|Odisha": [
+      22.1999,
+      84.8618
+    ],
+    "Rhenok|Sikkim": [
+      27.1782,
+      88.6467
+    ],
+    "Rishikesh|Uttarakhand": [
+      30.1078,
+      78.2926
+    ],
+    "Rohini|Delhi": [
+      28.7432,
+      77.0678
+    ],
+    "Rohtak|Haryana": [
+      28.8945,
+      76.5892
+    ],
+    "Roorkee|Uttarakhand": [
+      29.8663,
+      77.8912
+    ],
+    "Rourkela|Odisha": [
+      22.225,
+      84.8641
+    ],
+    "Rudrapur|Uttarakhand": [
+      28.98,
+      79.4
+    ],
+    "Saiha|Mizoram": [
+      22.4918,
+      92.9814
+    ],
+    "Saitual|Mizoram": [
+      23.6831,
+      92.9671
+    ],
+    "Sambalpur|Odisha": [
+      21.4653,
+      83.9757
+    ],
+    "Sancoale|Goa": [
+      15.3779,
+      73.9035
+    ],
+    "Satna|Madhya Pradesh": [
+      24.5773,
+      80.8272
+    ],
+    "Seppa|Arunachal Pradesh": [
+      27.3617,
+      93.0399
+    ],
+    "Serchhip|Mizoram": [
+      23.2931,
+      92.8468
+    ],
+    "Shella|Meghalaya": [
+      25.1786,
+      91.6395
+    ],
+    "Shillong|Meghalaya": [
+      25.5689,
+      91.8831
+    ],
+    "Shimla|Himachal Pradesh": [
+      31.1044,
+      77.1666
+    ],
+    "Shyamnagar|West Bengal": [
+      22.8333,
+      88.3667
+    ],
+    "Silchar|Assam": [
+      24.8273,
+      92.7979
+    ],
+    "Siliguri|West Bengal": [
+      26.71,
+      88.4285
+    ],
+    "Silvassa|Dadra and Nagar Haveli and Daman and Diu": [
+      20.2739,
+      72.9967
+    ],
+    "Singtam|Sikkim": [
+      27.2347,
+      88.5017
+    ],
+    "Solan|Himachal Pradesh": [
+      30.9091,
+      77.1087
+    ],
+    "Sonipat|Haryana": [
+      28.9948,
+      77.0194
+    ],
+    "Sopur|Jammu and Kashmir": [
+      34.2867,
+      74.4723
+    ],
+    "Soyibug|Jammu and Kashmir": [
+      34.0768,
+      74.7057
+    ],
+    "Srinagar|Jammu and Kashmir": [
+      34.0857,
+      74.8055
+    ],
+    "Sundarnagar|Himachal Pradesh": [
+      31.5352,
+      76.905
+    ],
+    "Surat|Gujarat": [
+      21.1959,
+      72.8302
+    ],
+    "Teliamura|Tripura": [
+      23.8417,
+      91.6303
+    ],
+    "Teni|Tamil Nadu": [
+      10.0112,
+      77.4777
+    ],
+    "Tezpur|Assam": [
+      26.6333,
+      92.8
+    ],
+    "Tezu|Arunachal Pradesh": [
+      27.9126,
+      96.1288
+    ],
+    "Thane|Maharashtra": [
+      19.197,
+      72.9635
+    ],
+    "Thang|Ladakh": [
+      34.9274,
+      76.7934
+    ],
+    "Thiruvananthapuram|Kerala": [
+      8.4855,
+      76.9492
+    ],
+    "Thoubal|Manipur": [
+      24.6388,
+      93.9964
+    ],
+    "Thrissur|Kerala": [
+      10.5167,
+      76.2167
+    ],
+    "Tinsukia|Assam": [
+      27.489,
+      95.3599
+    ],
+    "Tiruchirappalli|Tamil Nadu": [
+      10.8155,
+      78.6965
+    ],
+    "Tirunelveli|Tamil Nadu": [
+      8.7274,
+      77.6838
+    ],
+    "Tiruppur|Tamil Nadu": [
+      11.1154,
+      77.3546
+    ],
+    "Tuensang|Nagaland": [
+      26.267,
+      94.8242
+    ],
+    "Tura|Meghalaya": [
+      25.5142,
+      90.2024
+    ],
+    "Udaipur|Rajasthan": [
+      24.5858,
+      73.7135
+    ],
+    "Udaipur|Tripura": [
+      23.5333,
+      91.4833
+    ],
+    "Udhampur|Jammu and Kashmir": [
+      32.9243,
+      75.1357
+    ],
+    "Ujjain|Madhya Pradesh": [
+      23.1824,
+      75.7764
+    ],
+    "Ukhrul|Manipur": [
+      25.1196,
+      94.3642
+    ],
+    "Vadodara|Gujarat": [
+      22.2994,
+      73.2081
+    ],
+    "Varanasi|Uttar Pradesh": [
+      25.3167,
+      83.0104
+    ],
+    "Vasco da Gama|Goa": [
+      15.3958,
+      73.8157
+    ],
+    "Vijayawada|Andhra Pradesh": [
+      16.5074,
+      80.6466
+    ],
+    "Villianur|Puducherry": [
+      11.9139,
+      79.7557
+    ],
+    "Visakhapatnam|Andhra Pradesh": [
+      17.6801,
+      83.2016
+    ],
+    "Warangal|Telangana": [
+      18.0,
+      79.5833
+    ],
+    "Wokha|Nagaland": [
+      26.0972,
+      94.2582
+    ],
+    "Yamuna Nagar|Haryana": [
+      30.128,
+      77.2837
+    ],
+    "Zulidok|Ladakh": [
+      34.0549,
+      76.328
+    ],
+    "Zunheboto|Nagaland": [
+      25.9667,
+      94.5167
+    ]
+  }
 }

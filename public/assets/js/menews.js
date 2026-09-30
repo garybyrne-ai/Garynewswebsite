@@ -1,4 +1,4 @@
-/* ME News Ireland — site runtime (no framework, no build step) */
+/* Bharat Wire India — site runtime (no framework, no build step) */
 (function () {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -18,6 +18,12 @@
   window.ME = window.ME || {};
   window.ME.api = api;
   window.ME.esc = esc;
+
+  /* Register the service worker unconditionally so the site installs as an app
+     even before push is configured — push subscription (below) reuses this registration. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
+  }
 
   /* ---------- toast ---------- */
   let toastTimer;
@@ -50,12 +56,12 @@
     paint();
   }
 
-  /* ---------- HUD clock (Irish time) ---------- */
+  /* ---------- HUD clock (Indian time) ---------- */
   const clock = $('#hud-clock'), dateEl = $('#hud-date');
   if (clock) {
-    const tf = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    const df = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    const tick = () => { const d = new Date(); clock.textContent = tf.format(d); if (dateEl) dateEl.textContent = df.format(d) + ' · Dublin'; };
+    const tf = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const df = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const tick = () => { const d = new Date(); clock.textContent = tf.format(d); if (dateEl) dateEl.textContent = df.format(d) + ' · IST'; };
     tick(); setInterval(tick, 1000);
   }
 
@@ -101,7 +107,7 @@
     authNext = next && next.startsWith('/') ? next : null;
     $$('[data-auth-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.authTab === view));
     $$('[data-auth-view]').forEach(f => f.hidden = f.dataset.authView !== view);
-    $('#auth-title').textContent = view === 'register' ? 'Create your ME News account' : 'Sign in to ME News';
+    $('#auth-title').textContent = view === 'register' ? 'Create your Bharat Wire account' : 'Sign in to Bharat Wire';
     $('#auth-result').textContent = '';
     openModal('auth-modal');
   }
@@ -302,12 +308,30 @@
     if (!navigator.geolocation) return toast('Location is unavailable');
     navigator.geolocation.getCurrentPosition(p => { $('#report-lat').value = p.coords.latitude.toFixed(6); $('#report-lng').value = p.coords.longitude.toFixed(6); toast('GPS added to your report'); }, () => toast('Location permission was not granted'));
   });
+  /** Solve a lightweight, no-third-party proof-of-work challenge (native Web Crypto, no CDN/CSP change). */
+  async function solvePow() {
+    const ch = await api('/api/pow/challenge');
+    const need = '0'.repeat(ch.difficulty);
+    const enc = new TextEncoder();
+    for (let nonce = 0; ; nonce++) {
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(ch.id + ':' + nonce));
+      const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if (hex.startsWith(need)) return { id: ch.id, nonce: String(nonce) };
+    }
+  }
   $('#report-form')?.addEventListener('submit', async e => {
     e.preventDefault();
     const out = $('#report-result'); out.classList.remove('is-error'); out.textContent = 'Uploading privately and running safety checks…';
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
-      const j = await api('/api/report', { method: 'POST', body: new FormData(e.target) });
+      const fd = new FormData(e.target);
+      if (!window.ME.user) {
+        out.textContent = 'Verifying…';
+        const sol = await solvePow();
+        fd.set('pow_id', sol.id); fd.set('pow_nonce', sol.nonce);
+        out.textContent = 'Uploading privately and running safety checks…';
+      }
+      const j = await api('/api/report', { method: 'POST', body: fd });
       out.textContent = j.message || `Thanks — your report is with the newsroom (safety ${j.safety_score}/100, confidence ${j.trust_score}/100). You'll hear back either way.`;
       e.target.reset(); const pv = $('.dropzone__preview'); if (pv) { pv.hidden = true; pv.innerHTML = ''; } setTimeout(closeModals, j.message ? 6000 : 3200);
     } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
@@ -347,6 +371,53 @@
   /* ---------- near me (geolocation) ---------- */
   const setCookie = (k, v, days) => { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=' + (days * 86400) + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : ''); };
   const delCookie = k => { document.cookie = k + '=;path=/;max-age=0;SameSite=Lax'; };
+  const getCookie = k => { const m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : ''; };
+
+  /* ---------- breaking news push notifications ---------- */
+  (async function initPush() {
+    const btn = $('#push-toggle');
+    if (!btn || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
+    let cfg;
+    try { cfg = await api('/api/push/config'); } catch (e) { return; }
+    if (!cfg.configured) return;
+    function toUint8(base64) {
+      const padding = '='.repeat((4 - base64.length % 4) % 4);
+      const raw = atob((base64 + padding).replace(/-/g, '+').replace(/_/g, '/'));
+      return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+    }
+    function paint(subscribed) {
+      btn.hidden = false;
+      btn.classList.toggle('is-active', subscribed);
+      btn.setAttribute('aria-pressed', String(subscribed));
+      btn.title = subscribed ? 'Breaking news alerts on — tap to turn off' : 'Get breaking news alerts';
+    }
+    let reg, existing;
+    try {
+      reg = await navigator.serviceWorker.register('/sw.js');
+      existing = await reg.pushManager.getSubscription();
+    } catch (e) { return; }
+    paint(!!existing);
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const current = await reg.pushManager.getSubscription();
+        if (current) {
+          await api('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: current.endpoint }), headers: { 'Content-Type': 'application/json' } });
+          await current.unsubscribe();
+          paint(false);
+          toast('Breaking news alerts turned off');
+        } else {
+          if (Notification.permission === 'denied') { toast('Notifications are blocked in your browser settings'); return; }
+          const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toUint8(cfg.publicKey) });
+          const county = getCookie('me_county');
+          await api('/api/push/subscribe' + (county ? '?county=' + encodeURIComponent(county) : ''), { method: 'POST', body: JSON.stringify(sub.toJSON()), headers: { 'Content-Type': 'application/json' } });
+          paint(true);
+          toast(county ? 'Breaking news alerts on for ' + county : 'Breaking news alerts on');
+        }
+      } catch (err) { toast(err.message || 'Could not update alerts'); }
+      btn.disabled = false;
+    });
+  })();
   const dismissed = () => { try { return (Number(localStorage.getItem('me_loc_dismissed') || 0)) > Date.now(); } catch (e) { return false; } };
   const locbar = null;
   /* county picker: one tap on first visit, no permission needed */
@@ -365,7 +436,7 @@
         const j = await api(`/api/near?lat=${lat.toFixed(3)}&lng=${lng.toFixed(3)}${document.body.classList.contains('page-home') ? '&compact=1&limit=8' : '&limit=24'}`);
         const tmp = document.createElement('div'); tmp.innerHTML = j.html;
         const fresh = tmp.firstElementChild; near.replaceWith(fresh); fresh.classList.add('is-in'); bindNear();
-        toast(j.place.in_ireland ? 'Local section set to ' + j.title : 'You seem to be outside Ireland — choose a county');
+        toast(j.place.in_india ? 'Local section set to ' + j.title : 'You seem to be outside India — choose a state');
         if (!document.body.classList.contains('page-home')) location.reload();
       } catch (e) { near.classList.remove('is-loading'); toast(e.message); }
     } else location.reload();
@@ -498,11 +569,11 @@
     try {
       const j = await api('/api/bulletin?county=' + encodeURIComponent(b.dataset.bulletin || ''));
       bulletinEl = document.createElement('div'); bulletinEl.className = 'bulletin';
-      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'Ireland') + ' bulletin…</span><button type="button">Stop</button>';
+      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'India') + ' bulletin…</span><button type="button">Stop</button>';
       document.body.appendChild(bulletinEl);
       bulletinEl.querySelector('button').onclick = () => { speechSynthesis.cancel(); bulletinEl.remove(); bulletinEl = null; };
-      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IE/i.test(v.lang)) || voices.find(v => /en-GB/i.test(v.lang)) || null;
-      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IE'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
+      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IN/i.test(v.lang)) || voices.find(v => /hi-IN/i.test(v.lang)) || null;
+      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IN'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
     } catch (err) { toast(err.message); }
   }));
 })();

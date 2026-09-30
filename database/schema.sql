@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   handle        TEXT UNIQUE,
   role          TEXT NOT NULL DEFAULT 'member',      -- member | contributor | editor | admin
   is_verified   INTEGER NOT NULL DEFAULT 0,
-  plan          TEXT NOT NULL DEFAULT 'free',        -- free | ME+
+  plan          TEXT NOT NULL DEFAULT 'free',        -- free | Wire+
   title         TEXT,                                -- public job title for contributors
   desk          TEXT,                                -- National | Local | Business | Sport | Culture
   home_town     TEXT,

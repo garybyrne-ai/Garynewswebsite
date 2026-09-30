@@ -7,12 +7,12 @@ use DateTimeImmutable;
 use DateTimeZone;
 use MeNews\Config;
 
-/** Everything that makes a given Irish calendar day unique: edition number, seed, hue, word of the day. */
+/** Everything that makes a given Indian calendar day unique: edition number, seed, hue, word of the day. */
 final class Daily
 {
     public static function zone(): DateTimeZone
     {
-        return new DateTimeZone(Config::get('APP_TIMEZONE', 'Europe/Dublin'));
+        return new DateTimeZone(Config::get('APP_TIMEZONE', 'Asia/Kolkata'));
     }
 
     public static function today(): DateTimeImmutable
@@ -20,7 +20,7 @@ final class Daily
         return new DateTimeImmutable('now', self::zone());
     }
 
-    /** Y-m-d for today in Irish time. */
+    /** Y-m-d for today in Indian time. */
     public static function date(): string
     {
         return self::today()->format('Y-m-d');
@@ -36,7 +36,7 @@ final class Daily
         return $dt && $dt->format('Y-m-d') === $d ? $d : null;
     }
 
-    /** Sequential edition number counting from the first ME News 4.0 edition. */
+    /** Sequential edition number counting from the first Bharat Wire 4.0 edition. */
     public static function edition(?string $date = null): int
     {
         $d = new DateTimeImmutable($date ?? self::date(), self::zone());
@@ -65,13 +65,13 @@ final class Daily
         return (new DateTimeImmutable($date ?? self::date(), self::zone()))->format('l j F Y');
     }
 
-    /** Focal an lae — the Irish word of the day. */
+    /** Shabd of the day — the Hindi word of the day. */
     public static function focal(?string $date = null): array
     {
         static $bank;
         $bank ??= json_decode((string)file_get_contents(ME_ROOT . '/config/kids/focal.json'), true)['words'] ?? [];
         if (!$bank) {
-            return ['irish' => 'fáilte', 'english' => 'welcome', 'say' => 'FAWL-cha', 'example' => 'Céad míle fáilte!'];
+            return ['hindi' => 'नमस्ते', 'english' => 'hello / greetings', 'say' => 'nuh-MASS-tay', 'example' => 'Namaste, aap kaise hain?'];
         }
         $d = new DateTimeImmutable($date ?? self::date(), self::zone());
         return $bank[(int)$d->format('z') % count($bank)];
@@ -81,6 +81,6 @@ final class Daily
     public static function greeting(): string
     {
         $h = (int)self::today()->format('G');
-        return $h < 12 ? 'Maidin mhaith' : ($h < 18 ? 'Tráthnóna maith' : 'Oíche mhaith');
+        return $h < 12 ? 'Suprabhat' : ($h < 18 ? 'Shubh Sandhya' : 'Shubh Ratri');
     }
 }

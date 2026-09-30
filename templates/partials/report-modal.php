@@ -14,7 +14,7 @@ $prompts = ['Community' => 'Something happening now', 'Traffic' => 'A crash, clo
     <header class="modal__head"><h2 id="report-title"><?= icon('report') ?> What's happening in <?= e($where) ?> right now?</h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
     <div class="modal__body">
       <?php if ($whatsapp): ?>
-        <a class="wa" href="https://wa.me/<?= e(preg_replace('/\D+/', '', $whatsapp)) ?>?text=<?= rawurlencode('Hi ME News, I want to report something in ' . $where . ':') ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><b>Faster on WhatsApp?</b> Send a photo and a line to <?= e($whatsapp) ?> — it lands in the same newsroom queue.</span></a>
+        <a class="wa" href="https://wa.me/<?= e(preg_replace('/\D+/', '', $whatsapp)) ?>?text=<?= rawurlencode('Hi Bharat Wire, I want to report something in ' . $where . ':') ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><b>Faster on WhatsApp?</b> Send a photo and a line to <?= e($whatsapp) ?> — it lands in the same newsroom queue.</span></a>
       <?php endif; ?>
       <form id="report-form" class="form" enctype="multipart/form-data">
         <div class="reportcats" role="group" aria-label="What kind of report?">
@@ -27,10 +27,10 @@ $prompts = ['Community' => 'Something happening now', 'Traffic' => 'A crash, clo
           <span class="dropzone__preview" hidden></span>
         </label>
         <div class="form__row">
-          <label>Town / area<input name="location_name" id="report-town" list="all-locations" required placeholder="e.g. Bray" autocomplete="off" value="<?= e($town ?? '') ?>"></label>
-          <label>County<select name="county" id="report-county" data-county-select><option value="">Select county</option><?php if ($county): ?><option selected><?= e($county) ?></option><?php endif; ?></select></label>
+          <label>Town / area<input name="location_name" id="report-town" list="all-locations" required placeholder="e.g. Koregaon Park" autocomplete="off" value="<?= e($town ?? '') ?>"></label>
+          <label>State<select name="county" id="report-county" data-county-select><option value="">Select state</option><?php if ($county): ?><option selected><?= e($county) ?></option><?php endif; ?></select></label>
         </div>
-        <label>What can you see? <small class="form__hint">One or two lines is plenty. Describe only what you personally know — no names of people involved in an incident.</small><textarea name="body" rows="3" required minlength="12" placeholder="e.g. Two cars in a collision at the Main Street junction, gardaí on the scene, traffic backed up to the church."></textarea></label>
+        <label>What can you see? <small class="form__hint">One or two lines is plenty. Describe only what you personally know — no names of people involved in an incident.</small><textarea name="body" rows="3" required minlength="12" placeholder="e.g. Two vehicles in a collision at the main market junction, police on the scene, traffic backed up past the bus stand."></textarea></label>
         <label>Headline <small class="form__hint">Optional — we'll write one from your description if you leave it blank</small><input name="title" maxlength="180" placeholder="Short and factual"></label>
         <?php if (!$user): ?>
           <div class="form__row">

@@ -16,6 +16,7 @@ return static function (Router $r): void {
     // ---- Pages
     $r->get('/', [Page::class, 'home']);
     $r->get('/section/{slug:[a-z-]+}', [Page::class, 'category']);
+    $r->get('/language/{code:[a-z][a-z]}', [Page::class, 'language']);
     $r->get('/county/{slug:[a-z-]+}', [Page::class, 'county']);
     $r->get('/county/{slug:[a-z-]+}/map', [Page::class, 'countyMap']);
     $r->get('/story/{slug:[a-z0-9-]+}', [Page::class, 'story']);
@@ -62,6 +63,7 @@ return static function (Router $r): void {
     $r->get('/ownership', [Trust::class, 'ownership']);
     $r->get('/privacy', [Trust::class, 'privacy']);
     $r->get('/moderation', [Trust::class, 'moderation']);
+    $r->get('/schemes', [Trust::class, 'schemes']);
     $r->post('/api/takedown', [Trust::class, 'takedown']);
     $r->get('/api/admin/corrections', [Trust::class, 'adminCorrections']);
     $r->post('/api/admin/corrections', [Trust::class, 'addCorrection']);
@@ -100,6 +102,10 @@ return static function (Router $r): void {
     $r->get('/api/near', [Api::class, 'near']);
     $r->get('/cron/wire', [Api::class, 'cronWire']);
     $r->get('/api/pulse', [Api::class, 'pulse']);
+    $r->get('/api/pow/challenge', [Api::class, 'powChallenge']);
+    $r->get('/api/push/config', [Api::class, 'pushConfig']);
+    $r->post('/api/push/subscribe', [Api::class, 'pushSubscribe']);
+    $r->post('/api/push/unsubscribe', [Api::class, 'pushUnsubscribe']);
     $r->get('/advertise', [AdsC::class, 'advertisePage']);
     $r->get('/api/ads', [Api::class, 'ads']);
     $r->get('/api/ads/pricing', [AdsC::class, 'pricing']);
@@ -117,6 +123,7 @@ return static function (Router $r): void {
     $r->get('/media/ad/{id:[a-f0-9]+}/{kind:logo|image}', [AdsC::class, 'media']);
     $r->get('/billing/paypal/return', [AdsC::class, 'paypalReturn']);
     $r->post('/api/paypal/webhook', [AdsC::class, 'paypalWebhook']);
+    $r->post('/api/razorpay/webhook', [AdsC::class, 'razorpayWebhook']);
     $r->get('/api/wire/status', [Api::class, 'wireStatus']);
     $r->post('/api/wire/refresh', [Api::class, 'wireRefresh']);
 
@@ -140,6 +147,8 @@ return static function (Router $r): void {
     $r->get('/api/me/reports', [Account::class, 'myReports']);
     $r->get('/api/me/notifications', [Account::class, 'notifications']);
     $r->post('/api/me/notifications/read', [Account::class, 'notificationsRead']);
+    $r->get('/api/me/sessions', [Account::class, 'sessions']);
+    $r->post('/api/me/sessions/{id:[0-9]+}/revoke', [Account::class, 'sessionRevoke']);
     $r->get('/api/me/follows', [Account::class, 'follows']);
     $r->post('/api/me/follows', [Account::class, 'follow']);
     $r->delete('/api/me/follows/{id:\d+}', [Account::class, 'unfollow']);
@@ -171,6 +180,8 @@ return static function (Router $r): void {
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/decision', [Admin::class, 'decision']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/rerun-safety', [Admin::class, 'rerun']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/edit', [Admin::class, 'edit']);
+    $r->post('/api/admin/stories/{id:[a-f0-9]+}/push', [Admin::class, 'pushStory']);
+    $r->get('/api/admin/push', [Admin::class, 'pushStatus']);
     $r->get('/api/admin/mail', [Admin::class, 'mail']);
     $r->post('/api/admin/mail', [Admin::class, 'saveMail']);
     $r->post('/api/admin/mail/test', [Admin::class, 'testMail']);
@@ -189,6 +200,7 @@ return static function (Router $r): void {
     $r->post('/api/admin/ads/{id:[a-f0-9]+}', [AdsC::class, 'adminDecision']);
     $r->post('/api/admin/{table:comments}/{id:[a-zA-Z0-9-]+}', [Admin::class, 'itemDecision']);
     $r->post('/api/admin/locations/refresh', [Admin::class, 'refreshLocations']);
+    $r->get('/api/admin/export/ip', [Admin::class, 'exportIpActivity']);
     $r->post('/api/admin/wire/refresh', [Admin::class, 'refreshWire']);
     $r->get('/api/admin/wire/runs', [Admin::class, 'wireRuns']);
     $r->get('/api/admin/audit', [Admin::class, 'audit']);

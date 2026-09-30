@@ -19,7 +19,7 @@ $countySlug = $county ? slugify($county) : '';
       <span class="masthead__wx"><?php foreach (array_slice($weather['cities'], 0, 5) as $c): ?><span><?= e($c['icon']) ?> <?= e($c['name']) ?> <b><?= (int)$c['temp'] ?>°</b></span><?php endforeach; ?></span>
     <?php endif; ?>
     <?php if (!empty($warnings)): ?><a class="masthead__warn" href="/alerts"><?= icon('alert') ?> <?= e($warnings) ?></a><?php endif; ?>
-    <span class="masthead__focal">Focal an lae: <b><?= e($focal['irish']) ?></b> — <?= e($focal['english']) ?></span>
+    <span class="masthead__focal">Shabd of the day: <b><?= e($focal['hindi']) ?></b> — <?= e($focal['english']) ?></span>
   </div>
 </div>
 
@@ -63,7 +63,7 @@ $countySlug = $county ? slugify($county) : '';
       <header class="block__head">
         <span class="block__index mono"><?= icon('community') ?></span>
         <h2 class="block__title"><a href="/section/community">From the ground</a></h2>
-        <p class="block__blurb">What people in <?= e($county ? 'Co. ' . $county : 'Ireland') ?> are seeing right now. Reports are screened, then an editor decides. No account needed for your first one.</p>
+        <p class="block__blurb">What people in <?= e($county ?: 'India') ?> are seeing right now. Reports are screened, then an editor decides. No account needed for your first one.</p>
         <button class="btn btn--hot" type="button" data-open-report><?= icon('report') ?> Report a story</button>
       </header>
       <?php if ($community): ?>

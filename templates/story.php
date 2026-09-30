@@ -6,39 +6,40 @@ $jsonld = $isWire ? null : [
     '@context' => 'https://schema.org', '@type' => 'NewsArticle', '@id' => absolute_url($story['url']), 'url' => absolute_url($story['url']),
     'headline' => mb_substr($story['title'], 0, 110), 'datePublished' => $story['time'], 'dateModified' => $story['updated_at'] ?: $story['time'],
     'description' => $story['summary'] ?: excerpt($story['body'], 200), 'image' => $story['image'] ? [absolute_url($story['image'])] : [absolute_url('/assets/img/og.png')],
-    'articleSection' => $story['category'], 'inLanguage' => 'en-IE', 'wordCount' => str_word_count((string)$story['body']),
-    'keywords' => implode(', ', array_filter([$story['category'], $story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, 'Ireland'])),
-    'author' => ['@type' => 'Person', 'name' => $story['author_name'] ?: 'ME News community'] + (!empty($author['handle']) ? ['url' => absolute_url('/contributors/' . $author['handle'])] : []),
-    'publisher' => ['@type' => 'NewsMediaOrganization', '@id' => absolute_url('/#organization'), 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'logo' => ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/logo-512.png'), 'width' => 512, 'height' => 512]],
+    'articleSection' => $story['category'], 'inLanguage' => 'en-IN', 'wordCount' => str_word_count((string)$story['body']),
+    'keywords' => implode(', ', array_filter([$story['category'], $story['county'] ?: null, $story['location_name'] ?: null, 'India'])),
+    'author' => ['@type' => 'Person', 'name' => $story['author_name'] ?: 'Bharat Wire community'] + (!empty($author['handle']) ? ['url' => absolute_url('/contributors/' . $author['handle'])] : []),
+    'publisher' => ['@type' => 'NewsMediaOrganization', '@id' => absolute_url('/#organization'), 'name' => 'Bharat Wire India', 'url' => absolute_url('/'), 'logo' => ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/logo-512.png'), 'width' => 512, 'height' => 512]],
     'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => absolute_url($story['url'])],
     'isAccessibleForFree' => !$archived,
 ] + ($archived ? ['hasPart' => ['@type' => 'WebPageElement', 'isAccessibleForFree' => false, 'cssSelector' => '.article__body']] : [])
-  + ($story['county'] ? ['contentLocation' => ['@type' => 'Place', 'name' => trim(($story['location_name'] ? $story['location_name'] . ', ' : '') . 'County ' . $story['county'] . ', Ireland')]] : []);
+  + ($story['county'] ? ['contentLocation' => ['@type' => 'Place', 'name' => trim(($story['location_name'] ? $story['location_name'] . ', ' : '') . $story['county'] . ', India')]] : []);
 ?>
 <div class="progress" aria-hidden="true"><i id="read-progress"></i></div>
 <?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
 
 <article class="container article" data-story-id="<?= e($story['id']) ?>">
   <header class="article__head">
-    <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Around Me</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>">Co. <?= e($story['county']) ?></a><?php endif; ?></nav>
-    <div class="article__labels"><?= $isWire ? '<a class="chip chip--label is-wire" href="/about#labels" title="How we check things"><i></i>Wire · ' . e($story['source_name']) . '</a>' : Ui::label($story['verification_label']) ?><?= Ui::categoryChip($story['category']) ?><?= $cluster && $cluster['count'] > 1 ? '<a class="chip chip--cluster" href="#coverage">' . icon('layers') . ' ' . (int)$cluster['count'] . ' outlets covering this</a>' : '' ?><?= !$isWire && (int)($story['corroborations'] ?? 0) >= 3 ? '<span class="chip chip--label is-corroborated"><i></i>Corroborated ×' . (int)$story['corroborations'] . '</span>' : '' ?></div>
+    <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Around Me</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>"><?= e($story['county']) ?></a><?php endif; ?></nav>
+    <div class="article__labels"><?= $isWire ? '<a class="chip chip--label is-wire" href="/about#labels" title="How we check things"><i></i>Wire · ' . e($story['source_name']) . '</a>' : Ui::label($story['verification_label']) ?><?= Ui::categoryChip($story['category']) ?><?php $storyLang = $story['language'] ?? 'en'; if ($storyLang !== 'en'): ?><a class="chip chip--lang" href="/language/<?= e($storyLang) ?>" title="Originally published in <?= e(\MeNews\Support\Languages::label($storyLang)) ?>"><?= e(\MeNews\Support\Languages::native($storyLang)) ?></a><?php endif; ?><?= $cluster && $cluster['count'] > 1 ? '<a class="chip chip--cluster" href="#coverage">' . icon('layers') . ' ' . (int)$cluster['count'] . ' outlets covering this</a>' : '' ?><?= !$isWire && (int)($story['corroborations'] ?? 0) >= 3 ? '<span class="chip chip--label is-corroborated"><i></i>Corroborated ×' . (int)$story['corroborations'] . '</span>' : '' ?></div>
     <h1 class="article__title"><?= e($story['title']) ?></h1>
+    <?php if ($storyLang !== 'en'): ?><p class="article__translate notranslate"><?= icon('globe') ?> This story is in <?= e(\MeNews\Support\Languages::label($storyLang)) ?> (<?= e(\MeNews\Support\Languages::native($storyLang)) ?>). <a href="https://translate.google.com/translate?sl=auto&amp;tl=en&amp;u=<?= rawurlencode(absolute_url($story['url'])) ?>" target="_blank" rel="noopener">Translate to English ↗</a></p><?php endif; ?>
     <?php if ($story['summary']): ?><p class="article__standfirst"><?= e($story['summary']) ?></p><?php endif; ?>
     <div class="article__byline">
       <?php if ($isWire): ?>
-        <span class="byline"><?= Ui::avatar(null, 'md', $story['source_name']) ?><span><b><?= $story['source_author'] ? 'By ' . e($story['source_author']) . ', ' : '' ?><?= e($story['source_name']) ?></b><small>Wire story · curated by <?= $author && !empty($author['handle']) ? '<a href="/contributors/' . e($author['handle']) . '">' . e($author['display_name']) . '</a>' : 'the ME desk' ?> for the <?= e($author['desk'] ?? $story['category']) ?> desk</small></span></span>
+        <span class="byline"><?= Ui::avatar(null, 'md', $story['source_name']) ?><span><b><?= $story['source_author'] ? 'By ' . e($story['source_author']) . ', ' : '' ?><?= e($story['source_name']) ?></b><small>Wire story · curated by <?= $author && !empty($author['handle']) ? '<a href="/contributors/' . e($author['handle']) . '">' . e($author['display_name']) . '</a>' : 'the Bharat Wire desk' ?> for the <?= e($author['desk'] ?? $story['category']) ?> desk</small></span></span>
       <?php elseif ($author): ?>
-        <a class="byline" href="<?= !empty($author['handle']) ? '/contributors/' . e($author['handle']) : '#' ?>"><?= Ui::avatar($author, 'md') ?><span><b><?= e($author['display_name']) ?><?= ($author['plan'] ?? '') === 'ME+' ? ' <span class="chip chip--plus chip--xs" title="ME+ member">ME+</span>' : '' ?></b><small><?= e($author['title'] ?: 'Community reporter') ?><?= !empty($author['reports_published']) ? ' · ' . (int)$author['reports_published'] . ' published reports' : '' ?></small></span></a>
+        <a class="byline" href="<?= !empty($author['handle']) ? '/contributors/' . e($author['handle']) : '#' ?>"><?= Ui::avatar($author, 'md') ?><span><b><?= e($author['display_name']) ?><?= ($author['plan'] ?? '') === 'Wire+' ? ' <span class="chip chip--plus chip--xs" title="Wire+ member">Wire+</span>' : '' ?></b><small><?= e($author['title'] ?: 'Community reporter') ?><?= !empty($author['reports_published']) ? ' · ' . (int)$author['reports_published'] . ' published reports' : '' ?></small></span></a>
       <?php else: ?>
-        <span class="byline"><?= Ui::avatar(null, 'md', $story['author_name'] ?: 'ME') ?><span><b><?= e($story['author_name'] ?: 'Community reporter') ?></b><small>Community reporter</small></span></span>
+        <span class="byline"><?= Ui::avatar(null, 'md', $story['author_name'] ?: 'Bharat Wire') ?><span><b><?= e($story['author_name'] ?: 'Community reporter') ?></b><small>Community reporter</small></span></span>
       <?php endif; ?>
       <?= \MeNews\Support\Share::bar(['url' => absolute_url($story['url']), 'title' => $story['title'], 'text' => (string)($story['summary'] ?: ''), 'image' => $story['image'] ? absolute_url($story['image']) : ''], 'compact') ?>
       <div class="textsize" role="group" aria-label="Text size"><button type="button" data-textsize="" aria-label="Normal text">A</button><button type="button" data-textsize="lg" aria-label="Larger text">A</button><button type="button" data-textsize="xl" aria-label="Largest text">A</button></div>
       <div class="article__time mono">
-        <time datetime="<?= e($story['time']) ?>"><?= e(date_irish($story['time'])) ?></time>
+        <time datetime="<?= e($story['time']) ?>"><?= e(date_in($story['time'])) ?></time>
         <span>·</span><span><?= e(time_ago($story['time'])) ?></span>
         <?php if (views_label((int)$story['views']) !== ''): ?><span>·</span><span><?= e(views_label((int)$story['views'])) ?> reads</span><?php endif; ?>
-        <?php if ($story['location_name']): ?><span>·</span><span><?= icon('pin') ?> <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', Co. ' . e($story['county']) : '' ?></span><?php endif; ?>
+        <?php if ($story['location_name']): ?><span>·</span><span><?= icon('pin') ?> <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', ' . e($story['county']) : '' ?></span><?php endif; ?>
       </div>
     </div>
   </header>
@@ -62,7 +63,7 @@ $jsonld = $isWire ? null : [
           <p class="article__lede"><?= e($story['summary']) ?></p>
           <div class="sourcebox">
             <span class="kicker">Full story at the source</span>
-            <p>This is a wire headline from <b><?= e($story['source_name']) ?></b><?= $story['source_author'] ? ', reported by ' . e($story['source_author']) : '' ?>. ME did not report or verify it; we curated it into our <?= e($story['category']) ?> desk and link you straight to the publisher, who holds all rights to the full article, photographs and updates.</p>
+            <p>This is a wire headline from <b><?= e($story['source_name']) ?></b><?= $story['source_author'] ? ', reported by ' . e($story['source_author']) : '' ?>. Bharat Wire did not report or verify it; we curated it into our <?= e($story['category']) ?> desk and link you straight to the publisher, who holds all rights to the full article, photographs and updates.</p>
             <a class="btn btn--primary" href="<?= e($story['source_url']) ?>" target="_blank" rel="noopener">Continue reading at <?= e($story['source_name']) ?> <?= icon('external') ?></a>
             <span class="mono sourcebox__url"><?= e(parse_url($story['source_url'], PHP_URL_HOST)) ?></span>
           </div>
@@ -70,10 +71,10 @@ $jsonld = $isWire ? null : [
         <?php if ($cluster && $members): ?>
           <section class="coverage" id="coverage">
             <header class="block__head block__head--sm"><h2 class="block__title"><?= icon('layers') ?> <?= (int)$cluster['count'] ?> outlets covering this</h2><span class="mono">How we got here</span></header>
-            <p class="coverage__framing"><?= e($cluster['framing']) ?> ME's framing; each outlet's own headline is below.</p>
+            <p class="coverage__framing"><?= e($cluster['framing']) ?> Bharat Wire's framing; each outlet's own headline is below.</p>
             <ol class="timeline">
               <?php $all = array_merge([['id' => $story['id'], 'slug' => $story['slug'], 'title' => $story['title'], 'source_name' => $story['source_name'], 'source_url' => $story['source_url'], 'source_author' => $story['source_author'], 't' => $story['time']]], $members); usort($all, static fn($a, $b) => strcmp($a['t'], $b['t'])); foreach ($all as $m): ?>
-                <li class="<?= $m['id'] === $story['id'] ? 'is-current' : '' ?>"><time class="mono"><?= e(date_irish($m['t'], 'D H:i')) ?></time><div><b><?= e($m['source_name']) ?></b><?= $m['source_author'] ? ' <span class="mono">' . e($m['source_author']) . '</span>' : '' ?><br><a href="<?= e($m['source_url']) ?>" target="_blank" rel="noopener"><?= e($m['title']) ?> <?= icon('external') ?></a></div></li>
+                <li class="<?= $m['id'] === $story['id'] ? 'is-current' : '' ?>"><time class="mono"><?= e(date_in($m['t'], 'D H:i')) ?></time><div><b><?= e($m['source_name']) ?></b><?= $m['source_author'] ? ' <span class="mono">' . e($m['source_author']) . '</span>' : '' ?><br><a href="<?= e($m['source_url']) ?>" target="_blank" rel="noopener"><?= e($m['title']) ?> <?= icon('external') ?></a></div></li>
               <?php endforeach; ?>
             </ol>
           </section>
@@ -81,10 +82,10 @@ $jsonld = $isWire ? null : [
       <?php elseif (!empty($archived)): ?>
         <div class="article__body article__body--locked"><?= nl2br(e(excerpt($story['body'], 420))) ?></div>
         <div class="archivegate">
-          <span class="chip chip--plus">ME+</span>
+          <span class="chip chip--plus">Wire+</span>
           <h2>This report is in the members' archive</h2>
-          <p>Stories older than <?= (int)\MeNews\Services\Membership::archiveDays() ?> days are kept for ME+ members, who fund the county reporting behind them. Read the full archive ad-free for <?= e(\MeNews\Services\Membership::priceLabel()) ?> or <?= e(\MeNews\Services\Membership::annualLabel()) ?>.</p>
-          <div class="inline"><a class="btn btn--primary" href="/plus">Get ME+</a><?php if (empty($user)): ?><button class="btn btn--ghost" type="button" data-open-auth="signin">Already a member? Sign in</button><?php endif; ?></div>
+          <p>Stories older than <?= (int)\MeNews\Services\Membership::archiveDays() ?> days are kept for Wire+ members, who fund the state reporting behind them. Read the full archive ad-free for <?= e(\MeNews\Services\Membership::priceLabel()) ?> or <?= e(\MeNews\Services\Membership::annualLabel()) ?>.</p>
+          <div class="inline"><a class="btn btn--primary" href="/plus">Get Wire+</a><?php if (empty($user)): ?><button class="btn btn--ghost" type="button" data-open-auth="signin">Already a member? Sign in</button><?php endif; ?></div>
         </div>
       <?php else: ?>
         <div class="article__body"><?= nl2br(e($story['body'])) ?></div>
@@ -94,13 +95,13 @@ $jsonld = $isWire ? null : [
       <?= \MeNews\View::partial('partials/vote', ['story' => $story, 'signal' => $signal, 'signalRank' => $signalRank]) ?>
 
       <section class="trust">
-        <header class="trust__head"><span class="kicker">ME Trust Engine</span><span class="mono"><?= e($story['verification_label']) ?> — editorial label</span></header>
+        <header class="trust__head"><span class="kicker">Wire Trust Engine</span><span class="mono"><?= e($story['verification_label']) ?> — editorial label</span></header>
         <div class="trust__meters">
           <div><span class="mono">Safety</span><div class="meter"><i style="--v:<?= (int)$story['safety_score'] ?>"></i></div><b class="mono"><?= (int)$story['safety_score'] ?>/100</b></div>
           <div><span class="mono">Confidence</span><div class="meter meter--alt"><i style="--v:<?= (int)$story['trust_score'] ?>"></i></div><b class="mono"><?= (int)$story['trust_score'] ?>/100</b></div>
           <div><span class="mono">Confirmations</span><b class="trust__big" id="confirm-count"><?= (int)$confirmations ?></b></div>
         </div>
-        <p class="trust__note"><?= $isWire ? 'Wire stories come from established Irish publishers and carry their own editorial standards. ME labels them <b>Wire</b>: the source is known and linked, but ME has not independently checked the story. <b>Verified</b> is reserved for reports our desk has checked.' : 'Safety is not truth. The safety score screens for harmful content; the confidence score weighs evidence such as media, GPS and reporter track record. Only editors set the public label. Three independent “I saw this too” confirmations earn a <b>Corroborated</b> label.' ?> <a href="/about#labels">How we check things →</a></p>
+        <p class="trust__note"><?= $isWire ? 'Wire stories come from established Indian publishers and carry their own editorial standards. Bharat Wire labels them <b>Wire</b>: the source is known and linked, but Bharat Wire has not independently checked the story. <b>Verified</b> is reserved for reports our desk has checked.' : 'Safety is not truth. The safety score screens for harmful content; the confidence score weighs evidence such as media, GPS and reporter track record. Only editors set the public label. Three independent “I saw this too” confirmations earn a <b>Corroborated</b> label.' ?> <a href="/about#labels">How we check things →</a></p>
         <div class="trust__actions">
           <button class="btn btn--ghost" type="button" data-confirm="<?= e($story['id']) ?>"><?= $isWire ? 'I can add local context' : icon('eye') . ' I saw this too' ?></button>
           <button class="btn btn--ghost" type="button" data-save="<?= e($story['id']) ?>" data-save-label><?= icon('bookmark') ?> <span>Save</span></button>
@@ -112,7 +113,7 @@ $jsonld = $isWire ? null : [
         <header class="block__head block__head--sm"><h2 class="block__title">Community discussion</h2><span class="mono" id="comment-count"><?= count($comments) ?> published</span></header>
         <div class="comments" id="comments">
           <?php if ($comments): foreach ($comments as $c): ?>
-            <div class="comment"><?= Ui::avatar(['display_name' => $c['author'], 'accent' => $c['accent'] ?? null, 'is_verified' => $c['is_verified'] ?? 0], 'sm', $c['author']) ?><div><b><?= e($c['author']) ?><?= ($c['plan'] ?? '') === 'ME+' ? ' <span class="chip chip--plus chip--xs" title="ME+ member">ME+</span>' : '' ?></b><time class="mono"><?= e(time_ago($c['created_at'])) ?></time><p><?= nl2br(e($c['body'])) ?></p></div></div>
+            <div class="comment"><?= Ui::avatar(['display_name' => $c['author'], 'accent' => $c['accent'] ?? null, 'is_verified' => $c['is_verified'] ?? 0], 'sm', $c['author']) ?><div><b><?= e($c['author']) ?><?= ($c['plan'] ?? '') === 'Wire+' ? ' <span class="chip chip--plus chip--xs" title="Wire+ member">Wire+</span>' : '' ?></b><time class="mono"><?= e(time_ago($c['created_at'])) ?></time><p><?= nl2br(e($c['body'])) ?></p></div></div>
           <?php endforeach; else: ?>
             <p class="panel__note" id="no-comments">No published comments yet. Keep it factual and respectful — comments are screened before they appear.</p>
           <?php endif; ?>
