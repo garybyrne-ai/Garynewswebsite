@@ -639,7 +639,7 @@ details summary{cursor:pointer;color:var(--cy);font-weight:600;font-size:.86rem}
   .footer__in{grid-template-columns:1fr 1fr}
 }
 @media (max-width:1024px){
-  .layout,.article__grid,.mappage{grid-template-columns:1fr}
+  .layout,.article__grid,.mappage{grid-template-columns:minmax(0,1fr)}
   .maplist{max-height:360px}
   .side{position:static}
   .grid--4{grid-template-columns:repeat(2,1fr)}
@@ -1023,8 +1023,8 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
 .signal__bar .mapchips{margin:0}
 .signal__bar .mapchips a{padding:7px 14px;border-radius:999px;border:1px solid var(--line-2);font:600 .68rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
 .signal__bar .mapchips a.is-active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.signal__county{display:flex;gap:10px;align-items:center}
-.signal__county select{background:var(--bg-2);border:1px solid var(--line-2);border-radius:999px;padding:7px 12px;color:var(--ink);font-size:.85rem}
+.signal__county{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.signal__county select{background:var(--bg-2);border:1px solid var(--line-2);border-radius:999px;padding:7px 12px;color:var(--ink);font-size:.85rem;max-width:100%;min-width:0}
 .signal__county a{color:var(--em)}
 .signal__legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted)}
 .signal__legend i{width:8px;height:8px;border-radius:50%;background:var(--c);display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--c)}
@@ -1186,7 +1186,7 @@ body.has-bottombar .consent{bottom:64px}
 @media (max-width:1024px){.countygrid{grid-template-columns:repeat(2,1fr)}.moremenu__panel{grid-template-columns:1fr 1fr}}
 @media (max-width:760px){
   .hud__right{display:none}
-  .topbar__in{flex-wrap:nowrap;gap:8px;padding:8px 0}
+  .topbar__in{flex-wrap:wrap;gap:8px;padding:8px 0}
   .search{display:none}
   .countychip{max-width:120px;padding:7px 9px 7px 8px;font-size:.8rem;margin-left:auto}
   .btn--report{padding:8px 12px}
