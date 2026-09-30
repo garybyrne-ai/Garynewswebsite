@@ -195,6 +195,7 @@ See `.env.example`. Key settings: `APP_ENV`, `PUBLIC_BASE_URL`, `OPENAI_API_KEY`
 
 ## Deployment
 
+- Run `composer install --no-dev` once after cloning/pulling. This app is otherwise dependency-free (own PSR-4 autoloader, no framework) — the one exception is `minishlink/web-push` for push notifications, real cryptography not worth hand-rolling. `vendor/` is git-ignored; `bootstrap.php` loads it if present and degrades gracefully (push notifications simply stay unavailable) if `composer install` hasn't been run yet, so a missed step never breaks the rest of the site.
 - Point the document root at `public/` (see `deploy/apache.conf` or `deploy/nginx.conf`). `.env`, `src/` and `storage/` must stay outside the web root.
 - **Cloudways / shared hosting** where the web root is the project folder itself: the root-level `index.php` and `.htaccess` forward everything into `public/` and block private paths. See `deploy/cloudways.md` for the step-by-step guide (set Webroot to `public_html/public`, PHP 8.2+, run setup over SSH, add the wire cron).
 - Merge `deploy/php.ini` for upload limits.
