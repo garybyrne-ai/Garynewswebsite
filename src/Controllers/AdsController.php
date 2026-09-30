@@ -29,7 +29,7 @@ final class AdsController
     {
         $demo = [
             'id' => 'demo', 'business_name' => 'Your business', 'title' => 'Your headline, seen across India', 'body' => 'Sidebar cards and banners on the home page, section pages and inside every article.',
-            'cta' => 'Start free trial', 'badge' => '7-day trial', 'url' => 'https://example.ie', 'logo_path' => null, 'image_path' => null,
+            'cta' => 'Start free trial', 'badge' => '7-day trial', 'url' => 'https://example.in', 'logo_path' => null, 'image_path' => null,
             'design' => ['template' => 'aurora'] + Ads::TEMPLATES['aurora'] + ['shape' => 'orb', 'align' => 'left'],
         ];
         $packages = AdPackages::all();
@@ -108,7 +108,7 @@ final class AdsController
         $ad = [
             'id' => 'preview', 'business_name' => $get('business_name', Ads::LIMITS['business_name'], 'Your business'),
             'title' => $get('title', Ads::LIMITS['headline'], 'Your headline goes here'), 'body' => $get('body', Ads::LIMITS['subline']),
-            'cta' => $get('cta', Ads::LIMITS['cta'], 'Learn more'), 'badge' => $get('badge', Ads::LIMITS['badge']), 'url' => $get('url', 300, 'https://example.ie'),
+            'cta' => $get('cta', Ads::LIMITS['cta'], 'Learn more'), 'badge' => $get('badge', Ads::LIMITS['badge']), 'url' => $get('url', 300, 'https://example.in'),
             'logo_path' => null, 'image_path' => null, 'design' => Ads::sanitizeDesign($_POST),
         ];
         if ($id = $r->post('id', '', 40)) {

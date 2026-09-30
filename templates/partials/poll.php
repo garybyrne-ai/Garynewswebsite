@@ -16,6 +16,6 @@ $countyRes = $poll['county_results'] ?? null;
     <?php endforeach; ?>
   </div>
   <p class="panel__note mono" data-poll-foot>
-    <?php if ($poll['closed']): ?>Closed · <?= (int)$res['total'] ?> votes<?php elseif ($mine !== null): ?>Thanks · <?= $res['total'] >= 10 ? (int)$res['total'] . ' votes so far' : 'tap another option to change' ?><?= $countyRes && $countyRes['total'] >= 5 ? ' · ' . e($county) . ' leans ' . e($poll['options'][array_search(max($countyRes['counts']), $countyRes['counts'], true)] ?? '') : '' ?><?php else: ?>Closes <?= e(date_irish($poll['closes_at'], 'D H:i')) ?> · anonymous<?php endif; ?>
+    <?php if ($poll['closed']): ?>Closed · <?= (int)$res['total'] ?> votes<?php elseif ($mine !== null): ?>Thanks · <?= $res['total'] >= 10 ? (int)$res['total'] . ' votes so far' : 'tap another option to change' ?><?= $countyRes && $countyRes['total'] >= 5 ? ' · ' . e($county) . ' leans ' . e($poll['options'][array_search(max($countyRes['counts']), $countyRes['counts'], true)] ?? '') : '' ?><?php else: ?>Closes <?= e(date_in($poll['closes_at'], 'D H:i')) ?> · anonymous<?php endif; ?>
   </p>
 </section>

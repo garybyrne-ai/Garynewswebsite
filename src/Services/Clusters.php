@@ -17,7 +17,7 @@ use MeNews\Database;
 final class Clusters
 {
     private const WINDOW_HOURS = 48;
-    private const STOP = ['about', 'after', 'again', 'against', 'ahead', 'almost', 'along', 'also', 'amid', 'among', 'another', 'around', 'back', 'because', 'been', 'before', 'being', 'between', 'both', 'call', 'calls', 'could', 'day', 'days', 'does', 'down', 'during', 'each', 'even', 'ever', 'every', 'first', 'following', 'from', 'further', 'gets', 'have', 'here', 'high', 'home', 'hour', 'hours', 'how', 'into', 'ireland', 'irish', 'just', 'last', 'latest', 'like', 'live', 'look', 'made', 'make', 'makes', 'many', 'more', 'most', 'much', 'must', 'near', 'need', 'new', 'news', 'next', 'over', 'part', 'people', 'plan', 'plans', 'says', 'said', 'set', 'should', 'since', 'some', 'still', 'such', 'take', 'than', 'that', 'their', 'them', 'then', 'there', 'these', 'they', 'this', 'those', 'through', 'time', 'today', 'told', 'tonight', 'under', 'until', 'update', 'very', 'warns', 'week', 'weeks', 'were', 'what', 'when', 'where', 'which', 'while', 'will', 'with', 'would', 'year', 'years', 'your', 'reveals', 'revealed', 'named', 'named', 'watch', 'video', 'pictures', 'photos', 'live', 'explained', 'everything', 'know'];
+    private const STOP = ['about', 'after', 'again', 'against', 'ahead', 'almost', 'along', 'also', 'amid', 'among', 'another', 'around', 'back', 'because', 'been', 'before', 'being', 'between', 'both', 'call', 'calls', 'could', 'day', 'days', 'does', 'down', 'during', 'each', 'even', 'ever', 'every', 'first', 'following', 'from', 'further', 'gets', 'have', 'here', 'high', 'home', 'hour', 'hours', 'how', 'into', 'india', 'indian', 'just', 'last', 'latest', 'like', 'live', 'look', 'made', 'make', 'makes', 'many', 'more', 'most', 'much', 'must', 'near', 'need', 'new', 'news', 'next', 'over', 'part', 'people', 'plan', 'plans', 'says', 'said', 'set', 'should', 'since', 'some', 'still', 'such', 'take', 'than', 'that', 'their', 'them', 'then', 'there', 'these', 'they', 'this', 'those', 'through', 'time', 'today', 'told', 'tonight', 'under', 'until', 'update', 'very', 'warns', 'week', 'weeks', 'were', 'what', 'when', 'where', 'which', 'while', 'will', 'with', 'would', 'year', 'years', 'your', 'reveals', 'revealed', 'named', 'named', 'watch', 'video', 'pictures', 'photos', 'live', 'explained', 'everything', 'know'];
 
     /** Significant tokens of a headline, lower-cased; proper nouns are tracked separately. */
     public static function tokens(string $title): array
@@ -157,7 +157,7 @@ final class Clusters
         $first = $members[0];
         $framing = count($names) === 1
             ? $n . ' reports from ' . $names[0]
-            : $names[0] . ' had it first at ' . date_irish($first['t'], 'H:i') . '; ' . self::joinNames(array_slice($names, 1, 3)) . (count($names) > 4 ? ' and ' . (count($names) - 4) . ' more' : '') . ' followed' . ($n > count($names) ? ' with ' . $n . ' reports between them' : '') . '.';
+            : $names[0] . ' had it first at ' . date_in($first['t'], 'H:i') . '; ' . self::joinNames(array_slice($names, 1, 3)) . (count($names) > 4 ? ' and ' . (count($names) - 4) . ' more' : '') . ' followed' . ($n > count($names) ? ' with ' . $n . ' reports between them' : '') . '.';
         Database::query('UPDATE story_clusters SET lead_id=?,count=?,outlets_json=?,framing=?,updated_at=? WHERE id=?', [$lead['id'], $n, json_encode(array_values($outlets), JSON_UNESCAPED_UNICODE), $framing, now(), $clusterId]);
         Database::query('UPDATE stories SET cluster_count=? WHERE cluster_id=?', [$n, $clusterId]);
     }

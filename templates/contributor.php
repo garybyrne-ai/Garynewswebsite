@@ -11,7 +11,7 @@
       <span><?= (int)$c['reported'] ?> original <?= $c['reported'] === 1 ? 'report' : 'reports' ?></span>
       <span><?= (int)$c['curated'] ?> wire stories curated</span>
       <span>Reputation <?= (int)$c['reputation'] ?>/100</span>
-      <span>Joined <?= e(date_irish($c['created_at'], 'M Y')) ?></span>
+      <span>Joined <?= e(date_in($c['created_at'], 'M Y')) ?></span>
     </div>
   </div>
 </section>

@@ -9,7 +9,7 @@ use MeNews\Stories;
 use MeNews\Support\Daily;
 
 /**
- * "Your Wicklow morning": the 7am county email (five stories, weather, deaths, what's on)
+ * "Your Maharashtra morning": the 7am state email (five stories, weather, deaths, what's on)
  * and the 90-second spoken bulletin built from the same material.
  */
 final class Digest
@@ -79,18 +79,18 @@ final class Digest
         if ($d['deaths']) {
             $h .= '<h2 style="font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#139a5c;margin:22px 0 8px">Deaths</h2><ul style="padding-left:20px;margin:0">';
             foreach ($d['deaths'] as $n) {
-                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e($n['town'] ?: '') . ($n['funeral_at'] ? ' · funeral ' . e(date_irish($n['funeral_at'], 'D H:i')) : '') . '</span></li>';
+                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e($n['town'] ?: '') . ($n['funeral_at'] ? ' · funeral ' . e(date_in($n['funeral_at'], 'D H:i')) : '') . '</span></li>';
             }
             $h .= '</ul>';
         }
         if ($d['events']) {
             $h .= '<h2 style="font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#139a5c;margin:22px 0 8px">What’s on</h2><ul style="padding-left:20px;margin:0">';
             foreach ($d['events'] as $n) {
-                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e(date_irish($n['event_at'], 'D j M H:i')) . ($n['venue'] ? ' · ' . e($n['venue']) : '') . '</span></li>';
+                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e(date_in($n['event_at'], 'D j M H:i')) . ($n['venue'] ? ' · ' . e($n['venue']) : '') . '</span></li>';
             }
             $h .= '</ul>';
         }
-        $h .= '<p style="margin-top:22px;color:#33423a"><b>Shabd of the day:</b> <i>' . e($d['focal']['irish']) . '</i> — ' . e($d['focal']['english']) . '</p>';
+        $h .= '<p style="margin-top:22px;color:#33423a"><b>Shabd of the day:</b> <i>' . e($d['focal']['hindi']) . '</i> — ' . e($d['focal']['english']) . '</p>';
         $h .= '<p style="margin-top:18px"><a href="' . e($base . '/county/' . slugify($county)) . '" style="display:inline-block;background:#139a5c;color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:700">All of ' . e($county) . ' →</a> &nbsp; <a href="' . e($base . '/#community') . '" style="color:#d92645;font-weight:700;text-decoration:none">Report something</a></p>';
         if ($token !== 'preview') {
             $h .= '<p style="color:#59685f;font-size:12px;margin-top:22px">You asked for the ' . e($county) . ' morning email. <a href="' . e($base . '/alerts/unsubscribe/' . $token) . '" style="color:#59685f">Unsubscribe</a></p>';
@@ -113,7 +113,7 @@ final class Digest
         $cache = [];
         $n = 0;
         foreach ($rows as $s) {
-            if (!$force && $s['last_daily_at'] && str_starts_with(date_irish($s['last_daily_at'], 'Y-m-d'), $day)) {
+            if (!$force && $s['last_daily_at'] && str_starts_with(date_in($s['last_daily_at'], 'Y-m-d'), $day)) {
                 continue;
             }
             $cache[$s['county']] ??= self::html($s['county'], '{{token}}');
@@ -155,7 +155,7 @@ final class Digest
         if ($events) {
             $h .= '<h2 style="font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:#139a5c;margin:22px 0 8px">Coming up</h2><ul style="padding-left:20px;margin:0">';
             foreach ($events as $n) {
-                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e(date_irish($n['event_at'], 'D j M H:i')) . ($n['venue'] ? ' · ' . e($n['venue']) : '') . '</span></li>';
+                $h .= '<li style="margin:0 0 6px"><a href="' . e($base . $n['url']) . '" style="color:#0b1410;font-weight:700;text-decoration:none">' . e($n['title']) . '</a> <span style="color:#59685f;font-size:13px">' . e(date_in($n['event_at'], 'D j M H:i')) . ($n['venue'] ? ' · ' . e($n['venue']) : '') . '</span></li>';
             }
             $h .= '</ul>';
         }
@@ -175,7 +175,7 @@ final class Digest
         $n = 0;
         $cache = [];
         foreach (Database::all("SELECT id,email,display_name,home_county,last_monthly_at FROM users WHERE plan='Wire+' ORDER BY home_county") as $u) {
-            if (!$force && $u['last_monthly_at'] && str_starts_with(date_irish($u['last_monthly_at'], 'Y-m'), $month)) {
+            if (!$force && $u['last_monthly_at'] && str_starts_with(date_in($u['last_monthly_at'], 'Y-m'), $month)) {
                 continue;
             }
             $county = (string)($u['home_county'] ?? '');
@@ -211,9 +211,9 @@ final class Digest
             $lines[] = 'Deaths notified in ' . $name . ': ' . implode('; ', array_map(static fn($n) => $n['title'] . ($n['town'] ? ', ' . $n['town'] : ''), array_slice($d['deaths'], 0, 4))) . '.';
         }
         if ($d['events']) {
-            $lines[] = 'Coming up: ' . implode('; ', array_map(static fn($n) => $n['title'] . ' on ' . date_irish($n['event_at'], 'l'), array_slice($d['events'], 0, 3))) . '.';
+            $lines[] = 'Coming up: ' . implode('; ', array_map(static fn($n) => $n['title'] . ' on ' . date_in($n['event_at'], 'l'), array_slice($d['events'], 0, 3))) . '.';
         }
-        $lines[] = 'And today’s Hindi word is ' . $d['focal']['irish'] . ', meaning ' . $d['focal']['english'] . '. That’s the bulletin. Report what you can see at Bharat Wire.';
+        $lines[] = 'And today’s Hindi word is ' . $d['focal']['hindi'] . ', meaning ' . $d['focal']['english'] . '. That’s the bulletin. Report what you can see at Bharat Wire.';
         return ['county' => $county, 'lines' => $lines, 'text' => implode(' ', $lines), 'lang' => 'en-IN'];
     }
 }

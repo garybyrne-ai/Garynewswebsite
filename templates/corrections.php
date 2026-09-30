@@ -14,7 +14,7 @@
   <h2>Corrections log</h2>
   <?php if ($log): ?>
     <div class="tablewrap"><table class="table"><thead><tr><th>Date</th><th>Story</th><th>Correction</th></tr></thead><tbody>
-      <?php foreach ($log as $c): ?><tr><td class="mono"><?= e(date_irish($c['created_at'], 'j M Y')) ?></td><td><?= $c['slug'] ? '<a href="/story/' . e($c['slug']) . '">' . e($c['story_title'] ?: $c['title']) . '</a>' : e($c['title']) ?></td><td><?= e($c['summary']) ?><?= $c['detail'] ? '<br><small style="color:var(--muted)">' . e($c['detail']) . '</small>' : '' ?></td></tr><?php endforeach; ?>
+      <?php foreach ($log as $c): ?><tr><td class="mono"><?= e(date_in($c['created_at'], 'j M Y')) ?></td><td><?= $c['slug'] ? '<a href="/story/' . e($c['slug']) . '">' . e($c['story_title'] ?: $c['title']) . '</a>' : e($c['title']) ?></td><td><?= e($c['summary']) ?><?= $c['detail'] ? '<br><small style="color:var(--muted)">' . e($c['detail']) . '</small>' : '' ?></td></tr><?php endforeach; ?>
     </tbody></table></div>
   <?php else: ?>
     <p>No corrections have been needed yet. When one is, it will appear here the same day.</p>

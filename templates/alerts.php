@@ -34,7 +34,7 @@
               <span class="warn__level mono"><?= e($w['level']) ?><?= $w['advisory'] ? ' advisory' : ' warning' ?></span>
               <h3><?= e($w['headline']) ?></h3>
               <p><?= e($w['description']) ?></p>
-              <p class="warn__meta mono"><?= $w['onset'] ? 'From ' . e(date_irish($w['onset'], 'D H:i')) : '' ?><?= $w['expiry'] ? ' until ' . e(date_irish($w['expiry'], 'D H:i')) : '' ?> · <?= $w['national'] ? 'All of India' : e(implode(', ', $w['counties'])) ?></p>
+              <p class="warn__meta mono"><?= $w['onset'] ? 'From ' . e(date_in($w['onset'], 'D H:i')) : '' ?><?= $w['expiry'] ? ' until ' . e(date_in($w['expiry'], 'D H:i')) : '' ?> · <?= $w['national'] ? 'All of India' : e(implode(', ', $w['counties'])) ?></p>
             </article>
           <?php endforeach; ?>
         </div>
@@ -56,7 +56,7 @@
       <form class="form panel" id="closure-form" data-closure style="margin-top:22px">
         <span class="kicker"><?= icon('school') ?> Principals &amp; boards of management: report a closure</span>
         <div class="form__row"><label>School name<input name="school" required minlength="3"></label><label>State<select name="county" required data-county-select><option value="">Select state</option><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select></label></div>
-        <div class="form__row"><label>Town<input name="town" list="all-locations" autocomplete="off"></label><label>Reason<input name="reason" placeholder="e.g. Storm Ciarán, no water supply, heating failure"></label></div>
+        <div class="form__row"><label>Town<input name="town" list="all-locations" autocomplete="off"></label><label>Reason<input name="reason" placeholder="e.g. Cyclone Biparjoy, flooding, no water supply, power outage"></label></div>
         <div class="form__row"><label>Closed on<input name="closed_on" type="date" required value="<?= date('Y-m-d') ?>"></label><label>Reopens (optional)<input name="reopens_on" type="date"></label></div>
         <div class="form__row"><label>Your name<input name="contact_name" required></label><label>Role<input name="contact_role" value="Principal"></label></div>
         <label>School email address <small class="form__hint">We send a one-tap confirmation here. Closures go live the moment you confirm.</small><input name="contact_email" type="email" required></label>

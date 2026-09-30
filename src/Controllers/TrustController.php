@@ -116,7 +116,7 @@ final class TrustController
         $storyId = $r->post('story_id', '', 40) ?: null;
         Database::insert('corrections', ['created_at' => now(), 'story_id' => $storyId, 'title' => $title, 'summary' => $summary, 'detail' => $r->post('detail', '', 3000), 'editor_id' => $u['id']]);
         if ($storyId) {
-            Database::query('UPDATE stories SET editorial_note=COALESCE(editorial_note,\'\') || ? , updated_at=? WHERE id=?', [(Database::value('SELECT editorial_note FROM stories WHERE id=?', [$storyId]) ? "\n" : '') . 'Correction (' . date_irish(now(), 'j M Y') . '): ' . $summary, now(), $storyId]);
+            Database::query('UPDATE stories SET editorial_note=COALESCE(editorial_note,\'\') || ? , updated_at=? WHERE id=?', [(Database::value('SELECT editorial_note FROM stories WHERE id=?', [$storyId]) ? "\n" : '') . 'Correction (' . date_in(now(), 'j M Y') . '): ' . $summary, now(), $storyId]);
         }
         Audit::log($u['id'], 'correction.add', 'story', $storyId ?? '', $title);
         return Response::json(['ok' => true]);

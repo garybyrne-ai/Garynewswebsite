@@ -71,7 +71,7 @@ final class Daily
         static $bank;
         $bank ??= json_decode((string)file_get_contents(ME_ROOT . '/config/kids/focal.json'), true)['words'] ?? [];
         if (!$bank) {
-            return ['irish' => 'नमस्ते', 'english' => 'hello / greetings', 'say' => 'nuh-MASS-tay', 'example' => 'Namaste, aap kaise hain?'];
+            return ['hindi' => 'नमस्ते', 'english' => 'hello / greetings', 'say' => 'nuh-MASS-tay', 'example' => 'Namaste, aap kaise hain?'];
         }
         $d = new DateTimeImmutable($date ?? self::date(), self::zone());
         return $bank[(int)$d->format('z') % count($bank)];

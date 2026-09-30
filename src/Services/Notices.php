@@ -224,7 +224,7 @@ final class Notices
             Mailer::send($s['email'], ($n['kind'] === 'death' ? 'Death notice: ' : 'New notice: ') . $n['title'] . ' · ' . $n['county'],
                 '<p><span style="color:#59685f;font-size:12px;letter-spacing:.1em;text-transform:uppercase">' . e(self::KINDS[$n['kind']]['label']) . ' · ' . e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) . '</span></p>'
                 . '<h2 style="margin:6px 0 10px;font-size:22px">' . e($n['title']) . '</h2>'
-                . ($n['funeral_at'] ? '<p><b>Funeral:</b> ' . e(date_irish($n['funeral_at'], 'l j F, H:i')) . ($n['funeral_venue'] ? ', ' . e($n['funeral_venue']) : '') . '</p>' : '')
+                . ($n['funeral_at'] ? '<p><b>Funeral:</b> ' . e(date_in($n['funeral_at'], 'l j F, H:i')) . ($n['funeral_venue'] ? ', ' . e($n['funeral_venue']) : '') . '</p>' : '')
                 . ($n['reposing'] ? '<p><b>Reposing:</b> ' . e($n['reposing']) . '</p>' : '')
                 . '<p>' . nl2br(e(excerpt($n['body'], 400))) . '</p>'
                 . '<p><a href="' . e($url) . '" style="color:#139a5c;font-weight:700">Read the full notice →</a></p>'

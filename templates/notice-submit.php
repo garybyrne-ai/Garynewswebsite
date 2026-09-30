@@ -13,22 +13,22 @@
 
       <label><span data-title-label>Full name of the deceased</span><input name="title" required maxlength="160" placeholder=""></label>
       <div class="form__row">
-        <label>Town / parish<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Rathdrum"></label>
+        <label>Town / locality<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Shivaji Nagar"></label>
         <label>State<select name="county" required data-county-select><option value="">Select state</option><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select></label>
       </div>
 
       <fieldset data-for="death memoriam" class="noticeform__group">
         <div class="form__row">
           <label>Date of death<input name="date_of_death" type="date"></label>
-          <label>Address (optional)<input name="address" placeholder="e.g. Main Street, formerly of Arklow"></label>
+          <label>Address (optional)<input name="address" placeholder="e.g. MG Road, formerly of Nashik"></label>
         </div>
-        <label>Reposing<textarea name="reposing" rows="2" placeholder="e.g. Reposing at Byrne's Funeral Home, Rathdrum, on Thursday from 4pm to 7pm."></textarea></label>
+        <label>Reposing<textarea name="reposing" rows="2" placeholder="e.g. Reposing at Sharma Funeral Home, Shivaji Nagar, on Thursday from 4pm to 7pm."></textarea></label>
         <div class="form__row">
           <label>Funeral date &amp; time<input name="funeral_at" type="datetime-local"></label>
-          <label>Funeral venue<input name="funeral_venue" placeholder="e.g. St Mary's Church, Rathdrum"></label>
+          <label>Funeral venue<input name="funeral_venue" placeholder="e.g. St Mary's Church, Bandra"></label>
         </div>
-        <label>Burial / cremation<input name="burial" placeholder="e.g. Burial afterwards in the adjoining cemetery"></label>
-        <label>Family message (optional)<textarea name="family_message" rows="2" placeholder="e.g. Family flowers only; donations, if desired, to Wicklow Hospice. House private on the morning of the funeral."></textarea></label>
+        <label>Burial / cremation<input name="burial" placeholder="e.g. Cremation afterwards at the municipal crematorium"></label>
+        <label>Family message (optional)<textarea name="family_message" rows="2" placeholder="e.g. Family flowers only; donations, if desired, to a charity of your choice. House private on the morning of the funeral."></textarea></label>
       </fieldset>
 
       <fieldset data-for="event" class="noticeform__group">
@@ -37,25 +37,25 @@
           <label>Ends (optional)<input name="event_end" type="datetime-local"></label>
         </div>
         <div class="form__row">
-          <label>Venue<input name="venue" placeholder="e.g. Arklow Bay Hotel"></label>
+          <label>Venue<input name="venue" placeholder="e.g. Hotel Grand Palace, Pune"></label>
           <label>Price<input name="price" placeholder="e.g. Free · ₹500 · ₹200 kids"></label>
         </div>
       </fieldset>
 
       <fieldset data-for="job" class="noticeform__group">
         <div class="form__row">
-          <label>Employer<input name="contact_org_job" placeholder="e.g. Byrne's Hardware"></label>
+          <label>Employer<input name="contact_org_job" placeholder="e.g. Sharma Hardware Store"></label>
           <label>Pay / hours<input name="price" placeholder="e.g. ₹300/hr, 30 hrs"></label>
         </div>
       </fieldset>
 
       <fieldset data-for="result" class="noticeform__group">
-        <label>Competition<input name="competition" placeholder="e.g. Wicklow Junior B Football Championship"></label>
+        <label>Competition<input name="competition" placeholder="e.g. Maharashtra District Kabaddi Championship"></label>
         <div class="form__row form__row--score">
-          <label>Home<input name="home" placeholder="Rathdrum"></label>
-          <label>Score<input name="home_score" placeholder="1-12"></label>
-          <label>Score<input name="away_score" placeholder="0-09"></label>
-          <label>Away<input name="away" placeholder="Avondale"></label>
+          <label>Home<input name="home" placeholder="Shivaji Nagar"></label>
+          <label>Score<input name="home_score" placeholder="156"></label>
+          <label>Score<input name="away_score" placeholder="142"></label>
+          <label>Away<input name="away" placeholder="Andheri"></label>
         </div>
         <label>Club notes (optional)<textarea name="club_notes" rows="3" placeholder="Fixtures, lotto, training times, congratulations…"></textarea></label>
       </fieldset>
@@ -95,7 +95,7 @@
     'memoriam' => ['Name of the person remembered', 'Your message'],
     'event' => ['Event title', 'What’s happening'],
     'job' => ['Job title', 'About the role'],
-    'planning' => ['Notice title (e.g. Planning application, Main Street)', 'Full text of the notice'],
+    'planning' => ['Notice title (e.g. Planning application, MG Road)', 'Full text of the notice'],
     'pet' => ['Pet’s name and type (e.g. Bella, black labrador)', 'Where and when, markings, how to contact you'],
-    'result' => ['Headline (e.g. Rathdrum through to county semi-final)', 'Match report (optional)'],
+    'result' => ['Headline (e.g. Shivaji Nagar through to state semi-final)', 'Match report (optional)'],
 ]) . ';</script>'; ?>

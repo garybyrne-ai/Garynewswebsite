@@ -136,7 +136,7 @@ final class Alerts
             if ($w['advisory'] || strtotime($w['expiry'] ?: 'now') < time()) {
                 continue;
             }
-            $until = $w['expiry'] ? ' until ' . date_irish($w['expiry'], 'D H:i') : '';
+            $until = $w['expiry'] ? ' until ' . date_in($w['expiry'], 'D H:i') : '';
             return $w['level'] . ' ' . strtolower($w['kind']) . ' warning' . ($w['national'] ? '' : ($county ? ' · ' . $county : ' · ' . count($w['counties']) . ' states')) . $until;
         }
         return '';
@@ -318,7 +318,7 @@ final class Alerts
                 }
                 Mailer::send($s['email'], ($w['source'] ?? 'SACHET') . ' ' . $w['level'] . ' ' . strtolower($w['kind']) . ' warning · ' . $s['county'],
                     '<p><b style="color:' . (['Yellow' => '#c7780a', 'Orange' => '#e0641e', 'Red' => '#d92645'][$w['level']] ?? '#c7780a') . '">' . e($w['level'] . ' ' . $w['kind'] . ' warning') . '</b> · ' . e($w['headline']) . '</p><p>' . nl2br(e($w['description'])) . '</p>'
-                    . ($w['expiry'] ? '<p>Valid until ' . e(date_irish($w['expiry'], 'l H:i')) . '.</p>' : '')
+                    . ($w['expiry'] ? '<p>Valid until ' . e(date_in($w['expiry'], 'l H:i')) . '.</p>' : '')
                     . '<p><a href="' . e(absolute_url('/alerts')) . '" style="color:#139a5c;font-weight:700">Closures and warnings for your state →</a></p>'
                     . '<p style="color:#59685f;font-size:12px"><a href="' . e(absolute_url('/alerts/unsubscribe/' . $s['token'])) . '" style="color:#59685f">Unsubscribe</a></p>');
                 $n++;

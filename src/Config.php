@@ -103,7 +103,7 @@ final class Config
         return ($https ? 'https://' : 'http://') . $host;
     }
 
-    /** Accept "example.ie", "https://example.ie/" etc.; reject anything that is not a web address. */
+    /** Accept "example.in", "https://example.in/" etc.; reject anything that is not a web address. */
     public static function normaliseBase(string $value): string
     {
         $value = trim($value);

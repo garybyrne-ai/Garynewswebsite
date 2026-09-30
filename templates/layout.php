@@ -145,7 +145,7 @@ $more = [
   </div>
   <nav class="sections" aria-label="Sections">
     <div class="container sections__in">
-      <a href="<?= $myCounty ? '/county/' . e($countySlug) : '/near' ?>" class="sections__county <?= $active('/near') ?: ($myCounty && $path === '/county/' . $countySlug ? 'is-active' : '') ?>"><?= icon('pin') ?> <?= $myCounty ? e($myCounty) : e(t('Your county')) ?></a>
+      <a href="<?= $myCounty ? '/county/' . e($countySlug) : '/near' ?>" class="sections__county <?= $active('/near') ?: ($myCounty && $path === '/county/' . $countySlug ? 'is-active' : '') ?>"><?= icon('pin') ?> <?= $myCounty ? e($myCounty) : e(t('Your state')) ?></a>
       <?php foreach ($primary as [$href, $label, $ic]): ?>
         <a href="<?= e($href) ?>" class="<?= $active($href, $href === '/notices') ?>"><?= e(t($label)) ?></a>
       <?php endforeach; ?>
@@ -164,7 +164,7 @@ $more = [
   </nav>
 </header>
 
-<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate.')) ?> <a href="/lang/en-GB?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
+<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate.')) ?> <a href="/lang/en-IN?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
 <main id="main" class="<?= $isApp ? 'app' : 'site' ?>">
 <?= $content ?>
 </main>
@@ -279,7 +279,7 @@ $more = [
       <form id="register-form" class="form" data-auth-view="register" hidden>
         <label>Your name<input name="display_name" required minlength="2" autocomplete="name"></label>
         <div class="form__row">
-          <label>Home town<input name="home_town" list="all-locations" autocomplete="off" placeholder="e.g. Bray"></label>
+          <label>Home town<input name="home_town" list="all-locations" autocomplete="off" placeholder="e.g. Koregaon Park"></label>
           <label>State<select name="home_county" data-county-select><option value="">Select state</option></select></label>
         </div>
         <label>Email<input name="email" type="email" autocomplete="email" required></label>

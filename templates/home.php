@@ -19,7 +19,7 @@ $countySlug = $county ? slugify($county) : '';
       <span class="masthead__wx"><?php foreach (array_slice($weather['cities'], 0, 5) as $c): ?><span><?= e($c['icon']) ?> <?= e($c['name']) ?> <b><?= (int)$c['temp'] ?>°</b></span><?php endforeach; ?></span>
     <?php endif; ?>
     <?php if (!empty($warnings)): ?><a class="masthead__warn" href="/alerts"><?= icon('alert') ?> <?= e($warnings) ?></a><?php endif; ?>
-    <span class="masthead__focal">Shabd of the day: <b><?= e($focal['irish']) ?></b> — <?= e($focal['english']) ?></span>
+    <span class="masthead__focal">Shabd of the day: <b><?= e($focal['hindi']) ?></b> — <?= e($focal['english']) ?></span>
   </div>
 </div>
 

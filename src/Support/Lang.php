@@ -10,12 +10,12 @@ namespace MeNews\Support;
  */
 final class Lang
 {
-    public const DEFAULT = 'en-GB';
+    public const DEFAULT = 'en-IN';
     public const COOKIE = 'me_lang';
 
     /** code => [label in English, native name, Google Translate code (null = no translation), flag] */
     public const LANGS = [
-        'en-GB' => ['English (UK)', 'English (UK)', null, '🇬🇧'],
+        'en-IN' => ['English (India)', 'English (India)', null, '🇮🇳'],
         'en-US' => ['English (US)', 'English (US)', null, '🇺🇸'],
         'hi' => ['Hindi', 'हिन्दी', 'hi', '🇮🇳'],
         'bn' => ['Bengali', 'বাংলা', 'bn', '🇮🇳'],

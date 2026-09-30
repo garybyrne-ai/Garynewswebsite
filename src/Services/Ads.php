@@ -153,13 +153,13 @@ final class Ads
                 }
                 return ['Trial ended · subscribe to resume', 'bad'];
             case 'active':
-                return [($ad['current_period_end'] ?? '') > $now ? 'Live · renews ' . date_irish($ad['current_period_end'], 'j M') : 'Payment due', ($ad['current_period_end'] ?? '') > $now ? 'good' : 'bad'];
+                return [($ad['current_period_end'] ?? '') > $now ? 'Live · renews ' . date_in($ad['current_period_end'], 'j M') : 'Payment due', ($ad['current_period_end'] ?? '') > $now ? 'good' : 'bad'];
             case 'past_due':
                 return ['Payment failed · update your card', 'bad'];
             case 'comped':
-                return [($ad['current_period_end'] ?? '') > $now ? 'Live · until ' . date_irish($ad['current_period_end'], 'j M Y') : 'Expired', ($ad['current_period_end'] ?? '') > $now ? 'good' : 'bad'];
+                return [($ad['current_period_end'] ?? '') > $now ? 'Live · until ' . date_in($ad['current_period_end'], 'j M Y') : 'Expired', ($ad['current_period_end'] ?? '') > $now ? 'good' : 'bad'];
             case 'cancelled':
-                return [($ad['current_period_end'] ?? '') > $now ? 'Cancelled · runs until ' . date_irish($ad['current_period_end'], 'j M') : 'Cancelled', 'muted'];
+                return [($ad['current_period_end'] ?? '') > $now ? 'Cancelled · runs until ' . date_in($ad['current_period_end'], 'j M') : 'Cancelled', 'muted'];
             default:
                 return ['Approved · attach a package to go live', 'warn'];
         }

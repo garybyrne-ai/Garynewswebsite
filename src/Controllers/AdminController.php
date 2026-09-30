@@ -627,7 +627,7 @@ final class AdminController
         }
         Database::setSetting('mail_last_error', '');
         $m = \MeNews\Services\Mailer::class;
-        $sent = $m::send($to, 'Bharat Wire test email', '<p>This is a test from the Bharat Wire newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_irish(now())) . ' by ' . e($u['display_name']) . '.</p>');
+        $sent = $m::send($to, 'Bharat Wire test email', '<p>This is a test from the Bharat Wire newsroom.</p><p>If you are reading it, <b>' . e($m::transport()) . '</b> delivery is working and alerts, digests and receipts will reach your readers.</p><p style="color:#59685f;font-size:13px">Sent ' . e(date_in(now())) . ' by ' . e($u['display_name']) . '.</p>');
         $err = (string)Database::setting('mail_last_error', '');
         Audit::log($u['id'], 'mail.test', 'settings', 'mail', $to . ' · ' . ($err ?: 'ok'));
         if ($err !== '') {

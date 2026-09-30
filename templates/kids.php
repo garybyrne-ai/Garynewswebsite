@@ -37,7 +37,7 @@
       <div class="paper__item">
         <span class="paper__stamp">Hindi</span>
         <h2>Shabd of the day</h2>
-        <p class="paper__focal paper__focal--lg"><b><?= e($focal['irish']) ?></b><span><?= e($focal['english']) ?></span><small>say: <?= e($focal['say']) ?></small></p>
+        <p class="paper__focal paper__focal--lg"><b><?= e($focal['hindi']) ?></b><span><?= e($focal['english']) ?></span><small>say: <?= e($focal['say']) ?></small></p>
         <p><em><?= e($focal['example']) ?></em></p>
         <p>A new word every day. Learn one, use it at the dinner table tonight.</p>
       </div>

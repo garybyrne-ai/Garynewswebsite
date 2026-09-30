@@ -6,7 +6,7 @@ namespace MeNews\Support;
 /**
  * The visitor's chosen locality, kept in two small cookies set by the browser:
  *   me_loc    = "lat,lng"   (from the Geolocation API, rounded to ~100 m)
- *   me_county = "Wicklow"   (manual choice, or derived from me_loc)
+ *   me_county = "Maharashtra"   (manual choice, or derived from me_loc)
  * Nothing is stored server-side; the cookies only shape the "Near you" section.
  */
 final class Visitor

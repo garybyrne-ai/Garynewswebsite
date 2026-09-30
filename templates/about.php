@@ -13,12 +13,12 @@
 
   <h2 id="labels">How we check things: the labels</h2>
   <div class="labels-grid">
-    <div><?= \MeNews\Ui::label('Wire') ?><p>A headline from an established publisher, curated by our desk and linked to the original. ME has not independently checked it; the publisher's own standards apply.</p></div>
+    <div><?= \MeNews\Ui::label('Wire') ?><p>A headline from an established publisher, curated by our desk and linked to the original. Bharat Wire has not independently checked it; the publisher's own standards apply.</p></div>
     <div><?= \MeNews\Ui::label('Corroborated') ?><p>A community report that three separate people have independently confirmed with “I saw this too”.</p></div>
     <div><?= \MeNews\Ui::label('Community Report') ?><p>Reported by a member of the public. Screened for safety but not yet corroborated.</p></div>
     <div><?= \MeNews\Ui::label('Developing') ?><p>Editors are actively checking. Details may change.</p></div>
-    <div><?= \MeNews\Ui::label('Verified') ?><p>Checked by an ME editor: the reporter was contacted, the media and location examined, and the facts stood up. Never applied to wire headlines.</p></div>
-    <div><?= \MeNews\Ui::label('Official') ?><p>Based on a published statement from a public body such as a council, Garda Síochána or a Government department.</p></div>
+    <div><?= \MeNews\Ui::label('Verified') ?><p>Checked by a Bharat Wire editor: the reporter was contacted, the media and location examined, and the facts stood up. Never applied to wire headlines.</p></div>
+    <div><?= \MeNews\Ui::label('Official') ?><p>Based on a published statement from a public body such as the police, a state government department or a central Ministry.</p></div>
   </div>
 
   <h2 id="sources">Our wire sources</h2>
@@ -31,7 +31,7 @@
     <h2>Recent wire activity</h2>
     <div class="tablewrap"><table class="table mono">
       <thead><tr><th>Source</th><th>Started</th><th>Fetched</th><th>New</th><th>Result</th></tr></thead>
-      <tbody><?php foreach ($runs as $r): ?><tr><td><?= e($r['source_key']) ?></td><td><?= e(date_irish($r['started_at'], 'D H:i')) ?></td><td><?= (int)$r['fetched'] ?></td><td><?= (int)$r['inserted'] ?></td><td><?= $r['error'] ? '<span class="is-bad">' . e(excerpt($r['error'], 60)) . '</span>' : '<span class="is-good">ok</span>' ?></td></tr><?php endforeach; ?></tbody>
+      <tbody><?php foreach ($runs as $r): ?><tr><td><?= e($r['source_key']) ?></td><td><?= e(date_in($r['started_at'], 'D H:i')) ?></td><td><?= (int)$r['fetched'] ?></td><td><?= (int)$r['inserted'] ?></td><td><?= $r['error'] ? '<span class="is-bad">' . e(excerpt($r['error'], 60)) . '</span>' : '<span class="is-good">ok</span>' ?></td></tr><?php endforeach; ?></tbody>
     </table></div>
   <?php endif; ?>
 

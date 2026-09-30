@@ -13,7 +13,7 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
     <header class="panel__head"><span class="kicker"><?= icon('candle') ?> Notices<?= $county ? ' · ' . e($county) : '' ?></span><a class="mono panel__hint" href="/notices<?= $county ? '?county=' . rawurlencode($county) : '' ?>">All →</a></header>
     <ul class="noticelist">
       <?php foreach ($notices as $n): ?>
-        <li><a href="<?= e($n['url']) ?>"><span class="noticelist__kind mono"><?= icon($n['icon']) ?> <?= e($n['kind_label']) ?></span><b><?= e($n['title']) ?></b><small><?= e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) ?><?= $n['kind'] === 'death' && $n['funeral_at'] ? ' · Funeral ' . e(date_irish($n['funeral_at'], 'D H:i')) : '' ?></small></a></li>
+        <li><a href="<?= e($n['url']) ?>"><span class="noticelist__kind mono"><?= icon($n['icon']) ?> <?= e($n['kind_label']) ?></span><b><?= e($n['title']) ?></b><small><?= e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) ?><?= $n['kind'] === 'death' && $n['funeral_at'] ? ' · Funeral ' . e(date_in($n['funeral_at'], 'D H:i')) : '' ?></small></a></li>
       <?php endforeach; ?>
     </ul>
     <p class="panel__note"><a href="/notices/submit">Place a notice</a> · free for families and clubs.</p>
@@ -95,7 +95,7 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
     <header class="panel__head"><span class="kicker"><?= icon('calendar') ?> Festivals &amp; holidays<?= $county ? ' · ' . e($county) : '' ?></span></header>
     <ul class="noticelist">
       <?php foreach ($festivals as $f): ?>
-        <li><div><b><?= e($f['name']) ?></b><small><?= $f['date'] ? e(date_irish($f['date'], 'D j M')) . ($f['in_days'] === 0 ? ' · today' : ($f['in_days'] === 1 ? ' · tomorrow' : ' · in ' . (int)$f['in_days'] . ' days')) : 'Date varies — check locally' ?></small></div></li>
+        <li><div><b><?= e($f['name']) ?></b><small><?= $f['date'] ? e(date_in($f['date'], 'D j M')) . ($f['in_days'] === 0 ? ' · today' : ($f['in_days'] === 1 ? ' · tomorrow' : ' · in ' . (int)$f['in_days'] . ' days')) : 'Date varies — check locally' ?></small></div></li>
       <?php endforeach; ?>
     </ul>
   </section>
@@ -108,7 +108,7 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
       <input type="hidden" name="kinds[]" value="daily">
       <input type="hidden" name="county" value="<?= e((string)$county) ?>" data-subscribe-county>
       <label class="sr-only" for="side-sub-email">Email</label>
-      <div class="inline"><input id="side-sub-email" name="email" type="email" required placeholder="you@example.ie" value="<?= e($user['email'] ?? '') ?>"><button class="btn btn--primary btn--sm" type="submit">Sign up</button></div>
+      <div class="inline"><input id="side-sub-email" name="email" type="email" required placeholder="you@example.in" value="<?= e($user['email'] ?? '') ?>"><button class="btn btn--primary btn--sm" type="submit">Sign up</button></div>
       <p class="form__result" data-subscribe-result></p>
     </form>
   </section>
@@ -127,7 +127,7 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
     <?php if ($ads): ?>
       <?= \MeNews\Services\Ads::slot($ads, 'sidebar') ?>
     <?php else: ?>
-      <p class="panel__note">Your business could be here — designed in minutes, from <?= e(\MeNews\Services\AdPackages::money((int)(\MeNews\Services\AdPackages::all()[0]['price_cents'] ?? 600))) ?>. <a href="/advertise">Advertise with ME</a>.</p>
+      <p class="panel__note">Your business could be here — designed in minutes, from <?= e(\MeNews\Services\AdPackages::money((int)(\MeNews\Services\AdPackages::all()[0]['price_cents'] ?? 600))) ?>. <a href="/advertise">Advertise with us</a>.</p>
     <?php endif; ?>
   </section>
   <?php endif; ?>

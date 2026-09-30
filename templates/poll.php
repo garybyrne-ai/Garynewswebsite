@@ -8,7 +8,7 @@
     <?php if ($poll): ?>
       <?= \MeNews\View::partial('partials/poll', ['poll' => $poll, 'county' => $county, 'compact' => false]) ?>
       <section class="block reveal" style="margin-top:32px">
-        <header class="block__head"><span class="block__index mono"><?= icon('map') ?></span><h2 class="block__title">State by state</h2><p class="block__blurb"><?= $poll['results']['total'] ?> votes so far<?= $poll['closed'] ? ' · closed' : ' · closes ' . e(date_irish($poll['closes_at'], 'l H:i')) ?></p></header>
+        <header class="block__head"><span class="block__index mono"><?= icon('map') ?></span><h2 class="block__title">State by state</h2><p class="block__blurb"><?= $poll['results']['total'] ?> votes so far<?= $poll['closed'] ? ' · closed' : ' · closes ' . e(date_in($poll['closes_at'], 'l H:i')) ?></p></header>
         <?php if ($poll['breakdown']): ?>
           <div class="tablewrap"><table class="table"><thead><tr><th>State</th><th>Leaning</th><th>Share</th><th>Votes</th></tr></thead><tbody>
             <?php foreach ($poll['breakdown'] as $b): ?><tr><td><b><?= e($b['county']) ?></b></td><td><?= e($poll['options'][$b['lead']] ?? '') ?></td><td><div class="meter meter--sm"><i style="--v:<?= (int)$b['lead_pct'] ?>"></i></div> <?= (int)$b['lead_pct'] ?>%</td><td><?= (int)$b['total'] ?></td></tr><?php endforeach; ?>

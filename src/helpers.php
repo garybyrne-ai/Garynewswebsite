@@ -52,11 +52,11 @@ function time_ago(?string $iso): string
     if ($diff < 86400 * 7) {
         return intdiv($diff, 86400) . ' days ago';
     }
-    return date_irish($iso, 'j M Y');
+    return date_in($iso, 'j M Y');
 }
 
-/** Format an ISO timestamp in the site's local time (India by default; the name is historical). */
-function date_irish(?string $iso, string $format = 'D j M Y, H:i'): string
+/** Format an ISO timestamp in the site's local time (Asia/Kolkata by default). */
+function date_in(?string $iso, string $format = 'D j M Y, H:i'): string
 {
     if (!$iso) {
         return '';

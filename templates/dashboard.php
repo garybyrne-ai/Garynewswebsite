@@ -52,7 +52,7 @@
       <p class="pagehead__blurb">Local alerts arrive when an editor publishes a report in a place you follow. <span class="mono" id="follow-hint"></span></p>
       <form id="follow-form" class="form panel">
         <div class="form__row">
-          <label>Town / area<input name="location_name" list="all-locations" placeholder="e.g. Bray" autocomplete="off"></label>
+          <label>Town / area<input name="location_name" list="all-locations" placeholder="e.g. Koregaon Park" autocomplete="off"></label>
           <label>State<select name="county" data-county-select><option value="">Any state</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
         </div>
         <div class="form__actions"><button class="btn btn--primary" type="submit">Follow area</button></div>
@@ -63,7 +63,7 @@
       <form id="alerts-form" class="form panel">
         <div class="form__row">
           <label>State<select name="county" data-county-select required><option value="">Choose a state</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
-          <label>Town (optional)<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Bray"></label>
+          <label>Town (optional)<input name="town" list="all-locations" autocomplete="off" placeholder="e.g. Koregaon Park"></label>
         </div>
         <div class="checks"><?php foreach (\MeNews\Services\Alerts::KINDS as $k => $label): ?><label class="check"><input type="checkbox" name="kinds[]" value="<?= e($k) ?>" <?= in_array($k, ['deaths', 'closures', 'warnings', 'daily'], true) ? 'checked' : '' ?>><span><?= e($label) ?></span></label><?php endforeach; ?></div>
         <div class="form__actions"><button class="btn btn--primary" type="submit">Add state alerts</button></div>

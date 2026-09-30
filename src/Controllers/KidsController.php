@@ -17,7 +17,7 @@ use MeNews\View;
 final class KidsController
 {
     /** Stories a young reader can enjoy: What's On, Culture and Sport, minus anything grim. */
-    private const BLOCK = '/\b(dies?|died|death|dead|killed?|kill|murder|crash|collision|assault|rape|abuse|drugs?|cocaine|court|jail|prison|gardaí|garda|stab|shoot|shot|gun|knife|body|missing|injur|hospital|fatal|war|bomb|attack|threat|scam|fraud|suicide|overdose|arrest|charged|guilty|victim|racis|misogyn|cancer|tragedy|tragic|drown|drumcree|orange order|parade permission|protest|controvers|sectarian|loyalist|paramilitar|politic|election|minister|government|tax|strike|row over|anger|outrage|slam|blast|fury|feud|dispute|ban|lawsuit|sue|divorce|split|cheat|scandal|betting|gambl|alcohol|drink|vape|smok)/iu';
+    private const BLOCK = '/\b(dies?|died|death|dead|killed?|kill|murder|crash|collision|assault|rape|abuse|drugs?|cocaine|court|jail|prison|police|stab|shoot|shot|gun|knife|body|missing|injur|hospital|fatal|war|bomb|attack|threat|scam|fraud|suicide|overdose|arrest|charged|guilty|victim|racis|misogyn|cancer|tragedy|tragic|drown|communal|curfew|riot|protest|controvers|sectarian|politic|election|minister|government|tax|strike|row over|anger|outrage|slam|blast|fury|feud|dispute|ban|lawsuit|sue|divorce|split|cheat|scandal|betting|gambl|alcohol|drink|vape|smok)/iu';
 
     public static function youngReaders(int $limit = 6): array
     {

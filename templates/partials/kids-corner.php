@@ -18,7 +18,7 @@
       <div class="paper__item">
         <span class="paper__stamp">Hindi</span>
         <h3>Shabd of the day</h3>
-        <p class="paper__focal"><b><?= e($focal['irish']) ?></b><span><?= e($focal['english']) ?></span><small>say: <?= e($focal['say']) ?></small></p>
+        <p class="paper__focal"><b><?= e($focal['hindi']) ?></b><span><?= e($focal['english']) ?></span><small>say: <?= e($focal['say']) ?></small></p>
         <p><em><?= e($focal['example']) ?></em></p>
       </div>
       <a class="paper__item" href="/kids/quiz">

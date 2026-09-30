@@ -27,10 +27,10 @@ $prompts = ['Community' => 'Something happening now', 'Traffic' => 'A crash, clo
           <span class="dropzone__preview" hidden></span>
         </label>
         <div class="form__row">
-          <label>Town / area<input name="location_name" id="report-town" list="all-locations" required placeholder="e.g. Bray" autocomplete="off" value="<?= e($town ?? '') ?>"></label>
+          <label>Town / area<input name="location_name" id="report-town" list="all-locations" required placeholder="e.g. Koregaon Park" autocomplete="off" value="<?= e($town ?? '') ?>"></label>
           <label>State<select name="county" id="report-county" data-county-select><option value="">Select state</option><?php if ($county): ?><option selected><?= e($county) ?></option><?php endif; ?></select></label>
         </div>
-        <label>What can you see? <small class="form__hint">One or two lines is plenty. Describe only what you personally know — no names of people involved in an incident.</small><textarea name="body" rows="3" required minlength="12" placeholder="e.g. Two cars in a collision at the Main Street junction, gardaí on the scene, traffic backed up to the church."></textarea></label>
+        <label>What can you see? <small class="form__hint">One or two lines is plenty. Describe only what you personally know — no names of people involved in an incident.</small><textarea name="body" rows="3" required minlength="12" placeholder="e.g. Two vehicles in a collision at the main market junction, police on the scene, traffic backed up past the bus stand."></textarea></label>
         <label>Headline <small class="form__hint">Optional — we'll write one from your description if you leave it blank</small><input name="title" maxlength="180" placeholder="Short and factual"></label>
         <?php if (!$user): ?>
           <div class="form__row">

@@ -36,7 +36,7 @@ $jsonld = $isWire ? null : [
       <?= \MeNews\Support\Share::bar(['url' => absolute_url($story['url']), 'title' => $story['title'], 'text' => (string)($story['summary'] ?: ''), 'image' => $story['image'] ? absolute_url($story['image']) : ''], 'compact') ?>
       <div class="textsize" role="group" aria-label="Text size"><button type="button" data-textsize="" aria-label="Normal text">A</button><button type="button" data-textsize="lg" aria-label="Larger text">A</button><button type="button" data-textsize="xl" aria-label="Largest text">A</button></div>
       <div class="article__time mono">
-        <time datetime="<?= e($story['time']) ?>"><?= e(date_irish($story['time'])) ?></time>
+        <time datetime="<?= e($story['time']) ?>"><?= e(date_in($story['time'])) ?></time>
         <span>·</span><span><?= e(time_ago($story['time'])) ?></span>
         <?php if (views_label((int)$story['views']) !== ''): ?><span>·</span><span><?= e(views_label((int)$story['views'])) ?> reads</span><?php endif; ?>
         <?php if ($story['location_name']): ?><span>·</span><span><?= icon('pin') ?> <?= e($story['location_name']) ?><?= $story['county'] && !str_contains((string)$story['location_name'], $story['county']) ? ', ' . e($story['county']) : '' ?></span><?php endif; ?>
@@ -74,7 +74,7 @@ $jsonld = $isWire ? null : [
             <p class="coverage__framing"><?= e($cluster['framing']) ?> Bharat Wire's framing; each outlet's own headline is below.</p>
             <ol class="timeline">
               <?php $all = array_merge([['id' => $story['id'], 'slug' => $story['slug'], 'title' => $story['title'], 'source_name' => $story['source_name'], 'source_url' => $story['source_url'], 'source_author' => $story['source_author'], 't' => $story['time']]], $members); usort($all, static fn($a, $b) => strcmp($a['t'], $b['t'])); foreach ($all as $m): ?>
-                <li class="<?= $m['id'] === $story['id'] ? 'is-current' : '' ?>"><time class="mono"><?= e(date_irish($m['t'], 'D H:i')) ?></time><div><b><?= e($m['source_name']) ?></b><?= $m['source_author'] ? ' <span class="mono">' . e($m['source_author']) . '</span>' : '' ?><br><a href="<?= e($m['source_url']) ?>" target="_blank" rel="noopener"><?= e($m['title']) ?> <?= icon('external') ?></a></div></li>
+                <li class="<?= $m['id'] === $story['id'] ? 'is-current' : '' ?>"><time class="mono"><?= e(date_in($m['t'], 'D H:i')) ?></time><div><b><?= e($m['source_name']) ?></b><?= $m['source_author'] ? ' <span class="mono">' . e($m['source_author']) . '</span>' : '' ?><br><a href="<?= e($m['source_url']) ?>" target="_blank" rel="noopener"><?= e($m['title']) ?> <?= icon('external') ?></a></div></li>
               <?php endforeach; ?>
             </ol>
           </section>

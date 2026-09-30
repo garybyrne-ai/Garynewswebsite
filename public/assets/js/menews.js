@@ -566,8 +566,8 @@
       bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'India') + ' bulletin…</span><button type="button">Stop</button>';
       document.body.appendChild(bulletinEl);
       bulletinEl.querySelector('button').onclick = () => { speechSynthesis.cancel(); bulletinEl.remove(); bulletinEl = null; };
-      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IE/i.test(v.lang)) || voices.find(v => /en-GB/i.test(v.lang)) || null;
-      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IE'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
+      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IN/i.test(v.lang)) || voices.find(v => /hi-IN/i.test(v.lang)) || null;
+      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IN'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
     } catch (err) { toast(err.message); }
   }));
 })();

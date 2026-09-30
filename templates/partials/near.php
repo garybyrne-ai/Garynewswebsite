@@ -40,7 +40,7 @@ foreach ($counties as $c) {
     <?php if ($notices): ?>
       <div class="near__notices">
         <span class="kicker"><?= icon('candle') ?> Recent deaths · <?= e($loc['county']) ?></span>
-        <ul class="noticelist noticelist--row"><?php foreach ($notices as $n): ?><li><a href="<?= e($n['url']) ?>"><b><?= e($n['title']) ?></b><small><?= e($n['town'] ?: $n['county']) ?><?= $n['funeral_at'] ? ' · ' . e(date_irish($n['funeral_at'], 'D H:i')) : '' ?></small></a></li><?php endforeach; ?></ul>
+        <ul class="noticelist noticelist--row"><?php foreach ($notices as $n): ?><li><a href="<?= e($n['url']) ?>"><b><?= e($n['title']) ?></b><small><?= e($n['town'] ?: $n['county']) ?><?= $n['funeral_at'] ? ' · ' . e(date_in($n['funeral_at'], 'D H:i')) : '' ?></small></a></li><?php endforeach; ?></ul>
       </div>
     <?php endif; ?>
   <?php elseif ($loc['mode'] === 'none'): ?>
