@@ -59,6 +59,17 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
   </section>
   <?php endif; ?>
 
+  <?php $liveMatches = \MeNews\Services\Cricket::configured() ? \MeNews\Services\Cricket::liveMatches() : []; if ($liveMatches): ?>
+  <section class="panel reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('trophy') ?> Live cricket</span></header>
+    <ul class="noticelist">
+      <?php foreach ($liveMatches as $m): ?>
+        <li><div><b><?= e($m['teams']) ?></b><small><?= e($m['score'] ?: $m['status']) ?></small></div></li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
   <?php $festivals = $county ? \MeNews\Support\Festivals::upcomingForState($county, 4) : \MeNews\Support\Festivals::upcomingNational(4); if ($festivals): ?>
   <section class="panel reveal">
     <header class="panel__head"><span class="kicker"><?= icon('calendar') ?> Festivals &amp; holidays<?= $county ? ' · ' . e($county) : '' ?></span></header>

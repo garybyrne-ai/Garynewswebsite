@@ -1,0 +1,17 @@
+{
+  "_note": "Directory only — links to the official government portal for each scheme. Eligibility rules change and depend on personal/state details this site does not have, so we never claim to check eligibility ourselves; always confirm on the official site.",
+  "schemes": [
+    { "name": "PM-KISAN", "category": "Agriculture", "summary": "₹6,000/year income support for small and marginal farmer families, paid directly to their bank account.", "url": "https://pmkisan.gov.in" },
+    { "name": "Ayushman Bharat (PM-JAY)", "category": "Health", "summary": "Free hospital treatment up to ₹5 lakh/family/year for economically vulnerable households.", "url": "https://pmjay.gov.in" },
+    { "name": "PM Awas Yojana", "category": "Housing", "summary": "Subsidised home loans and direct assistance to build a pucca house, rural and urban.", "url": "https://pmaymis.gov.in" },
+    { "name": "PM Ujjwala Yojana", "category": "Household", "summary": "Free LPG gas connection for women from below-poverty-line households.", "url": "https://www.pmuy.gov.in" },
+    { "name": "PM Jan Dhan Yojana", "category": "Banking", "summary": "Zero-balance bank accounts with a RuPay debit card and accident insurance cover.", "url": "https://pmjdy.gov.in" },
+    { "name": "Atal Pension Yojana", "category": "Pension", "summary": "A guaranteed monthly pension of ₹1,000-5,000 after age 60, for workers in the unorganised sector.", "url": "https://npscra.nsdl.co.in/scheme-details.php" },
+    { "name": "Sukanya Samriddhi Yojana", "category": "Savings", "summary": "A high-interest savings scheme for a girl child's education and marriage, opened by a parent/guardian.", "url": "https://www.nsiindia.gov.in/(S(4tnr4045wumtqa45qi3v0455))/InternalPage.aspx?Id_Pk=89" },
+    { "name": "PM SVANidhi", "category": "Livelihood", "summary": "Small working-capital loans for street vendors, with a subsidy for repaying on time.", "url": "https://pmsvanidhi.mohua.gov.in" },
+    { "name": "National Scholarship Portal", "category": "Education", "summary": "A single portal for hundreds of central and state student scholarships, pre/post-matric and merit-based.", "url": "https://scholarships.gov.in" },
+    { "name": "PM Fasal Bima Yojana", "category": "Agriculture", "summary": "Low-premium crop insurance against natural calamities, pests and disease.", "url": "https://pmfby.gov.in" },
+    { "name": "Mudra Yojana", "category": "Livelihood", "summary": "Collateral-free loans up to ₹20 lakh for small businesses and micro-entrepreneurs.", "url": "https://www.mudra.org.in" },
+    { "name": "e-Shram", "category": "Labour", "summary": "A national database and card for unorganised-sector workers, unlocking social security benefits.", "url": "https://eshram.gov.in" }
+  ]
+}

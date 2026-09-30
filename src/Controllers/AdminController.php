@@ -709,6 +709,9 @@ final class AdminController
             'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Bharat Wire India'],
             'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'India'],
             'pii_retention_days' => ['label' => 'IP/device log retention (days) — scripts/purge-pii.php', 'group' => 'Security', 'type' => 'int', 'default' => '180'],
+            'waqi_token' => ['label' => 'WAQI air-quality token (free at aqicn.org/data-platform/token)', 'group' => 'Live data', 'type' => 'text', 'default' => ''],
+            'agmarknet_api_key' => ['label' => 'data.gov.in API key for mandi prices (free at data.gov.in/user/register)', 'group' => 'Live data', 'type' => 'text', 'default' => ''],
+            'cricket_api_key' => ['label' => 'Cricket score API key (optional — no reliable free provider, see README)', 'group' => 'Live data', 'type' => 'text', 'default' => ''],
         ];
         foreach (Locations::countyNames() as $c) {
             $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by state', 'type' => 'text', 'default' => ''];

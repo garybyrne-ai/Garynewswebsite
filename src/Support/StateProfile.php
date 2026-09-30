@@ -24,4 +24,11 @@ final class StateProfile
     {
         return self::data()['_emergency']['numbers'] ?? [];
     }
+
+    /** A stable, distinct accent hue per state/UT for the state page banner — deterministic, not curated. */
+    public static function accentColor(string $state): string
+    {
+        $hue = crc32($state) % 360;
+        return 'hsl(' . $hue . ' 62% 46%)';
+    }
 }

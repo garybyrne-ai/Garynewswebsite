@@ -96,7 +96,7 @@ $more = [
       <span class="hud__sep">·</span>
       <span id="wire-status" data-last="<?= e($wireLast ?? '') ?>"><?= !empty($wireLast) ? e(t('Updated')) . ' ' . e(time_ago($wireLast)) : e(t('Wire standing by')) ?></span>
     </div>
-    <div class="hud__mid"><span id="hud-clock">--:--:--</span><span class="hud__sep">·</span><span id="hud-date">India</span></div>
+    <div class="hud__mid"><span id="hud-clock">--:--:--</span><span class="hud__sep">·</span><span id="hud-date">India</span><?php $pc = \MeNews\Support\Panchang::forNow(); ?><span class="hud__sep">·</span><span title="Panchang (computed, Lahiri ayanamsa) — a guide, not an official almanac"><?= e(trim($pc['paksha'] . ' ' . $pc['tithi'])) ?> · <?= e($pc['nakshatra']) ?></span></div>
     <div class="hud__right"><a href="/alerts" id="hud-alerts"><?= icon('alert') ?> <?= e(t('Alerts')) ?></a><span class="hud__sep">·</span><a href="/notices"><?= e(t('Notices')) ?></a><span class="hud__sep">·</span><a href="/about"><?= e(t('How we check things')) ?></a></div>
   </div>
 </div>
@@ -189,6 +189,7 @@ $more = [
       <a href="/kids"><?= e(t('Wire Junior · Kids & puzzles')) ?></a>
       <a href="/plus"><?= e(t('Wire+ membership')) ?></a>
       <a href="/advertise"><?= e(t('Advertise with Bharat Wire')) ?></a>
+      <a href="/schemes"><?= e(t('Government schemes directory')) ?></a>
       <a href="/feeds">RSS</a>
     </div>
     <div class="footer__col">

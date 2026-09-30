@@ -62,6 +62,7 @@ return static function (Router $r): void {
     $r->get('/ownership', [Trust::class, 'ownership']);
     $r->get('/privacy', [Trust::class, 'privacy']);
     $r->get('/moderation', [Trust::class, 'moderation']);
+    $r->get('/schemes', [Trust::class, 'schemes']);
     $r->post('/api/takedown', [Trust::class, 'takedown']);
     $r->get('/api/admin/corrections', [Trust::class, 'adminCorrections']);
     $r->post('/api/admin/corrections', [Trust::class, 'addCorrection']);

@@ -317,6 +317,8 @@ p{margin:0}
 
 /* ---------- page heads ---------- */
 .pagehead{padding:46px 0 22px;display:flex;flex-direction:column;gap:12px}
+.pagehead--state{position:relative;padding-left:20px;border-left:4px solid var(--state-accent,var(--cy))}
+.pagehead--state .pagehead__icon{color:var(--state-accent,var(--cy))}
 .pagehead--narrow{max-width:900px}
 .pagehead--center{align-items:center;text-align:center;margin-inline:auto}
 .pagehead__title{font-size:clamp(2rem,4.4vw,3.6rem);font-weight:700;letter-spacing:-.04em;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
@@ -1319,6 +1321,7 @@ body.has-bottombar .consent{bottom:64px}
 .countystrip__item{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);transition:.2s;min-width:0}
 .countystrip__item:hover{border-color:var(--cy);transform:translateY(-1px)}
 .countystrip__item .icon{font-size:1.3rem;color:var(--cy);flex:none}
+.aqidot{width:14px;height:14px;border-radius:50%;background:var(--c,var(--cy));flex:none;box-shadow:0 0 8px var(--c,var(--cy))}
 .countystrip__item.is-live .icon{color:var(--am)}
 .countystrip__item b{display:block;font-size:.9rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .countystrip__item small{color:var(--muted);font-size:.74rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

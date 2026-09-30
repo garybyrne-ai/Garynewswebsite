@@ -61,6 +61,17 @@ final class TrustController
         ]));
     }
 
+    /** A directory of major central government schemes, linking to each official portal. */
+    public static function schemes(Request $r): Response
+    {
+        $data = json_decode((string)file_get_contents(ME_ROOT . '/config/schemes.json'), true, 512, JSON_THROW_ON_ERROR);
+        return View::page('schemes', self::base([
+            'title' => 'Government schemes directory — Bharat Wire India',
+            'description' => 'Major central government schemes — PM-Kisan, Ayushman Bharat, PM Awas Yojana and more — with links to the official portal for each.',
+            'schemes' => $data['schemes'],
+        ]));
+    }
+
     /** Notice-and-action route (IT Rules, 2021): anyone can flag content for removal. */
     public static function takedown(Request $r): Response
     {

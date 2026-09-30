@@ -175,6 +175,8 @@ final class PageController
             'countyStrip' => ['deaths' => $deaths, 'events' => $events, 'warning' => $warning, 'closures' => $closures, 'towns' => $topTowns, 'slug' => $p['slug'], 'whatsapp' => Database::setting('whatsapp_channel_' . $p['slug'])],
             'stateProfile' => \MeNews\Support\StateProfile::get($county),
             'stateWeather' => \MeNews\Services\Weather::forState($county),
+            'stateAqi' => \MeNews\Services\Aqi::forState($county),
+            'mandiPrices' => \MeNews\Services\MandiPrices::forState($county),
             'feedLinks' => [['/feed/county/' . $p['slug'] . '.xml', $county]],
             'jsonld' => ['@context' => 'https://schema.org', '@type' => 'CollectionPage', 'name' => $county . ' news', 'url' => absolute_url('/county/' . $p['slug']), 'isPartOf' => ['@type' => 'WebSite', 'name' => 'Bharat Wire India', 'url' => absolute_url('/')], 'about' => ['@type' => 'AdministrativeArea', 'name' => $county, 'containedInPlace' => ['@type' => 'Country', 'name' => 'India']]],
         ]));

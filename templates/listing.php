@@ -1,5 +1,5 @@
 <?php use MeNews\Ui; ?>
-<section class="container pagehead">
+<section class="container pagehead<?= !empty($stateProfile) ? ' pagehead--state' : '' ?>"<?= !empty($stateProfile) ? ' style="--state-accent:' . e(\MeNews\Support\StateProfile::accentColor($county)) . '"' : '' ?>>
   <span class="kicker"><?= e($kicker) ?></span>
   <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon($icon) ?></span><?= e($heading) ?><?php if (!empty($stateProfile['native_name'])): ?> <span class="pagehead__native"><?= e($stateProfile['native_name']) ?></span><?php endif; ?></h1>
   <p class="pagehead__blurb"><?= e($blurb) ?></p>
@@ -18,6 +18,18 @@
   <?php if (!empty($cs['whatsapp'])): ?><a class="countystrip__item" href="<?= e($cs['whatsapp']) ?>" target="_blank" rel="noopener"><?= icon('whatsapp') ?><span><b>WhatsApp channel</b><small>Join the <?= e($county) ?> channel →</small></span></a><?php endif; ?>
   <?php if (!empty($stateWeather)): $sw = $stateWeather; ?><span class="countystrip__item countystrip__item--static"><?= icon('sun') ?><span><b><?= (int)$sw['temp'] ?>°C <?= e($sw['label']) ?></b><small>H:<?= (int)$sw['max'] ?>° L:<?= (int)$sw['min'] ?>° near <?= e($stateProfile['capital'] ?? $county) ?></small></span></span><?php endif; ?>
   <?php if (!empty($stateProfile)): $sp = $stateProfile; ?><span class="countystrip__item countystrip__item--static"><?= icon('sparkle') ?><span><b><?= e($sp['festival']) ?> · <?= e($sp['language']) ?></b><small><?= e($sp['known_for']) ?></small></span></span><?php endif; ?>
+  <?php if (!empty($stateAqi)): $aq = $stateAqi; ?><span class="countystrip__item countystrip__item--static"><i class="aqidot" style="--c:<?= e($aq['colour']) ?>"></i><span><b>AQI <?= (int)$aq['aqi'] ?> · <?= e($aq['label']) ?></b><small>Air quality · updated <?= e(date_irish($aq['updated'], 'H:i')) ?></small></span></span><?php endif; ?>
+</div>
+<?php endif; ?>
+<?php if (!empty($mandiPrices)): ?>
+<div class="container">
+  <section class="block reveal" style="margin-bottom:28px">
+    <header class="block__head"><span class="block__index mono"><?= icon('sparkle') ?></span><h2 class="block__title">Mandi prices · <?= e($county) ?></h2><p class="block__blurb">Wholesale market prices per quintal, from data.gov.in's daily Agmarknet dataset.</p></header>
+    <div class="tablewrap"><table class="table">
+      <thead><tr><th>Commodity</th><th>Market</th><th>Min</th><th>Max</th><th>Modal</th><th>Date</th></tr></thead>
+      <tbody><?php foreach ($mandiPrices as $m): ?><tr><td><b><?= e($m['commodity']) ?></b></td><td><?= e($m['market']) ?></td><td class="mono">₹<?= e($m['min']) ?></td><td class="mono">₹<?= e($m['max']) ?></td><td class="mono">₹<?= e($m['modal']) ?></td><td><?= e($m['date']) ?></td></tr><?php endforeach; ?></tbody>
+    </table></div>
+  </section>
 </div>
 <?php endif; ?>
 <div class="container layout">
