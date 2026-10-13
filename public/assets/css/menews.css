@@ -1475,3 +1475,16 @@ font[style]{background:inherit!important;box-shadow:none!important}
 .sharecard__i svg{width:14px;height:14px}
 @media print{.sharebar,#share-modal{display:none!important}}
 @media (max-width:600px){.sharegrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}}
+
+/* Newsroom review cards: labelled controls outside .form (review queue, notices, comments) */
+.review .form__row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.review .form-label,.review label{display:flex;flex-direction:column;gap:6px;font:600 .72rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.review select,.review textarea,.review input:not([type=checkbox]){width:100%;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px;font:500 .92rem/1.4 var(--body);color:var(--ink);letter-spacing:0;text-transform:none;transition:.2s}
+.review select:focus,.review textarea:focus,.review input:focus{outline:none;border-color:var(--cy);box-shadow:var(--glow)}
+.review textarea{resize:vertical;min-height:70px}
+.review .actions{padding-top:4px}
+.review details summary{cursor:pointer;color:var(--cy);font-weight:600;font-size:.88rem}
+.review .audit{max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px;margin-top:8px}
+.review .scores{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.review .evidence ul{margin:6px 0 0 18px;display:grid;gap:4px;font-size:.85rem;color:var(--ink-2)}
+@media (max-width:640px){.review .form__row{grid-template-columns:1fr}}
