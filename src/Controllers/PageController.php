@@ -342,6 +342,7 @@ final class PageController
             'canonical' => absolute_url('/my-state' . ($slug !== '' ? '?state=' . $slug : '')),
             'county' => $county,
             'countySlug' => slugify($county),
+            'homeCounty' => \MeNews\Support\Visitor::homeCounty(),
             'counties' => Locations::countyNames(),
             'weather' => \MeNews\Services\Weather::forState($county),
             'aqi' => \MeNews\Services\Aqi::forState($county),

@@ -423,10 +423,26 @@
   /* county picker: one tap on first visit, no permission needed */
   const countyModal = $('#county-modal');
   const openCounty = () => openModal('county-modal');
-  $$('[data-open-county]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); closeDrawer(); openCounty(); }));
+  function setCountyMode(mode) {
+    if (!countyModal) return;
+    countyModal.dataset.countyActiveMode = mode;
+    $$('[data-county-mode-btn]').forEach(t => { const on = t.dataset.countyModeBtn === mode; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+    $$('[data-county-mode-lede]').forEach(el => { el.hidden = el.dataset.countyModeLede !== mode; });
+    $$('[data-county-mode-grid]').forEach(el => { el.hidden = el.dataset.countyModeGrid !== mode; });
+    $$('[data-county-mode-actions]').forEach(el => { el.hidden = el.dataset.countyModeActions !== mode; });
+    const title = $('[data-county-mode-title]'); if (title) title.textContent = mode === 'home' ? 'Where’s home?' : 'Where are you?';
+  }
+  $$('[data-open-county]').forEach(b => b.addEventListener('click', e => {
+    e.preventDefault(); closeDrawer();
+    if (b.dataset.openCounty === 'home') setCountyMode('home');
+    openCounty();
+  }));
   if (countyModal && !window.ME.located && !dismissed() && document.body.classList.contains('page-home') && !new URLSearchParams(location.search).get('county')) setTimeout(openCounty, 900);
   $$('[data-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_county', b.dataset.county, 180); delCookie('me_loc'); toast('Leading with ' + b.dataset.county); location.reload(); }));
+  $$('[data-home-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_home_county', b.dataset.homeCounty, 365); toast('Hometown set to ' + b.dataset.homeCounty); location.reload(); }));
+  $('[data-forget-home-county]')?.addEventListener('click', () => { delCookie('me_home_county'); toast('Hometown cleared'); location.reload(); });
   $('[data-county-later]')?.addEventListener('click', () => { closeModals(); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
+  $$('[data-county-mode-btn]').forEach(tab => tab.addEventListener('click', () => setCountyMode(tab.dataset.countyModeBtn)));
   async function applyPosition(lat, lng) {
     setCookie('me_loc', lat.toFixed(3) + ',' + lng.toFixed(3), 30); delCookie('me_county');
     const near = $('[data-near]');

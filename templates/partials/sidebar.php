@@ -75,12 +75,14 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
     </ol>
     <?php endif; ?>
     <p class="panel__note">Weather, air quality, alerts and trending searches for <?= e($county) ?> — <a href="/my-state">open the full dashboard →</a></p>
+    <?php $msHome = \MeNews\Support\Visitor::homeCounty(); if ($msHome && $msHome !== $county): ?><a class="mystate__home" href="/my-state?state=<?= e(slugify($msHome)) ?>"><?= icon('home') ?> Hometown: <?= e($msHome) ?> →</a><?php endif; ?>
   </section>
   <?php else: ?>
   <section class="panel panel--mystate reveal">
     <header class="panel__head"><span class="kicker"><?= icon('sparkle') ?> My State</span></header>
     <p class="panel__note" style="margin:0">Pick your state to see its weather, air quality, severe-weather alerts and trending searches in one place.</p>
     <button class="btn btn--ghost btn--sm" type="button" data-open-county style="margin-top:10px">Choose your state</button>
+    <?php $msHome = \MeNews\Support\Visitor::homeCounty(); if ($msHome): ?><a class="mystate__home" href="/my-state?state=<?= e(slugify($msHome)) ?>" style="margin-top:10px"><?= icon('home') ?> Hometown: <?= e($msHome) ?> →</a><?php endif; ?>
   </section>
   <?php endif; ?>
 

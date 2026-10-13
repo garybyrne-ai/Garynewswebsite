@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace MeNews\Support;
 
 /**
- * The visitor's chosen locality, kept in two small cookies set by the browser:
- *   me_loc    = "lat,lng"   (from the Geolocation API, rounded to ~100 m)
- *   me_county = "Maharashtra"   (manual choice, or derived from me_loc)
- * Nothing is stored server-side; the cookies only shape the "Near you" section.
+ * The visitor's chosen locality, kept in small cookies set by the browser:
+ *   me_loc        = "lat,lng"      (from the Geolocation API, rounded to ~100 m)
+ *   me_county     = "Maharashtra"  (current city/state — manual choice, or derived from me_loc)
+ *   me_home_county = "Kerala"      (hometown — set independently; moving doesn't lose it)
+ * Nothing is stored server-side; the cookies only shape the "Near you" section and personalisation.
  */
 final class Visitor
 {
@@ -29,6 +30,18 @@ final class Visitor
     public static function county(): ?string
     {
         $raw = trim((string)($_COOKIE['me_county'] ?? ''));
+        foreach (Locations::countyNames() as $c) {
+            if (strcasecmp($c, $raw) === 0) {
+                return $c;
+            }
+        }
+        return null;
+    }
+
+    /** The visitor's separately-saved hometown — unaffected by changing their current state. */
+    public static function homeCounty(): ?string
+    {
+        $raw = trim((string)($_COOKIE['me_home_county'] ?? ''));
         foreach (Locations::countyNames() as $c) {
             if (strcasecmp($c, $raw) === 0) {
                 return $c;

@@ -474,6 +474,14 @@ p{margin:0}
 .tabs{display:flex;gap:6px;margin-bottom:18px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
 .tabs button{flex:1;padding:8px;border-radius:999px;color:var(--muted);font-weight:700}
 .tabs button.is-active{background:var(--aurora);color:var(--on-accent)}
+.countymode{display:flex;gap:8px;margin-bottom:16px}
+.countymode__tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--muted);font-weight:700;transition:.15s}
+.countymode__tab .icon{font-size:1.1rem}
+.countymode__tab small{font-weight:600;color:var(--muted);font-size:.72rem}
+.countymode__tab.is-active{border-color:var(--cy);background:color-mix(in srgb,var(--cy) 10%,transparent);color:var(--ink)}
+.countymode__tab.is-active small{color:var(--cy)}
+.countymode__tab[data-county-mode-btn="home"].is-active{border-color:var(--saffron);background:color-mix(in srgb,var(--saffron) 10%,transparent)}
+.countymode__tab[data-county-mode-btn="home"].is-active small{color:var(--saffron)}
 .modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(6,16,11,.6);backdrop-filter:blur(10px)}
 .modal__box{width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
 .modal__box--wide{width:min(680px,100%)}
@@ -1358,6 +1366,7 @@ body.has-bottombar .consent{bottom:64px}
 .panel--mystate .mystate__ic{font-size:1.3rem}
 .panel--mystate .mystate__stat small{color:var(--muted);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
 .mystate__warn{display:flex;align-items:center;gap:8px;padding:9px 12px;margin:4px 0 10px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--hot) 14%,transparent);color:var(--hot);font-weight:700;font-size:.84rem}
+.mystate__home{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--saffron) 10%,transparent);color:var(--saffron);font-weight:700;font-size:.8rem}
 .trendlist--compact .trendlist__body{padding:0}
 .trendlist--compact li{padding:6px 0}
 .countystrip__item.is-live .icon{color:var(--am)}

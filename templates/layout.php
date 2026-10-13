@@ -21,6 +21,8 @@ $isStaff = \MeNews\Auth::isStaff($user);
 $isApp = str_contains($bodyClass, 'page-app');
 $myCounty = \MeNews\Database::installed() ? (Visitor::county() ?? (Visitor::position() ? (\MeNews\Support\Geo::nearest(Visitor::position()['lat'], Visitor::position()['lng'])['county'] ?? null) : null)) : null;
 $countySlug = $myCounty ? slugify($myCounty) : '';
+$myHomeCounty = \MeNews\Database::installed() ? Visitor::homeCounty() : null;
+$myHomeCountySlug = $myHomeCounty ? slugify($myHomeCounty) : '';
 $canonical = $canonical ?? null;
 $robots = $robots ?? null;
 $active = static fn(string $p, bool $prefix = false): string => ($prefix ? str_starts_with($path, $p) : $path === $p) ? 'is-active' : '';
@@ -252,19 +254,33 @@ $more = [
 </div>
 
 <!-- State picker -->
-<div class="modal modal--sheet" id="county-modal" role="dialog" aria-modal="true" aria-labelledby="county-title" hidden>
+<div class="modal modal--sheet" id="county-modal" role="dialog" aria-modal="true" aria-labelledby="county-title" hidden data-county-active-mode="current">
   <div class="modal__box modal__box--wide">
-    <header class="modal__head"><h2 id="county-title"><?= icon('pin') ?> <?= e(t('Where are you?')) ?></h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
+    <header class="modal__head"><h2 id="county-title"><?= icon('pin') ?> <span data-county-mode-title><?= e(t('Where are you?')) ?></span></h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
     <div class="modal__body">
-      <p class="modal__lede">One tap and Bharat Wire leads with your state: local stories, deaths and notices, school closures and weather warnings. Stored only on this device.</p>
-      <div class="countygrid">
+      <div class="countymode" role="tablist">
+        <button type="button" class="countymode__tab is-active" data-county-mode-btn="current" role="tab" aria-selected="true"><?= icon('pin') ?> Your state<?php if ($myCounty): ?><small><?= e($myCounty) ?></small><?php endif; ?></button>
+        <button type="button" class="countymode__tab" data-county-mode-btn="home" role="tab" aria-selected="false"><?= icon('home') ?> Hometown<?php if ($myHomeCounty): ?><small><?= e($myHomeCounty) ?></small><?php endif; ?></button>
+      </div>
+      <p class="modal__lede" data-county-mode-lede="current">One tap and Bharat Wire leads with your state: local stories, deaths and notices, school closures and weather warnings. Stored only on this device.</p>
+      <p class="modal__lede" data-county-mode-lede="home" hidden>Keep an eye on home too, wherever you live now. Saved separately — picking your current state never overwrites this.</p>
+      <div class="countygrid" data-county-mode-grid="current">
         <?php foreach (Locations::provinces() as $province => $counties): ?>
           <div class="countygrid__prov"><h4 class="mono"><?= e($province) ?></h4><div class="countygrid__list"><?php foreach ($counties as $c): ?><button type="button" class="countybtn <?= $myCounty === $c ? 'is-active' : '' ?>" data-county="<?= e($c) ?>"><?= e($c) ?></button><?php endforeach; ?></div></div>
         <?php endforeach; ?>
       </div>
-      <div class="form__actions form__actions--split">
+      <div class="countygrid" data-county-mode-grid="home" hidden>
+        <?php foreach (Locations::provinces() as $province => $counties): ?>
+          <div class="countygrid__prov"><h4 class="mono"><?= e($province) ?></h4><div class="countygrid__list"><?php foreach ($counties as $c): ?><button type="button" class="countybtn <?= $myHomeCounty === $c ? 'is-active' : '' ?>" data-home-county="<?= e($c) ?>"><?= e($c) ?></button><?php endforeach; ?></div></div>
+        <?php endforeach; ?>
+      </div>
+      <div class="form__actions form__actions--split" data-county-mode-actions="current">
         <button class="btn btn--ghost" type="button" data-locate-me><?= icon('gps') ?> Use my location instead</button>
         <span><?php if ($myCounty): ?><button class="btn btn--ghost" type="button" data-forget-location>Forget my state</button><?php endif; ?><button class="btn btn--dark" type="button" data-county-later>Not now</button></span>
+      </div>
+      <div class="form__actions form__actions--split" data-county-mode-actions="home" hidden>
+        <span></span>
+        <span><?php if ($myHomeCounty): ?><button class="btn btn--ghost" type="button" data-forget-home-county>Clear hometown</button><?php endif; ?><button class="btn btn--dark" type="button" data-county-later>Not now</button></span>
       </div>
     </div>
   </div>
@@ -316,7 +332,7 @@ $more = [
 </div>
 
 <script>window.ME_SHARE=<?= json_encode(\MeNews\Support\Share::jsPayload(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;</script>
-<script>window.ME={located:<?= (Visitor::position() || Visitor::county()) ? 'true' : 'false' ?>,county:<?= json_encode($myCounty) ?>,user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
+<script>window.ME={located:<?= (Visitor::position() || Visitor::county()) ? 'true' : 'false' ?>,county:<?= json_encode($myCounty) ?>,homeCounty:<?= json_encode($myHomeCounty) ?>,user:<?= json_encode($user ? ['id' => $user['id'], 'name' => $user['display_name'], 'role' => $user['role'], 'plan' => $user['plan']] : null, JSON_UNESCAPED_UNICODE) ?>,wireEnabled:<?= \MeNews\Services\NewsWire::enabled() ? 'true' : 'false' ?>};</script>
 <script src="/assets/js/menews.js?v=<?= e(ME_ASSETS) ?>" defer></script>
 <?php if ($gt): ?>
 <div id="google_translate_element" class="notranslate" hidden></div>

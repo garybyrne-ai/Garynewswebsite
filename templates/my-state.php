@@ -21,6 +21,8 @@
     <select id="ms-state" name="state" onchange="this.form.submit()"><?php foreach ($counties as $c): ?><option value="<?= e(slugify($c)) ?>" <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select>
     <noscript><button class="btn btn--primary btn--sm" type="submit">Go</button></noscript>
     <a class="btn btn--ghost btn--sm" href="/county/<?= e($countySlug) ?>"><?= icon('national') ?> <?= e($county) ?> news →</a>
+    <?php if ($homeCounty && $homeCounty !== $county): ?><a class="btn btn--ghost btn--sm" href="/my-state?state=<?= e(slugify($homeCounty)) ?>"><?= icon('home') ?> Hometown: <?= e($homeCounty) ?> →</a><?php endif; ?>
+    <?php if (!$homeCounty): ?><button class="btn btn--ghost btn--sm" type="button" data-open-county="home"><?= icon('home') ?> Set your hometown →</button><?php endif; ?>
   </form>
 </section>
 
