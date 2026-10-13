@@ -41,7 +41,7 @@
 
   async function summary() {
     const s = await api('/api/admin/summary');
-    $('#stats').innerHTML = [['Review', s.pending, 'warn'], ['Held', s.held, 'bad'], ['Published', s.published], ['Community', s.community], ['Wire', s.wire], ['Users', s.users], ['Comments', s.comments_review], ['Ads', s.ads_review]]
+    $('#stats').innerHTML = [['To review', s.pending, 'warn'], ['Held', s.held, 'bad'], ['Comments', s.comments_review], ['Ads', s.ads_review], ['Live stories', s.published]]
       .map(([k, v, c]) => `<div class="stat"><span class="mono">${k}</span><strong class="${c ? 'is-' + c : ''}">${v}</strong></div>`).join('');
     $('#nav-review-count').textContent = s.pending; $('#nav-comments-count').textContent = s.comments_review; $('#nav-ads-count').textContent = s.ads_review;
     $('#nav-sections-count').textContent = s.section_check; $('#nav-notices-count').textContent = s.notices_review; $('#nav-takedowns-count').textContent = s.takedowns_open;

@@ -494,7 +494,8 @@ final class AccountController
         }
         try {
             $mod = Moderation::screen($body);
-            $status = $mod['flagged'] ? 'review' : 'published';
+            // Comments are never auto-published on keyword screening alone in production.
+            $status = ($mod['flagged'] || (\MeNews\Config::production() && $mod['provider'] !== 'openai')) ? 'review' : 'published';
         } catch (\Throwable $e) {
             error_log($e->getMessage());
             $mod = ['provider' => 'unavailable', 'flagged' => true];

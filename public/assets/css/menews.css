@@ -1475,3 +1475,41 @@ font[style]{background:inherit!important;box-shadow:none!important}
 .sharecard__i svg{width:14px;height:14px}
 @media print{.sharebar,#share-modal{display:none!important}}
 @media (max-width:600px){.sharegrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}}
+
+/* Newsroom review cards: labelled controls outside .form (review queue, notices, comments) */
+.review .form__row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.review .form-label,.review label{display:flex;flex-direction:column;gap:6px;font:600 .72rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.review select,.review textarea,.review input:not([type=checkbox]){width:100%;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px;font:500 .92rem/1.4 var(--body);color:var(--ink);letter-spacing:0;text-transform:none;transition:.2s}
+.review select:focus,.review textarea:focus,.review input:focus{outline:none;border-color:var(--cy);box-shadow:var(--glow)}
+.review textarea{resize:vertical;min-height:70px}
+.review .actions{padding-top:4px}
+.review details summary{cursor:pointer;color:var(--cy);font-weight:600;font-size:.88rem}
+.review .audit{max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px;margin-top:8px}
+.review .scores{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.review .evidence ul{margin:6px 0 0 18px;display:grid;gap:4px;font-size:.85rem;color:var(--ink-2)}
+@media (max-width:640px){.review .form__row{grid-template-columns:1fr}}
+
+/* Newsroom — simplified, cleaner shell */
+.appshell{grid-template-columns:230px minmax(0,1fr);gap:28px}
+.appnav{padding:12px;gap:2px;box-shadow:var(--shadow)}
+.appnav__group{font:600 .64rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 12px 6px}
+.appnav__head+.appnav__group{padding-top:6px}
+.appnav button{font-weight:600;font-size:.88rem;border-radius:10px;transition:background .15s,transform .15s}
+.appnav button:hover{transform:translateX(2px)}
+.appnav button.is-active{background:linear-gradient(90deg,color-mix(in srgb,var(--cy) 18%,transparent),transparent);box-shadow:inset 3px 0 0 var(--cy)}
+.appnav .badge{min-width:22px;text-align:center}
+.appnav .badge:not(:empty){font-weight:700}
+#stats.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+#stats .stat{padding:14px 16px;border-radius:14px}
+#stats .stat strong{font-size:1.8rem}
+.view>h1,.view>.inline h1{font-size:1.7rem;margin-bottom:4px}
+.view .pagehead__blurb{max-width:60ch;font-size:.92rem}
+.queue{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}
+.review{border-radius:16px;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s}
+.review:hover{transform:translateY(-1px)}
+.review .trustnote{font-size:.8rem}
+.tablewrap{box-shadow:var(--shadow)}
+.table tbody tr:hover td{background:var(--surface-2)}
+@media (max-width:900px){.appnav__group{display:none}.queue{grid-template-columns:1fr}}
+#queue-status,#notices-status{background:var(--bg-2);border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;color:var(--ink);font-size:.85rem}
+.review .actions{border-top:1px solid var(--line);padding-top:14px;margin-top:2px}

@@ -8,7 +8,7 @@ storage/*
 !storage/.gitkeep
 
 # Local tooling
-vendor/
+/vendor/
 node_modules/
 *.log
 .DS_Store

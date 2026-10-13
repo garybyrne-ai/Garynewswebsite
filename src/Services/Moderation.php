@@ -16,11 +16,9 @@ final class Moderation
     public static function screen(string $text, array $images = []): array
     {
         if (Config::get('OPENAI_API_KEY') === '') {
-            if (Config::production()) {
-                throw new RuntimeException('OpenAI moderation is not configured');
-            }
+            // No OpenAI key: keyword screen only; a human editor makes the final call.
             $flagged = (bool)preg_match('/graphic blood|explicit nude|home address is|kill them|terrorist attack instructions/i', $text);
-            return ['provider' => 'local-dev-fallback', 'flagged' => $flagged, 'note' => 'Development-only screening'];
+            return ['provider' => 'local-keyword', 'flagged' => $flagged, 'note' => 'Keyword screening only (no OpenAI key configured); editor decision required'];
         }
         $input = [['type' => 'text', 'text' => mb_substr($text, 0, 30000)]];
         foreach (array_slice($images, 0, 16) as $file) {
@@ -47,9 +45,6 @@ final class Moderation
     public static function transcribe(string $audioFile): string
     {
         if (Config::get('OPENAI_API_KEY') === '') {
-            if (Config::production()) {
-                throw new RuntimeException('Audio transcription is not configured');
-            }
             return '';
         }
         $j = Remote::json(

@@ -40,7 +40,7 @@ final class TrustEngine
             $trust = min(82, 38 + ($len > 80 ? 8 : 0) + ($len > 250 ? 5 : 0) + ($s['media_original'] ? 9 : 0)
                 + ($s['latitude'] !== null && $s['longitude'] !== null ? 6 : 0) + (!empty($author['is_verified']) ? 8 : 0));
             $safety = $mod['flagged'] ? 18 : 97;
-            $status = $mod['flagged'] ? 'hold' : (Config::bool('AUTO_PUBLISH_SAFE') && !empty($s['reporter_verified_at']) ? 'published' : 'review');
+            $status = $mod['flagged'] ? 'hold' : (Config::bool('AUTO_PUBLISH_SAFE') && !empty($s['reporter_verified_at']) && (!Config::production() || ($mod['provider'] ?? '') === 'openai') ? 'published' : 'review');
             $public = null;
             $publishedAt = $s['published_at'];
             if ($status === 'published') {
@@ -105,8 +105,10 @@ final class TrustEngine
         if (($story['safety_score'] ?? 0) <= 0 || !array_key_exists('flagged', $m) || $m['flagged']) {
             throw new HttpException(409, 'A complete, clean safety screening is required before publication.');
         }
-        if (Config::production() && ($m['provider'] ?? '') !== 'openai') {
-            throw new HttpException(409, 'Production publication requires OpenAI moderation.');
+        // With an OpenAI key configured, production needs that provider's verdict. Without a key the
+        // keyword screen plus an explicit editor decision is the accepted path.
+        if (Config::production() && Config::get('OPENAI_API_KEY') !== '' && ($m['provider'] ?? '') !== 'openai') {
+            throw new HttpException(409, 'OpenAI safety screening did not complete. Use "Re-run safety" and try again.');
         }
     }
 }

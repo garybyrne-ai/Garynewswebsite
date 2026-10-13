@@ -14,16 +14,20 @@
   <div id="newsroom" class="appshell" hidden>
     <nav class="appnav" aria-label="Newsroom">
       <div class="appnav__head"><span class="livedot"></span><span><b id="who">Newsroom</b><small id="who-role">editor</small></span></div>
+      <span class="appnav__group">Editorial</span>
       <button class="is-active" data-view="review">Review queue <span class="badge" id="nav-review-count">0</span></button>
       <button data-view="stories">All stories</button>
       <button data-view="sections">Section check <span class="badge" id="nav-sections-count">0</span></button>
+      <span class="appnav__group">Community</span>
       <button data-view="notices">Notices <span class="badge" id="nav-notices-count">0</span></button>
       <button data-view="closures">Closures</button>
       <button data-view="comments">Comments <span class="badge" id="nav-comments-count">0</span></button>
+      <span class="appnav__group">Manage</span>
       <button data-view="users">People</button>
       <button data-view="ads">Advertising <span class="badge" id="nav-ads-count">0</span></button>
       <button data-view="wire">News wire</button>
       <button data-view="locations">Irish locations</button>
+      <span class="appnav__group">Trust &amp; system</span>
       <button data-view="trust">Corrections &amp; takedowns <span class="badge" id="nav-takedowns-count">0</span></button>
       <button data-view="settings">Settings</button>
       <button data-view="audit">Audit log</button>
