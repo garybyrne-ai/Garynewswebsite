@@ -59,23 +59,28 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
   </section>
   <?php endif; ?>
 
-  <?php $trends = \MeNews\Services\Trends::forState($county, 6); if ($trends): ?>
-  <section class="panel panel--trends reveal">
-    <header class="panel__head"><span class="kicker"><?= icon('flame') ?> Trending searches<?= $county ? ' · ' . e($county) : ' · India' ?></span><span class="mono panel__hint">Google Trends</span></header>
-    <ol class="trendlist">
-      <?php foreach ($trends as $i => $tr): ?>
-        <li>
-          <span class="trendlist__n mono"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
-          <div class="trendlist__body">
-            <div class="trendlist__q"><a href="<?= e($tr['internal_url']) ?>"><b><?= e($tr['query']) ?></b></a><?php if ($tr['traffic']): ?><span class="trendlist__traffic mono"><?= e($tr['traffic']) ?></span><?php endif; ?></div>
-            <?php if ($tr['news_title']): ?><a class="trendlist__news" href="<?= e($tr['internal_url']) ?>"><?= e(excerpt($tr['news_title'], 70)) ?></a><?php endif; ?>
-            <?php if ($tr['news_url'] && $tr['news_source']): ?><a class="trendlist__source" href="<?= e($tr['news_url']) ?>" target="_blank" rel="noopener">Originally: <?= e($tr['news_source']) ?> ↗</a><?php endif; ?>
-          </div>
-          <?php if ($i === 0 && $tr['picture']): ?><img class="trendlist__pic" src="<?= e($tr['picture']) ?>" alt="" loading="lazy" referrerpolicy="no-referrer"><?php endif; ?>
-        </li>
-      <?php endforeach; ?>
+  <?php if ($county): $msWeather = \MeNews\Services\Weather::forState($county); $msAqi = \MeNews\Services\Aqi::forState($county); $msWarning = \MeNews\Services\Alerts::headline($county); $msTrends = \MeNews\Services\Trends::forState($county, 3); ?>
+  <section class="panel panel--mystate reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('sparkle') ?> My State · <?= e($county) ?></span><a class="mono panel__hint" href="/my-state">Open →</a></header>
+    <?php if ($msWeather || $msAqi): ?>
+    <div class="mystate__stats">
+      <?php if ($msWeather): ?><div class="mystate__stat"><span class="mystate__ic"><?= e($msWeather['icon']) ?></span><b><?= (int)$msWeather['temp'] ?>°</b><small><?= e($msWeather['label']) ?></small></div><?php endif; ?>
+      <?php if ($msAqi): ?><div class="mystate__stat"><i class="aqidot" style="--c:<?= e($msAqi['colour']) ?>"></i><b><?= (int)$msAqi['aqi'] ?></b><small><?= e($msAqi['label']) ?></small></div><?php endif; ?>
+    </div>
+    <?php endif; ?>
+    <?php if ($msWarning): ?><a class="mystate__warn" href="/my-state"><?= icon('alert') ?> <?= e($msWarning) ?></a><?php endif; ?>
+    <?php if ($msTrends): ?>
+    <ol class="trendlist trendlist--compact">
+      <?php foreach ($msTrends as $i => $tr): ?><li><span class="trendlist__n mono"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span><div class="trendlist__body"><div class="trendlist__q"><a href="<?= e($tr['internal_url']) ?>"><b><?= e($tr['query']) ?></b></a></div></div></li><?php endforeach; ?>
     </ol>
-    <p class="panel__note">Real-time search demand from Google Trends<?= $county ? ' in ' . e($county) : ' across India' ?> — the closest free, public signal to "what people are searching about" since Facebook, Instagram and X don't publish one.</p>
+    <?php endif; ?>
+    <p class="panel__note">Weather, air quality, alerts and trending searches for <?= e($county) ?> — <a href="/my-state">open the full dashboard →</a></p>
+  </section>
+  <?php else: ?>
+  <section class="panel panel--mystate reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('sparkle') ?> My State</span></header>
+    <p class="panel__note" style="margin:0">Pick your state to see its weather, air quality, severe-weather alerts and trending searches in one place.</p>
+    <button class="btn btn--ghost btn--sm" type="button" data-open-county style="margin-top:10px">Choose your state</button>
   </section>
   <?php endif; ?>
 

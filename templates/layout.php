@@ -34,7 +34,7 @@ $primary = [
 ];
 $more = [
     'Sections' => [['/section/business', 'Business'], ['/section/culture', 'Culture'], ['/section/council', 'Council'], ['/section/community', 'Community reports'], ['/section/traffic', 'Traffic']],
-    'Bharat Wire' => [['/signal', 'The Signal · most-voted'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/kids', 'Wire Junior · Kids & puzzles'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'Wire+ membership']],
+    'Bharat Wire' => [['/signal', 'The Signal · most-voted'], ['/my-state', 'My State · weather, AQI & alerts'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/kids', 'Wire Junior · Kids & puzzles'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'Wire+ membership']],
     'About' => [['/about', 'How Bharat Wire works'], ['/about#sources', 'Our sources'], ['/corrections', 'Corrections'], ['/ownership', 'Who owns Bharat Wire'], ['/advertise', 'Advertise'], ['/feeds', 'RSS & feeds'], ['/privacy', 'Privacy & cookies']],
 ];
 ?><!doctype html>

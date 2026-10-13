@@ -85,4 +85,14 @@ final class Lang
     {
         return self::LANGS[$code ?? self::current()][1];
     }
+
+    /** Chrome language codes that also have real wire coverage in that language (see config/sources.json). */
+    private const STORY_LANGUAGES = ['hi', 'bn', 'te', 'mr', 'ta'];
+
+    /** The current chrome language, mapped to a story `language` column value — null when it has no wire coverage (English, Urdu). */
+    public static function storyLanguage(): ?string
+    {
+        $code = self::current();
+        return in_array($code, self::STORY_LANGUAGES, true) ? $code : null;
+    }
 }

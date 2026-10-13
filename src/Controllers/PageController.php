@@ -12,6 +12,7 @@ use MeNews\Services\Media;
 use MeNews\Services\NewsWire;
 use MeNews\Stories;
 use MeNews\Support\Categories;
+use MeNews\Support\Lang;
 use MeNews\Support\Locations;
 use MeNews\View;
 
@@ -43,6 +44,9 @@ final class PageController
                 $exclude = array_merge($exclude, array_column($rows, 'id'));
             }
         }
+        $forYouLanguage = Lang::storyLanguage();
+        $forYou = Stories::forYou($county, $forYouLanguage, $exclude, 8);
+        $exclude = array_merge($exclude, array_column($forYou, 'id'));
         $community = Stories::feed(['kind' => 'community'], 4);
         $leadKicker = $hero && $county && $hero['county'] === $county ? 'Lead story · ' . e($county) : ($hero && $hero['is_featured'] ? 'Editor\'s pick' : 'Lead story · India');
         return View::page('home', self::base([
@@ -53,6 +57,8 @@ final class PageController
             'latest' => $latest,
             'ticker' => Stories::ticker(16),
             'sections' => $sections,
+            'forYou' => $forYou,
+            'forYouLanguage' => $forYouLanguage,
             'community' => $community,
             'trending' => Stories::trending(6),
             'counties' => Stories::countyActivity(8),
@@ -299,6 +305,51 @@ final class PageController
             'counties' => Locations::countyNames(),
             'mapPoints' => $locality['position'] ? array_values(array_filter($locality['stories'], static fn($s) => $s['latitude'] !== null)) : [],
             'bodyClass' => 'page-near',
+        ]));
+    }
+
+    /**
+     * One page for everything about a state that isn't a news story: weather, air quality,
+     * severe-weather alerts, school closures, festivals and trending searches — previously
+     * scattered across the masthead, the state-page strip and a sidebar panel.
+     * Defaults to the visitor's saved state; ?state={slug} looks at any other one.
+     */
+    public static function myState(Request $r): Response
+    {
+        $slug = $r->query('state', '');
+        $county = null;
+        if ($slug !== '') {
+            foreach (Locations::countyNames() as $c) {
+                if (slugify($c) === $slug) {
+                    $county = $c;
+                    break;
+                }
+            }
+        }
+        $county ??= \MeNews\Support\Visitor::county();
+        if ($county === null) {
+            return View::page('my-state', self::base([
+                'title' => 'My State — Bharat Wire India',
+                'description' => 'Weather, air quality, severe-weather alerts and trending searches for your state, all in one place.',
+                'county' => null,
+                'counties' => Locations::countyNames(),
+                'bodyClass' => 'page-mystate',
+            ]));
+        }
+        return View::page('my-state', self::base([
+            'title' => $county . ': weather, AQI, alerts & trends — Bharat Wire India',
+            'description' => 'Weather, air quality, severe-weather alerts, school closures and trending searches for ' . $county . ', all in one place.',
+            'canonical' => absolute_url('/my-state' . ($slug !== '' ? '?state=' . $slug : '')),
+            'county' => $county,
+            'countySlug' => slugify($county),
+            'counties' => Locations::countyNames(),
+            'weather' => \MeNews\Services\Weather::forState($county),
+            'aqi' => \MeNews\Services\Aqi::forState($county),
+            'warnings' => \MeNews\Services\Alerts::forCounty($county),
+            'closures' => \MeNews\Services\Alerts::closures($county, 3),
+            'trends' => \MeNews\Services\Trends::forState($county, 10),
+            'festivals' => \MeNews\Support\Festivals::upcomingForState($county, 4),
+            'bodyClass' => 'page-mystate',
         ]));
     }
 

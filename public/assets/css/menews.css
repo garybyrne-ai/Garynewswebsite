@@ -251,6 +251,8 @@ p{margin:0}
 .block__more{grid-area:more;color:var(--cy);align-self:center;white-space:nowrap}
 .block__more:hover{text-decoration:underline;text-underline-offset:4px}
 .block__head .btn{grid-area:more;align-self:center}
+.block--foryou{background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 10%,transparent),transparent 55%),var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px clamp(14px,3vw,22px) 26px;margin-bottom:28px}
+.block--foryou .block__index{color:var(--gold)}
 .grid{display:grid;gap:18px}
 .grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -1339,6 +1341,21 @@ body.has-bottombar .consent{bottom:64px}
 .countystrip__item:hover{border-color:var(--cy);transform:translateY(-1px)}
 .countystrip__item .icon{font-size:1.3rem;color:var(--cy);flex:none}
 .aqidot{width:14px;height:14px;border-radius:50%;background:var(--c,var(--cy));flex:none;box-shadow:0 0 8px var(--c,var(--cy))}
+.aqidot--lg{width:22px;height:22px;box-shadow:0 0 16px var(--c,var(--cy))}
+
+/* ---------- My State dashboard ---------- */
+.statcard__main{display:flex;align-items:center;gap:12px;margin:10px 0 4px}
+.statcard__ic{font-size:2.4rem;line-height:1}
+.statcard__num{font-family:var(--display);font-size:2.4rem;font-weight:800;letter-spacing:-.03em}
+.statcard__label{color:var(--muted);font-weight:600;align-self:flex-end;padding-bottom:6px}
+.statcard__sub{color:var(--muted);font-size:.82rem}
+.panel--mystate .mystate__stats{display:flex;gap:18px;margin:8px 0}
+.panel--mystate .mystate__stat{display:flex;align-items:center;gap:7px;font-weight:700}
+.panel--mystate .mystate__ic{font-size:1.3rem}
+.panel--mystate .mystate__stat small{color:var(--muted);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+.mystate__warn{display:flex;align-items:center;gap:8px;padding:9px 12px;margin:4px 0 10px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--hot) 14%,transparent);color:var(--hot);font-weight:700;font-size:.84rem}
+.trendlist--compact .trendlist__body{padding:0}
+.trendlist--compact li{padding:6px 0}
 .countystrip__item.is-live .icon{color:var(--am)}
 .countystrip__item b{display:block;font-size:.9rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .countystrip__item small{color:var(--muted);font-size:.74rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1399,8 +1416,10 @@ body.has-bottombar .consent{bottom:64px}
 @media (max-width:900px){.perks{grid-template-columns:1fr 1fr}}
 @media (max-width:600px){.perks{grid-template-columns:1fr}}
 
-/* Saved stories */
-.card__save{margin-left:auto;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:inline-grid;place-items:center;cursor:pointer;transition:.2s;flex:none}
+/* One-tap WhatsApp share, then save */
+.card__share{margin-left:auto;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:inline-grid;place-items:center;transition:.2s;flex:none}
+.card__share--whatsapp:hover{color:#25D366;border-color:#25D366}
+.card__save{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:inline-grid;place-items:center;cursor:pointer;transition:.2s;flex:none}
 .card__save:hover{color:var(--em);border-color:var(--em)}
 .card__save.is-saved{background:var(--em);border-color:var(--em);color:#fff}
 .card__save.is-saved svg{fill:currentColor}

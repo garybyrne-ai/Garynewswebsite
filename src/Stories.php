@@ -70,6 +70,34 @@ final class Stories
         return array_map([self::class, 'present'], Database::all($sql, $args));
     }
 
+    /**
+     * A personalised mix: fresh stories from the visitor's state interleaved with fresh stories in
+     * their chosen language, deduplicated. Empty when neither preference is set, so the caller can
+     * skip the section entirely rather than show a redundant copy of the general feed.
+     */
+    public static function forYou(?string $county, ?string $language, array $exclude = [], int $limit = 8): array
+    {
+        if (!$county && !$language) {
+            return [];
+        }
+        $byCounty = $county ? self::feed(['county' => $county, 'exclude' => $exclude], $limit) : [];
+        $exclude = array_merge($exclude, array_column($byCounty, 'id'));
+        $byLanguage = $language ? self::feed(['language' => $language, 'exclude' => $exclude], $limit) : [];
+        $mixed = [];
+        for ($i = 0; count($mixed) < $limit && ($i < count($byCounty) || $i < count($byLanguage)); $i++) {
+            if (isset($byCounty[$i])) {
+                $mixed[] = $byCounty[$i];
+            }
+            if (count($mixed) >= $limit) {
+                break;
+            }
+            if (isset($byLanguage[$i])) {
+                $mixed[] = $byLanguage[$i];
+            }
+        }
+        return array_slice($mixed, 0, $limit);
+    }
+
     public static function countPublished(array $f = []): int
     {
         $sql = "SELECT COUNT(*) FROM stories s WHERE s.status='published'";

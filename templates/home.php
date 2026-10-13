@@ -55,6 +55,19 @@ $countySlug = $county ? slugify($county) : '';
 <div class="container layout">
   <div class="layout__main">
 
+    <?php if (!empty($forYou)): $forYouMatch = implode(' + ', array_filter([$county, $forYouLanguage ? \MeNews\Support\Lang::nativeName($forYouLanguage) : null])); ?>
+    <section class="block block--foryou reveal" id="for-you">
+      <header class="block__head">
+        <span class="block__index mono"><?= icon('sparkle') ?></span>
+        <h2 class="block__title">For You</h2>
+        <p class="block__blurb">Matched to <?= e($forYouMatch) ?> — based on your state and language, not browsing history.</p>
+      </header>
+      <div class="grid grid--4">
+        <?php foreach ($forYou as $i => $s): ?><?= Ui::card($s, $i === 0 ? 'standard' : 'compact', $i) ?><?php endforeach; ?>
+      </div>
+    </section>
+    <?php endif; ?>
+
     <?= \MeNews\View::partial('partials/near', ['locality' => $locality, 'counties' => $countyNames, 'compact' => true, 'notices' => $countyNotices ?? [], 'first' => true]) ?>
 
     <?= \MeNews\View::partial('partials/signal-slider', compact('signalBoard', 'signalStats')) ?>

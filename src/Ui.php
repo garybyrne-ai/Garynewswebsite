@@ -75,8 +75,10 @@ final class Ui
         $summary = $s['summary'] ? '<p class="card__summary">' . e(excerpt($s['summary'], $variant === 'feature' ? 260 : 150)) . '</p>' : '';
         $trust = $s['kind'] === 'community' ? '<div class="meter meter--sm" title="Confidence ' . (int)$s['trust_score'] . '/100"><i style="--v:' . (int)$s['trust_score'] . '"></i></div>' : '';
         $views = views_label((int)$s['views']);
+        $waUrl = \MeNews\Support\Share::link('whatsapp', ['url' => absolute_url($s['url']), 'title' => $s['title']]);
+        $whatsapp = '<a class="card__share card__share--whatsapp" href="' . e((string)$waUrl) . '" target="_blank" rel="noopener nofollow" aria-label="Share on WhatsApp" title="Share on WhatsApp">' . icon('whatsapp') . '</a>';
         $save = '<button class="card__save" type="button" data-save="' . e($s['id']) . '" aria-label="Save story" title="Save for later">' . icon('bookmark') . '</button>';
-        $foot = '<div class="card__foot">' . $source . $by . $place . ($views !== '' ? '<span class="card__views">' . e($views) . ' reads</span>' : '') . $save . '</div>';
+        $foot = '<div class="card__foot">' . $source . $by . $place . ($views !== '' ? '<span class="card__views">' . e($views) . ' reads</span>' : '') . $whatsapp . $save . '</div>';
         $title = '<h3 class="card__title"><a href="' . e($s['url']) . '">' . e($s['title']) . '</a></h3>';
 
         return match ($variant) {
