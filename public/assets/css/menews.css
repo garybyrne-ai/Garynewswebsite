@@ -16,7 +16,9 @@
   /* Green family */
   --g1:#0b5d3b;--g2:#139a5c;--g3:#26c072;--g4:#8ae8b3;
   --em:#12a06a;--cy:#0f8a52;--mint:#3ccf7d;--lime:#8fd84a;--vi:#5b4fd6;--am:#c7780a;--hot:#d92645;--gold:#b58a1d;
-  --aurora:linear-gradient(120deg,var(--g2),var(--g3) 50%,var(--g4));
+  /* Saffron, for tricolor-inspired accents (the top band of the Indian flag) — used sparingly alongside the green family, never for safety/severity colour (those stay true red/amber). */
+  --saffron:#ec7f13;--saffron-2:#f7a84a;
+  --aurora:linear-gradient(120deg,var(--saffron),var(--g3) 55%,var(--g2));
   --on-accent:#04140c;
   --shadow:0 18px 50px rgba(8,26,16,.12);--glow:0 0 0 1px rgba(19,154,92,.22),0 0 24px rgba(19,154,92,.16);
   --display:"Sora","Manrope",ui-sans-serif,system-ui,sans-serif;--body:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -32,6 +34,7 @@
   --ink:#edf5ef;--ink-2:#bfd0c5;--muted:#8fa296;
   --g1:#0f7a4c;--g2:#1fb56a;--g3:#3ddc84;--g4:#a6f5c8;
   --em:#5ef0a8;--cy:#3ddc84;--mint:#7ff0b4;--lime:#b7f26a;--vi:#a89cff;--am:#ffb547;--hot:#ff4d6d;--gold:#f1c76b;
+  --saffron:#ff9a3d;--saffron-2:#ffbf7a;
   --shadow:0 20px 60px rgba(0,0,0,.45);--glow:0 0 0 1px rgba(61,220,132,.28),0 0 30px rgba(61,220,132,.18);
   --img-filter:saturate(.92) contrast(1.04);
   color-scheme:dark;
@@ -60,7 +63,7 @@ p{margin:0}
 .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .aurora i{position:absolute;width:60vw;height:60vw;border-radius:50%;filter:blur(90px);opacity:.28;mix-blend-mode:screen;animation:drift 26s ease-in-out infinite alternate}
 .aurora i:nth-child(1){background:radial-gradient(circle,var(--em),transparent 60%);top:-25vw;left:-15vw}
-.aurora i:nth-child(2){background:radial-gradient(circle,var(--cy),transparent 60%);top:10vh;right:-25vw;animation-delay:-8s;animation-duration:32s}
+.aurora i:nth-child(2){background:radial-gradient(circle,var(--saffron),transparent 60%);top:10vh;right:-25vw;animation-delay:-8s;animation-duration:32s}
 .aurora i:nth-child(3){background:radial-gradient(circle,var(--lime),transparent 60%);bottom:-30vw;left:20vw;animation-delay:-16s;animation-duration:38s}
 @keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(6vw,4vh,0) scale(1.15)}}
 .gridlines{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 0%,#000 20%,transparent 100%);mask-image:radial-gradient(ellipse 70% 60% at 50% 0%,#000 20%,transparent 100%);opacity:.6}
@@ -251,8 +254,8 @@ p{margin:0}
 .block__more{grid-area:more;color:var(--cy);align-self:center;white-space:nowrap}
 .block__more:hover{text-decoration:underline;text-underline-offset:4px}
 .block__head .btn{grid-area:more;align-self:center}
-.block--foryou{background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 10%,transparent),transparent 55%),var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px clamp(14px,3vw,22px) 26px;margin-bottom:28px}
-.block--foryou .block__index{color:var(--gold)}
+.block--foryou{background:linear-gradient(160deg,color-mix(in srgb,var(--saffron) 10%,transparent),transparent 55%),var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px clamp(14px,3vw,22px) 26px;margin-bottom:28px}
+.block--foryou .block__index{color:var(--saffron)}
 .grid{display:grid;gap:18px}
 .grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -1349,6 +1352,7 @@ body.has-bottombar .consent{bottom:64px}
 .statcard__num{font-family:var(--display);font-size:2.4rem;font-weight:800;letter-spacing:-.03em}
 .statcard__label{color:var(--muted);font-weight:600;align-self:flex-end;padding-bottom:6px}
 .statcard__sub{color:var(--muted);font-size:.82rem}
+.panel--mystate .panel__head .kicker,body.page-mystate .pagehead .kicker{color:var(--saffron)}
 .panel--mystate .mystate__stats{display:flex;gap:18px;margin:8px 0}
 .panel--mystate .mystate__stat{display:flex;align-items:center;gap:7px;font-weight:700}
 .panel--mystate .mystate__ic{font-size:1.3rem}
