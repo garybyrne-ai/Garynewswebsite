@@ -286,19 +286,14 @@ check('summary', $s === 200 && isset($sum['pending']), 'pending ' . ($sum['pendi
 [$s, $queue] = http('GET', '/api/admin/stories?kind=community&status=review');
 check('review queue lists the report', $s === 200 && in_array($reportId, array_column($queue, 'id'), true));
 [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'publish', 'label' => 'Verified', 'note' => 'Published by smoke test']);
-if ($failClosed) {
-    check('publish refused without clean OpenAI screening (production)', $s === 409, $dec['detail'] ?? '');
-    [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'hold', 'label' => 'Developing', 'note' => 'Held by smoke test']);
-    check('hold decision', $s === 200 && ($dec['status'] ?? '') === 'hold');
-} else {
-    check('publish decision', $s === 200 && ($dec['status'] ?? '') === 'published', $dec['detail'] ?? '');
-    [$s, $pub] = http('GET', '/api/story/' . $reportId);
-    check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
-}
+// Editors can publish on the keyword screen plus their own decision when no OpenAI key is set.
+check('publish decision', $s === 200 && ($dec['status'] ?? '') === 'published', $dec['detail'] ?? '');
+[$s, $pub] = http('GET', '/api/story/' . $reportId);
+check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
 [$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Community', 'county' => 'Wicklow', 'label' => 'Verified', 'is_featured' => '1', 'location_name' => 'Bray']);
 check('feature a story', $s === 200);
 [$s, $html] = http('GET', '/', [], [], false);
-check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
+check('featured story leads the home page', $s === 200 && str_contains($html, "Smoke test report {$stamp}"));
 [$s] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
 check('reject (cleanup)', $s === 200);
 echo "\nAdvertising packages\n";
