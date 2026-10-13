@@ -87,7 +87,7 @@ final class Lang
     }
 
     /** Chrome language codes that also have real wire coverage in that language (see config/sources.json). */
-    private const STORY_LANGUAGES = ['hi', 'bn', 'te', 'mr', 'ta'];
+    private const STORY_LANGUAGES = ['hi', 'bn', 'te', 'mr', 'ta', 'ur'];
 
     /** The current chrome language, mapped to a story `language` column value — null when it has no wire coverage (English, Urdu). */
     public static function storyLanguage(): ?string
