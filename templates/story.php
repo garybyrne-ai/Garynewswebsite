@@ -18,9 +18,9 @@ $jsonld = $isWire ? null : [
 <div class="progress" aria-hidden="true"><i id="read-progress"></i></div>
 <?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
 
-<article class="container article" data-story-id="<?= e($story['id']) ?>">
+<article class="container article" data-story-id="<?= e($story['id']) ?>" data-story-county="<?= e((string)$story['county']) ?>">
   <header class="article__head">
-    <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Around Me</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>"><?= e($story['county']) ?></a><?php endif; ?></nav>
+    <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>"><?= e($story['county']) ?></a><?php endif; ?></nav>
     <div class="article__labels"><?= $isWire ? '<a class="chip chip--label is-wire" href="/about#labels" title="How we check things"><i></i>Wire · ' . e($story['source_name']) . '</a>' : Ui::label($story['verification_label']) ?><?= Ui::categoryChip($story['category']) ?><?php $storyLang = $story['language'] ?? 'en'; if ($storyLang !== 'en'): ?><a class="chip chip--lang" href="/language/<?= e($storyLang) ?>" title="Originally published in <?= e(\MeNews\Support\Languages::label($storyLang)) ?>"><?= e(\MeNews\Support\Languages::native($storyLang)) ?></a><?php endif; ?><?= $cluster && $cluster['count'] > 1 ? '<a class="chip chip--cluster" href="#coverage">' . icon('layers') . ' ' . (int)$cluster['count'] . ' outlets covering this</a>' : '' ?><?= !$isWire && (int)($story['corroborations'] ?? 0) >= 3 ? '<span class="chip chip--label is-corroborated"><i></i>Corroborated ×' . (int)$story['corroborations'] . '</span>' : '' ?></div>
     <h1 class="article__title"><?= e($story['title']) ?></h1>
     <?php if ($storyLang !== 'en'): ?><p class="article__translate notranslate"><?= icon('globe') ?> This story is in <?= e(\MeNews\Support\Languages::label($storyLang)) ?> (<?= e(\MeNews\Support\Languages::native($storyLang)) ?>). <a href="https://translate.google.com/translate?sl=auto&amp;tl=en&amp;u=<?= rawurlencode(absolute_url($story['url'])) ?>" target="_blank" rel="noopener">Translate to English ↗</a></p><?php endif; ?>
@@ -142,7 +142,7 @@ $jsonld = $isWire ? null : [
         </section>
       <?php endif; ?>
       <section class="panel reveal">
-        <header class="panel__head"><span class="kicker">Latest</span><a class="mono panel__hint" href="/">Around Me →</a></header>
+        <header class="panel__head"><span class="kicker">Latest</span><a class="mono panel__hint" href="/">Home →</a></header>
         <div class="minis"><?php foreach ($more as $r): ?><?= Ui::card($r, 'mini') ?><?php endforeach; ?></div>
       </section>
       <?php if ($ads): ?>

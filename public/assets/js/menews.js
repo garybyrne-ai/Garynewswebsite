@@ -376,7 +376,7 @@
   /* ---------- breaking news push notifications ---------- */
   (async function initPush() {
     const btn = $('#push-toggle');
-    if (!btn || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
     let cfg;
     try { cfg = await api('/api/push/config'); } catch (e) { return; }
     if (!cfg.configured) return;
@@ -386,6 +386,7 @@
       return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
     }
     function paint(subscribed) {
+      if (!btn) return;
       btn.hidden = false;
       btn.classList.toggle('is-active', subscribed);
       btn.setAttribute('aria-pressed', String(subscribed));
@@ -397,7 +398,16 @@
       existing = await reg.pushManager.getSubscription();
     } catch (e) { return; }
     paint(!!existing);
-    btn.addEventListener('click', async () => {
+    async function doSubscribe() {
+      if (Notification.permission === 'denied') { toast('Notifications are blocked in your browser settings'); return false; }
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toUint8(cfg.publicKey) });
+      const county = getCookie('me_county');
+      await api('/api/push/subscribe' + (county ? '?county=' + encodeURIComponent(county) : ''), { method: 'POST', body: JSON.stringify(sub.toJSON()), headers: { 'Content-Type': 'application/json' } });
+      paint(true);
+      toast(county ? 'Breaking news alerts on for ' + county : 'Breaking news alerts on');
+      return true;
+    }
+    btn?.addEventListener('click', async () => {
       btn.disabled = true;
       try {
         const current = await reg.pushManager.getSubscription();
@@ -407,16 +417,41 @@
           paint(false);
           toast('Breaking news alerts turned off');
         } else {
-          if (Notification.permission === 'denied') { toast('Notifications are blocked in your browser settings'); return; }
-          const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toUint8(cfg.publicKey) });
-          const county = getCookie('me_county');
-          await api('/api/push/subscribe' + (county ? '?county=' + encodeURIComponent(county) : ''), { method: 'POST', body: JSON.stringify(sub.toJSON()), headers: { 'Content-Type': 'application/json' } });
-          paint(true);
-          toast(county ? 'Breaking news alerts on for ' + county : 'Breaking news alerts on');
+          await doSubscribe();
         }
       } catch (err) { toast(err.message || 'Could not update alerts'); }
       btn.disabled = false;
     });
+
+    /* Contextual nudge: after reading a few stories from the visitor's own state, offer alerts
+       directly instead of relying on them noticing the bell icon. Shown at most once ever. */
+    if (existing || Notification.permission === 'denied') return;
+    const storyCounty = $('[data-story-county]')?.dataset.storyCounty;
+    const myCounty = getCookie('me_county');
+    if (!storyCounty || !myCounty || storyCounty !== myCounty) return;
+    let reads = {};
+    try { reads = JSON.parse(localStorage.getItem('me_state_reads') || '{}'); } catch (e) { }
+    if (reads.county !== myCounty) reads = { county: myCounty, count: 0 };
+    reads.count = (reads.count || 0) + 1;
+    try { localStorage.setItem('me_state_reads', JSON.stringify(reads)); } catch (e) { }
+    let nudged = false;
+    try { nudged = localStorage.getItem('me_push_nudged') === '1'; } catch (e) { }
+    if (reads.count < 3 || nudged) return;
+    try { localStorage.setItem('me_push_nudged', '1'); } catch (e) { }
+    const bellSvg = '<svg class="icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
+    const el = document.createElement('div');
+    el.className = 'pushnudge';
+    el.innerHTML = '<span>' + bellSvg + '</span><span class="pushnudge__text">Get breaking news alerts for ' + esc(myCounty) + '?</span>'
+      + '<span class="pushnudge__actions"><button type="button" class="pushnudge__enable">Enable</button><button type="button" class="pushnudge__dismiss">Not now</button></span>';
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-show')));
+    const hide = () => { el.classList.remove('is-show'); setTimeout(() => el.remove(), 300); };
+    el.querySelector('.pushnudge__dismiss').addEventListener('click', hide);
+    el.querySelector('.pushnudge__enable').addEventListener('click', async () => {
+      hide();
+      try { await doSubscribe(); } catch (err) { toast(err.message || 'Could not enable alerts'); }
+    });
+    setTimeout(hide, 12000);
   })();
   const dismissed = () => { try { return (Number(localStorage.getItem('me_loc_dismissed') || 0)) > Date.now(); } catch (e) { return false; } };
   const locbar = null;
