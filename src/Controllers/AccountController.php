@@ -112,6 +112,26 @@ final class AccountController
         return Response::json(['token' => Auth::login($u, $r->ip(), $r->userAgent()), 'user' => Auth::publicUser($u)]);
     }
 
+    /** "Continue with Google/Facebook/X": send the browser to the provider's consent screen. */
+    public static function oauthStart(Request $r, array $p): Response
+    {
+        RateLimiter::hit($r->ip() . '|oauth', 30, 900, 'Too many sign-in attempts. Try again in 15 minutes.');
+        return Response::redirect(\MeNews\Services\OAuth::authorizeUrl($p['provider'], $r));
+    }
+
+    /** The provider sends the browser back here with a code (or an error). */
+    public static function oauthCallback(Request $r, array $p): Response
+    {
+        RateLimiter::hit($r->ip() . '|oauth', 30, 900, 'Too many sign-in attempts. Try again in 15 minutes.');
+        if ($r->query('error', '', 200) !== '') {
+            throw new HttpException(400, ucfirst($p['provider']) . ' sign-in was cancelled.');
+        }
+        $u = \MeNews\Services\OAuth::completeLogin($p['provider'], $r, $r->query('code', '', 2000), $r->query('state', '', 200));
+        Auth::login($u, $r->ip(), $r->userAgent());
+        Audit::log($u['id'], 'login.oauth.' . $p['provider'], 'user', $u['id']);
+        return Response::redirect('/');
+    }
+
     public static function logout(Request $r): Response
     {
         $u = Auth::user();

@@ -31,6 +31,12 @@ final class Secrets
         'RAZORPAY_WEBHOOK_SECRET' => ['label' => 'Razorpay webhook secret', 'group' => 'razorpay', 'hint' => 'The secret you set when adding the webhook URL in the Razorpay dashboard', 'pattern' => '/^\S[\s\S]{4,255}$/'],
         'SMTP_PASS' => ['label' => 'SMTP password', 'group' => 'mail', 'hint' => 'The password or API key your mail host gave you', 'pattern' => '/^\S[\s\S]{2,255}$/'],
         'BREVO_API_KEY' => ['label' => 'Brevo API key', 'group' => 'mail', 'hint' => 'xkeysib-… from Brevo → SMTP & API → API keys', 'pattern' => '/^xkeysib-[A-Za-z0-9._\-]{10,}$/'],
+        'GOOGLE_CLIENT_ID' => ['label' => 'Google client ID', 'group' => 'google', 'hint' => 'Google Cloud Console → APIs & Services → Credentials → OAuth client ID (type: Web application)', 'pattern' => '/^[0-9]+-[A-Za-z0-9_]+\.apps\.googleusercontent\.com$/'],
+        'GOOGLE_CLIENT_SECRET' => ['label' => 'Google client secret', 'group' => 'google', 'hint' => 'Shown next to the client ID, or under “Additional information”', 'pattern' => '/^\S[\s\S]{8,100}$/'],
+        'FACEBOOK_CLIENT_ID' => ['label' => 'Facebook app ID', 'group' => 'facebook', 'hint' => 'developers.facebook.com → your app → Settings → Basic → App ID', 'pattern' => '/^[0-9]{5,20}$/'],
+        'FACEBOOK_CLIENT_SECRET' => ['label' => 'Facebook app secret', 'group' => 'facebook', 'hint' => 'Same page → App Secret (click “Show”)', 'pattern' => '/^[A-Za-z0-9]{20,64}$/'],
+        'X_CLIENT_ID' => ['label' => 'X (Twitter) client ID', 'group' => 'x', 'hint' => 'developer.x.com → your app → User authentication settings → OAuth 2.0 Client ID', 'pattern' => '/^[A-Za-z0-9_-]{10,100}$/'],
+        'X_CLIENT_SECRET' => ['label' => 'X (Twitter) client secret', 'group' => 'x', 'hint' => 'Same page → Client Secret', 'pattern' => '/^[A-Za-z0-9_-]{10,100}$/'],
     ];
 
     private static ?string $key = null;
@@ -181,6 +187,36 @@ final class Secrets
             $res = Remote::json('https://api.razorpay.com/v1/payment_links?count=1', null, ['Authorization: Basic ' . base64_encode($id . ':' . $secret)], 'json', 20);
             return ['ok' => true, 'message' => 'Razorpay connected (' . (str_contains($id, '_live_') ? 'live' : 'test') . ' mode' . (self::get('RAZORPAY_WEBHOOK_SECRET') === '' ? ', webhook secret still missing' : '') . ')'];
         }
+        if ($gateway === 'google') {
+            $id = self::get('GOOGLE_CLIENT_ID');
+            $secret = self::get('GOOGLE_CLIENT_SECRET');
+            if ($id === '' || $secret === '') {
+                throw new HttpException(400, 'Enter the Google client ID and secret first');
+            }
+            $res = self::probe('https://oauth2.googleapis.com/token', ['client_id' => $id, 'client_secret' => $secret, 'grant_type' => 'refresh_token', 'refresh_token' => 'menews-credential-probe']);
+            if (($res['error'] ?? '') === 'invalid_client') {
+                throw new HttpException(400, 'Google rejected the client ID/secret: ' . ($res['error_description'] ?? 'invalid_client'));
+            }
+            return ['ok' => true, 'message' => 'Google accepted the client ID and secret. Add ' . absolute_url('/auth/google/callback') . ' as an authorised redirect URI in Google Cloud Console, then “Continue with Google” is ready.'];
+        }
+        if ($gateway === 'facebook') {
+            $id = self::get('FACEBOOK_CLIENT_ID');
+            $secret = self::get('FACEBOOK_CLIENT_SECRET');
+            if ($id === '' || $secret === '') {
+                throw new HttpException(400, 'Enter the Facebook app ID and secret first');
+            }
+            $res = self::probe('https://graph.facebook.com/oauth/access_token?' . http_build_query(['client_id' => $id, 'client_secret' => $secret, 'grant_type' => 'client_credentials']), null);
+            if (empty($res['access_token'])) {
+                throw new HttpException(400, 'Facebook rejected the app ID/secret: ' . ($res['error']['message'] ?? 'unknown error'));
+            }
+            return ['ok' => true, 'message' => 'Facebook verified the app ID and secret. Add ' . absolute_url('/auth/facebook/callback') . ' under Valid OAuth Redirect URIs, then “Continue with Facebook” is ready.'];
+        }
+        if ($gateway === 'x') {
+            if (self::get('X_CLIENT_ID') === '' || self::get('X_CLIENT_SECRET') === '') {
+                throw new HttpException(400, 'Enter the X client ID and secret first');
+            }
+            return ['ok' => true, 'message' => 'Saved. X has no way to verify credentials without a real sign-in — add ' . absolute_url('/auth/x/callback') . ' as a callback URL in the X developer portal, then try “Continue with X” yourself to confirm.'];
+        }
         if ($gateway === 'brevo') {
             $key = self::get('BREVO_API_KEY');
             if ($key === '') {
@@ -191,5 +227,38 @@ final class Secrets
             return ['ok' => true, 'message' => 'Brevo connected: ' . $name . ($acct['plan'][0]['credits'] ?? null ? ' · ' . (int)$acct['plan'][0]['credits'] . ' credits' : '')];
         }
         throw new HttpException(400, 'Unknown gateway');
+    }
+
+    /**
+     * Like Remote::json(), but returns the decoded body even on a non-2xx response —
+     * OAuth token endpoints put the useful "invalid_client" vs "invalid_grant" distinction
+     * in a JSON body sent alongside a 400/401, which Remote::json() would otherwise discard.
+     */
+    private static function probe(string $url, ?array $form): array
+    {
+        $ch = curl_init($url);
+        if ($ch === false) {
+            throw new HttpException(502, 'Unable to initialise HTTP client');
+        }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+        ]);
+        if ($form !== null) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($form));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        }
+        $raw = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+        if ($raw === false) {
+            throw new HttpException(502, 'Could not reach the provider: ' . $err);
+        }
+        $json = json_decode((string)$raw, true);
+        return is_array($json) ? $json : [];
     }
 }

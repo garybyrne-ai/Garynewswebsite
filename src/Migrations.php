@@ -190,5 +190,19 @@ final class Migrations
             recorded_at TEXT NOT NULL
         )");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mandi_history_county ON mandi_history(county, commodity, recorded_at)");
+
+        // Social sign-in: one row per (provider, that provider's own user id), linked to our
+        // users table. A reader can hold several rows (Google + Facebook) against one account.
+        $pdo->exec("CREATE TABLE IF NOT EXISTS oauth_identities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            provider TEXT NOT NULL,
+            provider_user_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            email TEXT,
+            created_at TEXT NOT NULL,
+            UNIQUE(provider, provider_user_id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_oauth_identities_user ON oauth_identities(user_id)");
     }
 }

@@ -546,7 +546,9 @@ final class AdminController
         return Response::json([
             'fields' => \MeNews\Services\Secrets::status(),
             'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(), 'razorpay' => \MeNews\Services\Razorpay::configured(),
+            'google' => \MeNews\Services\OAuth::enabled('google'), 'facebook' => \MeNews\Services\OAuth::enabled('facebook'), 'x' => \MeNews\Services\OAuth::enabled('x'),
             'webhooks' => ['stripe' => absolute_url('/api/stripe/webhook'), 'paypal' => absolute_url('/api/paypal/webhook'), 'razorpay' => absolute_url('/api/razorpay/webhook')],
+            'redirect_uris' => ['google' => \MeNews\Services\OAuth::redirectUri('google'), 'facebook' => \MeNews\Services\OAuth::redirectUri('facebook'), 'x' => \MeNews\Services\OAuth::redirectUri('x')],
             'key_source' => \MeNews\Config::get('APP_KEY') !== '' ? 'APP_KEY' : 'storage/data/.secret_key',
         ]);
     }
@@ -662,7 +664,7 @@ final class AdminController
         if ($changed) {
             Audit::log($u['id'], 'gateways.update', 'settings', 'gateways', implode(', ', $changed));
         }
-        return Response::json(['ok' => true, 'changed' => $changed, 'fields' => \MeNews\Services\Secrets::status(), 'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(), 'razorpay' => \MeNews\Services\Razorpay::configured()]);
+        return Response::json(['ok' => true, 'changed' => $changed, 'fields' => \MeNews\Services\Secrets::status(), 'stripe' => \MeNews\Services\Stripe::configured(), 'paypal' => \MeNews\Services\PayPal::configured(), 'razorpay' => \MeNews\Services\Razorpay::configured(), 'google' => \MeNews\Services\OAuth::enabled('google'), 'facebook' => \MeNews\Services\OAuth::enabled('facebook'), 'x' => \MeNews\Services\OAuth::enabled('x')]);
     }
 
     public static function testGateway(Request $r): Response
@@ -671,6 +673,8 @@ final class AdminController
         $gateway = $r->post('gateway', '', 10);
         try {
             $out = \MeNews\Services\Secrets::test($gateway);
+        } catch (HttpException $e) {
+            throw $e; // Secrets::test() already gave a specific, correctly-worded error
         } catch (\JsonException | \RuntimeException $e) {
             if (str_contains($e->getMessage(), '401') || str_contains($e->getMessage(), '403')) {
                 throw new HttpException(400, ucfirst($gateway) . ' rejected the credentials. Check they were copied in full and belong to the right mode (test/live, sandbox/live).');

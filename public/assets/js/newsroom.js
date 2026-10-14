@@ -333,15 +333,30 @@
           <div><h3 style="margin:0 0 8px">Razorpay (UPI/BHIM/GPay/PhonePe)</h3><div class="settingsgrid">${group('razorpay')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="razorpay">Test Razorpay connection</button></div></div></div>
           <div class="form__actions"><button class="btn btn--primary" type="submit">Save gateway keys</button><span class="form__hint">Only fields you fill in are changed.</span></div>
           <p class="form__result" id="gateways-result"></p>
+        </form>
+        <div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px"><span class="kicker">Social sign-in</span><span class="mono">Google: <b class="${g.google ? 'is-good' : 'is-bad'}">${g.google ? 'connected' : 'not connected'}</b> · Facebook: <b class="${g.facebook ? 'is-good' : 'is-bad'}">${g.facebook ? 'connected' : 'not connected'}</b> · X: <b class="${g.x ? 'is-good' : 'is-bad'}">${g.x ? 'connected' : 'not connected'}</b></span></div>
+        <p class="panel__note" style="margin:6px 0 12px">Readers can then sign in with one tap instead of a password. Each provider needs its own app created in that provider's own developer console (this cannot be automated — the provider insists on verifying who owns the app) — paste the client ID and secret it gives you below, and give it the matching redirect URL shown under each one.</p>
+        <form id="oauth-form" class="form">
+          <div class="gwgrid">
+            <div><h3 style="margin:0 0 8px">Google</h3><div class="settingsgrid">${group('google')}</div><p class="form__hint">Authorised redirect URI — add exactly this in Google Cloud Console: <code>${esc(g.redirect_uris.google)}</code></p><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="google">Test Google credentials</button></div></div>
+            <div><h3 style="margin:0 0 8px">Facebook</h3><div class="settingsgrid">${group('facebook')}</div><p class="form__hint">Valid OAuth Redirect URI — add exactly this in Meta for Developers: <code>${esc(g.redirect_uris.facebook)}</code></p><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="facebook">Test Facebook credentials</button></div></div>
+            <div><h3 style="margin:0 0 8px">X (Twitter)</h3><div class="settingsgrid">${group('x')}</div><p class="form__hint">Callback URI — add exactly this in the X developer portal: <code>${esc(g.redirect_uris.x)}</code>. X rarely grants access to a member's email, so an X sign-in usually creates a fresh Bharat Wire account rather than joining an existing one.</p><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="x">Test X credentials</button></div></div>
+          </div>
+          <div class="form__actions"><button class="btn btn--primary" type="submit">Save sign-in keys</button><span class="form__hint">Only fields you fill in are changed.</span></div>
+          <p class="form__result" id="oauth-result"></p>
         </form>`;
       $('#gateways-form').addEventListener('submit', async e => {
         e.preventDefault(); const out = $('#gateways-result'); out.classList.remove('is-error');
         try { const j = await api('/api/admin/gateways', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Gateway keys saved'); loadGateways(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
       });
+      $('#oauth-form').addEventListener('submit', async e => {
+        e.preventDefault(); const out = $('#oauth-result'); out.classList.remove('is-error');
+        try { const j = await api('/api/admin/gateways', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Sign-in keys saved'); loadGateways(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+      });
       box.addEventListener('click', async e => {
         const t = e.target.closest('[data-test]'), c = e.target.closest('[data-clear]');
-        const out = $('#gateways-result');
-        if (t) { t.disabled = true; out.classList.remove('is-error'); out.textContent = 'Checking…'; try { const j = await api('/api/admin/gateways/test', { method: 'POST', body: fd({ gateway: t.dataset.test }) }); out.textContent = j.message; } catch (err) { out.classList.add('is-error'); out.textContent = err.message; } t.disabled = false; }
+        const resultFor = el => el.closest('form')?.querySelector('.form__result') || $('#gateways-result');
+        if (t) { const out = resultFor(t); t.disabled = true; out.classList.remove('is-error'); out.textContent = 'Checking…'; try { const j = await api('/api/admin/gateways/test', { method: 'POST', body: fd({ gateway: t.dataset.test }) }); out.textContent = j.message; } catch (err) { out.classList.add('is-error'); out.textContent = err.message; } t.disabled = false; }
         if (c) { e.preventDefault(); if (!confirm('Remove this key from the newsroom store?')) return; try { await api('/api/admin/gateways', { method: 'POST', body: fd({ ['clear_' + c.dataset.clear]: '1' }) }); toast('Removed'); loadGateways(); } catch (err) { toast(err.message); } }
       });
     } catch (e) { box.hidden = true; }

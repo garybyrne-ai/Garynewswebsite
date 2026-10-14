@@ -290,6 +290,15 @@ $more = [
   <div class="modal__box">
     <header class="modal__head"><h2 id="auth-title">Sign in to Bharat Wire</h2><button class="iconbtn" type="button" data-close aria-label="Close"><?= icon('close') ?></button></header>
     <div class="modal__body">
+      <?php $oauthProviders = \MeNews\Services\OAuth::enabledProviders(); ?>
+      <?php if ($oauthProviders): ?>
+        <div class="authsocial">
+          <?php foreach ($oauthProviders as $op): ?>
+            <a class="btn btn--ghost btn--block authsocial__btn authsocial__btn--<?= e($op) ?>" href="/auth/<?= e($op) ?>/start">Continue with <?= e(\MeNews\Services\OAuth::label($op)) ?></a>
+          <?php endforeach; ?>
+        </div>
+        <div class="authsocial__divider"><span>or</span></div>
+      <?php endif; ?>
       <div class="tabs mono" role="tablist"><button type="button" class="is-active" data-auth-tab="signin" role="tab">Sign in</button><button type="button" data-auth-tab="register" role="tab">Create account</button></div>
       <form id="signin-form" class="form" data-auth-view="signin">
         <label>Email<input name="email" type="email" autocomplete="email" required></label>

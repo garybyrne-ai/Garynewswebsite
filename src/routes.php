@@ -135,6 +135,8 @@ return static function (Router $r): void {
     $r->post('/api/auth/register', [Account::class, 'register']);
     $r->post('/api/auth/login', [Account::class, 'login']);
     $r->post('/api/auth/logout', [Account::class, 'logout']);
+    $r->get('/auth/{provider:google|facebook|x}/start', [Account::class, 'oauthStart']);
+    $r->get('/auth/{provider:google|facebook|x}/callback', [Account::class, 'oauthCallback']);
     $r->get('/api/me', [Account::class, 'me']);
     $r->post('/api/me/profile', [Account::class, 'profile']);
     $r->post('/api/me/password', [Account::class, 'password']);
