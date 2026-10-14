@@ -37,6 +37,18 @@ $adFree = $user && ($user['plan'] ?? '') === 'Wire+';
   </section>
   <?php endif; ?>
 
+  <?php $breaking = \MeNews\Stories::breakingNow(5); if ($breaking): ?>
+  <section class="panel panel--breaking reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('bolt') ?> Breaking right now</span><span class="mono panel__hint">last 3h</span></header>
+    <ol class="ranked">
+      <?php foreach ($breaking as $i => $t): ?>
+        <li><span class="mono ranked__n"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span><a href="<?= e($t['url']) ?>"><?= e($t['title']) ?></a></li>
+      <?php endforeach; ?>
+    </ol>
+    <p class="panel__note" style="margin-top:8px">Ranked by how fast it's being read right now, not total views — breaking news that's just taken off, surfaced before it's old news.</p>
+  </section>
+  <?php endif; ?>
+
   <?php if (!empty($trending)): $shown = array_values(array_filter($trending, static fn($t) => views_label((int)$t['views']) !== '')); if (count($shown) >= 3): ?>
   <section class="panel reveal">
     <header class="panel__head"><span class="kicker">Most read</span><span class="mono panel__hint">72 h</span></header>

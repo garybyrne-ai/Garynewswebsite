@@ -442,11 +442,26 @@ final class NewsWire
             'suggested_category' => $story['category'],
         ]);
         try {
-            Clusters::assign($id);
+            $clusterId = Clusters::assign($id);
+            if ($clusterId) {
+                self::notifyFollowers($clusterId, $id, $story['title']);
+            }
         } catch (\Throwable $e) {
             error_log('Clustering ' . $id . ': ' . $e->getMessage());
         }
         return true;
+    }
+
+    /** Tell anyone following another story in this cluster that a new outlet has picked it up. */
+    private static function notifyFollowers(string $clusterId, string $newStoryId, string $newTitle): void
+    {
+        $followers = Database::all(
+            "SELECT DISTINCT f.user_id FROM story_follows f JOIN stories s ON s.id=f.story_id WHERE s.cluster_id=? AND f.story_id<>?",
+            [$clusterId, $newStoryId]
+        );
+        foreach ($followers as $f) {
+            Notifier::send($f['user_id'], 'story-follow', 'New coverage on a story you follow', $newTitle, $newStoryId);
+        }
     }
 
     private static function contributorFor(string $category): ?array

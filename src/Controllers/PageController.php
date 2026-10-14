@@ -47,6 +47,10 @@ final class PageController
         }
         $forYou = Stories::forYou($county, $forYouLanguage, $exclude, 8);
         $exclude = array_merge($exclude, array_column($forYou, 'id'));
+        $becauseYouRead = Auth::user() ? Stories::becauseYouRead(Auth::user()['id'], 6) : null;
+        if ($becauseYouRead) {
+            $exclude = array_merge($exclude, array_column($becauseYouRead['rows'], 'id'));
+        }
         $community = Stories::feed(['kind' => 'community'], 4);
         $leadKicker = $hero && $county && $hero['county'] === $county ? 'Lead story · ' . e($county) : ($hero && $hero['is_featured'] ? 'Editor\'s pick' : 'Lead story · India');
         return View::page('home', self::base([
@@ -59,6 +63,7 @@ final class PageController
             'sections' => $sections,
             'forYou' => $forYou,
             'forYouLanguage' => $forYouLanguage,
+            'becauseYouRead' => $becauseYouRead,
             'community' => $community,
             'trending' => Stories::trending(6),
             'counties' => Stories::countyActivity(8),
@@ -267,11 +272,21 @@ final class PageController
         }
         Database::query('UPDATE stories SET views=views+1 WHERE id=?', [$story['id']]);
         $story['views']++;
+        Stories::logView($story['id']);
+        $viewer = Auth::user();
+        if ($viewer) {
+            Database::query(
+                'INSERT INTO story_reads(user_id,story_id,created_at) VALUES(?,?,?) ON CONFLICT(user_id,story_id) DO UPDATE SET created_at=excluded.created_at',
+                [$viewer['id'], $story['id'], now()]
+            );
+        }
         $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role,reports_published,plan FROM users WHERE id=?', [$story['author_user_id']]) : null;
         $isWire = $story['kind'] === 'wire';
         // Members' archive: community reports older than the archive window are summarised for non-members.
         $archived = !$isWire && \MeNews\Services\Membership::isArchived($story, Auth::user());
         return View::page('story', self::base([
+            'corrections' => Database::all('SELECT * FROM corrections WHERE story_id=? ORDER BY created_at DESC', [$story['id']]),
+            'following' => $viewer ? (bool)Database::value('SELECT 1 FROM story_follows WHERE user_id=? AND story_id=?', [$viewer['id'], $story['id']]) : false,
             // Wire pages canonicalise to the publisher and stay out of the index: the original is the article.
             'canonical' => $isWire ? $story['source_url'] : absolute_url($story['url']),
             'robots' => $isWire ? 'noindex,follow' : null,
@@ -348,6 +363,10 @@ final class PageController
             'counties' => Locations::countyNames(),
             'weather' => \MeNews\Services\Weather::forState($county),
             'aqi' => \MeNews\Services\Aqi::forState($county),
+            'aqiHistory' => \MeNews\Services\Aqi::history($county, 30),
+            'mandiCommodities' => $mandiCommodities = \MeNews\Services\MandiPrices::chartableCommodities($county),
+            'mandiHistory' => $mandiCommodities ? \MeNews\Services\MandiPrices::history($county, $mandiCommodities[0], 30) : [],
+            'mandiCommodity' => $mandiCommodities[0] ?? null,
             'warnings' => \MeNews\Services\Alerts::forCounty($county),
             'closures' => \MeNews\Services\Alerts::closures($county, 3),
             'trends' => \MeNews\Services\Trends::forState($county, 10),
@@ -396,6 +415,24 @@ final class PageController
             'ads' => self::ads('', '', 6, 'section'),
             'banner' => self::banner('', '', 'section'),
             'bodyClass' => 'page-mysteries',
+        ]));
+    }
+
+    /**
+     * National emergency numbers plus a state quick-jump. Deliberately limited to the numbers in
+     * StateProfile::emergencyNumbers() — the same ones unified across every state and already
+     * published on /alerts — rather than city-specific hospital/police numbers we have no
+     * verified source for and would risk publishing wrong.
+     */
+    public static function helplines(Request $r): Response
+    {
+        return View::page('helplines', self::base([
+            'title' => 'Helplines & emergency numbers — Bharat Wire India',
+            'description' => "India's unified national emergency numbers — police, fire, ambulance, women's and child helplines, cyber crime and more — plus a quick jump to any state's own news and alerts.",
+            'canonical' => absolute_url('/helplines'),
+            'numbers' => \MeNews\Support\StateProfile::emergencyNumbers(),
+            'counties' => Locations::countyNames(),
+            'bodyClass' => 'page-helplines',
         ]));
     }
 
@@ -461,7 +498,7 @@ final class PageController
 
     public static function contributor(Request $r, array $p): Response
     {
-        $c = Database::one("SELECT id,display_name,handle,title,desk,bio,accent,home_town,home_county,reputation,is_verified,created_at FROM users WHERE handle=? AND role IN ('contributor','editor','admin')", [$p['handle']]);
+        $c = Database::one("SELECT id,display_name,handle,title,desk,bio,accent,home_town,home_county,reputation,is_verified,created_at,reports_published FROM users WHERE handle=? AND role IN ('contributor','editor','admin')", [$p['handle']]);
         if (!$c) {
             throw new HttpException(404, 'Contributor not found');
         }
@@ -573,7 +610,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/tech', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/mysteries', '/contributors', '/about', '/plus', '/feeds'];
+        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/tech', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/mysteries', '/helplines', '/contributors', '/about', '/plus', '/feeds'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }

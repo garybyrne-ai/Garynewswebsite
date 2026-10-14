@@ -48,6 +48,29 @@
     </div>
   </div>
 
+  <?php if ($aqi || !empty($mandiCommodity)): ?>
+  <div class="grid grid--2" style="margin-bottom:24px">
+    <div class="panel reveal">
+      <header class="panel__head"><span class="kicker"><?= icon('wind') ?> AQI · 30-day trend</span></header>
+      <?php $aqiSpark = array_column($aqiHistory ?? [], 'aqi'); if (count($aqiSpark) >= 2): ?>
+        <?= \MeNews\Ui::sparkline($aqiSpark) ?>
+        <p class="panel__note" style="margin:8px 0 0">One reading a day · <?= count($aqiSpark) ?> day<?= count($aqiSpark) === 1 ? '' : 's' ?> logged so far</p>
+      <?php else: ?>
+        <p class="panel__note" style="margin:0">Not enough history yet — this builds up one reading a day as the site runs, and needs at least two days logged before a trend line can be drawn.</p>
+      <?php endif; ?>
+    </div>
+    <div class="panel reveal">
+      <header class="panel__head"><span class="kicker"><?= icon('sparkle') ?> Mandi price · 30-day trend<?= $mandiCommodity ? ' · ' . e($mandiCommodity) : '' ?></span></header>
+      <?php $mandiSpark = array_map('floatval', array_column($mandiHistory ?? [], 'modal')); if (count($mandiSpark) >= 2): ?>
+        <?= \MeNews\Ui::sparkline($mandiSpark) ?>
+        <p class="panel__note" style="margin:8px 0 0">Modal price, ₹ per quintal · <?= count($mandiSpark) ?> days logged<?= count($mandiCommodities ?? []) > 1 ? ' · ' . (count($mandiCommodities) - 1) . ' more commodity trend' . (count($mandiCommodities) > 2 ? 's' : '') . ' tracked on this state' : '' ?></p>
+      <?php else: ?>
+        <p class="panel__note" style="margin:0">Not enough history yet for a mandi-price trend — same as AQI, it needs a couple of days of daily readings first.</p>
+      <?php endif; ?>
+    </div>
+  </div>
+  <?php endif; ?>
+
   <section class="block">
     <header class="block__head"><span class="block__index mono"><?= icon('alert') ?></span><h2 class="block__title">Alerts &amp; closures</h2><p class="block__blurb">SACHET severe-weather warnings and school closures confirmed by principals.</p><a class="block__more mono" href="/alerts?county=<?= e($countySlug) ?>">Full alerts page →</a></header>
     <?php if ($warnings): ?>

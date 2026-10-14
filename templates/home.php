@@ -68,6 +68,19 @@ $countySlug = $county ? slugify($county) : '';
     </section>
     <?php endif; ?>
 
+    <?php if (!empty($becauseYouRead)): ?>
+    <section class="block block--foryou reveal" id="because-you-read">
+      <header class="block__head">
+        <span class="block__index mono"><?= icon('layers') ?></span>
+        <h2 class="block__title">Because you read this</h2>
+        <p class="block__blurb">Picked from your reading, starting with <a href="<?= e($becauseYouRead['seed']['url']) ?>"><?= e(excerpt($becauseYouRead['seed']['title'], 60)) ?></a> — never your saved list, only what you've opened.</p>
+      </header>
+      <div class="grid grid--4">
+        <?php foreach ($becauseYouRead['rows'] as $i => $s): ?><?= Ui::card($s, $i === 0 ? 'standard' : 'compact', $i) ?><?php endforeach; ?>
+      </div>
+    </section>
+    <?php endif; ?>
+
     <div class="countystrip" aria-label="Dedicated corners">
       <a class="countystrip__item countystrip__item--tech" href="/tech"><?= icon('cpu') ?><span><b>Tech Corner</b><small>Startups, AI, gadgets & software →</small></span></a>
       <a class="countystrip__item countystrip__item--kids" href="/kids"><?= icon('kids') ?><span><b>Wire Junior</b><small>Puzzles, quiz & free things for kids →</small></span></a>

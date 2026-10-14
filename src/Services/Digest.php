@@ -14,13 +14,13 @@ use MeNews\Support\Daily;
  */
 final class Digest
 {
-    /** Everything the county email and bulletin need, in one array. */
-    public static function build(?string $county): array
+    /** Everything the county email and bulletin need, in one array. $language: prefer stories in that language first (see Stories::feedLang()), topped up with English — never English-only when a language is set and has coverage. */
+    public static function build(?string $county, ?string $language = null): array
     {
-        $stories = $county ? Stories::feed(['county' => $county], 5) : [];
+        $stories = $county ? Stories::feedLang(['county' => $county], 5, 0, $language) : [];
         if (count($stories) < 5) {
             $seen = array_column($stories, 'id');
-            foreach (Stories::feed(['category' => 'National', 'exclude' => $seen ?: ['-']], 5 - count($stories)) as $s) {
+            foreach (Stories::feedLang(['category' => 'National', 'exclude' => $seen ?: ['-']], 5 - count($stories), 0, $language) as $s) {
                 $stories[] = $s;
             }
         }
@@ -56,9 +56,9 @@ final class Digest
         return 'Your ' . ($d['county'] ?: 'India') . ' morning · ' . excerpt($lead, 70);
     }
 
-    public static function html(string $county, string $token): string
+    public static function html(string $county, string $token, ?string $language = null): string
     {
-        $d = self::build($county);
+        $d = self::build($county, $language);
         $base = rtrim(Config::get('PUBLIC_BASE_URL', ''), '/');
         $h = '<p style="color:#59685f;font-size:12px;letter-spacing:.15em;text-transform:uppercase;margin:0 0 6px">Edition ' . (int)$d['edition'] . ' · ' . e($d['date']) . '</p>';
         $h .= '<h1 style="font-size:24px;margin:0 0 14px;letter-spacing:-.02em">Your ' . e($county) . ' morning</h1>';
@@ -109,16 +109,17 @@ final class Digest
             return 0;
         }
         $day = $today->format('Y-m-d');
-        $rows = Database::all("SELECT id,email,county,token,last_daily_at FROM alert_subscriptions WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL AND (','||kinds||',') LIKE '%,daily,%' ORDER BY county");
+        $rows = Database::all("SELECT id,email,county,language,token,last_daily_at FROM alert_subscriptions WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL AND (','||kinds||',') LIKE '%,daily,%' ORDER BY county");
         $cache = [];
         $n = 0;
         foreach ($rows as $s) {
             if (!$force && $s['last_daily_at'] && str_starts_with(date_in($s['last_daily_at'], 'Y-m-d'), $day)) {
                 continue;
             }
-            $cache[$s['county']] ??= self::html($s['county'], '{{token}}');
-            $html = str_replace('{{token}}', $s['token'], $cache[$s['county']]);
-            if (Mailer::send($s['email'], self::subject(self::build($s['county'])), $html)) {
+            $key = $s['county'] . '|' . (string)$s['language'];
+            $cache[$key] ??= self::html($s['county'], '{{token}}', $s['language'] ?: null);
+            $html = str_replace('{{token}}', $s['token'], $cache[$key]);
+            if (Mailer::send($s['email'], self::subject(self::build($s['county'], $s['language'] ?: null)), $html)) {
                 Database::query('UPDATE alert_subscriptions SET last_daily_at=? WHERE id=?', [now(), $s['id']]);
                 $n++;
             }

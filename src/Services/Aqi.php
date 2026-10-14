@@ -60,10 +60,28 @@ final class Aqi
             }
             $fresh = ['aqi' => $aqi, 'label' => $label, 'colour' => $colour, 'updated' => now()];
             file_put_contents($file, json_encode($fresh, JSON_UNESCAPED_UNICODE), LOCK_EX);
+            self::recordHistory($state, $aqi, $label);
             return $fresh;
         } catch (Throwable $e) {
             error_log('AQI (state ' . $state . '): ' . $e->getMessage());
             return is_array($cached) ? $cached : null;
         }
+    }
+
+    /** One reading per state per day is plenty for a trend line — skip if we already logged today. */
+    private static function recordHistory(string $state, int $aqi, string $label): void
+    {
+        $today = substr(now(), 0, 10);
+        if (Database::value('SELECT 1 FROM aqi_history WHERE county=? AND substr(recorded_at,1,10)=?', [$state, $today])) {
+            return;
+        }
+        Database::insert('aqi_history', ['county' => $state, 'aqi' => $aqi, 'label' => $label, 'recorded_at' => now()]);
+    }
+
+    /** Daily AQI readings for a state over the last $days, oldest first — for a trend chart. */
+    public static function history(string $state, int $days = 30): array
+    {
+        $since = gmdate('Y-m-d\TH:i:s', time() - $days * 86400) . '+00:00';
+        return Database::all('SELECT aqi,label,recorded_at FROM aqi_history WHERE county=? AND recorded_at>=? ORDER BY recorded_at ASC', [$state, $since]);
     }
 }

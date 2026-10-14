@@ -34,6 +34,8 @@ $jsonld = $isWire ? null : [
         <span class="byline"><?= Ui::avatar(null, 'md', $story['author_name'] ?: 'Bharat Wire') ?><span><b><?= e($story['author_name'] ?: 'Community reporter') ?></b><small>Community reporter</small></span></span>
       <?php endif; ?>
       <?= \MeNews\Support\Share::bar(['url' => absolute_url($story['url']), 'title' => $story['title'], 'text' => (string)($story['summary'] ?: ''), 'image' => $story['image'] ? absolute_url($story['image']) : ''], 'compact') ?>
+      <button class="btn btn--ghost btn--sm" type="button" data-tts data-tts-title="<?= e($story['title']) ?>" data-tts-text="<?= e(excerpt($story['summary'] ?: strip_tags((string)$story['body']), 600)) ?>" data-tts-lang="<?= e($story['language'] ?? 'en') ?>" aria-pressed="false"><?= icon('audio') ?> <span data-tts-label>Listen</span></button>
+      <button class="btn btn--ghost btn--sm" type="button" data-follow-story="<?= e($story['id']) ?>" aria-pressed="<?= !empty($following) ? 'true' : 'false' ?>"><?= icon('bell') ?> <span data-follow-label><?= !empty($following) ? 'Following' : 'Follow this story' ?></span></button>
       <div class="textsize" role="group" aria-label="Text size"><button type="button" data-textsize="" aria-label="Normal text">A</button><button type="button" data-textsize="lg" aria-label="Larger text">A</button><button type="button" data-textsize="xl" aria-label="Largest text">A</button></div>
       <div class="article__time mono">
         <time datetime="<?= e($story['time']) ?>"><?= e(date_in($story['time'])) ?></time>
@@ -43,6 +45,14 @@ $jsonld = $isWire ? null : [
       </div>
     </div>
   </header>
+
+  <?php if (!empty($corrections)): ?>
+    <div class="correctionbox">
+      <?php foreach ($corrections as $c): ?>
+        <div class="correctionbox__item"><?= icon('edit') ?><div><b>Correction, <?= e(date_in($c['created_at'], 'j M Y')) ?>:</b> <?= e($c['summary']) ?><?php if ($c['detail']): ?> <span class="correctionbox__detail"><?= e($c['detail']) ?></span><?php endif; ?></div></div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 
   <div class="article__grid">
     <div class="article__main">
@@ -113,7 +123,7 @@ $jsonld = $isWire ? null : [
         <header class="block__head block__head--sm"><h2 class="block__title">Community discussion</h2><span class="mono" id="comment-count"><?= count($comments) ?> published</span></header>
         <div class="comments" id="comments">
           <?php if ($comments): foreach ($comments as $c): ?>
-            <div class="comment"><?= Ui::avatar(['display_name' => $c['author'], 'accent' => $c['accent'] ?? null, 'is_verified' => $c['is_verified'] ?? 0], 'sm', $c['author']) ?><div><b><?= e($c['author']) ?><?= ($c['plan'] ?? '') === 'Wire+' ? ' <span class="chip chip--plus chip--xs" title="Wire+ member">Wire+</span>' : '' ?></b><time class="mono"><?= e(time_ago($c['created_at'])) ?></time><p><?= nl2br(e($c['body'])) ?></p></div></div>
+            <div class="comment"><?= Ui::avatar(['display_name' => $c['author'], 'accent' => $c['accent'] ?? null, 'is_verified' => $c['is_verified'] ?? 0, 'reputation' => $c['reputation'] ?? 0, 'reports_published' => $c['reports_published'] ?? 0, 'home_county' => $c['home_county'] ?? null], 'sm', $c['author']) ?><div><b><?= e($c['author']) ?><?= ($c['plan'] ?? '') === 'Wire+' ? ' <span class="chip chip--plus chip--xs" title="Wire+ member">Wire+</span>' : '' ?></b><time class="mono"><?= e(time_ago($c['created_at'])) ?></time><p><?= nl2br(e($c['body'])) ?></p></div></div>
           <?php endforeach; else: ?>
             <p class="panel__note" id="no-comments">No published comments yet. Keep it factual and respectful — comments are screened before they appear.</p>
           <?php endif; ?>

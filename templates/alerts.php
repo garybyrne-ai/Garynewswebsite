@@ -70,6 +70,7 @@
       <header class="panel__head"><span class="kicker"><?= icon('bell') ?> Email alerts</span></header>
       <form class="form" data-subscribe>
         <label>State<select name="county" data-subscribe-county><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select></label>
+        <label>Morning email language<select name="language"><option value="">English</option><?php foreach (['hi', 'bn', 'te', 'mr', 'ta', 'ur'] as $lc): ?><option value="<?= e($lc) ?>"><?= e(\MeNews\Support\Lang::nativeName($lc)) ?></option><?php endforeach; ?></select></label>
         <div class="checks"><?php foreach ($kinds as $k => $label): ?><label class="check"><input type="checkbox" name="kinds[]" value="<?= e($k) ?>" <?= in_array($k, ['warnings', 'closures', 'daily'], true) ? 'checked' : '' ?>><span><?= e($label) ?></span></label><?php endforeach; ?></div>
         <label>Email<input name="email" type="email" required value="<?= e($user['email'] ?? '') ?>"></label>
         <button class="btn btn--primary btn--block" type="submit">Turn on alerts</button>

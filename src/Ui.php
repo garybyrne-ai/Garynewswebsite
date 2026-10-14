@@ -31,7 +31,18 @@ final class Ui
         $name = $nameOverride ?? ($user['display_name'] ?? 'Bharat Wire');
         $hue = (int)($user['accent'] ?? self::hue($name));
         $verified = !empty($user['is_verified']) ? '<i class="avatar__tick" title="Verified contributor">✓</i>' : '';
-        return '<span class="avatar avatar--' . e($size) . '" style="--h:' . $hue . '"><span>' . e(self::initials($name)) . '</span>' . $verified . '</span>';
+        $local = self::isVerifiedLocal($user) ? '<i class="avatar__local" title="Verified local: a track record of confirmed reports in ' . e((string)($user['home_county'] ?? 'their state')) . '">📍</i>' : '';
+        return '<span class="avatar avatar--' . e($size) . '" style="--h:' . $hue . '"><span>' . e(self::initials($name)) . '</span>' . $verified . $local . '</span>';
+    }
+
+    /**
+     * "Verified local" badge: a real track record in their own state, not a one-off report —
+     * at least 3 published reports and a reputation the trust system has actually earned up to
+     * 70+. Computed on the fly from existing columns; no separate flag to keep in sync.
+     */
+    public static function isVerifiedLocal(?array $user): bool
+    {
+        return $user !== null && !empty($user['home_county']) && (int)($user['reports_published'] ?? 0) >= 3 && (int)($user['reputation'] ?? 0) >= 70;
     }
 
     /** Editorial label chip. Links to the how-we-check page so the label is always explained. */

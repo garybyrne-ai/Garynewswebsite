@@ -55,10 +55,39 @@ final class MandiPrices
                 ];
             }
             file_put_contents($file, json_encode(['updated' => now(), 'rows' => $rows], JSON_UNESCAPED_UNICODE), LOCK_EX);
+            self::recordHistory($state, $rows);
             return $rows;
         } catch (Throwable $e) {
             error_log('Mandi prices (state ' . $state . '): ' . $e->getMessage());
             return is_array($cached) ? $cached['rows'] : [];
         }
+    }
+
+    /** One modal-price reading per commodity per state per day — skip commodities already logged today. */
+    private static function recordHistory(string $state, array $rows): void
+    {
+        $today = substr(now(), 0, 10);
+        foreach ($rows as $row) {
+            if ($row['commodity'] === '' || $row['modal'] === '') {
+                continue;
+            }
+            if (Database::value('SELECT 1 FROM mandi_history WHERE county=? AND commodity=? AND substr(recorded_at,1,10)=?', [$state, $row['commodity'], $today])) {
+                continue;
+            }
+            Database::insert('mandi_history', ['county' => $state, 'commodity' => $row['commodity'], 'modal' => $row['modal'], 'recorded_at' => now()]);
+        }
+    }
+
+    /** Daily modal-price readings for one commodity over the last $days, oldest first. */
+    public static function history(string $state, string $commodity, int $days = 30): array
+    {
+        $since = gmdate('Y-m-d\TH:i:s', time() - $days * 86400) . '+00:00';
+        return Database::all('SELECT modal,recorded_at FROM mandi_history WHERE county=? AND commodity=? AND recorded_at>=? ORDER BY recorded_at ASC', [$state, $commodity, $since]);
+    }
+
+    /** Commodities with at least 2 days of history for a state, for a "chart this" picker. */
+    public static function chartableCommodities(string $state): array
+    {
+        return array_column(Database::all('SELECT commodity, COUNT(DISTINCT substr(recorded_at,1,10)) AS n FROM mandi_history WHERE county=? GROUP BY commodity HAVING n>=2 ORDER BY commodity', [$state]), 'commodity');
     }
 }

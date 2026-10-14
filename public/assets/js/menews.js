@@ -270,6 +270,44 @@
   });
   loadSavedMarks();
 
+  /* ---------- follow a story (notified when the wire adds new coverage) ---------- */
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-follow-story]'); if (!b) return;
+    e.preventDefault();
+    if (!window.ME.user) { toast('Sign in to follow this story'); showAuth('signin'); return; }
+    const id = b.dataset.followStory;
+    const following = b.getAttribute('aria-pressed') === 'true';
+    try {
+      const j = await api('/api/story/' + id + '/' + (following ? 'unfollow' : 'follow'), { method: 'POST' });
+      b.setAttribute('aria-pressed', j.following ? 'true' : 'false');
+      const l = $('[data-follow-label]', b); if (l) l.textContent = j.following ? 'Following' : 'Follow this story';
+      b.classList.toggle('is-following', !!j.following);
+      toast(j.following ? "Following — we'll tell you about new coverage" : 'Unfollowed');
+    } catch (err) { toast(err.message); }
+  });
+
+  /* ---------- listen to a story (browser text-to-speech, no server round-trip) ---------- */
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-tts]'); if (!b) return;
+    e.preventDefault();
+    if (!('speechSynthesis' in window)) { toast('Your browser cannot read aloud'); return; }
+    const label = $('[data-tts-label]', b);
+    if (speechSynthesis.speaking || b.getAttribute('aria-pressed') === 'true') {
+      speechSynthesis.cancel();
+      if (label) label.textContent = 'Listen'; b.setAttribute('aria-pressed', 'false');
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(b.dataset.ttsTitle + '. ' + b.dataset.ttsText);
+    const lang = b.dataset.ttsLang || 'en';
+    const bcp47 = { hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN', ta: 'ta-IN', ur: 'ur-IN' }[lang] || 'en-IN';
+    const voices = speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang === bcp47) || voices.find(v => v.lang && v.lang.startsWith(lang)) || null;
+    u.lang = bcp47; if (voice) u.voice = voice; u.rate = 0.95;
+    u.onend = u.onerror = () => { if (label) label.textContent = 'Listen'; b.setAttribute('aria-pressed', 'false'); };
+    if (label) label.textContent = 'Stop'; b.setAttribute('aria-pressed', 'true');
+    speechSynthesis.speak(u);
+  });
+
   /* ---------- locations & counties ---------- */
   let countiesLoaded = false;
   async function loadCounties() {

@@ -26,6 +26,7 @@ return static function (Router $r): void {
     $r->get('/my-state', [Page::class, 'myState']);
     $r->get('/tech', [Page::class, 'techHub']);
     $r->get('/mysteries', [Page::class, 'mysteriesHub']);
+    $r->get('/helplines', [Page::class, 'helplines']);
     $r->get('/signal', [Sig::class, 'page']);
     $r->get('/api/signal', [Sig::class, 'board']);
     $r->get('/api/signal/story/{id:[a-f0-9]+}', [Sig::class, 'story']);
@@ -170,6 +171,8 @@ return static function (Router $r): void {
     $r->get('/media/q/{id:[a-f0-9]+}/{sig:[a-f0-9]+}', [Page::class, 'quarantineMedia']);
     $r->post('/api/story/{id:[a-f0-9]+}/confirm', [Account::class, 'confirm']);
     $r->post('/api/story/{id:[a-f0-9]+}/comment', [Account::class, 'comment']);
+    $r->post('/api/story/{id:[a-f0-9]+}/follow', [Account::class, 'followStory']);
+    $r->post('/api/story/{id:[a-f0-9]+}/unfollow', [Account::class, 'unfollowStory']);
 
     // ---- Billing
     $r->get('/api/billing/status', [Account::class, 'billingStatus']);

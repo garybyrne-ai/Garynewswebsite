@@ -348,6 +348,27 @@ final class AccountController
         return Response::json(['ok' => true]);
     }
 
+    /** Follow a specific story: notified (in-app) when the wire adds a new outlet to its cluster. */
+    public static function followStory(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        if (!Database::one("SELECT id FROM stories WHERE id=? AND status='published'", [$p['id']])) {
+            throw new HttpException(404, 'Story not found');
+        }
+        Database::query(
+            'INSERT INTO story_follows(user_id,story_id,created_at) VALUES(?,?,?) ON CONFLICT(user_id,story_id) DO NOTHING',
+            [$u['id'], $p['id'], now()]
+        );
+        return Response::json(['ok' => true, 'following' => true]);
+    }
+
+    public static function unfollowStory(Request $r, array $p): Response
+    {
+        $u = Auth::require();
+        Database::query('DELETE FROM story_follows WHERE user_id=? AND story_id=?', [$u['id'], $p['id']]);
+        return Response::json(['ok' => true, 'following' => false]);
+    }
+
     // -------------------------------------------------------- community reporting
 
     /**

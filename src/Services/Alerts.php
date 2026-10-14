@@ -247,6 +247,8 @@ final class Alerts
         $email = mb_strtolower(trim((string)($in['email'] ?? ($user['email'] ?? ''))));
         $county = trim((string)($in['county'] ?? ''));
         $kinds = array_values(array_intersect(array_keys(self::KINDS), (array)($in['kinds'] ?? ['daily'])));
+        $language = trim((string)($in['language'] ?? ''));
+        $language = \MeNews\Support\Lang::valid($language) && $language !== \MeNews\Support\Lang::DEFAULT ? $language : null;
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new HttpException(400, 'Enter a valid email');
         }
@@ -268,9 +270,9 @@ final class Alerts
         $token = $existing['token'] ?? bin2hex(random_bytes(20));
         $town = mb_substr(trim((string)($in['town'] ?? '')), 0, 80);
         if ($existing) {
-            Database::query('UPDATE alert_subscriptions SET kinds=?,town=?,unsubscribed_at=NULL,user_id=COALESCE(user_id,?) WHERE id=?', [implode(',', $kinds), $town, $user['id'] ?? null, $existing['id']]);
+            Database::query('UPDATE alert_subscriptions SET kinds=?,town=?,language=?,unsubscribed_at=NULL,user_id=COALESCE(user_id,?) WHERE id=?', [implode(',', $kinds), $town, $language, $user['id'] ?? null, $existing['id']]);
         } else {
-            Database::insert('alert_subscriptions', ['email' => $email, 'county' => $county, 'town' => $town, 'kinds' => implode(',', $kinds), 'token' => $token, 'user_id' => $user['id'] ?? null, 'created_at' => now(), 'confirmed_at' => $user && strcasecmp($user['email'], $email) === 0 ? now() : null]);
+            Database::insert('alert_subscriptions', ['email' => $email, 'county' => $county, 'town' => $town, 'kinds' => implode(',', $kinds), 'language' => $language, 'token' => $token, 'user_id' => $user['id'] ?? null, 'created_at' => now(), 'confirmed_at' => $user && strcasecmp($user['email'], $email) === 0 ? now() : null]);
         }
         $confirmed = (bool)Database::value('SELECT confirmed_at FROM alert_subscriptions WHERE token=?', [$token]);
         if (!$confirmed) {

@@ -218,6 +218,59 @@ final class Stories
         return array_map([self::class, 'present'], $rows);
     }
 
+    /** Record one view in the current hourly bucket, for the breakingNow() velocity score. */
+    public static function logView(string $storyId): void
+    {
+        $hour = gmdate('Y-m-d\TH:00');
+        Database::query(
+            'INSERT INTO story_view_hours(story_id,hour,views) VALUES(?,?,1)
+             ON CONFLICT(story_id,hour) DO UPDATE SET views=views+1',
+            [$storyId, $hour]
+        );
+    }
+
+    /**
+     * "Breaking now": ranked by recent reading velocity (views in the last 3 hours), not the
+     * cumulative total trending() uses — a story published an hour ago that's suddenly getting
+     * read a lot outranks an old story that quietly racked up views over days.
+     */
+    public static function breakingNow(int $limit = 6): array
+    {
+        $since = gmdate('Y-m-d\TH:i:s', time() - 48 * 3600) . '+00:00';
+        $fromHour = gmdate('Y-m-d\TH:00', time() - 3 * 3600);
+        $rows = Database::all(
+            self::SELECT . " JOIN (SELECT story_id, SUM(views) AS recent_views FROM story_view_hours WHERE hour>=? GROUP BY story_id) v ON v.story_id=s.id
+             WHERE s.status='published' AND COALESCE(s.published_at,s.created_at)>? AND v.recent_views>0
+             ORDER BY v.recent_views DESC LIMIT ?",
+            [$fromHour, $since, $limit]
+        );
+        return array_map([self::class, 'present'], $rows);
+    }
+
+    /**
+     * "Because you read X": the single most recent story a signed-in reader opened, plus a
+     * handful more from the same category and state — content-based, no ML, nothing beyond
+     * what they've actually read (never their saved list or browsing elsewhere).
+     */
+    public static function becauseYouRead(string $userId, int $limit = 6): ?array
+    {
+        $seedId = Database::value('SELECT story_id FROM story_reads WHERE user_id=? ORDER BY created_at DESC LIMIT 1', [$userId]);
+        $seed = $seedId ? self::byId((string)$seedId) : null;
+        if (!$seed) {
+            return null;
+        }
+        $exclude = array_column(Database::all('SELECT story_id FROM story_reads WHERE user_id=?', [$userId]), 'story_id');
+        $rows = $seed['category'] ? self::feed(['category' => $seed['category'], 'exclude' => $exclude], $limit) : [];
+        if ($seed['county'] && count($rows) < $limit) {
+            $exclude2 = array_merge($exclude, array_column($rows, 'id'));
+            $rows = array_merge($rows, self::feed(['county' => $seed['county'], 'exclude' => $exclude2], $limit - count($rows)));
+        }
+        if (!$rows) {
+            return null;
+        }
+        return ['seed' => $seed, 'rows' => array_slice($rows, 0, $limit)];
+    }
+
     /** Stories published per hour for the last 24 hours (oldest → newest). */
     public static function pulse(): array
     {
@@ -321,7 +374,7 @@ final class Stories
 
     public static function comments(string $storyId): array
     {
-        return Database::all("SELECT c.id,c.created_at,c.author,c.body,u.handle,u.accent,u.is_verified,u.plan FROM comments c LEFT JOIN users u ON u.id=c.user_id WHERE c.story_id=? AND c.status='published' ORDER BY c.created_at", [$storyId]);
+        return Database::all("SELECT c.id,c.created_at,c.author,c.body,u.handle,u.accent,u.is_verified,u.plan,u.reputation,u.reports_published,u.home_county FROM comments c LEFT JOIN users u ON u.id=c.user_id WHERE c.story_id=? AND c.status='published' ORDER BY c.created_at", [$storyId]);
     }
 
     public static function confirmations(string $storyId): int

@@ -65,6 +65,9 @@ final class Migrations
             'last_login_ip' => 'TEXT',
             'last_login_at' => 'TEXT',
         ],
+        'alert_subscriptions' => [
+            'language' => 'TEXT',
+        ],
         'ads' => [
             'design_json' => 'TEXT',
             'logo_path' => 'TEXT',
@@ -135,5 +138,57 @@ final class Migrations
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         )");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_push_county ON push_subscriptions(county)");
+
+        // Hourly view buckets per story — cheap enough to keep forever-ish, used only to compute
+        // a recent-views "velocity" score (breaking now) rather than a cumulative total.
+        $pdo->exec("CREATE TABLE IF NOT EXISTS story_view_hours (
+            story_id TEXT NOT NULL,
+            hour TEXT NOT NULL,
+            views INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (story_id, hour)
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_story_view_hours_hour ON story_view_hours(hour)");
+
+        // One row per (signed-in reader, story) they've actually opened — the "because you read
+        // X" recommender's only input. Never collected for anonymous visitors.
+        $pdo->exec("CREATE TABLE IF NOT EXISTS story_reads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            story_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            UNIQUE(user_id, story_id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_story_reads_user ON story_reads(user_id, created_at)");
+
+        // "Follow this story": notified when the wire adds a new outlet to the same cluster.
+        $pdo->exec("CREATE TABLE IF NOT EXISTS story_follows (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            story_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            UNIQUE(user_id, story_id),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_story_follows_story ON story_follows(story_id)");
+
+        // Daily AQI / mandi-price snapshots, written alongside the existing 30-min/1-hour file
+        // cache, so /my-state can chart a real trend instead of only showing today's reading.
+        $pdo->exec("CREATE TABLE IF NOT EXISTS aqi_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            county TEXT NOT NULL,
+            aqi INTEGER NOT NULL,
+            label TEXT,
+            recorded_at TEXT NOT NULL
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_aqi_history_county ON aqi_history(county, recorded_at)");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS mandi_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            county TEXT NOT NULL,
+            commodity TEXT NOT NULL,
+            modal TEXT,
+            recorded_at TEXT NOT NULL
+        )");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mandi_history_county ON mandi_history(county, commodity, recorded_at)");
     }
 }

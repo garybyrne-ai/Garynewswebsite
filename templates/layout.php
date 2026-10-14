@@ -36,7 +36,7 @@ $primary = [
 ];
 $more = [
     'Sections' => [['/section/business', 'Business'], ['/section/culture', 'Culture'], ['/section/council', 'Council'], ['/section/community', 'Community reports'], ['/section/traffic', 'Traffic']],
-    'Bharat Wire' => [['/signal', 'The Signal · most-voted'], ['/my-state', 'My State · weather, AQI & alerts'], ['/alerts', 'Weather & school alerts'], ['/map', 'Live map'], ['/tech', 'Tech Corner'], ['/kids', 'Wire Junior · Kids & puzzles'], ['/mysteries', 'Mystery Files · unsolved cases'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'Wire+ membership']],
+    'Bharat Wire' => [['/signal', 'The Signal · most-voted'], ['/my-state', 'My State · weather, AQI & alerts'], ['/alerts', 'Weather & school alerts'], ['/helplines', 'Helplines & emergency numbers'], ['/map', 'Live map'], ['/tech', 'Tech Corner'], ['/kids', 'Wire Junior · Kids & puzzles'], ['/mysteries', 'Mystery Files · unsolved cases'], ['/saved', 'Saved stories'], ['/contributors', 'The desk'], ['/plus', 'Wire+ membership']],
     'About' => [['/about', 'How Bharat Wire works'], ['/about#sources', 'Our sources'], ['/corrections', 'Corrections'], ['/ownership', 'Who owns Bharat Wire'], ['/advertise', 'Advertise'], ['/feeds', 'RSS & feeds'], ['/privacy', 'Privacy & cookies']],
 ];
 ?><!doctype html>
