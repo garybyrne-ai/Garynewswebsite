@@ -356,6 +356,49 @@ final class PageController
         ]));
     }
 
+    /** A dedicated front page for the Technology desk — distinct from the plain /section/technology listing. */
+    public static function techHub(Request $r): Response
+    {
+        $exclude = [];
+        $featured = Stories::feed(['category' => 'Technology'], 1);
+        $exclude = array_column($featured, 'id');
+        $latest = Stories::feed(['category' => 'Technology', 'exclude' => $exclude], 12);
+        $exclude = array_merge($exclude, array_column($latest, 'id'));
+        $startups = Stories::feed(['category' => 'Technology', 'q' => 'startup', 'exclude' => $exclude], 4);
+        return View::page('tech-hub', self::base([
+            'title' => 'Tech Corner — gadgets, AI, startups and software — Bharat Wire India',
+            'description' => 'Everything in Indian and global technology: startups, AI, gadgets, software and the companies building them.',
+            'canonical' => absolute_url('/tech'),
+            'featured' => $featured[0] ?? null,
+            'latest' => $latest,
+            'startups' => $startups,
+            'trending' => Stories::trending(6),
+            'ads' => self::ads('', '', 6, 'section'),
+            'banner' => self::banner('', '', 'section'),
+            'bodyClass' => 'page-techhub',
+        ]));
+    }
+
+    /**
+     * A dedicated front page for unsolved cases. Sourced entirely from the wire: a story only
+     * lands here when NewsWire::suggest() finds BOTH a crime and the original publisher's own
+     * "unsolved/cold case" framing in the text — nothing here is written or speculated by us.
+     */
+    public static function mysteriesHub(Request $r): Response
+    {
+        $cases = Stories::feed(['category' => 'Mysteries'], 24);
+        return View::page('mysteries-hub', self::base([
+            'title' => 'Mystery Files — unsolved cases from across India — Bharat Wire India',
+            'description' => 'Unsolved and cold cases, reported as such by the journalists who covered them. No speculation, no naming of unconfirmed suspects — just the known, published facts.',
+            'canonical' => absolute_url('/mysteries'),
+            'cases' => $cases,
+            'trending' => Stories::trending(6),
+            'ads' => self::ads('', '', 6, 'section'),
+            'banner' => self::banner('', '', 'section'),
+            'bodyClass' => 'page-mysteries',
+        ]));
+    }
+
     public static function map(Request $r): Response
     {
         return View::page('map', self::base([
@@ -530,7 +573,7 @@ final class PageController
 
     public static function sitemap(Request $r): Response
     {
-        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus', '/feeds'];
+        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/tech', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/mysteries', '/contributors', '/about', '/plus', '/feeds'];
         foreach (Categories::ALL as $meta) {
             $urls[] = '/section/' . $meta['slug'];
         }

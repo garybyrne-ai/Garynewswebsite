@@ -21,10 +21,11 @@ final class Categories
         'Council'   => ['slug' => 'council',   'blurb' => 'Local authorities, planning and civic decisions', 'icon' => 'council'],
         "What's On" => ['slug' => 'whats-on',  'blurb' => 'Events, festivals, gigs and things to do', 'icon' => 'calendar'],
         'World'     => ['slug' => 'world',     'blurb' => 'The stories beyond our shores that matter at home', 'icon' => 'world'],
+        'Mysteries' => ['slug' => 'mysteries', 'blurb' => 'Unsolved cases and cold cases, reported as such by the publishers who covered them', 'icon' => 'magnifier'],
     ];
 
     /** Sections shown in the primary navigation, in order. */
-    public const NAV = ['National', 'Local', 'Business', 'Technology', 'Sport', 'Entertainment', 'Culture', 'Defence', 'Community', 'Traffic', 'Council', "What's On", 'World'];
+    public const NAV = ['National', 'Local', 'Business', 'Technology', 'Sport', 'Entertainment', 'Culture', 'Defence', 'Community', 'Traffic', 'Council', "What's On", 'World', 'Mysteries'];
 
     public const LABELS = ['Community Report', 'Developing', 'Corroborated', 'Verified', 'Official'];
 

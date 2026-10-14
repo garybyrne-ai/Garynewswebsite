@@ -38,12 +38,17 @@ final class NewsWire
     private const TECH_RE = '/\b(smartphone|iphone|android|ios update|app store|play store|launched a new|chipset|processor|semiconductor|artificial intelligence|\bai\b|machine learning|chatbot|large language model|software update|app update|cybersecurity|data breach|hacked|hackers?|data centre|cloud computing|5g|6g|wi-?fi|satellite internet|electric vehicle|\bev\b|battery tech|robotics|drone (?:delivery|startup)|quantum computing|tech giant|apple|google|meta platforms|microsoft|amazon web services|infosys|tcs|wipro|byju|paytm|zomato|swiggy|ola electric|flipkart|gadget|laptop|tablet|wearable|smartwatch|nvidia|intel|qualcomm|spacex|starlink)\b/iu';
     /** Defence technology and the armed forces. */
     private const DEFENCE_RE = '/\b(drdo|hal\b|bharat electronics|\bbel\b|brahmos|agni missile|akash missile|tejas jet|rafale|indian army|indian navy|indian air force|\bias\b|\bins\b (?:vikrant|vikramaditya)|submarine|fighter jet|missile test|missile system|air defence|defence ministry|ministry of defence|defence budget|defence deal|defence procurement|arms deal|military exercise|border security force|\bbsf\b|indo-pak border|line of control|\bloc\b|line of actual control|\blac\b|army chief|navy chief|air chief marshal|chief of defence staff|paramilitary|special forces|para commandos|garud commandos|marcos|nsg commandos|radar system|surveillance drone|combat drone|unmanned aerial|artillery|howitzer|warship|aircraft carrier|stealth frigate|anti-tank|counter-terror operation)\b/iu';
+    /** A crime or disappearance is the subject matter. Needs MYSTERY_FRAME_RE too — most crime gets solved. */
+    private const MYSTERY_CRIME_RE = '/\b(murder|murdered|killing|killed|slain|homicide|found dead|dead body|decomposed body|skeleta?l remains|disappear(?:ed|ance)|went missing|missing (?:person|since|for \d+ years?|\d+ years?|teenager|woman|man|boy|girl)|kidnapp?(?:ed|ing)|abduct(?:ed|ion)|heist|robbery|dacoity|serial killer|poisoning|arson attack)\b/iu';
+    /** The publisher itself frames the case as unsolved — we only mirror that framing, never add our own. */
+    private const MYSTERY_FRAME_RE = '/\b(unsolved|cold case|cold-case|still a mystery|remains a mystery|shrouded in mystery|baffled (?:police|investigators)|no breakthrough|yet to (?:crack|solve)|no arrests? (?:made|so far|yet)|manhunt (?:continues|still on)|still at large|whodunit|decades?-old (?:case|mystery|murder)|years? (?:on|later).{0,30}(?:unsolved|no closure|no answers|still missing|mystery)|no closure|closure eludes|never (?:solved|cracked|found)|probe (?:yet to|still|has failed to)|case (?:remains|still) open|trail (?:has )?gone cold|clueless (?:police|cops))\b/iu';
 
     /** Editorial desk → contributor handle. */
     private const DESKS = [
         'National' => 'aisha', 'World' => 'aisha', 'Council' => 'rohan', 'Defence' => 'aisha',
         'Sport' => 'arjun', 'Culture' => 'meera', "What's On" => 'meera', 'Entertainment' => 'meera',
         'Business' => 'priya', 'Technology' => 'priya', 'Local' => 'rohan', 'Traffic' => 'rohan', 'Community' => 'rohan',
+        'Mysteries' => 'aisha',
     ];
 
     public static function sources(): array
@@ -281,6 +286,13 @@ final class NewsWire
             $category = 'Sport';
         }
         $notCrimeOrPolitics = !preg_match('/\b(police|court|crash|died|killed|arrested|minister|parliament|election)\b/iu', $title);
+        // Mysteries: both a crime/disappearance AND the publisher's own "unsolved/cold case" framing must be
+        // present — most crime news gets solved, so this only catches stories already reported that way.
+        // Kept to India like the rest of the wire: skip a story with strong foreign markers and no India anchor.
+        if (preg_match(self::MYSTERY_CRIME_RE, $text) && preg_match(self::MYSTERY_FRAME_RE, $text)
+            && !(preg_match(self::WORLD_RE, $title) && !preg_match(self::INDIA_RE, $title))) {
+            return 'Mysteries';
+        }
         // Defence: checked before World, since border/neighbour stories would otherwise misfire as foreign news.
         if (in_array($category, ['National', 'Local', 'World'], true) && preg_match(self::DEFENCE_RE, $title)) {
             return 'Defence';

@@ -24,6 +24,8 @@ return static function (Router $r): void {
     $r->get('/map', [Page::class, 'map']);
     $r->get('/near', [Page::class, 'near']);
     $r->get('/my-state', [Page::class, 'myState']);
+    $r->get('/tech', [Page::class, 'techHub']);
+    $r->get('/mysteries', [Page::class, 'mysteriesHub']);
     $r->get('/signal', [Sig::class, 'page']);
     $r->get('/api/signal', [Sig::class, 'board']);
     $r->get('/api/signal/story/{id:[a-f0-9]+}', [Sig::class, 'story']);

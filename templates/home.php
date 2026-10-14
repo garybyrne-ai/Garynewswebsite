@@ -68,6 +68,12 @@ $countySlug = $county ? slugify($county) : '';
     </section>
     <?php endif; ?>
 
+    <div class="countystrip" aria-label="Dedicated corners">
+      <a class="countystrip__item countystrip__item--tech" href="/tech"><?= icon('cpu') ?><span><b>Tech Corner</b><small>Startups, AI, gadgets & software →</small></span></a>
+      <a class="countystrip__item countystrip__item--kids" href="/kids"><?= icon('kids') ?><span><b>Wire Junior</b><small>Puzzles, quiz & free things for kids →</small></span></a>
+      <a class="countystrip__item countystrip__item--mystery" href="/mysteries"><?= icon('magnifier') ?><span><b>Mystery Files</b><small>Unsolved cases from the wire →</small></span></a>
+    </div>
+
     <?= \MeNews\View::partial('partials/near', ['locality' => $locality, 'counties' => $countyNames, 'compact' => true, 'notices' => $countyNotices ?? [], 'first' => true]) ?>
 
     <?= \MeNews\View::partial('partials/signal-slider', compact('signalBoard', 'signalStats')) ?>
