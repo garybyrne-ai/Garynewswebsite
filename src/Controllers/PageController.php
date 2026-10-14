@@ -32,19 +32,19 @@ final class PageController
     {
         $locality = \MeNews\Support\Visitor::locality(8);
         $county = $locality['county'] ?? null;
+        $forYouLanguage = Lang::storyLanguage();
         $hero = Stories::hero($county);
         $exclude = $hero ? [$hero['id']] : [];
-        $latest = Stories::feed(['exclude' => $exclude], 9);
+        $latest = Stories::feedLang(['exclude' => $exclude], 9, 0, $forYouLanguage);
         $exclude = array_merge($exclude, array_column($latest, 'id'));
         $sections = [];
         foreach (['National', 'Local', 'Sport', 'Business', 'Culture', 'World'] as $cat) {
-            $rows = Stories::feed(['category' => $cat, 'exclude' => $exclude], 4);
+            $rows = Stories::feedLang(['category' => $cat, 'exclude' => $exclude], 4, 0, $forYouLanguage);
             if ($rows) {
                 $sections[$cat] = $rows;
                 $exclude = array_merge($exclude, array_column($rows, 'id'));
             }
         }
-        $forYouLanguage = Lang::storyLanguage();
         $forYou = Stories::forYou($county, $forYouLanguage, $exclude, 8);
         $exclude = array_merge($exclude, array_column($forYou, 'id'));
         $community = Stories::feed(['kind' => 'community'], 4);
@@ -101,8 +101,9 @@ final class PageController
         $page = $r->int('page', 1, 1, 200);
         $per = 24;
         $cutoff = \MeNews\Services\Membership::archiveCutoff(Auth::user());
-        $rows = Stories::feed(['category' => $name, 'since' => $cutoff], $per, ($page - 1) * $per);
-        $total = Stories::countPublished(['category' => $name, 'since' => $cutoff]);
+        $storyLang = Lang::storyLanguage();
+        $rows = Stories::feedLang(['category' => $name, 'since' => $cutoff], $per, ($page - 1) * $per, $storyLang);
+        $total = Stories::countPublished(['category' => $name, 'since' => $cutoff] + ($storyLang ? ['language_in' => [$storyLang, 'en']] : []));
 
         $extra = [];
         if ($name === 'Sport') {
@@ -180,8 +181,9 @@ final class PageController
         }
         $page = $r->int('page', 1, 1, 200);
         $per = 24;
-        $rows = Stories::feed(['county' => $county], $per, ($page - 1) * $per);
-        $total = Stories::countPublished(['county' => $county]);
+        $storyLang = Lang::storyLanguage();
+        $rows = Stories::feedLang(['county' => $county], $per, ($page - 1) * $per, $storyLang);
+        $total = Stories::countPublished(['county' => $county] + ($storyLang ? ['language_in' => [$storyLang, 'en']] : []));
         $province = Locations::provinceFor($county);
         $towns = array_values(array_unique(array_column(array_filter(Locations::all(), static fn($t) => $t['county'] === $county), 'town')));
         $week = Database::count("SELECT COUNT(*) FROM stories WHERE status='published' AND county=? AND COALESCE(published_at,created_at)>?", [$county, gmdate('Y-m-d\TH:i:s', time() - 7 * 86400) . '+00:00']);

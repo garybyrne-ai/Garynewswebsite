@@ -171,7 +171,6 @@ $more = [
   </nav>
 </header>
 
-<?php if ($gt): ?><div class="translated notranslate"><div class="container translated__in"><?= icon('globe') ?> <?= e(t('Content translated automatically by Google Translate.')) ?> <a href="/lang/en-IN?back=<?= rawurlencode($backPath) ?>"><?= e(t('Read in English')) ?></a></div></div><?php endif; ?>
 <main id="main" class="<?= $isApp ? 'app' : 'site' ?>">
 <?= $content ?>
 </main>

@@ -251,9 +251,9 @@ p{margin:0}
 .block__index .icon{font-size:1.9rem}
 .block__title{grid-area:title;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:800;letter-spacing:-.035em}
 .block__blurb{grid-area:blurb;color:var(--muted);font-size:.9rem}
-.block__more{grid-area:more;color:var(--cy);align-self:center;white-space:nowrap}
+.block__more{grid-area:more;color:var(--cy);align-self:start;white-space:nowrap}
 .block__more:hover{text-decoration:underline;text-underline-offset:4px}
-.block__head .btn{grid-area:more;align-self:center}
+.block__head .btn{grid-area:more;align-self:start}
 .block--foryou{background:linear-gradient(160deg,color-mix(in srgb,var(--saffron) 10%,transparent),transparent 55%),var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px clamp(14px,3vw,22px) 26px;margin-bottom:28px}
 .block--foryou .block__index{color:var(--saffron)}
 .grid{display:grid;gap:18px}
@@ -1489,9 +1489,6 @@ body.has-bottombar .consent{bottom:64px}
 .drawer__langs{display:flex;flex-wrap:wrap;gap:6px}
 .drawer__langs a{padding:6px 10px!important;border:1px solid var(--line);border-radius:999px;font-size:.85rem}
 .drawer__langs a.is-active{border-color:var(--em);color:var(--em)}
-.translated{background:color-mix(in srgb,var(--em) 9%,var(--bg));border-bottom:1px solid var(--line);font-size:.82rem;color:var(--ink-2)}
-.translated__in{display:flex;align-items:center;gap:8px;padding:8px 0;flex-wrap:wrap}
-.translated a{color:var(--em);font-weight:700;margin-left:auto}
 .article__translate{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;margin:4px 0 10px;background:color-mix(in srgb,var(--am) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--am) 30%,var(--line));border-radius:var(--r-sm);font-size:.86rem;color:var(--ink-2)}
 .article__translate a{color:var(--am);font-weight:700;margin-left:auto}
 /* Google's own banner and tooltip are hidden: the choice lives in our switcher. */

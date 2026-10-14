@@ -90,9 +90,9 @@ $countySlug = $county ? slugify($county) : '';
             <article class="card card--compact">
               <div class="card__body">
                 <div class="card__meta"><?= Ui::categoryChip('Traffic') ?><?= Ui::label('Corroborated') ?><time>Example</time></div>
-                <h3 class="card__title">Water main burst on Church Road, one lane closed at the school</h3>
-                <p class="card__summary">Council crew on site since 8am, traffic being let through in turns. Photo attached, GPS on. Three neighbours tapped "I saw this too".</p>
-                <div class="card__foot"><span class="card__source card__source--community">Community report</span><span class="card__place"><?= icon('pin') ?> Greystones</span></div>
+                <h3 class="card__title">Water pipeline burst near MG Road, one lane closed at the school</h3>
+                <p class="card__summary">Municipal crew on site since 8am, traffic being let through in turns. Photo attached, GPS on. Three neighbours tapped "I saw this too".</p>
+                <div class="card__foot"><span class="card__source card__source--community">Community report</span><span class="card__place"><?= icon('pin') ?> <?= e($county ?: 'Indiranagar') ?></span></div>
               </div>
             </article>
           </div>

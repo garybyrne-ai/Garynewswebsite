@@ -71,6 +71,29 @@ final class Stories
     }
 
     /**
+     * Like feed(), but when $lang is set, shows only stories originally reported in that language,
+     * topped up with English wire stories to fill the slot when that language doesn't have enough —
+     * so picking a language never leaves a section empty, it just prefers that language first.
+     */
+    public static function feedLang(array $f, int $limit, int $offset, ?string $lang): array
+    {
+        if (!$lang) {
+            return self::feed($f, $limit, $offset);
+        }
+        $nativeFilters = $f;
+        $nativeFilters['language'] = $lang;
+        $native = self::feed($nativeFilters, $limit, $offset);
+        if (count($native) >= $limit) {
+            return $native;
+        }
+        $fallbackFilters = $f;
+        $fallbackFilters['language'] = 'en';
+        $fallbackFilters['exclude'] = array_merge($f['exclude'] ?? [], array_column($native, 'id'));
+        $fallback = self::feed($fallbackFilters, $limit - count($native), $offset);
+        return array_merge($native, $fallback);
+    }
+
+    /**
      * A personalised mix: fresh stories from the visitor's state interleaved with fresh stories in
      * their chosen language, deduplicated. Empty when neither preference is set, so the caller can
      * skip the section entirely rather than show a redundant copy of the general feed.
@@ -116,6 +139,9 @@ final class Stories
         if (!empty($f['language'])) {
             $sql .= ' AND s.language=?';
             $args[] = $f['language'];
+        } elseif (!empty($f['language_in'])) {
+            $sql .= ' AND s.language IN (' . implode(',', array_fill(0, count($f['language_in']), '?')) . ')';
+            array_push($args, ...$f['language_in']);
         }
         if (!empty($f['q'])) {
             $sql .= ' AND (s.title LIKE ? OR s.summary LIKE ? OR s.body LIKE ? OR s.location_name LIKE ? OR s.county LIKE ?)';
