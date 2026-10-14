@@ -1,5 +1,5 @@
 <?php $n = $notice; $x = $n['extra']; ?>
-<?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
+<?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE) ?></script><?php endif; ?>
 <article class="container article article--notice">
   <header class="article__head">
     <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/notices">Notices</a><span>/</span><a href="/notices/<?= e($n['kind']) ?>"><?= e(\MeNews\Services\Notices::KINDS[$n['kind']]['plural']) ?></a><span>/</span><a href="/notices/<?= e($n['kind']) ?>?county=<?= rawurlencode($n['county']) ?>"><?= e($n['county']) ?></a></nav>

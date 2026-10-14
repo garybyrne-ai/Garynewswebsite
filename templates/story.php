@@ -16,7 +16,7 @@ $jsonld = $isWire ? null : [
   + ($story['county'] ? ['contentLocation' => ['@type' => 'Place', 'name' => trim(($story['location_name'] ? $story['location_name'] . ', ' : '') . $story['county'] . ', India')]] : []);
 ?>
 <div class="progress" aria-hidden="true"><i id="read-progress"></i></div>
-<?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
+<?php if ($jsonld): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE) ?></script><?php endif; ?>
 
 <article class="container article" data-story-id="<?= e($story['id']) ?>" data-story-county="<?= e((string)$story['county']) ?>">
   <header class="article__head">
