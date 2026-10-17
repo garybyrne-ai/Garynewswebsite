@@ -2,7 +2,7 @@
 <section class="container pagehead pagehead--center">
   <span class="chip chip--plus">Wire+ membership</span>
   <h1 class="pagehead__title">Ad-free, and every place <em>you love, first.</em></h1>
-  <p class="pagehead__blurb">Wire+ is membership, not a paywall: everything today stays free to read. Members read without adverts, follow up to ten towns and counties, keep the full archive, and fund the council and court reporting nobody else does. <b><?= e($priceLabel) ?></b> or <b><?= e($annualLabel) ?></b>, cancel any time.</p>
+  <p class="pagehead__blurb">Wire+ is membership, not a paywall: everything today stays free to read. Members read without adverts, follow up to ten towns and states, keep the full archive, and fund the council and court reporting nobody else does. <b><?= e($priceLabel) ?></b> or <b><?= e($annualLabel) ?></b>, cancel any time.</p>
   <?php if ($isPlus): ?>
     <p class="form__result" style="text-align:center">You are an Wire+ member — thank you. <a href="/dashboard#membership">Manage your membership</a> · <a href="/dashboard#follows">Set your ten areas</a></p>
   <?php endif; ?>
@@ -54,8 +54,8 @@
       <tr><td>Read every story, notice, alert and poll</td><td>✓</td><td>✓</td></tr>
       <tr><td>Report, comment, confirm and vote in the Signal</td><td>✓</td><td>✓</td></tr>
       <tr><td>Adverts</td><td>Shown</td><td><b>None</b></td></tr>
-      <tr><td>Followed towns and counties</td><td>1</td><td><b>10</b></td></tr>
-      <tr><td>Email alert counties (deaths, closures, warnings, 7am email)</td><td>1</td><td><b>10</b></td></tr>
+      <tr><td>Followed towns and states</td><td>1</td><td><b>10</b></td></tr>
+      <tr><td>Email alert states (deaths, closures, warnings, 7am email)</td><td>1</td><td><b>10</b></td></tr>
       <tr><td>Archive</td><td>Last <?= (int)$archiveDays ?> days</td><td><b>Everything</b></td></tr>
       <tr><td>Members' monthly state newsletter</td><td>—</td><td><b>✓</b></td></tr>
       <tr><td>Wire+ badge on reports and comments</td><td>—</td><td><b>✓</b></td></tr>

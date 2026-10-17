@@ -89,10 +89,15 @@ final class Lang
     /** Chrome language codes that also have real wire coverage in that language (see config/sources.json). */
     private const STORY_LANGUAGES = ['hi', 'bn', 'te', 'mr', 'ta', 'ur'];
 
-    /** The current chrome language, mapped to a story `language` column value — null when it has no wire coverage (English, Urdu). */
-    public static function storyLanguage(): ?string
+    /**
+     * The current chrome language, mapped to a story `language` column value — every chrome
+     * language here has real wire coverage, English included, so this is never null: picking
+     * a language is meant to show only that language's stories (Stories::feedLang() tops up
+     * with English only when that language alone doesn't fill the slot).
+     */
+    public static function storyLanguage(): string
     {
         $code = self::current();
-        return in_array($code, self::STORY_LANGUAGES, true) ? $code : null;
+        return str_starts_with($code, 'en') ? 'en' : (in_array($code, self::STORY_LANGUAGES, true) ? $code : 'en');
     }
 }

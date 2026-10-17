@@ -525,7 +525,7 @@ final class PageController
         return View::page('about', self::base([
             'title' => 'How Bharat Wire works — Bharat Wire India',
             'description' => 'The Wire Trust Engine, editorial labels, our sources and how community reporting is screened.',
-            'sources' => NewsWire::sources(),
+            'sources' => NewsWire::activeSources(),
             'runs' => Database::installed() ? Database::all('SELECT * FROM wire_runs ORDER BY id DESC LIMIT 16') : [],
             'contributors' => self::contributors(),
             'pulse' => Stories::pulse(),

@@ -16,7 +16,7 @@ use MeNews\Support\Locations;
 final class Notices
 {
     public const KINDS = [
-        'death' => ['label' => 'Death notice', 'plural' => 'Death notices', 'icon' => 'candle', 'blurb' => 'Funeral arrangements, reposing and family messages, by county.', 'who' => 'Funeral directors and families', 'days' => 30],
+        'death' => ['label' => 'Death notice', 'plural' => 'Death notices', 'icon' => 'candle', 'blurb' => 'Funeral arrangements, reposing and family messages, by state.', 'who' => 'Funeral directors and families', 'days' => 30],
         'memoriam' => ['label' => 'In memoriam', 'plural' => 'In memoriam', 'icon' => 'heart', 'blurb' => 'Anniversary and remembrance notices.', 'who' => 'Families', 'days' => 45],
         'event' => ['label' => 'Event', 'plural' => "What's on", 'icon' => 'calendar', 'blurb' => 'Gigs, markets, matches, fundraisers and community events.', 'who' => 'Promoters, venues, clubs', 'days' => 60],
         'job' => ['label' => 'Local job', 'plural' => 'Local jobs', 'icon' => 'briefcase', 'blurb' => 'Vacancies from local employers, cheaper than the big boards.', 'who' => 'Local employers', 'days' => 30],
@@ -119,7 +119,7 @@ final class Notices
         }
         $county = trim((string)($in['county'] ?? ''));
         if (!in_array($county, Locations::countyNames(), true)) {
-            throw new HttpException(400, 'Choose a county');
+            throw new HttpException(400, 'Choose a state');
         }
         $email = mb_strtolower(trim((string)($in['contact_email'] ?? ($user['email'] ?? ''))));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {

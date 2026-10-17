@@ -176,7 +176,16 @@
   });
 
   async function loadAds() { if (window.ME.loadAds) window.ME.loadAds(); }
+  async function loadSources() {
+    const j = await api('/api/admin/sources');
+    $('#wire-publishers').innerHTML = `<div class="checks">${j.publishers.map(p => `<label class="check"><input type="checkbox" name="enabled" value="${esc(p.name)}" ${p.enabled ? 'checked' : ''}><span><b>${esc(p.name)}</b> <small style="color:var(--muted)">${esc(p.languages.join(', '))} · ${p.feed_count} feed${p.feed_count > 1 ? 's' : ''}${p.counties.length ? ' · ' + esc(p.counties.slice(0, 3).join(', ')) + (p.counties.length > 3 ? ' +' + (p.counties.length - 3) : '') : ''}</small></span></label>`).join('')}</div>`;
+  }
+  $('#sources-form').addEventListener('submit', async e => {
+    e.preventDefault(); const out = $('#sources-result'); out.classList.remove('is-error');
+    try { const j = await api('/api/admin/sources', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Publishers saved'); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+  });
   async function loadWire() {
+    loadSources();
     const j = await api('/api/admin/wire/runs');
     $('#wire-schedule').innerHTML = `<span class="kicker">Automatic updates</span>
       <div class="stats" style="margin:12px 0"><div class="stat"><span class="mono">Last refresh</span><strong style="font-size:1.1rem">${j.last_refresh ? fmt(j.last_refresh) : 'never'}</strong></div><div class="stat"><span class="mono">Interval</span><strong>${j.interval_minutes} min</strong></div><div class="stat"><span class="mono">Refreshes so far</span><strong>${j.refresh_count}</strong></div><div class="stat"><span class="mono">Background mode</span><strong style="font-size:1.1rem" class="${j.auto_refresh ? 'is-good' : 'is-bad'}">${j.auto_refresh ? (j.background_capable ? 'server (PHP-FPM)' : 'browser ping') : 'off'}</strong></div></div>
@@ -276,7 +285,7 @@
       const labels = { log: 'Write to a log file (nothing is sent)', mail: 'PHP mail() — the server itself', smtp: 'SMTP — Brevo relay, Gmail, your host', brevo: 'Brevo API over HTTPS (no open ports needed)' };
       box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Email delivery</span><span class="mono">Sending by <b>${esc(m.transport)}</b> · <b class="${m.configured ? 'is-good' : 'is-bad'}">${m.configured ? 'ready' : 'needs details'}</b>${m.last_sent_at ? ' · last sent ' + fmt(m.last_sent_at) : ''}</span></div>
         ${m.last_error ? `<p class="form__result is-error" style="margin:8px 0">Last send failed: ${esc(m.last_error)}</p>` : ''}
-        <p class="panel__note" style="margin:6px 0 12px">Alerts, the 7am county email, the members' monthly, report updates and receipts all go out this way. Brevo works either as an API key (best on hosts that block mail ports) or as an ordinary SMTP relay at <code>smtp-relay.brevo.com:587</code>. Nothing sends while this is set to the log file.</p>
+        <p class="panel__note" style="margin:6px 0 12px">Alerts, the 7am state email, the members' monthly, report updates and receipts all go out this way. Brevo works either as an API key (best on hosts that block mail ports) or as an ordinary SMTP relay at <code>smtp-relay.brevo.com:587</code>. Nothing sends while this is set to the log file.</p>
         <form id="mail-form" class="form">
           <div class="settingsgrid">
             <label>Transport<select name="transport">${m.transports.map(t => `<option value="${t}" ${t === m.transport ? 'selected' : ''}>${esc(labels[t] || t)}</option>`).join('')}</select></label>

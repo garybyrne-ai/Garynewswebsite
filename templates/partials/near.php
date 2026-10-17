@@ -25,7 +25,7 @@ foreach ($counties as $c) {
     <div class="near__controls">
       <?php if ($loc['mode'] === 'none'): ?><button class="btn btn--primary btn--sm" type="button" data-open-county><?= icon('pin') ?> Choose my state</button><?php endif; ?>
       <button class="btn btn--ghost btn--sm" type="button" data-locate-me><?= icon('gps') ?> <?= $loc['mode'] === 'gps' ? 'Update location' : 'Use my location' ?></button>
-      <label class="near__county"><span class="mono">county</span><select data-county-pick><option value="">Choose…</option><?= $countyOptions ?></select></label>
+      <label class="near__county"><span class="mono">state</span><select data-county-pick><option value="">Choose…</option><?= $countyOptions ?></select></label>
       <?php if ($loc['mode'] !== 'none'): ?><button class="btn btn--ghost btn--sm" type="button" data-forget-location>Forget</button><?php endif; ?>
     </div>
   </header>

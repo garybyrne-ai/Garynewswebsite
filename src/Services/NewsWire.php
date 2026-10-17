@@ -62,6 +62,85 @@ final class NewsWire
         return Config::bool('WIRE_ENABLED', true);
     }
 
+    /** Publisher names the newsroom has switched off — unchecked in the "News sources" panel. */
+    public static function disabledPublishers(): array
+    {
+        $arr = json_decode((string)Database::setting('wire_disabled_publishers', '[]'), true);
+        return is_array($arr) ? array_values(array_filter($arr, 'is_string')) : [];
+    }
+
+    private static function setDisabledPublishers(array $names): void
+    {
+        Database::setSetting('wire_disabled_publishers', json_encode(array_values(array_unique($names))));
+    }
+
+    /** Every configured feed, minus any whose publisher is currently switched off. */
+    public static function activeSources(): array
+    {
+        $disabled = self::disabledPublishers();
+        if (!$disabled) {
+            return self::sources();
+        }
+        return array_values(array_filter(self::sources(), static fn(array $s): bool => !in_array($s['name'], $disabled, true)));
+    }
+
+    /**
+     * One row per distinct publisher (several config entries can share a name — e.g. The Times
+     * of India has a national, a sport and several city feeds), for the newsroom's on/off
+     * checklist: which languages/categories/states it covers, and whether it's currently on.
+     */
+    public static function publishers(): array
+    {
+        $disabled = self::disabledPublishers();
+        $byName = [];
+        foreach (self::sources() as $s) {
+            $p = &$byName[$s['name']];
+            $p['name'] ??= $s['name'];
+            $p['home'] ??= $s['home'] ?? '';
+            $p['languages'][$s['language']] = true;
+            $p['categories'][$s['category']] = true;
+            if (!empty($s['county'])) {
+                $p['counties'][$s['county']] = true;
+            }
+            $p['feed_count'] = ($p['feed_count'] ?? 0) + 1;
+            unset($p);
+        }
+        $out = [];
+        foreach ($byName as $name => $p) {
+            $out[] = [
+                'name' => $name,
+                'home' => $p['home'],
+                'languages' => array_keys($p['languages']),
+                'categories' => array_keys($p['categories']),
+                'counties' => array_keys($p['counties'] ?? []),
+                'feed_count' => $p['feed_count'],
+                'enabled' => !in_array($name, $disabled, true),
+            ];
+        }
+        usort($out, static fn(array $a, array $b): int => strcmp($a['name'], $b['name']));
+        return $out;
+    }
+
+    /**
+     * Switch a publisher on or off. Takes effect immediately: disabling stops future fetches
+     * AND hides every story already on the site from that publisher; re-enabling brings back
+     * only the ones this switch hid (never a story an editor separately held or rejected).
+     */
+    public static function setPublisherEnabled(string $name, bool $enabled): void
+    {
+        $disabled = self::disabledPublishers();
+        if ($enabled) {
+            self::setDisabledPublishers(array_diff($disabled, [$name]));
+            Database::query("UPDATE stories SET status='published' WHERE source_name=? AND status='source_hidden'", [$name]);
+        } else {
+            if (!in_array($name, $disabled, true)) {
+                $disabled[] = $name;
+            }
+            self::setDisabledPublishers($disabled);
+            Database::query("UPDATE stories SET status='source_hidden' WHERE source_name=? AND status='published'", [$name]);
+        }
+    }
+
     public static function lastRefresh(): ?string
     {
         return Database::setting('wire_last_refresh');
@@ -93,7 +172,7 @@ final class NewsWire
         }
         try {
             $summary['ran'] = true;
-            foreach (self::sources() as $source) {
+            foreach (self::activeSources() as $source) {
                 $runId = self::startRun($source['key']);
                 try {
                     $items = self::fetch($source);

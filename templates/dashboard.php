@@ -30,7 +30,7 @@
         <label>Display name<input name="display_name" id="p-name" required minlength="2"></label>
         <div class="form__row">
           <label>Home town<input name="home_town" id="p-town" list="all-locations" autocomplete="off"></label>
-          <label>Home county<select name="home_county" id="p-county" data-county-select><option value="">Select county</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+          <label>Home state<select name="home_county" id="p-county" data-county-select><option value="">Select state</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
         </div>
         <label>Bio<textarea name="bio" id="p-bio" maxlength="500" rows="3"></textarea></label>
         <div class="form__actions"><button class="btn btn--primary" type="submit">Save profile</button></div>

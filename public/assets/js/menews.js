@@ -71,6 +71,36 @@
     $$('.reveal').forEach(el => io.observe(el));
   } else document.documentElement.classList.add('no-observer');
 
+  /* ---------- animated stat counters ---------- */
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    const countUp = el => {
+      const to = parseInt(el.dataset.count, 10); if (!Number.isFinite(to)) return;
+      const dur = 900, t0 = performance.now();
+      const step = now => {
+        const p = Math.min(1, (now - t0) / dur), eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(to * eased).toLocaleString('en-IN');
+        if (p < 1) requestAnimationFrame(step); else el.textContent = to.toLocaleString('en-IN');
+      };
+      requestAnimationFrame(step);
+    };
+    const cio = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { countUp(en.target); cio.unobserve(en.target); } }), { threshold: .4 });
+    $$('.countup').forEach(el => cio.observe(el));
+  } else {
+    $$('.countup').forEach(el => { const n = parseInt(el.dataset.count, 10); if (Number.isFinite(n)) el.textContent = n.toLocaleString('en-IN'); });
+  }
+
+  /* ---------- cursor-reactive card glow ---------- */
+  if (!reduceMotion && matchMedia('(hover: hover)').matches) {
+    document.addEventListener('pointermove', e => {
+      const el = e.target.closest ? e.target.closest('.card, .panel') : null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    }, { passive: true });
+  }
+
   /* ---------- language menu ---------- */
   const langToggle = $('#lang-toggle'), langMenu = $('#lang-menu');
   if (langToggle) {
@@ -314,7 +344,7 @@
     if (countiesLoaded) return; countiesLoaded = true;
     try {
       const a = await api('/api/counties');
-      const html = '<option value="">Select county</option>' + a.map(x => `<option value="${esc(x.county)}">${esc(x.county)}</option>`).join('');
+      const html = '<option value="">Select state</option>' + a.map(x => `<option value="${esc(x.county)}">${esc(x.county)}</option>`).join('');
       $$('[data-county-select]').forEach(s => { const v = s.value; s.innerHTML = html; s.value = v; });
     } catch (e) { }
   }
@@ -536,7 +566,7 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Locating…'; }
     navigator.geolocation.getCurrentPosition(
       pos => { closeModals(); applyPosition(pos.coords.latitude, pos.coords.longitude); },
-      err => { if (btn) { btn.disabled = false; btn.textContent = 'Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a county instead' : 'Could not get your location'); },
+      err => { if (btn) { btn.disabled = false; btn.textContent = 'Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a state instead' : 'Could not get your location'); },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 }
     );
   }
@@ -620,7 +650,7 @@
     if (btn) btn.disabled = false;
   }));
   $$('[data-subscribe]').forEach(f => { const c = $('[data-subscribe-county]', f); if (c && !c.value && window.ME.county) c.value = window.ME.county; if (c && c.tagName === 'INPUT' && !c.value) { c.value = ''; } });
-  $$('[data-subscribe]').forEach(f => f.addEventListener('submit', e => { const c = $('[data-subscribe-county]', f); if (c && !c.value) { e.preventDefault(); e.stopImmediatePropagation(); toast('Choose your county first'); window.ME.openModal && window.ME.openModal('county-modal'); } }, true));
+  $$('[data-subscribe]').forEach(f => f.addEventListener('submit', e => { const c = $('[data-subscribe-county]', f); if (c && !c.value) { e.preventDefault(); e.stopImmediatePropagation(); toast('Choose your state first'); window.ME.openModal && window.ME.openModal('county-modal'); } }, true));
   bindForm('[data-subscribe]', '/api/alerts/subscribe', '[data-subscribe-result]', (j, f) => { if (j.confirmed) f.reset(); });
   bindForm('[data-closure]', '/api/alerts/closure', '[data-closure-result]', (j, f) => f.reset());
   bindForm('#takedown-form', '/api/takedown', '#takedown-result', (j, f) => f.reset());
@@ -645,7 +675,7 @@
     try {
       const p = await api('/api/poll/vote', { method: 'POST', body: fd });
       $$('.pollopt', w).forEach(o => { const i = Number(o.dataset.option); const pct = p.results.pct[i] || 0; o.classList.add('is-result'); o.classList.toggle('is-mine', p.mine === i); $('i', o).style.setProperty('--v', pct); $('[data-pct]', o).textContent = pct + '%'; });
-      const foot = $('[data-poll-foot]', w); if (foot) foot.textContent = 'Thanks · ' + (p.results.total >= 10 ? p.results.total + ' votes so far' : 'tap another option to change') + (!window.ME.county ? ' · choose your county so it counts locally' : '');
+      const foot = $('[data-poll-foot]', w); if (foot) foot.textContent = 'Thanks · ' + (p.results.total >= 10 ? p.results.total + ' votes so far' : 'tap another option to change') + (!window.ME.county ? ' · choose your state so it counts locally' : '');
       toast('Vote counted' + (window.ME.county ? ' for ' + window.ME.county : ''));
     } catch (err) { toast(err.message); }
   });

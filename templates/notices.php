@@ -5,7 +5,7 @@
   <p class="pagehead__blurb"><?= $meta ? e($meta['blurb']) : 'Funeral arrangements, in memoriam, what’s on, local jobs, planning notices, lost pets and club results. Free for families and clubs; alerts by email for your state.' ?></p>
   <form class="noticefilter" method="get" action="<?= e($kind ? '/notices/' . $kind : '/notices') ?>">
     <label class="sr-only" for="nf-county">State</label>
-    <select id="nf-county" name="county"><option value="">All counties</option><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select>
+    <select id="nf-county" name="county"><option value="">All states</option><?php foreach ($counties as $c): ?><option <?= $c === $county ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select>
     <label class="sr-only" for="nf-q">Search</label>
     <input id="nf-q" type="search" name="q" value="<?= e($q) ?>" placeholder="Search a name, town or club…">
     <button class="btn btn--primary btn--sm" type="submit">Filter</button>

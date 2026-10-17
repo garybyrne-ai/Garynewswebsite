@@ -53,7 +53,7 @@
           <div class="form__row" style="grid-template-columns:1fr 1fr 1fr 1fr">
             <label>Role<select name="role"><option value="member">Member</option><option value="contributor">Contributor</option><option value="editor">Editor</option><option value="admin">Admin</option></select></label>
             <label>Plan<select name="plan"><option value="free">Free</option><option value="Wire+">Wire+ (complimentary)</option></select></label>
-            <label>Home county<select name="home_county" data-county-select><option value="">—</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
+            <label>Home state<select name="home_county" data-county-select><option value="">—</option><?php foreach ($counties as $c): ?><option><?= e($c) ?></option><?php endforeach; ?></select></label>
             <label>Temporary password<input name="password" type="text" autocomplete="off" placeholder="blank = generate one" minlength="8"></label>
           </div>
           <div class="form__row"><label>Title (contributors)<input name="title" maxlength="80" placeholder="e.g. Council reporter"></label><label>Desk<select name="desk"><option value="">—</option><option>National</option><option>Local</option><option>Business</option><option>Sport</option><option>Culture</option></select></label></div>
@@ -79,6 +79,9 @@
       <div id="view-wire" class="view">
         <div class="inline" style="justify-content:space-between"><div><h1>News wire</h1><p class="pagehead__blurb">Headlines are pulled from established Indian publishers every <?= e(\MeNews\Config::get('WIRE_REFRESH_MINUTES', '20')) ?> minutes and filed to the matching desk editor.</p></div><button class="btn btn--primary" id="wire-refresh" type="button">Refresh wire now</button></div>
         <div class="panel" id="wire-schedule"></div>
+        <h2>Publishers</h2>
+        <p class="pagehead__blurb">Uncheck a publisher to stop pulling new stories from it and immediately hide the ones already published — check it again and both resume straight away.</p>
+        <form id="sources-form"><div class="panel" id="wire-publishers"></div><div class="form__actions"><button class="btn btn--primary" type="submit">Save</button><span class="form__hint">Only shows on the site once saved.</span></div><p class="form__result" id="sources-result"></p></form>
         <ul class="sources" id="wire-sources"></ul>
         <h2>Recent runs</h2>
         <div id="wire-runs"></div>

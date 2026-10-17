@@ -344,7 +344,7 @@ final class AccountController
         $loc = $r->post('location_name', '', 100);
         $county = $r->post('county', '', 80);
         if ($loc === '' && $county === '') {
-            throw new HttpException(400, 'Choose a town or county');
+            throw new HttpException(400, 'Choose a town or state');
         }
         $result = Database::transaction(static function () use ($u, $loc, $county): array {
             if (Database::one("SELECT id FROM follows WHERE user_id=? AND lower(COALESCE(location_name,''))=lower(?) AND lower(COALESCE(county,''))=lower(?)", [$u['id'], $loc, $county])) {

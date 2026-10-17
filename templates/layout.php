@@ -118,7 +118,7 @@ $more = [
       <?= icon('pin') ?><span class="countychip__label"><?= $myCounty ? e($myCounty) : e(t('Your state')) ?></span><?= icon('chevron', 'countychip__caret') ?>
     </button>
     <form class="search" action="/search" role="search">
-      <input type="search" name="q" placeholder="<?= e(t('Search stories, towns, counties…')) ?>" value="<?= e($q ?? '') ?>" aria-label="<?= e(t('Search')) ?>">
+      <input type="search" name="q" placeholder="<?= e(t('Search stories, towns, districts…')) ?>" value="<?= e($q ?? '') ?>" aria-label="<?= e(t('Search')) ?>">
       <button type="submit" aria-label="<?= e(t('Search')) ?>"><?= icon('search') ?></button>
     </form>
     <div class="topbar__actions">

@@ -55,7 +55,7 @@ $countySlug = $county ? slugify($county) : '';
 <div class="container layout">
   <div class="layout__main">
 
-    <?php if (!empty($forYou)): $forYouMatch = implode(' + ', array_filter([$county, $forYouLanguage ? \MeNews\Support\Lang::nativeName($forYouLanguage) : null])); ?>
+    <?php if (!empty($forYou)): $forYouMatch = implode(' + ', array_filter([$county, $forYouLanguage ? \MeNews\Support\Languages::native($forYouLanguage) : null])); ?>
     <section class="block block--foryou reveal" id="for-you">
       <header class="block__head">
         <span class="block__index mono"><?= icon('sparkle') ?></span>

@@ -194,8 +194,8 @@ final class LocalController
         $poll = Polls::current($county);
         $past = Database::all("SELECT id,week,question,closes_at FROM polls WHERE status<>'open' OR closes_at<? ORDER BY week DESC LIMIT 8", [now()]);
         return View::page('poll', self::base([
-            'title' => ($poll ? $poll['question'] : 'Weekly county poll') . ' — Bharat Wire India',
-            'description' => 'This week’s county poll and the county-by-county breakdown.',
+            'title' => ($poll ? $poll['question'] : 'Weekly state poll') . ' — Bharat Wire India',
+            'description' => 'This week’s state poll and the state-by-state breakdown.',
             'poll' => $poll, 'county' => $county, 'past' => $past, 'counties' => Locations::countyNames(),
         ]));
     }

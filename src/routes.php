@@ -211,6 +211,8 @@ return static function (Router $r): void {
     $r->get('/api/admin/export/ip', [Admin::class, 'exportIpActivity']);
     $r->post('/api/admin/wire/refresh', [Admin::class, 'refreshWire']);
     $r->get('/api/admin/wire/runs', [Admin::class, 'wireRuns']);
+    $r->get('/api/admin/sources', [Admin::class, 'sources']);
+    $r->post('/api/admin/sources', [Admin::class, 'saveSources']);
     $r->get('/api/admin/audit', [Admin::class, 'audit']);
     $r->get('/api/admin/section-check', [Admin::class, 'sectionCheck']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/refile', [Admin::class, 'refile']);

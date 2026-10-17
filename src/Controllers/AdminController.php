@@ -456,6 +456,35 @@ final class AdminController
         ]);
     }
 
+    /** The on/off checklist of wire publishers. */
+    public static function sources(Request $r): Response
+    {
+        self::staff();
+        return Response::json(['publishers' => NewsWire::publishers()]);
+    }
+
+    /** Switch publishers on/off: unchecked ones stop being fetched and vanish from the site immediately. */
+    public static function saveSources(Request $r): Response
+    {
+        $u = self::staff();
+        $all = array_column(NewsWire::publishers(), 'name');
+        $checked = array_values(array_intersect($all, (array)($_POST['enabled'] ?? [])));
+        $disabled = NewsWire::disabledPublishers();
+        $changed = [];
+        foreach ($all as $name) {
+            $shouldEnable = in_array($name, $checked, true);
+            $isEnabled = !in_array($name, $disabled, true);
+            if ($shouldEnable !== $isEnabled) {
+                NewsWire::setPublisherEnabled($name, $shouldEnable);
+                $changed[] = $name . ($shouldEnable ? ' on' : ' off');
+            }
+        }
+        if ($changed) {
+            Audit::log($u['id'], 'sources.update', 'settings', 'sources', implode(', ', $changed));
+        }
+        return Response::json(['ok' => true, 'changed' => $changed, 'publishers' => NewsWire::publishers()]);
+    }
+
     /** Wire stories whose suggested section differs from the stored one (editor override queue). */
     public static function sectionCheck(Request $r): Response
     {

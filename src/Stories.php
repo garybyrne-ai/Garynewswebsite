@@ -83,7 +83,8 @@ final class Stories
         $nativeFilters = $f;
         $nativeFilters['language'] = $lang;
         $native = self::feed($nativeFilters, $limit, $offset);
-        if (count($native) >= $limit) {
+        if ($lang === 'en' || count($native) >= $limit) {
+            // Already English: a fallback pass would just re-run the same filter and find nothing new.
             return $native;
         }
         $fallbackFilters = $f;

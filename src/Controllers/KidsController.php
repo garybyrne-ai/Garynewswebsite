@@ -103,7 +103,7 @@ final class KidsController
     {
         return View::page('kids-county', self::base([
             'title' => 'Find the State — Wire Junior',
-            'description' => 'Can you find all 26 counties on the map?',
+            'description' => 'Can you find India’s states on the map?',
             'game' => Puzzles::countyGame(Daily::date()),
         ]));
     }
