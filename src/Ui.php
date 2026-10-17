@@ -17,9 +17,9 @@ final class Ui
     public static function initials(string $name): string
     {
         $parts = preg_split('/\s+/u', trim($name)) ?: [];
-        $parts = array_values(array_filter($parts, static fn($p) => $p !== '' && !in_array(mb_strtolower($p), ['ní', 'ó', 'mac', 'nic', 'de', 'uí'], true)));
+        $parts = array_values(array_filter($parts, static fn($p) => $p !== ''));
         if (!$parts) {
-            return 'ME';
+            return 'BW';
         }
         $first = mb_substr($parts[0], 0, 1);
         $last = count($parts) > 1 ? mb_substr($parts[count($parts) - 1], 0, 1) : '';
@@ -28,10 +28,21 @@ final class Ui
 
     public static function avatar(?array $user, string $size = 'md', ?string $nameOverride = null): string
     {
-        $name = $nameOverride ?? ($user['display_name'] ?? 'ME');
+        $name = $nameOverride ?? ($user['display_name'] ?? 'Bharat Wire');
         $hue = (int)($user['accent'] ?? self::hue($name));
         $verified = !empty($user['is_verified']) ? '<i class="avatar__tick" title="Verified contributor">✓</i>' : '';
-        return '<span class="avatar avatar--' . e($size) . '" style="--h:' . $hue . '"><span>' . e(self::initials($name)) . '</span>' . $verified . '</span>';
+        $local = self::isVerifiedLocal($user) ? '<i class="avatar__local" title="Verified local: a track record of confirmed reports in ' . e((string)($user['home_county'] ?? 'their state')) . '">📍</i>' : '';
+        return '<span class="avatar avatar--' . e($size) . '" style="--h:' . $hue . '"><span>' . e(self::initials($name)) . '</span>' . $verified . $local . '</span>';
+    }
+
+    /**
+     * "Verified local" badge: a real track record in their own state, not a one-off report —
+     * at least 3 published reports and a reputation the trust system has actually earned up to
+     * 70+. Computed on the fly from existing columns; no separate flag to keep in sync.
+     */
+    public static function isVerifiedLocal(?array $user): bool
+    {
+        return $user !== null && !empty($user['home_county']) && (int)($user['reports_published'] ?? 0) >= 3 && (int)($user['reputation'] ?? 0) >= 70;
     }
 
     /** Editorial label chip. Links to the how-we-check page so the label is always explained. */
@@ -61,20 +72,24 @@ final class Ui
             : '<span class="card__source card__source--community">Community report</span>';
         $place = $s['location_name'] ? '<span class="card__place">' . icon('pin') . ' ' . e($s['location_name']) . '</span>' : '';
         // Wire bylines belong to the publisher's journalist, never to our desk.
-        $plus = !$isWire && ($s['author_plan'] ?? '') === 'ME+' ? ' <span class="chip chip--plus chip--xs" title="ME+ member">ME+</span>' : '';
+        $plus = !$isWire && ($s['author_plan'] ?? '') === 'Wire+' ? ' <span class="chip chip--plus chip--xs" title="Wire+ member">Wire+</span>' : '';
         $by = $isWire ? (!empty($s['source_author']) ? '<span class="card__by">' . e($s['source_author']) . '</span>' : '') : ($s['author_name'] ? '<span class="card__by">' . e($s['author_name']) . $plus . '</span>' : '');
         $sig = !empty($s['signal_total']) ? '<span class="chip chip--signal" title="Signal votes">' . icon('signal') . ' ' . (int)$s['signal_total'] . '</span>' : '';
         $cluster = $isWire && $s['cluster_count'] > 1 ? '<span class="chip chip--cluster" title="Outlets covering this story">' . icon('layers') . ' ' . (int)$s['cluster_count'] . ' outlets</span>' : '';
+        $storyLang = $s['language'] ?? 'en';
+        $langChip = $storyLang !== 'en' ? '<span class="chip chip--lang" title="' . e(\MeNews\Support\Languages::label($storyLang)) . '"><a href="/language/' . e($storyLang) . '">' . e(\MeNews\Support\Languages::native($storyLang)) . '</a></span>' : '';
         $label = $isWire ? '' : self::label($s['verification_label']);
-        $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . $label . $cluster . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
+        $meta = '<div class="card__meta">' . self::categoryChip($s['category']) . $label . $cluster . $langChip . $sig . '<time datetime="' . e($s['time']) . '">' . e(time_ago($s['time'])) . '</time></div>';
         if ($isWire && !\MeNews\Services\Wire::images()) {
             $media = '<a class="card__media card__media--typo" href="' . e($s['url']) . '" tabindex="-1" aria-hidden="true" style="--h:' . $hue . '"><span class="card__typo">' . e(mb_strtoupper(mb_substr($s['source_name'], 0, 2))) . '</span><span class="card__corners"></span></a>';
         }
         $summary = $s['summary'] ? '<p class="card__summary">' . e(excerpt($s['summary'], $variant === 'feature' ? 260 : 150)) . '</p>' : '';
         $trust = $s['kind'] === 'community' ? '<div class="meter meter--sm" title="Confidence ' . (int)$s['trust_score'] . '/100"><i style="--v:' . (int)$s['trust_score'] . '"></i></div>' : '';
         $views = views_label((int)$s['views']);
+        $waUrl = \MeNews\Support\Share::link('whatsapp', ['url' => absolute_url($s['url']), 'title' => $s['title']]);
+        $whatsapp = '<a class="card__share card__share--whatsapp" href="' . e((string)$waUrl) . '" target="_blank" rel="noopener nofollow" aria-label="Share on WhatsApp" title="Share on WhatsApp">' . icon('whatsapp') . '</a>';
         $save = '<button class="card__save" type="button" data-save="' . e($s['id']) . '" aria-label="Save story" title="Save for later">' . icon('bookmark') . '</button>';
-        $foot = '<div class="card__foot">' . $source . $by . $place . ($views !== '' ? '<span class="card__views">' . e($views) . ' reads</span>' : '') . $save . '</div>';
+        $foot = '<div class="card__foot">' . $source . $by . $place . ($views !== '' ? '<span class="card__views">' . e($views) . ' reads</span>' : '') . $whatsapp . $save . '</div>';
         $title = '<h3 class="card__title"><a href="' . e($s['url']) . '">' . e($s['title']) . '</a></h3>';
 
         return match ($variant) {

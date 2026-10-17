@@ -1,6 +1,6 @@
-# Deploying ME News Ireland on Cloudways
+# Deploying Bharat Wire India on Cloudways
 
-Cloudways serves `public_html/` for a PHP stack application. The ME News web root is the
+Cloudways serves `public_html/` for a PHP stack application. The Bharat Wire web root is the
 `public/` folder inside the project, so there are two ways to run it.
 
 ## Option A (recommended): point the web root at public/
@@ -15,7 +15,7 @@ cp .env.example .env
 nano .env
 #   APP_ENV=production
 #   PUBLIC_BASE_URL=https://your-app.cloudwaysapps.com   (or your domain)
-#   ADMIN_EMAIL=you@yourdomain.ie
+#   ADMIN_EMAIL=you@yourdomain.in
 #   ADMIN_PASSWORD=<a unique password of 12+ characters>
 #   CONTRIBUTOR_PASSWORD=<change from the default>
 php scripts/setup.php --seed

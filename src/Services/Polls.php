@@ -106,7 +106,7 @@ final class Polls
         return ['total' => $total, 'counts' => $counts, 'pct' => $pct];
     }
 
-    /** County-by-county leading option (counties with at least 3 votes). */
+    /** State-by-state leading option (states with at least 3 votes). */
     public static function breakdown(string $pollId, int $optionCount): array
     {
         $rows = Database::all("SELECT county, option_idx, COUNT(*) AS n FROM poll_votes WHERE poll_id=? AND county IS NOT NULL AND county<>'' GROUP BY county, option_idx", [$pollId]);

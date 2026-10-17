@@ -8,7 +8,7 @@ use MeNews\Database;
 use MeNews\Http\HttpException;
 
 /**
- * PayPal Subscriptions for ME Ads (REST API v1/billing). A product and a plan per price are
+ * PayPal Subscriptions for Wire Ads (REST API v1/billing). A product and a plan per price are
  * created on demand and cached in settings, so changing the price in the newsroom simply
  * creates a new plan next time someone subscribes.
  *

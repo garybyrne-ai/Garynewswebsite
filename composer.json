@@ -1,6 +1,6 @@
 {
-    "name": "menews/ireland",
-    "description": "ME News Ireland — community-first Irish news platform built on PHP 8.2+ and SQLite.",
+    "name": "bharatwire/india",
+    "description": "Bharat Wire India — community-first Indian news platform built on PHP 8.2+ and SQLite.",
     "type": "project",
     "license": "proprietary",
     "require": {
@@ -9,11 +9,13 @@
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
-        "ext-simplexml": "*"
+        "ext-simplexml": "*",
+        "minishlink/web-push": "^11.0",
+        "php-http/curl-client": "^2.4",
+        "nyholm/psr7": "^1.8"
     },
     "autoload": {
-        "psr-4": { "MeNews\\": "src/" },
-        "files": ["src/helpers.php"]
+        "psr-4": { "MeNews\\": "src/" }
     },
     "scripts": {
         "setup": "php scripts/setup.php",

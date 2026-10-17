@@ -7,27 +7,31 @@ use MeNews\Config;
 use MeNews\Services\Remote;
 
 /**
- * Irish place data: provinces, counties and towns. Uses the bundled fallback list in
- * config/locations.json, or the official CSO / Tailte Éireann 2022 urban areas layer once
- * imported into STORAGE/data/ireland_locations.json.
+ * Indian place data: regions, states/UTs and towns. Uses the bundled fallback list in
+ * config/locations.json (built from the GeoNames "IN" export — see refreshOfficial()), or the
+ * fuller official dataset once imported into STORAGE/data/india_locations.json.
+ *
+ * The public method names here still say "county"/"province" for historical reasons (they are
+ * called from two dozen places across the codebase) but the data behind them is now Indian
+ * states/union territories grouped into regions, and towns are Indian cities/towns.
  */
 final class Locations
 {
     private static ?array $map = null;
     private static ?array $rows = null;
 
-    /** Words that are also towns but far more often something else in headlines. */
-    private const TOWN_STOPLIST = ['Trim', 'Swords', 'Virginia', 'Newport', 'Clara', 'Moate', 'Bandon', 'Rush', 'Lusk', 'Tallow', 'Borris', 'Gort', 'Cahir', 'Boyle', 'Ferbane', 'Portlaw', 'Athy', 'Naas'];
+    /** Town names that collide with common words or ambiguous short forms in headlines. Empty for now — add entries as false positives turn up in the wire. */
+    private const TOWN_STOPLIST = [];
 
     private static function map(): array
     {
         return self::$map ??= json_decode(file_get_contents(ME_ROOT . '/config/locations.json'), true, 512, JSON_THROW_ON_ERROR);
     }
 
-    /** @return array<string,array<string>> province => counties */
+    /** @return array<string,array<string>> region => states/UTs */
     public static function provinces(): array
     {
-        return self::map()['PROVINCE_COUNTIES'];
+        return self::map()['ZONE_STATES'];
     }
 
     /** @return array<int,array{province:string,county:string}> */
@@ -57,9 +61,49 @@ final class Locations
         return '';
     }
 
+    /** GeoNames admin1 code → state/UT name (the "IN" country export at download.geonames.org). */
+    private const ADMIN1_STATES = [
+        '01' => 'Andaman and Nicobar Islands',
+        '02' => 'Andhra Pradesh',
+        '03' => 'Assam',
+        '05' => 'Chandigarh',
+        '07' => 'Delhi',
+        '09' => 'Gujarat',
+        '10' => 'Haryana',
+        '11' => 'Himachal Pradesh',
+        '12' => 'Jammu and Kashmir',
+        '13' => 'Kerala',
+        '14' => 'Lakshadweep',
+        '16' => 'Maharashtra',
+        '17' => 'Manipur',
+        '18' => 'Meghalaya',
+        '19' => 'Karnataka',
+        '20' => 'Nagaland',
+        '21' => 'Odisha',
+        '22' => 'Puducherry',
+        '23' => 'Punjab',
+        '24' => 'Rajasthan',
+        '25' => 'Tamil Nadu',
+        '26' => 'Tripura',
+        '28' => 'West Bengal',
+        '29' => 'Sikkim',
+        '30' => 'Arunachal Pradesh',
+        '31' => 'Mizoram',
+        '33' => 'Goa',
+        '34' => 'Bihar',
+        '35' => 'Madhya Pradesh',
+        '36' => 'Uttar Pradesh',
+        '37' => 'Chhattisgarh',
+        '38' => 'Jharkhand',
+        '39' => 'Uttarakhand',
+        '40' => 'Telangana',
+        '41' => 'Ladakh',
+        '52' => 'Dadra and Nagar Haveli and Daman and Diu',
+    ];
+
     public static function officialFile(): string
     {
-        return Config::storage() . '/data/ireland_locations.json';
+        return Config::storage() . '/data/india_locations.json';
     }
 
     public static function source(): string
@@ -107,24 +151,19 @@ final class Locations
     }
 
     /**
-     * Guess a county / town from free text such as a headline. Returns
-     * ['county' => ?, 'town' => ?] with nulls when nothing is recognised.
+     * Guess a state / town from free text such as a headline. Returns
+     * ['county' => ?, 'town' => ?] with nulls when nothing is recognised (the key names stay
+     * "county"/"town" for compatibility with every caller; the values are state and city names).
      */
     public static function infer(string $text): array
     {
         $county = null;
         $town = null;
         $counties = self::countyNames();
-        // "Co Mayo", "Co. Donegal", "County Clare"
-        if (preg_match('/\b(?:Co\.?|County)\s+([A-Z][a-zé]+)\b/u', $text, $m) && in_array($m[1], $counties, true)) {
-            $county = $m[1];
-        }
-        if ($county === null) {
-            foreach ($counties as $c) {
-                if (preg_match('/\b' . preg_quote($c, '/') . '\b/u', $text)) {
-                    $county = $c;
-                    break;
-                }
+        foreach ($counties as $c) {
+            if (preg_match('/\b' . preg_quote($c, '/') . '\b/u', $text)) {
+                $county = $c;
+                break;
             }
         }
         $best = 0;
@@ -147,37 +186,75 @@ final class Locations
         return ['county' => $county, 'town' => $town];
     }
 
-    /** Download the official CSO / Tailte Éireann urban areas list. Returns the rows imported. */
+    /** Strip combining diacritics (GeoNames' Indian place names carry macrons like "Thāne"; we want the everyday spelling "Thane"). */
+    private static function stripDiacritics(string $s): string
+    {
+        $n = \Normalizer::normalize($s, \Normalizer::FORM_KD) ?: $s;
+        return preg_replace('/\p{Mn}/u', '', $n) ?? $s;
+    }
+
+    /**
+     * Download and parse GeoNames' free "IN" country export (download.geonames.org/export/dump/IN.zip,
+     * no key required) into the fuller official place list. Populated places (feature class P) are
+     * grouped by state/UT, state and country capitals are always kept, and each state keeps its
+     * ~40 largest remaining towns by population. Returns the rows imported.
+     */
     public static function refreshOfficial(): array
     {
-        $url = 'https://services-eu1.arcgis.com/BuS9rtTsYEV5C0xh/ArcGIS/rest/services/Urban_Areas_National_Statistical_Boundaries_2022_Ungeneralised_View/FeatureServer/0/query';
-        $rows = [];
-        $seen = [];
-        for ($offset = 0; $offset < 20000; $offset += 2000) {
-            $payload = Remote::json($url . '?' . http_build_query([
-                'where' => '1=1', 'outFields' => 'URBAN_AREA_CODE,URBAN_AREA_NAME,COUNTY', 'returnGeometry' => 'false',
-                'f' => 'json', 'resultRecordCount' => 2000, 'resultOffset' => $offset, 'orderByFields' => 'URBAN_AREA_CODE',
-            ]));
-            if (isset($payload['error']) || !isset($payload['features'])) {
-                throw new \RuntimeException('Official location service unavailable');
-            }
-            foreach ($payload['features'] as $feature) {
-                $a = $feature['attributes'];
-                $town = trim((string)($a['URBAN_AREA_NAME'] ?? ''));
-                $county = trim((string)($a['COUNTY'] ?? ''));
-                $key = mb_strtolower($town . '|' . $county);
-                if ($town === '' || isset($seen[$key])) {
-                    continue;
-                }
-                $seen[$key] = true;
-                $rows[] = ['town' => $town, 'county' => $county, 'province' => self::provinceFor($county), 'code' => $a['URBAN_AREA_CODE'] ?? null, 'source' => 'CSO/Tailte Éireann 2022'];
-            }
-            if (empty($payload['exceededTransferLimit'])) {
-                break;
-            }
+        $zipBytes = Remote::get('https://download.geonames.org/export/dump/IN.zip', [], 90);
+        $tmpZip = tempnam(sys_get_temp_dir(), 'in_geonames_') . '.zip';
+        file_put_contents($tmpZip, $zipBytes);
+        $zip = new \ZipArchive();
+        $ok = $zip->open($tmpZip) === true;
+        $txt = $ok ? $zip->getFromName('IN.txt') : false;
+        if ($ok) {
+            $zip->close();
         }
-        if (!$rows) {
+        @unlink($tmpZip);
+        if ($txt === false || $txt === '') {
+            throw new \RuntimeException('Official location service unavailable');
+        }
+
+        $byState = [];
+        foreach (explode("\n", $txt) as $line) {
+            if ($line === '') {
+                continue;
+            }
+            $f = explode("\t", $line);
+            if (count($f) < 15 || $f[6] !== 'P') {
+                continue; // feature class P = populated place
+            }
+            $state = self::ADMIN1_STATES[$f[10]] ?? null;
+            if ($state === null) {
+                continue;
+            }
+            $name = self::stripDiacritics(trim($f[1]));
+            if ($name === '') {
+                continue;
+            }
+            $byState[$state][] = ['town' => $name, 'lat' => (float)$f[4], 'lon' => (float)$f[5], 'code' => $f[7], 'population' => (int)$f[14]];
+        }
+        if (!$byState) {
             throw new \RuntimeException('No official locations returned');
+        }
+
+        $rows = [];
+        foreach ($byState as $state => $places) {
+            $best = [];
+            foreach ($places as $p) {
+                if (!isset($best[$p['town']]) || $p['population'] > $best[$p['town']]['population']) {
+                    $best[$p['town']] = $p;
+                }
+            }
+            $places = array_values($best);
+            usort($places, static function (array $a, array $b): int {
+                $capA = in_array($a['code'], ['PPLC', 'PPLA'], true) ? 1 : 0;
+                $capB = in_array($b['code'], ['PPLC', 'PPLA'], true) ? 1 : 0;
+                return $capB <=> $capA ?: $b['population'] <=> $a['population'];
+            });
+            foreach (array_slice($places, 0, 40) as $p) {
+                $rows[] = ['town' => $p['town'], 'county' => $state, 'province' => self::provinceFor($state), 'code' => $p['code'], 'source' => 'GeoNames (IN export)'];
+            }
         }
         usort($rows, static fn($a, $b) => [$a['county'], $a['town']] <=> [$b['county'], $b['town']]);
         $file = self::officialFile();

@@ -5,13 +5,11 @@ namespace MeNews\Services;
 
 use MeNews\Config;
 use MeNews\Support\Daily;
-use MeNews\Support\Geo;
-use MeNews\Support\Locations;
 use MeNews\Support\Rng;
 
 /**
- * Daily puzzles for ME Óg (the kids' section). Everything is generated deterministically from
- * the date, so every reader in Ireland gets the same puzzle, and cached on disk.
+ * Daily puzzles for the Junior Post (the kids' section). Everything is generated deterministically
+ * from the date, so every reader gets the same puzzle, and cached on disk.
  */
 final class Puzzles
 {
@@ -293,22 +291,49 @@ final class Puzzles
         });
     }
 
-    // ------------------------------------------------------------------ find the county
+    // ------------------------------------------------------------------ find the state
 
+    /**
+     * States (and their region) with a map centroid, read directly from config/locations.json
+     * (ZONE_STATES) and config/geo.json (states) rather than through Locations::/Geo::, since
+     * those classes are being converted separately and this stays correct either way.
+     */
+    private static function stateBank(): array
+    {
+        static $states = null;
+        if ($states !== null) {
+            return $states;
+        }
+        $locations = json_decode((string)file_get_contents(ME_ROOT . '/config/locations.json'), true) ?: [];
+        $geo = json_decode((string)file_get_contents(ME_ROOT . '/config/geo.json'), true) ?: [];
+        $zones = $locations['ZONE_STATES'] ?? [];
+        $centroids = $geo['states'] ?? [];
+        $out = [];
+        foreach ($zones as $region => $names) {
+            foreach ($names as $name) {
+                if (isset($centroids[$name][0], $centroids[$name][1])) {
+                    $out[] = ['name' => $name, 'region' => $region, 'latitude' => $centroids[$name][0], 'longitude' => $centroids[$name][1]];
+                }
+            }
+        }
+        return $states = $out;
+    }
+
+    /**
+     * The "Find the State" map game. Field names ('county'/'province') are kept as the JS front
+     * end (public/assets/js/kids.js) expects them; they now carry a state name and its region.
+     */
     public static function countyGame(string $date): array
     {
         $rng = Daily::rng('county', $date);
-        $counties = [];
-        foreach ($rng->shuffle(Locations::countyNames()) as $c) {
-            $pt = Geo::county($c);
-            if ($pt) {
-                $counties[] = ['county' => $c, 'province' => Locations::provinceFor($c), 'latitude' => $pt[0], 'longitude' => $pt[1]];
-            }
-            if (count($counties) >= 10) {
+        $rounds = [];
+        foreach ($rng->shuffle(self::stateBank()) as $s) {
+            $rounds[] = ['county' => $s['name'], 'province' => $s['region'], 'latitude' => $s['latitude'], 'longitude' => $s['longitude']];
+            if (count($rounds) >= 10) {
                 break;
             }
         }
-        return ['id' => "county-{$date}", 'date' => $date, 'rounds' => $counties];
+        return ['id' => "county-{$date}", 'date' => $date, 'rounds' => $rounds];
     }
 
     /** Recent dates for the puzzle archive (newest first). */

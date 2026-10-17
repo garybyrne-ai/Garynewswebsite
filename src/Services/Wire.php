@@ -7,7 +7,7 @@ use MeNews\Database;
 
 /**
  * The wire content position, chosen in the newsroom:
- *   clustered - one card per story with "N outlets covering this" and ME's framing (default)
+ *   clustered - one card per story with "N outlets covering this" and Bharat Wire's framing (default)
  *   full      - every outlet's headline as its own card
  *   links     - headline + source + time only; no summaries, no publisher images
  */

@@ -5,40 +5,40 @@ namespace MeNews\Services;
 
 use MeNews\Database;
 
-/** ME+ pricing (editable in the newsroom) and what the plan unlocks. */
+/** Wire+ pricing (editable in the newsroom) and what the plan unlocks. */
 final class Membership
 {
     public static function priceCents(): int
     {
-        return max(100, (int)(Database::setting('plus_price_cents', '399') ?? 399));
+        return max(100, (int)(Database::setting('plus_price_cents', '9900') ?? 9900));
     }
 
     public static function annualCents(): int
     {
-        return max(500, (int)(Database::setting('plus_annual_cents', '3900') ?? 3900));
+        return max(500, (int)(Database::setting('plus_annual_cents', '99900') ?? 99900));
     }
 
     public static function priceLabel(): string
     {
-        return '€' . number_format(self::priceCents() / 100, 2) . '/month';
+        return '₹' . number_format(self::priceCents() / 100, self::priceCents() % 100 === 0 ? 0 : 2) . '/month';
     }
 
     public static function annualLabel(): string
     {
-        return '€' . number_format(self::annualCents() / 100, 0) . '/year';
+        return '₹' . number_format(self::annualCents() / 100, 0) . '/year';
     }
 
     public static function followLimit(?array $user): int
     {
-        return $user && ($user['plan'] ?? '') === 'ME+' ? 10 : 1;
+        return $user && ($user['plan'] ?? '') === 'Wire+' ? 10 : 1;
     }
 
     public static function isPlus(?array $user): bool
     {
-        return $user !== null && ($user['plan'] ?? '') === 'ME+';
+        return $user !== null && ($user['plan'] ?? '') === 'Wire+';
     }
 
-    /** ME+ members read ad-free; staff always see adverts so they can check what is running. */
+    /** Wire+ members read ad-free; staff always see adverts so they can check what is running. */
     public static function adFree(?array $user): bool
     {
         return self::isPlus($user) && !in_array($user['role'] ?? '', ['editor', 'admin'], true);
@@ -81,12 +81,12 @@ final class Membership
     {
         return [
             'Ad-free reading on every page',
-            'Death notice and school closure alerts for up to ten towns or counties',
+            'Death notice and school closure alerts for up to ten towns or states',
             'The 7am morning email for every area you follow',
-            'The full archive and every county poll breakdown',
-            'A members-only monthly county newsletter',
+            'The full archive and every state poll breakdown',
+            'A members-only monthly state newsletter',
             'A member badge on your comments and reports',
-            'Directly funds council and court reporting in your county',
+            'Directly funds municipal and court reporting in your state',
         ];
     }
 }

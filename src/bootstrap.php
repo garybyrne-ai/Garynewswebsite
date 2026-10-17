@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * ME News Ireland — application bootstrap.
+ * Bharat Wire India — application bootstrap.
  *
  * Registers the PSR-4 autoloader for the MeNews namespace, loads the .env file,
  * configures error handling and exposes a handful of global view helpers.
@@ -24,6 +24,13 @@ spl_autoload_register(static function (string $class): void {
         require $file;
     }
 });
+
+// Composer packages (currently just minishlink/web-push, for RFC 8291 web push encryption — not
+// something worth hand-rolling). Optional at the file level so a deploy that hasn't run
+// `composer install` yet still boots; Services/Push.php checks class_exists() before using it.
+if (is_file(ME_ROOT . '/vendor/autoload.php')) {
+    require ME_ROOT . '/vendor/autoload.php';
+}
 
 require __DIR__ . '/helpers.php';
 

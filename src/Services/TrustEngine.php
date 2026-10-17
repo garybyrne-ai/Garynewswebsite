@@ -9,7 +9,7 @@ use MeNews\Http\HttpException;
 use Throwable;
 
 /**
- * The ME Trust Engine screens community submissions before any editor sees them:
+ * The Wire Trust Engine screens community submissions before any editor sees them:
  * media is probed, video frames and audio are sampled, everything is moderated and two
  * separate scores are produced. Safety != truth: publication and labels stay editorial.
  */

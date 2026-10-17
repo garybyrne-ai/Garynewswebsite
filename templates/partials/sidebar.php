@@ -3,17 +3,17 @@
 $ads = $ads ?? [];
 $county = $county ?? null;
 $user = $user ?? \MeNews\Auth::user();
-$adFree = $user && ($user['plan'] ?? '') === 'ME+';
+$adFree = $user && ($user['plan'] ?? '') === 'Wire+';
 ?>
 <aside class="side">
-  <?php if (isset($edition)): ?><?= \MeNews\View::partial('partials/edition', ['weather' => $weather ?? null, 'edition' => $edition, 'longDate' => $longDate, 'focal' => $focal, 'greeting' => $greeting ?? 'Dia duit']) ?><?php endif; ?>
+  <?php if (isset($edition)): ?><?= \MeNews\View::partial('partials/edition', ['weather' => $weather ?? null, 'edition' => $edition, 'longDate' => $longDate, 'focal' => $focal, 'greeting' => $greeting ?? \MeNews\Support\Daily::greeting()]) ?><?php endif; ?>
 
   <?php if (!empty($notices)): ?>
   <section class="panel panel--notices reveal">
     <header class="panel__head"><span class="kicker"><?= icon('candle') ?> Notices<?= $county ? ' · ' . e($county) : '' ?></span><a class="mono panel__hint" href="/notices<?= $county ? '?county=' . rawurlencode($county) : '' ?>">All →</a></header>
     <ul class="noticelist">
       <?php foreach ($notices as $n): ?>
-        <li><a href="<?= e($n['url']) ?>"><span class="noticelist__kind mono"><?= icon($n['icon']) ?> <?= e($n['kind_label']) ?></span><b><?= e($n['title']) ?></b><small><?= e(($n['town'] ? $n['town'] . ', ' : '') . 'Co. ' . $n['county']) ?><?= $n['kind'] === 'death' && $n['funeral_at'] ? ' · Funeral ' . e(date_irish($n['funeral_at'], 'D H:i')) : '' ?></small></a></li>
+        <li><a href="<?= e($n['url']) ?>"><span class="noticelist__kind mono"><?= icon($n['icon']) ?> <?= e($n['kind_label']) ?></span><b><?= e($n['title']) ?></b><small><?= e(($n['town'] ? $n['town'] . ', ' : '') . $n['county']) ?><?= $n['kind'] === 'death' && $n['funeral_at'] ? ' · Funeral ' . e(date_in($n['funeral_at'], 'D H:i')) : '' ?></small></a></li>
       <?php endforeach; ?>
     </ul>
     <p class="panel__note"><a href="/notices/submit">Place a notice</a> · free for families and clubs.</p>
@@ -26,14 +26,26 @@ $adFree = $user && ($user['plan'] ?? '') === 'ME+';
 
   <?php if (isset($mapPoints)): $colours = \MeNews\Support\Geo::COLOURS; ?>
   <section class="panel panel--map reveal" data-map-root>
-    <header class="panel__head"><span class="kicker">Live map</span><a class="mono panel__hint" href="<?= $county ? '/county/' . e(slugify($county)) . '/map' : '/map' ?>"><?= $county ? 'Co. ' . e($county) : 'Ireland' ?> →</a></header>
+    <header class="panel__head"><span class="kicker">Live map</span><a class="mono panel__hint" href="<?= $county ? '/county/' . e(slugify($county)) . '/map' : '/map' ?>"><?= $county ? e($county) : 'India' ?> →</a></header>
     <div class="mapchips">
       <button type="button" class="is-active" data-map-chip>All</button>
       <button type="button" data-map-chip data-kind="community" style="--c:<?= e($colours['Community']) ?>"><i></i>Community</button>
       <?php foreach (['Local', 'Traffic', 'Sport'] as $c): ?><button type="button" data-map-chip data-category="<?= e($c) ?>" style="--c:<?= e($colours[$c]) ?>"><i></i><?= e($c) ?></button><?php endforeach; ?>
     </div>
     <div id="map" class="map" data-map="side" data-points='<?= e(json_encode($mapPoints, JSON_UNESCAPED_UNICODE)) ?>' data-counties='<?= e(json_encode($mapCounties ?? [], JSON_UNESCAPED_UNICODE)) ?>' data-colours='<?= e(json_encode($colours)) ?>' data-focus-county="<?= e((string)$county) ?>"></div>
-    <p class="panel__note"><b class="mono" data-map-count></b> across Ireland. Counties cluster when zoomed out; zoom in for pins. <a href="/map">Full map →</a></p>
+    <p class="panel__note"><b class="mono" data-map-count></b> across India. States cluster when zoomed out; zoom in for pins. <a href="/map">Full map →</a></p>
+  </section>
+  <?php endif; ?>
+
+  <?php $breaking = \MeNews\Stories::breakingNow(5); if ($breaking): ?>
+  <section class="panel panel--breaking reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('bolt') ?> Breaking right now</span><span class="mono panel__hint">last 3h</span></header>
+    <ol class="ranked">
+      <?php foreach ($breaking as $i => $t): ?>
+        <li><span class="mono ranked__n"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span><a href="<?= e($t['url']) ?>"><?= e($t['title']) ?></a></li>
+      <?php endforeach; ?>
+    </ol>
+    <p class="panel__note" style="margin-top:8px">Ranked by how fast it's being read right now, not total views — breaking news that's just taken off, surfaced before it's old news.</p>
   </section>
   <?php endif; ?>
 
@@ -59,25 +71,74 @@ $adFree = $user && ($user['plan'] ?? '') === 'ME+';
   </section>
   <?php endif; ?>
 
+  <?php if ($county): $msWeather = \MeNews\Services\Weather::forState($county); $msAqi = \MeNews\Services\Aqi::forState($county); $msWarning = \MeNews\Services\Alerts::headline($county); $msTrends = \MeNews\Services\Trends::forState($county, 3); ?>
+  <section class="panel panel--mystate reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('sparkle') ?> My State · <?= e($county) ?></span><a class="mono panel__hint" href="/my-state">Open →</a></header>
+    <?php if ($msWeather || $msAqi): ?>
+    <div class="mystate__stats">
+      <?php if ($msWeather): ?><div class="mystate__stat"><span class="mystate__ic"><?= e($msWeather['icon']) ?></span><b><?= (int)$msWeather['temp'] ?>°</b><small><?= e($msWeather['label']) ?></small></div><?php endif; ?>
+      <?php if ($msAqi): ?><div class="mystate__stat"><i class="aqidot" style="--c:<?= e($msAqi['colour']) ?>"></i><b><?= (int)$msAqi['aqi'] ?></b><small><?= e($msAqi['label']) ?></small></div><?php endif; ?>
+    </div>
+    <?php endif; ?>
+    <?php if ($msWarning): ?><a class="mystate__warn" href="/my-state"><?= icon('alert') ?> <?= e($msWarning) ?></a><?php endif; ?>
+    <?php if ($msTrends): ?>
+    <ol class="trendlist trendlist--compact">
+      <?php foreach ($msTrends as $i => $tr): ?><li><span class="trendlist__n mono"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span><div class="trendlist__body"><div class="trendlist__q"><a href="<?= e($tr['internal_url']) ?>"><b><?= e($tr['query']) ?></b></a></div></div></li><?php endforeach; ?>
+    </ol>
+    <?php endif; ?>
+    <p class="panel__note">Weather, air quality, alerts and trending searches for <?= e($county) ?> — <a href="/my-state">open the full dashboard →</a></p>
+    <?php $msHome = \MeNews\Support\Visitor::homeCounty(); if ($msHome && $msHome !== $county): ?><a class="mystate__home" href="/my-state?state=<?= e(slugify($msHome)) ?>"><?= icon('home') ?> Hometown: <?= e($msHome) ?> →</a><?php endif; ?>
+  </section>
+  <?php else: ?>
+  <section class="panel panel--mystate reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('sparkle') ?> My State</span></header>
+    <p class="panel__note" style="margin:0">Pick your state to see its weather, air quality, severe-weather alerts and trending searches in one place.</p>
+    <button class="btn btn--ghost btn--sm" type="button" data-open-county style="margin-top:10px">Choose your state</button>
+    <?php $msHome = \MeNews\Support\Visitor::homeCounty(); if ($msHome): ?><a class="mystate__home" href="/my-state?state=<?= e(slugify($msHome)) ?>" style="margin-top:10px"><?= icon('home') ?> Hometown: <?= e($msHome) ?> →</a><?php endif; ?>
+  </section>
+  <?php endif; ?>
+
+  <?php $liveMatches = \MeNews\Services\Cricket::configured() ? \MeNews\Services\Cricket::liveMatches() : []; if ($liveMatches): ?>
+  <section class="panel reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('trophy') ?> Live cricket</span></header>
+    <ul class="noticelist">
+      <?php foreach ($liveMatches as $m): ?>
+        <li><div><b><?= e($m['teams']) ?></b><small><?= e($m['score'] ?: $m['status']) ?></small></div></li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
+  <?php $festivals = $county ? \MeNews\Support\Festivals::upcomingForState($county, 4) : \MeNews\Support\Festivals::upcomingNational(4); if ($festivals): ?>
+  <section class="panel reveal">
+    <header class="panel__head"><span class="kicker"><?= icon('calendar') ?> Festivals &amp; holidays<?= $county ? ' · ' . e($county) : '' ?></span></header>
+    <ul class="noticelist">
+      <?php foreach ($festivals as $f): ?>
+        <li><div><b><?= e($f['name']) ?></b><small><?= $f['date'] ? e(date_in($f['date'], 'D j M')) . ($f['in_days'] === 0 ? ' · today' : ($f['in_days'] === 1 ? ' · tomorrow' : ' · in ' . (int)$f['in_days'] . ' days')) : 'Date varies — check locally' ?></small></div></li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
   <section class="panel panel--alerts reveal">
     <header class="panel__head"><span class="kicker"><?= icon('mail') ?> Your 7am morning</span></header>
-    <p class="panel__note" style="margin:0 0 10px">Five stories, the weather, deaths and what's on for <?= e($county ? 'Co. ' . $county : 'your county') ?>, in your inbox at seven.</p>
+    <p class="panel__note" style="margin:0 0 10px">Five stories, the weather, deaths and what's on for <?= e($county ?: 'your state') ?>, in your inbox at seven.</p>
     <form class="form form--inline" data-subscribe>
       <input type="hidden" name="kinds[]" value="daily">
       <input type="hidden" name="county" value="<?= e((string)$county) ?>" data-subscribe-county>
       <label class="sr-only" for="side-sub-email">Email</label>
-      <div class="inline"><input id="side-sub-email" name="email" type="email" required placeholder="you@example.ie" value="<?= e($user['email'] ?? '') ?>"><button class="btn btn--primary btn--sm" type="submit">Sign up</button></div>
+      <div class="inline"><input id="side-sub-email" name="email" type="email" required placeholder="you@example.in" value="<?= e($user['email'] ?? '') ?>"><button class="btn btn--primary btn--sm" type="submit">Sign up</button></div>
       <p class="form__result" data-subscribe-result></p>
     </form>
   </section>
 
   <?php if (!$adFree): ?>
   <section class="panel panel--plus reveal">
-    <span class="chip chip--plus">ME+</span>
+    <span class="chip chip--plus">Wire+</span>
     <h3>Ad-free, with alerts for every place you love</h3>
     <p>Death notices and closures for up to ten areas, the full archive, and no adverts.</p>
     <div class="price"><b><?= e(\MeNews\Services\Membership::priceLabel()) ?></b><small>or <?= e(\MeNews\Services\Membership::annualLabel()) ?></small></div>
-    <a class="btn btn--primary btn--block" href="/plus">Get ME+</a>
+    <a class="btn btn--primary btn--block" href="/plus">Get Wire+</a>
   </section>
 
   <section class="panel panel--ads reveal">
@@ -85,7 +146,7 @@ $adFree = $user && ($user['plan'] ?? '') === 'ME+';
     <?php if ($ads): ?>
       <?= \MeNews\Services\Ads::slot($ads, 'sidebar') ?>
     <?php else: ?>
-      <p class="panel__note">Your business could be here — designed in minutes, from <?= e(\MeNews\Services\AdPackages::money((int)(\MeNews\Services\AdPackages::all()[0]['price_cents'] ?? 600))) ?>. <a href="/advertise">Advertise with ME</a>.</p>
+      <p class="panel__note">Your business could be here — designed in minutes, from <?= e(\MeNews\Services\AdPackages::money((int)(\MeNews\Services\AdPackages::all()[0]['price_cents'] ?? 600))) ?>. <a href="/advertise">Advertise with us</a>.</p>
     <?php endif; ?>
   </section>
   <?php endif; ?>

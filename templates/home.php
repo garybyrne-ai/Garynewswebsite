@@ -19,7 +19,7 @@ $countySlug = $county ? slugify($county) : '';
       <span class="masthead__wx"><?php foreach (array_slice($weather['cities'], 0, 5) as $c): ?><span><?= e($c['icon']) ?> <?= e($c['name']) ?> <b><?= (int)$c['temp'] ?>°</b></span><?php endforeach; ?></span>
     <?php endif; ?>
     <?php if (!empty($warnings)): ?><a class="masthead__warn" href="/alerts"><?= icon('alert') ?> <?= e($warnings) ?></a><?php endif; ?>
-    <span class="masthead__focal">Focal an lae: <b><?= e($focal['irish']) ?></b> — <?= e($focal['english']) ?></span>
+    <span class="masthead__focal">Shabd of the day: <b><?= e($focal['hindi']) ?></b> — <?= e($focal['english']) ?></span>
   </div>
 </div>
 
@@ -55,6 +55,38 @@ $countySlug = $county ? slugify($county) : '';
 <div class="container layout">
   <div class="layout__main">
 
+    <?php if (!empty($forYou)): $forYouMatch = implode(' + ', array_filter([$county, $forYouLanguage ? \MeNews\Support\Languages::native($forYouLanguage) : null])); ?>
+    <section class="block block--foryou reveal" id="for-you">
+      <header class="block__head">
+        <span class="block__index mono"><?= icon('sparkle') ?></span>
+        <h2 class="block__title">For You</h2>
+        <p class="block__blurb">Matched to <?= e($forYouMatch) ?> — based on your state and language, not browsing history.</p>
+      </header>
+      <div class="grid grid--4">
+        <?php foreach ($forYou as $i => $s): ?><?= Ui::card($s, $i === 0 ? 'standard' : 'compact', $i) ?><?php endforeach; ?>
+      </div>
+    </section>
+    <?php endif; ?>
+
+    <?php if (!empty($becauseYouRead)): ?>
+    <section class="block block--foryou reveal" id="because-you-read">
+      <header class="block__head">
+        <span class="block__index mono"><?= icon('layers') ?></span>
+        <h2 class="block__title">Because you read this</h2>
+        <p class="block__blurb">Picked from your reading, starting with <a href="<?= e($becauseYouRead['seed']['url']) ?>"><?= e(excerpt($becauseYouRead['seed']['title'], 60)) ?></a> — never your saved list, only what you've opened.</p>
+      </header>
+      <div class="grid grid--4">
+        <?php foreach ($becauseYouRead['rows'] as $i => $s): ?><?= Ui::card($s, $i === 0 ? 'standard' : 'compact', $i) ?><?php endforeach; ?>
+      </div>
+    </section>
+    <?php endif; ?>
+
+    <div class="countystrip" aria-label="Dedicated corners">
+      <a class="countystrip__item countystrip__item--tech" href="/tech"><?= icon('cpu') ?><span><b>Tech Corner</b><small>Startups, AI, gadgets & software →</small></span></a>
+      <a class="countystrip__item countystrip__item--kids" href="/kids"><?= icon('kids') ?><span><b>Wire Junior</b><small>Puzzles, quiz & free things for kids →</small></span></a>
+      <a class="countystrip__item countystrip__item--mystery" href="/mysteries"><?= icon('magnifier') ?><span><b>Mystery Files</b><small>Unsolved cases from the wire →</small></span></a>
+    </div>
+
     <?= \MeNews\View::partial('partials/near', ['locality' => $locality, 'counties' => $countyNames, 'compact' => true, 'notices' => $countyNotices ?? [], 'first' => true]) ?>
 
     <?= \MeNews\View::partial('partials/signal-slider', compact('signalBoard', 'signalStats')) ?>
@@ -63,7 +95,7 @@ $countySlug = $county ? slugify($county) : '';
       <header class="block__head">
         <span class="block__index mono"><?= icon('community') ?></span>
         <h2 class="block__title"><a href="/section/community">From the ground</a></h2>
-        <p class="block__blurb">What people in <?= e($county ? 'Co. ' . $county : 'Ireland') ?> are seeing right now. Reports are screened, then an editor decides. No account needed for your first one.</p>
+        <p class="block__blurb">What people in <?= e($county ?: 'India') ?> are seeing right now. Reports are screened, then an editor decides. No account needed for your first one.</p>
         <button class="btn btn--hot" type="button" data-open-report><?= icon('report') ?> Report a story</button>
       </header>
       <?php if ($community): ?>
@@ -77,9 +109,9 @@ $countySlug = $county ? slugify($county) : '';
             <article class="card card--compact">
               <div class="card__body">
                 <div class="card__meta"><?= Ui::categoryChip('Traffic') ?><?= Ui::label('Corroborated') ?><time>Example</time></div>
-                <h3 class="card__title">Water main burst on Church Road, one lane closed at the school</h3>
-                <p class="card__summary">Council crew on site since 8am, traffic being let through in turns. Photo attached, GPS on. Three neighbours tapped "I saw this too".</p>
-                <div class="card__foot"><span class="card__source card__source--community">Community report</span><span class="card__place"><?= icon('pin') ?> Greystones</span></div>
+                <h3 class="card__title">Water pipeline burst near MG Road, one lane closed at the school</h3>
+                <p class="card__summary">Municipal crew on site since 8am, traffic being let through in turns. Photo attached, GPS on. Three neighbours tapped "I saw this too".</p>
+                <div class="card__foot"><span class="card__source card__source--community">Community report</span><span class="card__place"><?= icon('pin') ?> <?= e($county ?: 'Indiranagar') ?></span></div>
               </div>
             </article>
           </div>

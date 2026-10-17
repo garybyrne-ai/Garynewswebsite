@@ -1,9 +1,9 @@
 <?php $byCat = []; foreach ($points as $p) { $byCat[$p['category']] = ($byCat[$p['category']] ?? 0) + 1; } arsort($byCat); $focus = $focus ?? null; $focusCounty = $focusCounty ?? null; ?>
 <section class="container pagehead">
-  <span class="kicker"><?= $focusCounty ? 'Co. ' . e($focusCounty) . ' · map' : 'Live map' ?></span>
-  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon('map') ?></span><?= $focusCounty ? e($focusCounty) . ', <em>on the map.</em>' : 'Ireland, <em>right now.</em>' ?></h1>
-  <p class="pagehead__blurb"><?= $focusCounty ? 'Every story placed in County ' . e($focusCounty) . ': wire stories by the town they mention, community reports exactly where they were filed. Filter by section and by time.' : 'Every published story pinned to the island. Zoomed out, counties cluster into one bubble each; zoom in for individual pins. Filter by section and by time.' ?></p>
-  <div class="mapstats mono"><span><b><?= count($points) ?></b> stories placed</span><?php if (!$focusCounty): ?><span><b><?= count($counties) ?></b> counties active</span><?php endif; ?><span><b><?= (int)array_sum(array_column($counties, 'n')) ?></b> stories this week</span><?php if ($focusCounty): ?><a href="/map">All of Ireland →</a><?php else: ?><a href="/notices">Deaths &amp; notices →</a><?php endif; ?></div>
+  <span class="kicker"><?= $focusCounty ? e($focusCounty) . ' · map' : 'Live map' ?></span>
+  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon('map') ?></span><?= $focusCounty ? e($focusCounty) . ', <em>on the map.</em>' : 'India, <em>right now.</em>' ?></h1>
+  <p class="pagehead__blurb"><?= $focusCounty ? 'Every story placed in ' . e($focusCounty) . ': wire stories by the town they mention, community reports exactly where they were filed. Filter by section and by time.' : 'Every published story pinned to the country. Zoomed out, states cluster into one bubble each; zoom in for individual pins. Filter by section and by time.' ?></p>
+  <div class="mapstats mono"><span><b><?= count($points) ?></b> stories placed</span><?php if (!$focusCounty): ?><span><b><?= count($counties) ?></b> states active</span><?php endif; ?><span><b><?= (int)array_sum(array_column($counties, 'n')) ?></b> stories this week</span><?php if ($focusCounty): ?><a href="/map">All of India →</a><?php else: ?><a href="/notices">Deaths &amp; notices →</a><?php endif; ?></div>
 </section>
 <div class="container mappage" data-map-root>
   <div>
@@ -22,7 +22,7 @@
       <?php foreach ($colours as $c => $hex): ?><span style="--c:<?= e($hex) ?>"><i class="<?= $c === 'Community' ? 'is-community' : '' ?>"></i><?= e($c) ?></span><?php endforeach; ?>
       <span><?= icon('sparkle') ?> newest stories pulse</span>
     </div>
-    <?php if (!$focusCounty): ?><p class="panel__note">Every county has its own permanent map: <?php foreach (\MeNews\Support\Locations::countyNames() as $i => $c): ?><a href="/county/<?= e(slugify($c)) ?>/map"><?= e($c) ?></a><?= $i < 25 ? ' · ' : '' ?><?php endforeach; ?></p><?php endif; ?>
+    <?php if (!$focusCounty): $allCounties = \MeNews\Support\Locations::countyNames(); $lastCounty = count($allCounties) - 1; ?><p class="panel__note">Every state has its own permanent map: <?php foreach ($allCounties as $i => $c): ?><a href="/county/<?= e(slugify($c)) ?>/map"><?= e($c) ?></a><?= $i < $lastCounty ? ' · ' : '' ?><?php endforeach; ?></p><?php endif; ?>
   </div>
   <aside>
     <header class="panel__head"><span class="kicker">On the map</span><span class="mono panel__hint" data-map-count><?= count($points) ?> pins</span></header>

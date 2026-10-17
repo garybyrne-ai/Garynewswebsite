@@ -1,521 +1,557 @@
 {
- "_comment": "Focal an lae — Irish word of the day.",
+ "_comment": "Shabd of the day — Hindi word of the day. Read by src/Support/Daily.php's focal() method.",
  "words": [
   {
-   "irish": "madra",
+   "hindi": "कुत्ता",
    "english": "dog",
-   "say": "MOD-ra",
-   "example": "Tá madra agam. — I have a dog."
+   "say": "KUT-ta",
+   "example": "मेरे पास एक कुत्ता है। — I have a dog."
   },
   {
-   "irish": "cat",
+   "hindi": "बिल्ली",
    "english": "cat",
-   "say": "cat",
-   "example": "Tá an cat ina chodladh. — The cat is asleep."
+   "say": "BIL-lee",
+   "example": "बिल्ली सो रही है। — The cat is sleeping."
   },
   {
-   "irish": "capall",
+   "hindi": "घोड़ा",
    "english": "horse",
-   "say": "KOP-ul",
-   "example": "Capall bán. — A white horse."
+   "say": "GHO-da",
+   "example": "सफ़ेद घोड़ा। — A white horse."
   },
   {
-   "irish": "bó",
+   "hindi": "गाय",
    "english": "cow",
-   "say": "boh",
-   "example": "Tá an bhó sa pháirc. — The cow is in the field."
+   "say": "gaay",
+   "example": "गाय खेत में है। — The cow is in the field."
   },
   {
-   "irish": "caora",
-   "english": "sheep",
-   "say": "KAY-ra",
-   "example": "Caora ar an sliabh. — A sheep on the mountain."
+   "hindi": "बकरी",
+   "english": "goat",
+   "say": "BAK-ree",
+   "example": "छोटी बकरी। — A little goat."
   },
   {
-   "irish": "muc",
+   "hindi": "सुअर",
    "english": "pig",
-   "say": "muk",
-   "example": "Muc bheag. — A little pig."
+   "say": "SU-ar",
+   "example": "छोटा सुअर। — A little pig."
   },
   {
-   "irish": "éan",
+   "hindi": "पंछी",
    "english": "bird",
-   "say": "ayn",
-   "example": "Éan ar an gcrann. — A bird on the tree."
+   "say": "PUN-chee",
+   "example": "पेड़ पर पंछी। — A bird on the tree."
   },
   {
-   "irish": "iasc",
+   "hindi": "मछली",
    "english": "fish",
-   "say": "EE-usk",
-   "example": "Iasc san abhainn. — A fish in the river."
+   "say": "MUCH-lee",
+   "example": "नदी में मछली। — A fish in the river."
   },
   {
-   "irish": "grian",
-   "english": "sun",
-   "say": "GREE-un",
-   "example": "Tá an ghrian ag taitneamh. — The sun is shining."
+   "hindi": "शेर",
+   "english": "lion",
+   "say": "share",
+   "example": "शेर जंगल का राजा है। — The lion is king of the jungle."
   },
   {
-   "irish": "báisteach",
-   "english": "rain",
-   "say": "BAWSH-tukh",
-   "example": "Tá sé ag cur báistí. — It is raining."
+   "hindi": "बाघ",
+   "english": "tiger",
+   "say": "baagh",
+   "example": "भारत का राष्ट्रीय पशु बाघ है। — The tiger is India's national animal."
   },
   {
-   "irish": "gaoth",
-   "english": "wind",
-   "say": "gwee",
-   "example": "Gaoth láidir. — A strong wind."
+   "hindi": "हाथी",
+   "english": "elephant",
+   "say": "HAA-thee",
+   "example": "बड़ा हाथी। — A big elephant."
   },
   {
-   "irish": "sneachta",
-   "english": "snow",
-   "say": "SHNAKH-ta",
-   "example": "Tá sneachta ann! — There is snow!"
+   "hindi": "बंदर",
+   "english": "monkey",
+   "say": "BUN-dar",
+   "example": "बंदर पेड़ पर कूदता है। — The monkey jumps on the tree."
   },
   {
-   "irish": "scamall",
-   "english": "cloud",
-   "say": "SKOM-ul",
-   "example": "Scamall mór dubh. — A big black cloud."
-  },
-  {
-   "irish": "farraige",
-   "english": "sea",
-   "say": "FAR-ig-eh",
-   "example": "Cois farraige. — By the sea."
-  },
-  {
-   "irish": "abhainn",
-   "english": "river",
-   "say": "OW-in",
-   "example": "Abhainn na Sionainne. — The River Shannon."
-  },
-  {
-   "irish": "loch",
-   "english": "lake",
-   "say": "lokh",
-   "example": "Loch nEathach. — Lough Neagh."
-  },
-  {
-   "irish": "sliabh",
-   "english": "mountain",
-   "say": "shleev",
-   "example": "Sliabh ard. — A high mountain."
-  },
-  {
-   "irish": "crann",
-   "english": "tree",
-   "say": "kron",
-   "example": "Crann darach. — An oak tree."
-  },
-  {
-   "irish": "bláth",
-   "english": "flower",
-   "say": "blaw",
-   "example": "Bláth buí. — A yellow flower."
-  },
-  {
-   "irish": "teach",
-   "english": "house",
-   "say": "chakh",
-   "example": "Mo theach. — My house."
-  },
-  {
-   "irish": "scoil",
-   "english": "school",
-   "say": "skul",
-   "example": "Táim ar scoil. — I am at school."
-  },
-  {
-   "irish": "leabhar",
-   "english": "book",
-   "say": "LOW-er",
-   "example": "Leabhar maith. — A good book."
-  },
-  {
-   "irish": "peann",
-   "english": "pen",
-   "say": "pyan",
-   "example": "Peann dearg. — A red pen."
-  },
-  {
-   "irish": "cara",
-   "english": "friend",
-   "say": "KOR-a",
-   "example": "Mo chara. — My friend."
-  },
-  {
-   "irish": "teaghlach",
-   "english": "family",
-   "say": "CHAI-lukh",
-   "example": "Mo theaghlach. — My family."
-  },
-  {
-   "irish": "máthair",
-   "english": "mother",
-   "say": "MAW-hir",
-   "example": "Mo mháthair. — My mother."
-  },
-  {
-   "irish": "athair",
-   "english": "father",
-   "say": "AH-hir",
-   "example": "M'athair. — My father."
-  },
-  {
-   "irish": "deartháir",
-   "english": "brother",
-   "say": "DRAH-hawr",
-   "example": "Mo dheartháir. — My brother."
-  },
-  {
-   "irish": "deirfiúr",
-   "english": "sister",
-   "say": "DREF-oor",
-   "example": "Mo dheirfiúr. — My sister."
-  },
-  {
-   "irish": "bia",
-   "english": "food",
-   "say": "BEE-a",
-   "example": "Bia blasta. — Tasty food."
-  },
-  {
-   "irish": "uisce",
-   "english": "water",
-   "say": "ISH-ka",
-   "example": "Gloine uisce. — A glass of water."
-  },
-  {
-   "irish": "bainne",
-   "english": "milk",
-   "say": "BAN-ya",
-   "example": "Bainne te. — Warm milk."
-  },
-  {
-   "irish": "arán",
-   "english": "bread",
-   "say": "a-RAWN",
-   "example": "Arán donn. — Brown bread."
-  },
-  {
-   "irish": "im",
-   "english": "butter",
-   "say": "im",
-   "example": "Arán agus im. — Bread and butter."
-  },
-  {
-   "irish": "úll",
-   "english": "apple",
-   "say": "ool",
-   "example": "Úll glas. — A green apple."
-  },
-  {
-   "irish": "prátaí",
-   "english": "potatoes",
-   "say": "PRAW-tee",
-   "example": "Prátaí rósta. — Roast potatoes."
-  },
-  {
-   "irish": "tae",
-   "english": "tea",
-   "say": "tay",
-   "example": "Cupán tae. — A cup of tea."
-  },
-  {
-   "irish": "cáca",
-   "english": "cake",
-   "say": "KAW-ka",
-   "example": "Cáca milis. — A sweet cake."
-  },
-  {
-   "irish": "milseán",
-   "english": "a sweet",
-   "say": "mil-SHAWN",
-   "example": "Milseáin! — Sweets!"
-  },
-  {
-   "irish": "lá",
-   "english": "day",
-   "say": "law",
-   "example": "Lá breá. — A fine day."
-  },
-  {
-   "irish": "oíche",
-   "english": "night",
-   "say": "EE-ha",
-   "example": "Oíche mhaith. — Good night."
-  },
-  {
-   "irish": "maidin",
-   "english": "morning",
-   "say": "MOD-jin",
-   "example": "Maidin mhaith. — Good morning."
-  },
-  {
-   "irish": "tráthnóna",
-   "english": "evening",
-   "say": "traw-NOH-na",
-   "example": "Tráthnóna maith. — Good evening."
-  },
-  {
-   "irish": "dearg",
-   "english": "red",
-   "say": "JAR-ug",
-   "example": "Carr dearg. — A red car."
-  },
-  {
-   "irish": "glas",
-   "english": "green",
-   "say": "gloss",
-   "example": "Féar glas. — Green grass."
-  },
-  {
-   "irish": "gorm",
-   "english": "blue",
-   "say": "GUR-um",
-   "example": "Spéir ghorm. — A blue sky."
-  },
-  {
-   "irish": "buí",
-   "english": "yellow",
-   "say": "bwee",
-   "example": "Grian bhuí. — A yellow sun."
-  },
-  {
-   "irish": "bán",
-   "english": "white",
-   "say": "bawn",
-   "example": "Sneachta bán. — White snow."
-  },
-  {
-   "irish": "dubh",
-   "english": "black",
-   "say": "duv",
-   "example": "Cat dubh. — A black cat."
-  },
-  {
-   "irish": "mór",
-   "english": "big",
+   "hindi": "मोर",
+   "english": "peacock",
    "say": "more",
-   "example": "Teach mór. — A big house."
+   "example": "मोर भारत का राष्ट्रीय पक्षी है। — The peacock is India's national bird."
   },
   {
-   "irish": "beag",
+   "hindi": "तोता",
+   "english": "parrot",
+   "say": "TO-ta",
+   "example": "हरा तोता। — A green parrot."
+  },
+  {
+   "hindi": "सूरज",
+   "english": "sun",
+   "say": "SOO-raj",
+   "example": "सूरज चमक रहा है। — The sun is shining."
+  },
+  {
+   "hindi": "बारिश",
+   "english": "rain",
+   "say": "BAA-rish",
+   "example": "बारिश हो रही है। — It is raining."
+  },
+  {
+   "hindi": "हवा",
+   "english": "wind",
+   "say": "HA-va",
+   "example": "तेज़ हवा। — A strong wind."
+  },
+  {
+   "hindi": "बर्फ़",
+   "english": "snow",
+   "say": "burf",
+   "example": "पहाड़ पर बर्फ़। — Snow on the mountain."
+  },
+  {
+   "hindi": "बादल",
+   "english": "cloud",
+   "say": "BAA-dal",
+   "example": "बड़ा काला बादल। — A big black cloud."
+  },
+  {
+   "hindi": "समुद्र",
+   "english": "sea",
+   "say": "sa-MUD-ra",
+   "example": "समुद्र के किनारे। — By the sea."
+  },
+  {
+   "hindi": "नदी",
+   "english": "river",
+   "say": "NA-dee",
+   "example": "गंगा नदी। — The river Ganga."
+  },
+  {
+   "hindi": "झील",
+   "english": "lake",
+   "say": "jheel",
+   "example": "बड़ी झील। — A big lake."
+  },
+  {
+   "hindi": "पहाड़",
+   "english": "mountain",
+   "say": "pa-HAAD",
+   "example": "ऊँचा पहाड़। — A high mountain."
+  },
+  {
+   "hindi": "पेड़",
+   "english": "tree",
+   "say": "payd",
+   "example": "आम का पेड़। — A mango tree."
+  },
+  {
+   "hindi": "फूल",
+   "english": "flower",
+   "say": "phool",
+   "example": "पीला फूल। — A yellow flower."
+  },
+  {
+   "hindi": "घर",
+   "english": "house",
+   "say": "ghar",
+   "example": "मेरा घर। — My house."
+  },
+  {
+   "hindi": "स्कूल",
+   "english": "school",
+   "say": "skool",
+   "example": "मैं स्कूल में हूँ। — I am at school."
+  },
+  {
+   "hindi": "किताब",
+   "english": "book",
+   "say": "ki-TAAB",
+   "example": "अच्छी किताब। — A good book."
+  },
+  {
+   "hindi": "कलम",
+   "english": "pen",
+   "say": "KA-lam",
+   "example": "लाल कलम। — A red pen."
+  },
+  {
+   "hindi": "दोस्त",
+   "english": "friend",
+   "say": "dost",
+   "example": "मेरा दोस्त। — My friend."
+  },
+  {
+   "hindi": "परिवार",
+   "english": "family",
+   "say": "pa-ri-VAAR",
+   "example": "मेरा परिवार। — My family."
+  },
+  {
+   "hindi": "माँ",
+   "english": "mother",
+   "say": "maa",
+   "example": "मेरी माँ। — My mother."
+  },
+  {
+   "hindi": "पिता",
+   "english": "father",
+   "say": "PI-ta",
+   "example": "मेरे पिता। — My father."
+  },
+  {
+   "hindi": "भाई",
+   "english": "brother",
+   "say": "bhai",
+   "example": "मेरा भाई। — My brother."
+  },
+  {
+   "hindi": "बहन",
+   "english": "sister",
+   "say": "buh-HUN",
+   "example": "मेरी बहन। — My sister."
+  },
+  {
+   "hindi": "खाना",
+   "english": "food",
+   "say": "KHAA-na",
+   "example": "स्वादिष्ट खाना। — Tasty food."
+  },
+  {
+   "hindi": "पानी",
+   "english": "water",
+   "say": "PAA-nee",
+   "example": "एक गिलास पानी। — A glass of water."
+  },
+  {
+   "hindi": "दूध",
+   "english": "milk",
+   "say": "doodh",
+   "example": "गरम दूध। — Warm milk."
+  },
+  {
+   "hindi": "रोटी",
+   "english": "bread",
+   "say": "RO-tee",
+   "example": "रोटी और सब्ज़ी। — Bread and vegetables."
+  },
+  {
+   "hindi": "मक्खन",
+   "english": "butter",
+   "say": "MUK-khan",
+   "example": "रोटी और मक्खन। — Bread and butter."
+  },
+  {
+   "hindi": "सेब",
+   "english": "apple",
+   "say": "sayb",
+   "example": "हरा सेब। — A green apple."
+  },
+  {
+   "hindi": "आलू",
+   "english": "potato",
+   "say": "AA-loo",
+   "example": "आलू के पराठे। — Potato parathas."
+  },
+  {
+   "hindi": "चाय",
+   "english": "tea",
+   "say": "chai",
+   "example": "एक कप चाय। — A cup of tea."
+  },
+  {
+   "hindi": "केक",
+   "english": "cake",
+   "say": "kayk",
+   "example": "मीठा केक। — A sweet cake."
+  },
+  {
+   "hindi": "मिठाई",
+   "english": "sweet",
+   "say": "mi-THAI",
+   "example": "मिठाई! — Sweets!"
+  },
+  {
+   "hindi": "दिन",
+   "english": "day",
+   "say": "din",
+   "example": "अच्छा दिन। — A fine day."
+  },
+  {
+   "hindi": "रात",
+   "english": "night",
+   "say": "raat",
+   "example": "शुभ रात्रि। — Good night."
+  },
+  {
+   "hindi": "सुबह",
+   "english": "morning",
+   "say": "SU-bah",
+   "example": "सुप्रभात। — Good morning."
+  },
+  {
+   "hindi": "शाम",
+   "english": "evening",
+   "say": "shaam",
+   "example": "शुभ संध्या। — Good evening."
+  },
+  {
+   "hindi": "लाल",
+   "english": "red",
+   "say": "laal",
+   "example": "लाल कार। — A red car."
+  },
+  {
+   "hindi": "हरा",
+   "english": "green",
+   "say": "HA-ra",
+   "example": "हरी घास। — Green grass."
+  },
+  {
+   "hindi": "नीला",
+   "english": "blue",
+   "say": "NEE-la",
+   "example": "नीला आसमान। — A blue sky."
+  },
+  {
+   "hindi": "पीला",
+   "english": "yellow",
+   "say": "PEE-la",
+   "example": "पीला सूरज। — A yellow sun."
+  },
+  {
+   "hindi": "सफ़ेद",
+   "english": "white",
+   "say": "sa-FAYD",
+   "example": "सफ़ेद बर्फ़। — White snow."
+  },
+  {
+   "hindi": "काला",
+   "english": "black",
+   "say": "KAA-la",
+   "example": "काली बिल्ली। — A black cat."
+  },
+  {
+   "hindi": "बड़ा",
+   "english": "big",
+   "say": "ba-DA",
+   "example": "बड़ा घर। — A big house."
+  },
+  {
+   "hindi": "छोटा",
    "english": "small",
-   "say": "byug",
-   "example": "Madra beag. — A small dog."
+   "say": "CHHO-ta",
+   "example": "छोटा कुत्ता। — A small dog."
   },
   {
-   "irish": "te",
+   "hindi": "गरम",
    "english": "hot",
-   "say": "cheh",
-   "example": "Tae te. — Hot tea."
+   "say": "GA-ram",
+   "example": "गरम चाय। — Hot tea."
   },
   {
-   "irish": "fuar",
+   "hindi": "ठंडा",
    "english": "cold",
-   "say": "FOO-ur",
-   "example": "Lá fuar. — A cold day."
+   "say": "THUN-da",
+   "example": "ठंडा दिन। — A cold day."
   },
   {
-   "irish": "sásta",
+   "hindi": "खुश",
    "english": "happy",
-   "say": "SAWS-ta",
-   "example": "Táim sásta. — I am happy."
+   "say": "khoosh",
+   "example": "मैं खुश हूँ। — I am happy."
   },
   {
-   "irish": "brónach",
+   "hindi": "उदास",
    "english": "sad",
-   "say": "BROH-nukh",
-   "example": "Tá sé brónach. — He is sad."
+   "say": "u-DAAS",
+   "example": "वह उदास है। — He is sad."
   },
   {
-   "irish": "go raibh maith agat",
+   "hindi": "धन्यवाद",
    "english": "thank you",
-   "say": "guh rev mah AG-ut",
-   "example": "Go raibh maith agat, a mhúinteoir! — Thank you, teacher!"
+   "say": "dhan-ya-VAAD",
+   "example": "धन्यवाद, गुरुजी! — Thank you, teacher!"
   },
   {
-   "irish": "fáilte",
+   "hindi": "स्वागत",
    "english": "welcome",
-   "say": "FAWL-cha",
-   "example": "Céad míle fáilte! — A hundred thousand welcomes!"
+   "say": "SWA-gat",
+   "example": "आपका स्वागत है! — You are welcome!"
   },
   {
-   "irish": "slán",
-   "english": "goodbye",
-   "say": "slawn",
-   "example": "Slán go fóill. — Bye for now."
-  },
-  {
-   "irish": "Dia duit",
+   "hindi": "नमस्ते",
    "english": "hello",
-   "say": "DEE-a gwit",
-   "example": "Dia duit, a Aoife! — Hello, Aoife!"
+   "say": "na-mas-TAY",
+   "example": "नमस्ते, आशा! — Hello, Asha!"
   },
   {
-   "irish": "craic",
+   "hindi": "अलविदा",
+   "english": "goodbye",
+   "say": "al-vi-DA",
+   "example": "अलविदा, फिर मिलेंगे। — Goodbye, see you again."
+  },
+  {
+   "hindi": "मज़ा",
    "english": "fun",
-   "say": "crack",
-   "example": "Bhí craic againn. — We had fun."
+   "say": "MA-za",
+   "example": "हमने बहुत मज़ा किया। — We had a lot of fun."
   },
   {
-   "irish": "ceol",
+   "hindi": "संगीत",
    "english": "music",
-   "say": "kyol",
-   "example": "Ceol traidisiúnta. — Traditional music."
+   "say": "san-GEET",
+   "example": "पारंपरिक संगीत। — Traditional music."
   },
   {
-   "irish": "damhsa",
+   "hindi": "नृत्य",
    "english": "dance",
-   "say": "DOW-sa",
-   "example": "Damhsa Gaelach. — Irish dancing."
+   "say": "NRIT-ya",
+   "example": "भारतीय नृत्य। — Indian dance."
   },
   {
-   "irish": "spórt",
+   "hindi": "खेल",
    "english": "sport",
-   "say": "spohrt",
-   "example": "Is maith liom spórt. — I like sport."
+   "say": "khayl",
+   "example": "मुझे खेल पसंद है। — I like sport."
   },
   {
-   "irish": "peil",
+   "hindi": "फुटबॉल",
    "english": "football",
-   "say": "pel",
-   "example": "Cluiche peile. — A football match."
+   "say": "FOOT-bawl",
+   "example": "फुटबॉल मैच। — A football match."
   },
   {
-   "irish": "iománaíocht",
-   "english": "hurling",
-   "say": "uh-MAW-nee-ukht",
-   "example": "Camán agus sliotar. — Hurley and sliotar."
+   "hindi": "क्रिकेट",
+   "english": "cricket",
+   "say": "CRICK-et",
+   "example": "क्रिकेट का खेल। — A game of cricket."
   },
   {
-   "irish": "rothar",
+   "hindi": "साइकिल",
    "english": "bicycle",
-   "say": "ROH-har",
-   "example": "Rothar nua. — A new bike."
+   "say": "SAI-kil",
+   "example": "नई साइकिल। — A new bike."
   },
   {
-   "irish": "carr",
+   "hindi": "गाड़ी",
    "english": "car",
-   "say": "kor",
-   "example": "Carr gorm. — A blue car."
+   "say": "GAA-dee",
+   "example": "नीली गाड़ी। — A blue car."
   },
   {
-   "irish": "bád",
+   "hindi": "नाव",
    "english": "boat",
-   "say": "bawd",
-   "example": "Bád beag. — A little boat."
+   "say": "naav",
+   "example": "छोटी नाव। — A little boat."
   },
   {
-   "irish": "traein",
+   "hindi": "ट्रेन",
    "english": "train",
    "say": "trayn",
-   "example": "Ar an traein. — On the train."
+   "example": "ट्रेन में। — On the train."
   },
   {
-   "irish": "Éire",
-   "english": "Ireland",
-   "say": "AIR-a",
-   "example": "Éire go deo! — Ireland forever!"
+   "hindi": "भारत",
+   "english": "India",
+   "say": "BHA-rat",
+   "example": "भारत महान है! — India is great!"
   },
   {
-   "irish": "baile",
-   "english": "town",
-   "say": "BAL-ya",
-   "example": "Baile Átha Cliath. — Dublin."
-  },
-  {
-   "irish": "cathair",
+   "hindi": "शहर",
    "english": "city",
-   "say": "KA-hir",
-   "example": "Cathair na Gaillimhe. — Galway city."
+   "say": "SHA-har",
+   "example": "दिल्ली शहर। — Delhi city."
   },
   {
-   "irish": "trá",
-   "english": "beach",
-   "say": "traw",
-   "example": "Ar an trá. — At the beach."
+   "hindi": "गाँव",
+   "english": "village",
+   "say": "gaanw",
+   "example": "छोटा सा गाँव। — A small village."
   },
   {
-   "irish": "oileán",
+   "hindi": "तट",
+   "english": "coast",
+   "say": "tut",
+   "example": "समुद्र तट पर। — At the beach."
+  },
+  {
+   "hindi": "द्वीप",
    "english": "island",
-   "say": "IL-awn",
-   "example": "Oileán Acla. — Achill Island."
+   "say": "dveep",
+   "example": "अंडमान द्वीप। — Andaman island."
   },
   {
-   "irish": "bogha báistí",
+   "hindi": "इंद्रधनुष",
    "english": "rainbow",
-   "say": "BOW-a BAWSH-tee",
-   "example": "Féach, bogha báistí! — Look, a rainbow!"
+   "say": "in-dra-DHA-nush",
+   "example": "देखो, इंद्रधनुष! — Look, a rainbow!"
   },
   {
-   "irish": "réalta",
+   "hindi": "तारा",
    "english": "star",
-   "say": "RAYL-ta",
-   "example": "Réalta sa spéir. — A star in the sky."
+   "say": "TAA-ra",
+   "example": "आसमान में तारा। — A star in the sky."
   },
   {
-   "irish": "gealach",
+   "hindi": "चाँद",
    "english": "moon",
-   "say": "GYAL-ukh",
-   "example": "Gealach lán. — A full moon."
+   "say": "chaand",
+   "example": "पूरा चाँद। — A full moon."
   },
   {
-   "irish": "leabharlann",
+   "hindi": "पुस्तकालय",
    "english": "library",
-   "say": "LOW-er-lon",
-   "example": "Sa leabharlann. — In the library."
+   "say": "pus-tak-AA-lay",
+   "example": "पुस्तकालय में। — In the library."
   },
   {
-   "irish": "múinteoir",
+   "hindi": "शिक्षक",
    "english": "teacher",
-   "say": "MOON-chore",
-   "example": "Múinteoir deas. — A nice teacher."
+   "say": "shik-SHUK",
+   "example": "अच्छे शिक्षक। — A nice teacher."
   },
   {
-   "irish": "páiste",
+   "hindi": "बच्चा",
    "english": "child",
-   "say": "PAWSH-cha",
-   "example": "Páiste sona. — A happy child."
+   "say": "BUCH-cha",
+   "example": "खुश बच्चा। — A happy child."
   },
   {
-   "irish": "gáire",
-   "english": "a laugh",
-   "say": "GAW-ra",
-   "example": "Rinne mé gáire. — I laughed."
+   "hindi": "हँसी",
+   "english": "laugh",
+   "say": "HUN-see",
+   "example": "मैं हँसा। — I laughed."
   },
   {
-   "irish": "aimsir",
+   "hindi": "मौसम",
    "english": "weather",
-   "say": "AM-shir",
-   "example": "Aimsir bhreá. — Fine weather."
+   "say": "MOW-sum",
+   "example": "अच्छा मौसम। — Fine weather."
   },
   {
-   "irish": "samhradh",
+   "hindi": "गर्मी",
    "english": "summer",
-   "say": "SOW-ra",
-   "example": "Laethanta saoire an tsamhraidh. — Summer holidays."
+   "say": "GAR-mee",
+   "example": "गर्मी की छुट्टियाँ। — Summer holidays."
   },
   {
-   "irish": "geimhreadh",
+   "hindi": "सर्दी",
    "english": "winter",
-   "say": "GEV-ra",
-   "example": "Geimhreadh fuar. — A cold winter."
+   "say": "SAR-dee",
+   "example": "ठंडी सर्दी। — A cold winter."
   },
   {
-   "irish": "earrach",
+   "hindi": "बसंत",
    "english": "spring",
-   "say": "AR-ukh",
-   "example": "San earrach. — In spring."
+   "say": "buh-SUNT",
+   "example": "बसंत में। — In spring."
   },
   {
-   "irish": "fómhar",
+   "hindi": "पतझड़",
    "english": "autumn",
-   "say": "FOH-wur",
-   "example": "Duilleoga an fhómhair. — Autumn leaves."
+   "say": "put-JHUD",
+   "example": "पतझड़ के पत्ते। — Autumn leaves."
   }
  ]
 }

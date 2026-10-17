@@ -1,4 +1,4 @@
-/* ME News Ireland — newsroom */
+/* Bharat Wire India — newsroom */
 (function () {
   'use strict';
   const { api, esc, toast } = window.ME;
@@ -6,7 +6,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const LABELS = window.NEWSROOM.labels, CATS = window.NEWSROOM.categories, COUNTIES = window.NEWSROOM.counties;
   let me = null;
-  const fmt = iso => iso ? new Date(iso).toLocaleString('en-IE', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+  const fmt = iso => iso ? new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
   const opts = (list, sel) => list.map(x => `<option ${x === sel ? 'selected' : ''}>${esc(x)}</option>`).join('');
   const fd = obj => { const f = new FormData(); Object.entries(obj).forEach(([k, v]) => f.append(k, v)); return f; };
 
@@ -48,12 +48,16 @@
     $('#wire-last').textContent = s.wire_last_refresh ? 'Wire updated ' + fmt(s.wire_last_refresh) + (s.wire_stale ? ' (stale)' : '') : 'Wire never refreshed';
   }
 
+  function repeatBadge(x) {
+    return x.repeat_count > 2 ? ` <span class="chip chip--bad" title="${x.repeat_count} from this IP in the last 7 days">⚠ repeat submitter × ${x.repeat_count}</span>` : '';
+  }
   function reviewCard(x) {
     const media = x.media_url ? `<div class="review__media">${x.media_type === 'video' ? `<video controls preload="metadata" src="${x.media_url}"></video>` : `<img src="${x.media_url}" alt="">`}</div>` : '';
     return `<article class="review" data-id="${x.id}">
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
       <h3>${esc(x.title)}</h3>
       <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''}${x.author_user_id ? ` · reputation ${x.reporter_reputation ?? '—'}` : (x.reporter_verified_at ? ' · <span class="is-good">guest, contact confirmed</span>' : ` · <span class="is-bad">guest, not yet confirmed</span> (${esc(x.reporter_contact || '')})`)}${x.latitude ? ' · GPS' : ''}</div>
+      <div class="meta sub mono" title="${esc(x.submitter_user_agent || '')}">${esc(x.submitter_ip || 'no IP recorded')}${repeatBadge(x)}</div>
       ${x.incident_reports && x.incident_reports.length ? `<div class="trustnote"><b>${x.incident_reports.length + 1} reports of this incident.</b> ${x.incident_reports.map(i => `<a href="#" data-jump="${i.id}">${esc(i.author_name || 'Reporter')} · ${esc(i.location_name || '')} · ${esc(i.status)}</a>`).join(' · ')}</div>` : ''}
       ${media}
       ${x.media_type === 'image' && x.media_url ? `<div class="evidence">
@@ -96,14 +100,14 @@
   async function loadStories() {
     const q = $('#stories-q').value, kind = $('#stories-kind').value, status = $('#stories-status').value;
     const a = await api(`/api/admin/stories?q=${encodeURIComponent(q)}&kind=${kind}&status=${status}&limit=150`);
-    $('#stories-table').innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>Story</th><th>Section</th><th>County</th><th>Label</th><th>Status</th><th>Featured</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
+    $('#stories-table').innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>Story</th><th>Section</th><th>State</th><th>Label</th><th>Status</th><th>Featured</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
       <td><b>${x.status === 'published' ? `<a href="${esc(x.url)}" target="_blank">${esc(x.title)}</a>` : esc(x.title)}</b><span class="sub">${esc(x.kind)} · ${esc(x.source_name || x.author_name || '')} · ${fmt(x.published_at || x.created_at)} · ${x.views} views</span></td>
       <td><select data-cat>${opts(CATS, x.category)}</select></td>
       <td><select data-county><option value="">—</option>${opts(COUNTIES, x.county)}</select></td>
       <td><select data-label>${opts(LABELS, x.verification_label)}</select></td>
       <td><span class="status ${esc(x.status)}">${esc(x.status)}</span></td>
       <td><input type="checkbox" data-featured ${x.is_featured ? 'checked' : ''}></td>
-      <td class="actions"><button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
+      <td class="actions"><button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}${x.status === 'published' ? (x.pushed_at ? `<span class="sub" title="${fmt(x.pushed_at)}">✓ Pushed</span>` : '<button class="btn btn--hot btn--sm" data-push title="Send a breaking-news push notification">🔔 Push</button>') : ''}</td></tr>`).join('')}</tbody></table></div>`;
   }
   ['stories-q', 'stories-kind', 'stories-status'].forEach(id => $('#' + id).addEventListener('change', loadStories));
   $('#stories-q').addEventListener('input', () => { clearTimeout(window._sq); window._sq = setTimeout(loadStories, 300); });
@@ -118,13 +122,17 @@
         await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: 'unpublish', label: $('[data-label]', row).value, note: 'Unpublished from the newsroom' }) }); toast('Unpublished'); loadStories(); summary();
       } else if (e.target.hasAttribute('data-republish')) {
         await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: 'publish', label: $('[data-label]', row).value, note: '' }) }); toast('Published'); loadStories(); summary();
+      } else if (e.target.hasAttribute('data-push')) {
+        if (!confirm('Send a breaking-news push notification for this story to subscribers now? This cannot be undone.')) return;
+        const j = await api('/api/admin/stories/' + id + '/push', { method: 'POST', body: new FormData() });
+        toast(`Pushed to ${j.sent} subscriber${j.sent === 1 ? '' : 's'}${j.failed ? ', ' + j.failed + ' failed' : ''}`); loadStories();
       }
     } catch (err) { toast(err.message); }
   });
 
   async function loadComments() {
     const a = await api('/api/admin/comments');
-    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
+    $('#comments-list').innerHTML = a.length ? a.map(x => `<div class="review" data-id="${x.id}"><div class="meta"><b>${esc(x.author)}</b> on <a href="/story/${esc(x.slug)}" target="_blank">${esc(x.title)}</a> · ${fmt(x.created_at)}</div><div class="meta sub mono" title="${esc(x.user_agent || '')}">${esc(x.ip_address || 'no IP recorded')}${repeatBadge(x)}</div><p>${esc(x.body)}</p><details><summary>Moderation</summary><pre class="audit">${esc(x.moderation_json || '')}</pre></details><div class="actions"><button class="btn btn--good btn--sm" data-c="publish">Publish</button><button class="btn btn--hot btn--sm" data-c="reject">Reject</button></div></div>`).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>No flagged comments.</h3></div>';
   }
   $('#comments-list').addEventListener('click', async e => {
     const d = e.target.dataset.c; if (!d) return;
@@ -139,7 +147,7 @@
       <td><select data-role ${admin ? '' : 'disabled'}>${opts(['member', 'contributor', 'editor', 'admin'], x.role)}</select></td>
       <td><input data-title value="${esc(x.title || '')}" placeholder="Title" ${admin ? '' : 'disabled'}><br><select data-desk ${admin ? '' : 'disabled'}><option value="">— desk —</option>${opts(['National', 'Local', 'Business', 'Sport', 'Culture'], x.desk)}</select></td>
       <td><input type="checkbox" data-verified ${x.is_verified ? 'checked' : ''} ${admin ? '' : 'disabled'}></td>
-      <td><select data-plan ${admin ? '' : 'disabled'}>${opts(['free', 'ME+'], x.plan)}</select></td>
+      <td><select data-plan ${admin ? '' : 'disabled'}>${opts(['free', 'Wire+'], x.plan)}</select></td>
       <td><input type="number" data-rep min="0" max="100" value="${x.reputation}" style="width:70px" ${admin ? '' : 'disabled'}></td>
       <td class="inline" style="gap:4px">${admin ? '<button class="btn btn--ghost btn--sm" data-save-user>Save</button>' + (x.id !== me.id ? '<button class="btn btn--hot btn--sm" data-delete-user>Delete…</button>' : '') : ''}</td></tr>`).join('')}</tbody></table></div>`;
     $('#user-add-toggle').hidden = !admin;
@@ -168,7 +176,16 @@
   });
 
   async function loadAds() { if (window.ME.loadAds) window.ME.loadAds(); }
+  async function loadSources() {
+    const j = await api('/api/admin/sources');
+    $('#wire-publishers').innerHTML = `<div class="checks">${j.publishers.map(p => `<label class="check"><input type="checkbox" name="enabled" value="${esc(p.name)}" ${p.enabled ? 'checked' : ''}><span><b>${esc(p.name)}</b> <small style="color:var(--muted)">${esc(p.languages.join(', '))} · ${p.feed_count} feed${p.feed_count > 1 ? 's' : ''}${p.counties.length ? ' · ' + esc(p.counties.slice(0, 3).join(', ')) + (p.counties.length > 3 ? ' +' + (p.counties.length - 3) : '') : ''}</small></span></label>`).join('')}</div>`;
+  }
+  $('#sources-form').addEventListener('submit', async e => {
+    e.preventDefault(); const out = $('#sources-result'); out.classList.remove('is-error');
+    try { const j = await api('/api/admin/sources', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Publishers saved'); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+  });
   async function loadWire() {
+    loadSources();
     const j = await api('/api/admin/wire/runs');
     $('#wire-schedule').innerHTML = `<span class="kicker">Automatic updates</span>
       <div class="stats" style="margin:12px 0"><div class="stat"><span class="mono">Last refresh</span><strong style="font-size:1.1rem">${j.last_refresh ? fmt(j.last_refresh) : 'never'}</strong></div><div class="stat"><span class="mono">Interval</span><strong>${j.interval_minutes} min</strong></div><div class="stat"><span class="mono">Refreshes so far</span><strong>${j.refresh_count}</strong></div><div class="stat"><span class="mono">Background mode</span><strong style="font-size:1.1rem" class="${j.auto_refresh ? 'is-good' : 'is-bad'}">${j.auto_refresh ? (j.background_capable ? 'server (PHP-FPM)' : 'browser ping') : 'off'}</strong></div></div>
@@ -214,7 +231,8 @@
     $('#notices-queue').innerHTML = a.length ? a.map(n => `<article class="review" data-id="${n.id}">
       <div class="inline"><span class="status ${esc(n.status)}">${esc(n.status)}</span><span class="chip chip--cat">${esc(n.kind)}</span>${n.plan === 'promoted' ? '<span class="chip chip--plus">Promoted</span>' : ''}<span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(n.created_at)}</span></div>
       <h3>${esc(n.title)}</h3>
-      <div class="meta">${esc(n.town || '')}${n.county ? ', Co. ' + esc(n.county) : ''} · ${esc(n.contact_org || n.contact_name || '')}${n.verified_at ? ' · <span class="is-good">email confirmed</span>' : ' · <span class="is-bad">not confirmed yet</span>'}</div>
+      <div class="meta">${esc(n.town || '')}${n.county ? ', ' + esc(n.county) : ''} · ${esc(n.contact_org || n.contact_name || '')}${n.verified_at ? ' · <span class="is-good">email confirmed</span>' : ' · <span class="is-bad">not confirmed yet</span>'}</div>
+      <div class="meta sub mono" title="${esc(n.user_agent || '')}">${esc(n.ip_address || 'no IP recorded')}</div>
       ${n.funeral_at ? `<p><b>Funeral</b> ${esc(n.funeral_at)} ${esc(n.funeral_venue || '')}</p>` : ''}${n.event_at ? `<p><b>When</b> ${esc(n.event_at)} ${esc(n.venue || '')}</p>` : ''}
       ${n.reposing ? `<p><b>Reposing</b> ${esc(n.reposing)}</p>` : ''}<p>${esc(n.body || '')}</p>${n.family_message ? `<p><i>${esc(n.family_message)}</i></p>` : ''}
       <label class="form-label">Editor note (emailed to the sender)<textarea data-note rows="2">${esc(n.editorial_note || '')}</textarea></label>
@@ -230,9 +248,10 @@
   /* ---- closures ---- */
   async function loadClosures() {
     const a = await api('/api/admin/closures');
-    $('#closures-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>School</th><th>Closed</th><th>Reason</th><th>Contact</th><th>Status</th><th></th></tr></thead><tbody>${a.map(c => `<tr data-id="${c.id}">
-      <td><b>${esc(c.school)}</b><span class="sub">${esc(c.town || '')} Co. ${esc(c.county)}</span></td><td>${esc(c.closed_on)}${c.reopens_on ? ' → ' + esc(c.reopens_on) : ''}</td><td>${esc(c.reason || '')}</td>
+    $('#closures-table').innerHTML = a.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>School</th><th>Closed</th><th>Reason</th><th>Contact</th><th>Submitted from</th><th>Status</th><th></th></tr></thead><tbody>${a.map(c => `<tr data-id="${c.id}">
+      <td><b>${esc(c.school)}</b><span class="sub">${esc(c.town || '')} ${esc(c.county)}</span></td><td>${esc(c.closed_on)}${c.reopens_on ? ' → ' + esc(c.reopens_on) : ''}</td><td>${esc(c.reason || '')}</td>
       <td>${esc(c.contact_name || '')} <span class="sub">${esc(c.contact_role || '')} · ${esc(c.contact_email)}${c.verified_at ? ' · confirmed' : ' · unconfirmed'}</span></td>
+      <td class="mono" title="${esc(c.user_agent || '')}">${esc(c.ip_address || '—')}</td>
       <td><span class="status ${esc(c.status)}">${esc(c.status)}</span></td>
       <td class="actions">${c.status !== 'published' ? '<button class="btn btn--good btn--sm" data-cl="publish">Publish</button>' : '<button class="btn btn--warn btn--sm" data-cl="unpublish">Remove</button>'}<button class="btn btn--hot btn--sm" data-cl="reject">Reject</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><div class="empty__glyph">—</div><h3>No closures submitted.</h3></div>';
   }
@@ -266,11 +285,11 @@
       const labels = { log: 'Write to a log file (nothing is sent)', mail: 'PHP mail() — the server itself', smtp: 'SMTP — Brevo relay, Gmail, your host', brevo: 'Brevo API over HTTPS (no open ports needed)' };
       box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Email delivery</span><span class="mono">Sending by <b>${esc(m.transport)}</b> · <b class="${m.configured ? 'is-good' : 'is-bad'}">${m.configured ? 'ready' : 'needs details'}</b>${m.last_sent_at ? ' · last sent ' + fmt(m.last_sent_at) : ''}</span></div>
         ${m.last_error ? `<p class="form__result is-error" style="margin:8px 0">Last send failed: ${esc(m.last_error)}</p>` : ''}
-        <p class="panel__note" style="margin:6px 0 12px">Alerts, the 7am county email, the members' monthly, report updates and receipts all go out this way. Brevo works either as an API key (best on hosts that block mail ports) or as an ordinary SMTP relay at <code>smtp-relay.brevo.com:587</code>. Nothing sends while this is set to the log file.</p>
+        <p class="panel__note" style="margin:6px 0 12px">Alerts, the 7am state email, the members' monthly, report updates and receipts all go out this way. Brevo works either as an API key (best on hosts that block mail ports) or as an ordinary SMTP relay at <code>smtp-relay.brevo.com:587</code>. Nothing sends while this is set to the log file.</p>
         <form id="mail-form" class="form">
           <div class="settingsgrid">
             <label>Transport<select name="transport">${m.transports.map(t => `<option value="${t}" ${t === m.transport ? 'selected' : ''}>${esc(labels[t] || t)}</option>`).join('')}</select></label>
-            <label>From address<input name="from" type="email" value="${esc(m.from)}" placeholder="news@menews.ie"><small class="form__hint">Must be a sender your provider has verified.</small></label>
+            <label>From address<input name="from" type="email" value="${esc(m.from)}" placeholder="news@bharatwire.in"><small class="form__hint">Must be a sender your provider has verified.</small></label>
             <label>From name<input name="from_name" maxlength="80" value="${esc(m.from_name)}"></label>
             <label>Reply-to<input name="reply_to" type="email" value="${esc(m.reply_to)}"></label>
           </div>
@@ -315,33 +334,56 @@
         ? `<select name="${k}"><option value="">— keep ${esc(f.masked || 'sandbox')} —</option><option value="sandbox">sandbox</option><option value="live">live</option></select>`
         : `<input name="${k}" type="password" autocomplete="new-password" placeholder="${f.set ? esc(f.masked) + '  (leave blank to keep)' : 'Paste here'}">`}<small class="form__hint">${esc(f.hint)}${f.source === 'panel' ? ` · <a href="#" data-clear="${k}">remove</a>` : ''}</small></label>`;
       const group = name => Object.entries(g.fields).filter(([, f]) => f.group === name).map(field).join('');
-      box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Payment gateways</span><span class="mono">Stripe: <b class="${g.stripe ? 'is-good' : 'is-bad'}">${g.stripe ? 'connected' : 'not connected'}</b> · PayPal: <b class="${g.paypal ? 'is-good' : 'is-bad'}">${g.paypal ? 'connected' : 'not connected'}</b></span></div>
-        <p class="panel__note" style="margin:6px 0 12px">Paste the keys from your Stripe and PayPal dashboards here; they are encrypted before they are stored (key: <code>${esc(g.key_source)}</code>) and never shown again, only the last four characters. Nothing needs to be edited on the server. Add these webhook URLs in each dashboard: <code>${esc(g.webhooks.stripe)}</code> (events: checkout.session.completed, payment_intent.succeeded, charge.refunded, customer.subscription.*) and <code>${esc(g.webhooks.paypal)}</code> (PAYMENT.CAPTURE.COMPLETED, PAYMENT.CAPTURE.REFUNDED, BILLING.SUBSCRIPTION.*).</p>
+      box.innerHTML = `<div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><span class="kicker">Payment gateways</span><span class="mono">Stripe: <b class="${g.stripe ? 'is-good' : 'is-bad'}">${g.stripe ? 'connected' : 'not connected'}</b> · PayPal: <b class="${g.paypal ? 'is-good' : 'is-bad'}">${g.paypal ? 'connected' : 'not connected'}</b> · Razorpay (UPI): <b class="${g.razorpay ? 'is-good' : 'is-bad'}">${g.razorpay ? 'connected' : 'not connected'}</b></span></div>
+        <p class="panel__note" style="margin:6px 0 12px">Paste the keys from your Stripe, PayPal and Razorpay dashboards here; they are encrypted before they are stored (key: <code>${esc(g.key_source)}</code>) and never shown again, only the last four characters. Nothing needs to be edited on the server. Add these webhook URLs in each dashboard: <code>${esc(g.webhooks.stripe)}</code> (events: checkout.session.completed, payment_intent.succeeded, charge.refunded, customer.subscription.*), <code>${esc(g.webhooks.paypal)}</code> (PAYMENT.CAPTURE.COMPLETED, PAYMENT.CAPTURE.REFUNDED, BILLING.SUBSCRIPTION.*) and <code>${esc(g.webhooks.razorpay)}</code> (payment_link.paid, subscription.activated, subscription.charged, subscription.cancelled, subscription.halted). Razorpay is how readers and advertisers pay by UPI — BHIM, Google Pay, PhonePe, Paytm and every other UPI app show up automatically on its hosted checkout, no separate integration needed for each one.</p>
         <form id="gateways-form" class="form">
           <div class="gwgrid"><div><h3 style="margin:0 0 8px">Stripe</h3><div class="settingsgrid">${group('stripe')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="stripe">Test Stripe connection</button></div></div>
-          <div><h3 style="margin:0 0 8px">PayPal</h3><div class="settingsgrid">${group('paypal')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="paypal">Test PayPal connection</button></div></div></div>
+          <div><h3 style="margin:0 0 8px">PayPal</h3><div class="settingsgrid">${group('paypal')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="paypal">Test PayPal connection</button></div></div>
+          <div><h3 style="margin:0 0 8px">Razorpay (UPI/BHIM/GPay/PhonePe)</h3><div class="settingsgrid">${group('razorpay')}</div><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="razorpay">Test Razorpay connection</button></div></div></div>
           <div class="form__actions"><button class="btn btn--primary" type="submit">Save gateway keys</button><span class="form__hint">Only fields you fill in are changed.</span></div>
           <p class="form__result" id="gateways-result"></p>
+        </form>
+        <div class="inline" style="justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:28px"><span class="kicker">Social sign-in</span><span class="mono">Google: <b class="${g.google ? 'is-good' : 'is-bad'}">${g.google ? 'connected' : 'not connected'}</b> · Facebook: <b class="${g.facebook ? 'is-good' : 'is-bad'}">${g.facebook ? 'connected' : 'not connected'}</b> · X: <b class="${g.x ? 'is-good' : 'is-bad'}">${g.x ? 'connected' : 'not connected'}</b></span></div>
+        <p class="panel__note" style="margin:6px 0 12px">Readers can then sign in with one tap instead of a password. Each provider needs its own app created in that provider's own developer console (this cannot be automated — the provider insists on verifying who owns the app) — paste the client ID and secret it gives you below, and give it the matching redirect URL shown under each one.</p>
+        <form id="oauth-form" class="form">
+          <div class="gwgrid">
+            <div><h3 style="margin:0 0 8px">Google</h3><div class="settingsgrid">${group('google')}</div><p class="form__hint">Authorised redirect URI — add exactly this in Google Cloud Console: <code>${esc(g.redirect_uris.google)}</code></p><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="google">Test Google credentials</button></div></div>
+            <div><h3 style="margin:0 0 8px">Facebook</h3><div class="settingsgrid">${group('facebook')}</div><p class="form__hint">Valid OAuth Redirect URI — add exactly this in Meta for Developers: <code>${esc(g.redirect_uris.facebook)}</code></p><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="facebook">Test Facebook credentials</button></div></div>
+            <div><h3 style="margin:0 0 8px">X (Twitter)</h3><div class="settingsgrid">${group('x')}</div><p class="form__hint">Callback URI — add exactly this in the X developer portal: <code>${esc(g.redirect_uris.x)}</code>. X rarely grants access to a member's email, so an X sign-in usually creates a fresh Bharat Wire account rather than joining an existing one.</p><div class="inline" style="margin-top:10px"><button class="btn btn--ghost btn--sm" type="button" data-test="x">Test X credentials</button></div></div>
+          </div>
+          <div class="form__actions"><button class="btn btn--primary" type="submit">Save sign-in keys</button><span class="form__hint">Only fields you fill in are changed.</span></div>
+          <p class="form__result" id="oauth-result"></p>
         </form>`;
       $('#gateways-form').addEventListener('submit', async e => {
         e.preventDefault(); const out = $('#gateways-result'); out.classList.remove('is-error');
         try { const j = await api('/api/admin/gateways', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Gateway keys saved'); loadGateways(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
       });
+      $('#oauth-form').addEventListener('submit', async e => {
+        e.preventDefault(); const out = $('#oauth-result'); out.classList.remove('is-error');
+        try { const j = await api('/api/admin/gateways', { method: 'POST', body: new FormData(e.target) }); out.textContent = j.changed.length ? 'Saved: ' + j.changed.join(', ') : 'Nothing changed.'; toast('Sign-in keys saved'); loadGateways(); } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
+      });
       box.addEventListener('click', async e => {
         const t = e.target.closest('[data-test]'), c = e.target.closest('[data-clear]');
-        const out = $('#gateways-result');
-        if (t) { t.disabled = true; out.classList.remove('is-error'); out.textContent = 'Checking…'; try { const j = await api('/api/admin/gateways/test', { method: 'POST', body: fd({ gateway: t.dataset.test }) }); out.textContent = j.message; } catch (err) { out.classList.add('is-error'); out.textContent = err.message; } t.disabled = false; }
+        const resultFor = el => el.closest('form')?.querySelector('.form__result') || $('#gateways-result');
+        if (t) { const out = resultFor(t); t.disabled = true; out.classList.remove('is-error'); out.textContent = 'Checking…'; try { const j = await api('/api/admin/gateways/test', { method: 'POST', body: fd({ gateway: t.dataset.test }) }); out.textContent = j.message; } catch (err) { out.classList.add('is-error'); out.textContent = err.message; } t.disabled = false; }
         if (c) { e.preventDefault(); if (!confirm('Remove this key from the newsroom store?')) return; try { await api('/api/admin/gateways', { method: 'POST', body: fd({ ['clear_' + c.dataset.clear]: '1' }) }); toast('Removed'); loadGateways(); } catch (err) { toast(err.message); } }
       });
     } catch (e) { box.hidden = true; }
   }
+  async function loadPush() {
+    const box = $('#push-status'); if (!box) return;
+    try {
+      const j = await api('/api/admin/push');
+      box.innerHTML = `<h2>Breaking-news push notifications</h2><p style="margin:8px 0">Standard Web Push — no app, no third-party service. Send one from the "Push" button on any published story in Stories. State-scoped: readers following a state get pushes for that state's stories plus nationally-subscribed readers.</p><p class="mono">Status: <b class="${j.configured ? 'is-good' : 'is-bad'}">${j.configured ? 'ready' : 'not available (composer install needed)'}</b> · ${j.subscribers} subscriber${j.subscribers === 1 ? '' : 's'}</p>`;
+    } catch (e) { box.hidden = true; }
+  }
   async function loadSettings() {
-    loadMail(); loadGateways();
+    loadMail(); loadGateways(); loadPush();
     try {
       const s = await api('/api/admin/settings');
       const groups = {};
       Object.entries(s).forEach(([k, v]) => { (groups[v.group] ??= []).push([k, v]); });
-      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://menews.ie"' : ''}>`}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
+      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://bharatwire.in"' : ''}>`}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
       $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(field).join('')}</div></details>` : items.map(field).join('')).join('');
     } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
   }

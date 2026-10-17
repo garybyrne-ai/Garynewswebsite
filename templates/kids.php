@@ -4,7 +4,7 @@
     <?= \MeNews\View::partial('partials/paper-head', ['edition' => $edition, 'longDate' => $longDate]) ?>
     <div class="paper__lead">
       <h1><span class="dropcap">W</span>elcome to the puzzle corner.</h1>
-      <p>Every morning The Junior Post prints a brand-new crossword, a word search, five quiz questions and a new Irish word. Nothing to buy, nothing to download — grab a pencil or play on screen. Grown-ups get a bigger crossword too.</p>
+      <p>Every morning The Junior Post prints a brand-new crossword, a word search, five quiz questions and a new Hindi word. Nothing to buy, nothing to download — grab a pencil or play on screen. Grown-ups get a bigger crossword too.</p>
     </div>
 
     <div class="paper__cols paper__cols--3">
@@ -12,7 +12,7 @@
         <span class="paper__stamp">Daily</span>
         <h2>Crossword No. <?= (int)$crossword['edition'] ?></h2>
         <div class="xw-mini xw-mini--lg" aria-hidden="true"><?php for ($r = 0; $r < min(7, $crossword['rows']); $r++): for ($c = 0; $c < min(9, $crossword['cols']); $c++): ?><i class="<?= $crossword['cells'][$r][$c] === null ? 'is-block' : '' ?>"></i><?php endfor; endfor; ?></div>
-        <p><?= (int)$crossword['words'] ?> Irish-flavoured clues in the junior grid. Switch to the grown-up grid for a proper challenge. Print it, or solve it on screen with check and reveal.</p>
+        <p><?= (int)$crossword['words'] ?> India-flavoured clues in the junior grid. Switch to the grown-up grid for a proper challenge. Print it, or solve it on screen with check and reveal.</p>
         <span class="btn btn--dark">Solve today's crossword →</span>
       </a>
       <a class="paper__item paper__item--big" href="/kids/wordsearch">
@@ -24,9 +24,9 @@
       </a>
       <a class="paper__item paper__item--big" href="/kids/quiz">
         <span class="paper__stamp">Quiz</span>
-        <h2>Know Your Ireland</h2>
+        <h2>Know Your India</h2>
         <?php if ($q): ?><p><b>Q1.</b> <?= e($q['q']) ?></p><ul class="paper__opts"><?php foreach ($q['options'] as $o): ?><li><?= e($o) ?></li><?php endforeach; ?></ul><?php endif; ?>
-        <p>Five questions a day about our island. Every answer comes with a fact worth remembering.</p>
+        <p>Five questions a day about our country. Every answer comes with a fact worth remembering.</p>
         <span class="btn btn--dark">Take the quiz →</span>
       </a>
     </div>
@@ -35,16 +35,16 @@
 
     <div class="paper__cols paper__cols--3">
       <div class="paper__item">
-        <span class="paper__stamp">Gaeilge</span>
-        <h2>Focal an lae</h2>
-        <p class="paper__focal paper__focal--lg"><b><?= e($focal['irish']) ?></b><span><?= e($focal['english']) ?></span><small>say: <?= e($focal['say']) ?></small></p>
+        <span class="paper__stamp">Hindi</span>
+        <h2>Shabd of the day</h2>
+        <p class="paper__focal paper__focal--lg"><b><?= e($focal['hindi']) ?></b><span><?= e($focal['english']) ?></span><small>say: <?= e($focal['say']) ?></small></p>
         <p><em><?= e($focal['example']) ?></em></p>
         <p>A new word every day. Learn one, use it at the dinner table tonight.</p>
       </div>
       <a class="paper__item" href="/kids/county-game">
         <span class="paper__stamp">Map game</span>
-        <h2>Find the County</h2>
-        <p>Ten counties, one map, no labels. Tap where you think Co. Leitrim is — then find out how close you were. Can you get all ten?</p>
+        <h2>Find the State</h2>
+        <p>Ten states, one map, no labels. Tap where you think Nagaland is — then find out how close you were. Can you get all ten?</p>
         <span class="btn btn--dark">Play →</span>
       </a>
       <div class="paper__item">
@@ -67,7 +67,7 @@
     <?php endif; ?>
 
     <div class="paper__rule"></div>
-    <h2 class="paper__section" id="free">Free things to do across Ireland</h2>
+    <h2 class="paper__section" id="free">Free things to do across India</h2>
     <p class="paper__note">All genuinely free. Check opening times before you travel.</p>
     <div class="paper__cols paper__cols--3 paper__cols--tight">
       <?php foreach ($stuff as $item): ?>
@@ -79,6 +79,6 @@
         </a>
       <?php endforeach; ?>
     </div>
-    <footer class="paper__foot mono"><span>The Junior Post is part of ME News Ireland</span><span>Puzzles reset at midnight, Irish time</span><span>Yesterday's puzzles are in the archive on each puzzle page</span></footer>
+    <footer class="paper__foot mono"><span>The Junior Post is part of Bharat Wire India</span><span>Puzzles reset at midnight, Indian time</span><span>Yesterday's puzzles are in the archive on each puzzle page</span></footer>
   </div>
 </div>

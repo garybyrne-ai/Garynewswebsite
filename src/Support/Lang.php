@@ -10,18 +10,19 @@ namespace MeNews\Support;
  */
 final class Lang
 {
-    public const DEFAULT = 'en-GB';
+    public const DEFAULT = 'en-IN';
     public const COOKIE = 'me_lang';
 
     /** code => [label in English, native name, Google Translate code (null = no translation), flag] */
     public const LANGS = [
-        'en-GB' => ['English (UK)', 'English (UK)', null, '🇬🇧'],
+        'en-IN' => ['English (India)', 'English (India)', null, '🇮🇳'],
         'en-US' => ['English (US)', 'English (US)', null, '🇺🇸'],
-        'ga' => ['Irish', 'Gaeilge', 'ga', '🇮🇪'],
-        'pl' => ['Polish', 'Polski', 'pl', '🇵🇱'],
-        'de' => ['German', 'Deutsch', 'de', '🇩🇪'],
-        'uk' => ['Ukrainian', 'Українська', 'uk', '🇺🇦'],
-        'ru' => ['Russian', 'Русский', 'ru', '🇷🇺'],
+        'hi' => ['Hindi', 'हिन्दी', 'hi', '🇮🇳'],
+        'bn' => ['Bengali', 'বাংলা', 'bn', '🇮🇳'],
+        'te' => ['Telugu', 'తెలుగు', 'te', '🇮🇳'],
+        'mr' => ['Marathi', 'मराठी', 'mr', '🇮🇳'],
+        'ta' => ['Tamil', 'தமிழ்', 'ta', '🇮🇳'],
+        'ur' => ['Urdu', 'اردو', 'ur', '🇮🇳'],
     ];
 
     private static ?string $current = null;
@@ -83,5 +84,20 @@ final class Lang
     public static function nativeName(?string $code = null): string
     {
         return self::LANGS[$code ?? self::current()][1];
+    }
+
+    /** Chrome language codes that also have real wire coverage in that language (see config/sources.json). */
+    private const STORY_LANGUAGES = ['hi', 'bn', 'te', 'mr', 'ta', 'ur'];
+
+    /**
+     * The current chrome language, mapped to a story `language` column value — every chrome
+     * language here has real wire coverage, English included, so this is never null: picking
+     * a language is meant to show only that language's stories (Stories::feedLang() tops up
+     * with English only when that language alone doesn't fill the slot).
+     */
+    public static function storyLanguage(): string
+    {
+        $code = self::current();
+        return str_starts_with($code, 'en') ? 'en' : (in_array($code, self::STORY_LANGUAGES, true) ? $code : 'en');
     }
 }

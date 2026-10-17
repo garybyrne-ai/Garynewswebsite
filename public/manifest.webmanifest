@@ -1,10 +1,18 @@
 {
-  "name": "ME News Ireland",
-  "short_name": "ME News",
+  "name": "Bharat Wire India",
+  "short_name": "Bharat Wire",
   "description": "Your Community. Your News. Live.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#139a5c",
   "theme_color": "#139a5c",
-  "icons": [{ "src": "/assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+  "lang": "en-IN",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/assets/img/logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/logo-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }

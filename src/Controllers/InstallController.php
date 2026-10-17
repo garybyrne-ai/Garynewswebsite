@@ -22,7 +22,7 @@ final class InstallController
     public static function guard(): void
     {
         if (Database::installed()) {
-            throw new HttpException(404, 'ME News is already installed.');
+            throw new HttpException(404, 'Bharat Wire is already installed.');
         }
     }
 

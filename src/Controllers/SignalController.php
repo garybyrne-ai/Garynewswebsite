@@ -30,7 +30,7 @@ final class SignalController
         unset($s);
         return View::page('signal', [
             'user' => $user, 'nav' => Categories::NAV,
-            'title' => 'The Signal — Ireland\'s most-voted stories — ME News Ireland',
+            'title' => 'The Signal — India\'s most-voted stories — Bharat Wire India',
             'description' => 'Readers vote on why a story matters. The Signal ranks them with a transparent, locality-aware algorithm.',
             'board' => $board, 'window' => $window, 'county' => $county, 'counties' => Locations::countyNames(),
             'stats' => Signal::stats(), 'signals' => Signal::SIGNALS, 'myCounty' => Visitor::locality(1)['county'] ?? null,

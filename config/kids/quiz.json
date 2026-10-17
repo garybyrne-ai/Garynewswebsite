@@ -1,665 +1,665 @@
 {
- "_comment": "Ireland quiz bank. Option index 'answer' is the correct one; options are shuffled at play time.",
+ "_comment": "Know Your India quiz bank. Option index 'answer' is the correct one; options are shuffled at play time.",
  "questions": [
   {
-   "q": "What is the capital city of Ireland?",
+   "q": "What is the capital city of India?",
    "options": [
-    "Dublin",
-    "Cork",
-    "Galway",
-    "Belfast"
+    "New Delhi",
+    "Mumbai",
+    "Kolkata",
+    "Chennai"
    ],
    "answer": 0,
-   "fact": "Dublin (Baile Átha Cliath) has been Ireland's capital for centuries."
+   "fact": "New Delhi has served as India's capital since 1911."
   },
   {
-   "q": "Which is Ireland's longest river?",
+   "q": "Which is India's longest river?",
    "options": [
-    "Shannon",
-    "Liffey",
-    "Boyne",
-    "Lee"
+    "Ganga",
+    "Godavari",
+    "Yamuna",
+    "Krishna"
    ],
    "answer": 0,
-   "fact": "The Shannon runs about 360 km from Cavan to the Atlantic below Limerick."
+   "fact": "The Ganga flows about 2,525 km from the Himalayas to the Bay of Bengal."
   },
   {
-   "q": "Ireland's highest mountain is…",
+   "q": "Which is India's highest mountain peak?",
    "options": [
-    "Carrauntoohil",
-    "Errigal",
-    "Lugnaquilla",
-    "Croagh Patrick"
+    "Kangchenjunga",
+    "Nanda Devi",
+    "K2",
+    "Anamudi"
    ],
    "answer": 0,
-   "fact": "Carrauntoohil in Kerry's MacGillycuddy's Reeks is 1,039 m high."
+   "fact": "Kangchenjunga (8,586 m) sits on the India-Nepal border; K2 lies in Pakistan-administered territory."
   },
   {
-   "q": "How many provinces does Ireland have?",
+   "q": "How many states does India have?",
    "options": [
+    "28",
+    "27",
+    "29",
+    "25"
+   ],
+   "answer": 0,
+   "fact": "India has 28 states and 8 union territories."
+  },
+  {
+   "q": "Which is India's largest state by area?",
+   "options": [
+    "Rajasthan",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Uttar Pradesh"
+   ],
+   "answer": 0,
+   "fact": "Rajasthan covers more than 342,000 square kilometres."
+  },
+  {
+   "q": "Which state is called 'God's Own Country'?",
+   "options": [
+    "Kerala",
+    "Goa",
+    "Karnataka",
+    "Tamil Nadu"
+   ],
+   "answer": 0,
+   "fact": "Kerala is famous for its backwaters, beaches and greenery."
+  },
+  {
+   "q": "The Taj Mahal stands in which city?",
+   "options": [
+    "Agra",
+    "Delhi",
+    "Jaipur",
+    "Lucknow"
+   ],
+   "answer": 0,
+   "fact": "It was built by Emperor Shah Jahan in memory of Mumtaz Mahal."
+  },
+  {
+   "q": "What is India's national animal?",
+   "options": [
+    "Tiger",
+    "Lion",
+    "Elephant",
+    "Peacock"
+   ],
+   "answer": 0,
+   "fact": "The Bengal tiger was named India's national animal in 1973."
+  },
+  {
+   "q": "What is India's national bird?",
+   "options": [
+    "Peacock",
+    "Parrot",
+    "Crane",
+    "Eagle"
+   ],
+   "answer": 0,
+   "fact": "The peacock was declared the national bird in 1963."
+  },
+  {
+   "q": "What is India's national flower?",
+   "options": [
+    "Lotus",
+    "Rose",
+    "Marigold",
+    "Jasmine"
+   ],
+   "answer": 0,
+   "fact": "The lotus is admired for blooming clean even from muddy water."
+  },
+  {
+   "q": "What is India's national fruit?",
+   "options": [
+    "Mango",
+    "Banana",
+    "Papaya",
+    "Guava"
+   ],
+   "answer": 0,
+   "fact": "India grows hundreds of mango varieties, including Alphonso and Dasheri."
+  },
+  {
+   "q": "What is India's national tree?",
+   "options": [
+    "Banyan",
+    "Neem",
+    "Peepal",
+    "Mango"
+   ],
+   "answer": 0,
+   "fact": "The banyan can grow huge aerial roots that look like extra trunks."
+  },
+  {
+   "q": "What is the currency of India?",
+   "options": [
+    "Rupee",
+    "Taka",
+    "Rial",
+    "Dinar"
+   ],
+   "answer": 0,
+   "fact": "The rupee symbol ₹ was officially adopted in 2010."
+  },
+  {
+   "q": "Which festival is known as the 'Festival of Lights'?",
+   "options": [
+    "Diwali",
+    "Holi",
+    "Eid",
+    "Onam"
+   ],
+   "answer": 0,
+   "fact": "Diwali is marked by lighting rows of small clay lamps called diyas."
+  },
+  {
+   "q": "Which festival is known as the 'Festival of Colours'?",
+   "options": [
+    "Holi",
+    "Diwali",
+    "Pongal",
+    "Navratri"
+   ],
+   "answer": 0,
+   "fact": "People throw coloured powder called gulal to celebrate the arrival of spring."
+  },
+  {
+   "q": "India's men's hockey team has won how many Olympic gold medals?",
+   "options": [
+    "Eight",
     "Four",
-    "Three",
-    "Five",
+    "Two",
     "Six"
    ],
    "answer": 0,
-   "fact": "Leinster, Munster, Connacht and Ulster."
+   "fact": "India dominated Olympic hockey for decades, winning golds from 1928 to 1980."
   },
   {
-   "q": "Ireland's largest lake is…",
+   "q": "Who is known as the 'Father of the Nation' in India?",
    "options": [
-    "Lough Neagh",
-    "Lough Corrib",
-    "Lough Derg",
-    "Lough Erne"
+    "Mahatma Gandhi",
+    "Jawaharlal Nehru",
+    "Sardar Patel",
+    "Subhas Chandra Bose"
    ],
    "answer": 0,
-   "fact": "Lough Neagh in the north is the biggest lake on the island."
+   "fact": "Gandhi led India's independence movement through non-violent protest."
   },
   {
-   "q": "The Cliffs of Moher are in which county?",
+   "q": "Who was India's first Prime Minister?",
    "options": [
-    "Clare",
-    "Kerry",
-    "Galway",
-    "Mayo"
+    "Jawaharlal Nehru",
+    "Mahatma Gandhi",
+    "Rajendra Prasad",
+    "Sardar Patel"
    ],
    "answer": 0,
-   "fact": "They rise over 200 m above the Atlantic near Doolin."
+   "fact": "Nehru served as Prime Minister from 1947 until his death in 1964."
   },
   {
-   "q": "Which plant is a symbol of Ireland?",
+   "q": "Who was India's first President?",
    "options": [
-    "Shamrock",
-    "Rose",
-    "Thistle",
-    "Daffodil"
+    "Rajendra Prasad",
+    "Jawaharlal Nehru",
+    "Zakir Husain",
+    "S. Radhakrishnan"
    ],
    "answer": 0,
-   "fact": "Saint Patrick is said to have used its three leaves to explain the Trinity."
+   "fact": "Rajendra Prasad held office from 1950 to 1962."
   },
   {
-   "q": "Saint Patrick's Day is on…",
+   "q": "In which year did India gain independence from British rule?",
    "options": [
-    "17 March",
-    "1 February",
-    "23 June",
-    "31 October"
+    "1947",
+    "1945",
+    "1950",
+    "1930"
    ],
    "answer": 0,
-   "fact": "It is Ireland's national holiday."
+   "fact": "India became independent on 15 August 1947."
   },
   {
-   "q": "What currency is used in the Republic of Ireland?",
+   "q": "In which year did India become a republic?",
    "options": [
-    "Euro",
-    "Punt",
-    "Pound",
-    "Dollar"
+    "1950",
+    "1947",
+    "1952",
+    "1935"
    ],
    "answer": 0,
-   "fact": "The euro replaced the Irish punt in 2002."
+   "fact": "India adopted its Constitution and became a republic on 26 January 1950."
   },
   {
-   "q": "Which GAA sport uses a sliotar?",
+   "q": "Who wrote India's national anthem, 'Jana Gana Mana'?",
    "options": [
-    "Hurling",
-    "Gaelic football",
-    "Handball",
-    "Rounders"
+    "Rabindranath Tagore",
+    "Bankim Chandra Chattopadhyay",
+    "Sarojini Naidu",
+    "Muhammad Iqbal"
    ],
    "answer": 0,
-   "fact": "A sliotar is the small leather ball; camogie uses one too."
+   "fact": "Tagore, a Bengali poet, also won the Nobel Prize in Literature in 1913."
   },
   {
-   "q": "Croke Park is in which city?",
+   "q": "Who wrote 'Vande Mataram', India's national song?",
    "options": [
-    "Dublin",
-    "Cork",
-    "Limerick",
-    "Galway"
+    "Bankim Chandra Chattopadhyay",
+    "Rabindranath Tagore",
+    "Muhammad Iqbal",
+    "Subramania Bharati"
    ],
    "answer": 0,
-   "fact": "It holds over 82,000 people and is the GAA's headquarters."
+   "fact": "It first appeared in his 1882 novel Anandamath."
   },
   {
-   "q": "Where is the Book of Kells kept?",
+   "q": "How many colours are on the Indian flag?",
    "options": [
-    "Trinity College Dublin",
-    "The National Museum",
-    "Kells, Co. Meath",
-    "Kilkenny Castle"
-   ],
-   "answer": 0,
-   "fact": "The 9th-century manuscript is displayed in the Old Library."
-  },
-  {
-   "q": "The Titanic was built in…",
-   "options": [
-    "Belfast",
-    "Cobh",
-    "Dublin",
-    "Liverpool"
-   ],
-   "answer": 0,
-   "fact": "Harland & Wolff built her; she last called at Cobh in 1912."
-  },
-  {
-   "q": "Which county is called the Garden of Ireland?",
-   "options": [
-    "Wicklow",
-    "Kildare",
-    "Meath",
-    "Wexford"
-   ],
-   "answer": 0,
-   "fact": "Home to Powerscourt, Glendalough and the Wicklow Mountains."
-  },
-  {
-   "q": "Ireland's smallest county is…",
-   "options": [
-    "Louth",
-    "Carlow",
-    "Dublin",
-    "Longford"
-   ],
-   "answer": 0,
-   "fact": "Louth is called the Wee County."
-  },
-  {
-   "q": "Ireland's largest county is…",
-   "options": [
-    "Cork",
-    "Galway",
-    "Mayo",
-    "Donegal"
-   ],
-   "answer": 0,
-   "fact": "Cork is known as the Rebel County."
-  },
-  {
-   "q": "Newgrange is in which county?",
-   "options": [
-    "Meath",
-    "Louth",
-    "Kildare",
-    "Westmeath"
-   ],
-   "answer": 0,
-   "fact": "The passage tomb is older than Stonehenge and the pyramids of Giza."
-  },
-  {
-   "q": "The Giant's Causeway is in which county?",
-   "options": [
-    "Antrim",
-    "Derry",
-    "Down",
-    "Donegal"
-   ],
-   "answer": 0,
-   "fact": "Legend says Finn McCool built it to reach Scotland."
-  },
-  {
-   "q": "How do you say hello in Irish?",
-   "options": [
-    "Dia duit",
-    "Slán",
-    "Go raibh maith agat",
-    "Fáilte"
-   ],
-   "answer": 0,
-   "fact": "It literally means 'God be with you'."
-  },
-  {
-   "q": "What is the Irish word for water?",
-   "options": [
-    "Uisce",
-    "Bainne",
-    "Tae",
-    "Arán"
-   ],
-   "answer": 0,
-   "fact": "Whiskey comes from 'uisce beatha', the water of life."
-  },
-  {
-   "q": "Who wrote Ulysses?",
-   "options": [
-    "James Joyce",
-    "W. B. Yeats",
-    "Oscar Wilde",
-    "Seamus Heaney"
-   ],
-   "answer": 0,
-   "fact": "The novel follows Leopold Bloom around Dublin on 16 June 1904."
-  },
-  {
-   "q": "Which Irish poet won the Nobel Prize in Literature in 1995?",
-   "options": [
-    "Seamus Heaney",
-    "W. B. Yeats",
-    "Samuel Beckett",
-    "Patrick Kavanagh"
-   ],
-   "answer": 0,
-   "fact": "Heaney was born in Co. Derry."
-  },
-  {
-   "q": "W. B. Yeats is buried in which county?",
-   "options": [
-    "Sligo",
-    "Galway",
-    "Dublin",
-    "Mayo"
-   ],
-   "answer": 0,
-   "fact": "His grave at Drumcliffe lies under Ben Bulben."
-  },
-  {
-   "q": "What is Dublin's tram system called?",
-   "options": [
-    "Luas",
-    "DART",
-    "Leap",
-    "Rapid"
-   ],
-   "answer": 0,
-   "fact": "Luas is the Irish word for speed."
-  },
-  {
-   "q": "What are the letters of Ireland's national broadcaster?",
-   "options": [
-    "RTÉ",
-    "BBC",
-    "TG3",
-    "IRN"
-   ],
-   "answer": 0,
-   "fact": "Raidió Teilifís Éireann."
-  },
-  {
-   "q": "What is the head of the Irish Government called?",
-   "options": [
-    "Taoiseach",
-    "Tánaiste",
-    "President",
-    "Ceann Comhairle"
-   ],
-   "answer": 0,
-   "fact": "The Tánaiste is the deputy."
-  },
-  {
-   "q": "Where does the President of Ireland live?",
-   "options": [
-    "Áras an Uachtaráin",
-    "Leinster House",
-    "Dublin Castle",
-    "Farmleigh"
-   ],
-   "answer": 0,
-   "fact": "It stands in the Phoenix Park."
-  },
-  {
-   "q": "Ireland's oldest city is…",
-   "options": [
-    "Waterford",
-    "Dublin",
-    "Cork",
-    "Limerick"
-   ],
-   "answer": 0,
-   "fact": "Founded by Vikings in 914."
-  },
-  {
-   "q": "The Aran Islands are off which county?",
-   "options": [
-    "Galway",
-    "Clare",
-    "Kerry",
-    "Mayo"
-   ],
-   "answer": 0,
-   "fact": "Inis Mór, Inis Meáin and Inis Oírr."
-  },
-  {
-   "q": "Skellig Michael is off which county?",
-   "options": [
-    "Kerry",
-    "Cork",
-    "Clare",
-    "Donegal"
-   ],
-   "answer": 0,
-   "fact": "Its beehive huts appeared in Star Wars."
-  },
-  {
-   "q": "Which river flows through Cork city?",
-   "options": [
-    "Lee",
-    "Shannon",
-    "Suir",
-    "Blackwater"
-   ],
-   "answer": 0,
-   "fact": "The city centre sits on an island in the Lee."
-  },
-  {
-   "q": "Which river flows through Dublin?",
-   "options": [
-    "Liffey",
-    "Boyne",
-    "Dodder",
-    "Tolka"
-   ],
-   "answer": 0,
-   "fact": "The Dodder and Tolka are Dublin rivers too, but the Liffey is the big one."
-  },
-  {
-   "q": "Croagh Patrick is in which county?",
-   "options": [
-    "Mayo",
-    "Galway",
-    "Sligo",
-    "Donegal"
-   ],
-   "answer": 0,
-   "fact": "Pilgrims climb 'the Reek' on the last Sunday of July."
-  },
-  {
-   "q": "What are the colours of the Irish flag, in order?",
-   "options": [
-    "Green, white, orange",
-    "Orange, white, green",
-    "Green, gold, white",
-    "White, green, orange"
-   ],
-   "answer": 0,
-   "fact": "Green for the Gaelic tradition, orange for the followers of William of Orange, white for peace."
-  },
-  {
-   "q": "Which instrument appears on Irish euro coins?",
-   "options": [
-    "Harp",
-    "Fiddle",
-    "Bodhrán",
-    "Uilleann pipes"
-   ],
-   "answer": 0,
-   "fact": "The harp has been Ireland's emblem for centuries."
-  },
-  {
-   "q": "Which city is the City of the Tribes?",
-   "options": [
-    "Galway",
-    "Limerick",
-    "Kilkenny",
-    "Waterford"
-   ],
-   "answer": 0,
-   "fact": "Named after the 14 merchant families who ran the town."
-  },
-  {
-   "q": "Kilkenny is most famous for which sport?",
-   "options": [
-    "Hurling",
-    "Rugby",
-    "Soccer",
-    "Rowing"
-   ],
-   "answer": 0,
-   "fact": "The Cats have won the Liam MacCarthy Cup many times."
-  },
-  {
-   "q": "Donegal is in which province?",
-   "options": [
-    "Ulster",
-    "Connacht",
-    "Leinster",
-    "Munster"
-   ],
-   "answer": 0,
-   "fact": "Three Ulster counties are in the Republic: Donegal, Cavan and Monaghan."
-  },
-  {
-   "q": "Kerry is in which province?",
-   "options": [
-    "Munster",
-    "Connacht",
-    "Leinster",
-    "Ulster"
-   ],
-   "answer": 0,
-   "fact": "Munster also includes Cork, Clare, Limerick, Tipperary and Waterford."
-  },
-  {
-   "q": "Galway is in which province?",
-   "options": [
-    "Connacht",
-    "Munster",
-    "Leinster",
-    "Ulster"
-   ],
-   "answer": 0,
-   "fact": "Connacht is the western province."
-  },
-  {
-   "q": "Dublin is in which province?",
-   "options": [
-    "Leinster",
-    "Munster",
-    "Connacht",
-    "Ulster"
-   ],
-   "answer": 0,
-   "fact": "Leinster has twelve counties."
-  },
-  {
-   "q": "What is Tír na nÓg?",
-   "options": [
-    "The land of eternal youth",
-    "A mountain in Kerry",
-    "An island in Lough Neagh",
-    "A famous hurling team"
-   ],
-   "answer": 0,
-   "fact": "Oisín rode there with Niamh on a white horse."
-  },
-  {
-   "q": "Who is known as the Hound of Ulster?",
-   "options": [
-    "Cúchulainn",
-    "Finn McCool",
-    "Brian Boru",
-    "Oisín"
-   ],
-   "answer": 0,
-   "fact": "As a boy he was called Setanta."
-  },
-  {
-   "q": "The Children of Lir were turned into…",
-   "options": [
-    "Swans",
-    "Deer",
-    "Seals",
-    "Ravens"
-   ],
-   "answer": 0,
-   "fact": "They spent 900 years as swans."
-  },
-  {
-   "q": "Fungie, who lived in Dingle harbour, was a…",
-   "options": [
-    "Dolphin",
-    "Seal",
-    "Whale",
-    "Basking shark"
-   ],
-   "answer": 0,
-   "fact": "He arrived in 1983 and stayed for decades."
-  },
-  {
-   "q": "Which ancient festival became Halloween?",
-   "options": [
-    "Samhain",
-    "Imbolc",
-    "Bealtaine",
-    "Lughnasa"
-   ],
-   "answer": 0,
-   "fact": "Samhain marked the end of the harvest and the start of winter."
-  },
-  {
-   "q": "How many times has Ireland won the Eurovision Song Contest?",
-   "options": [
-    "Seven",
     "Three",
-    "Five",
-    "Nine"
+    "Two",
+    "Four",
+    "Five"
    ],
    "answer": 0,
-   "fact": "More than any other country, including three in a row from 1992 to 1994."
+   "fact": "The flag has saffron, white and green bands with a navy blue wheel."
   },
   {
-   "q": "The Spire stands on which Dublin street?",
+   "q": "What symbol sits at the centre of the Indian flag?",
    "options": [
-    "O'Connell Street",
-    "Grafton Street",
-    "Dame Street",
-    "Henry Street"
+    "Ashoka Chakra",
+    "Lotus",
+    "Sun",
+    "Star"
    ],
    "answer": 0,
-   "fact": "It is 120 m tall."
+   "fact": "The wheel is taken from an Ashoka pillar at Sarnath."
   },
   {
-   "q": "How many counties are on the island of Ireland?",
+   "q": "How many spokes does the Ashoka Chakra have?",
    "options": [
-    "32",
-    "26",
-    "28",
-    "30"
+    "24",
+    "12",
+    "16",
+    "32"
    ],
    "answer": 0,
-   "fact": "26 in the Republic and 6 in Northern Ireland."
+   "fact": "The 24 spokes are said to represent the hours of the day."
   },
   {
-   "q": "What is the Dáil?",
+   "q": "Which river is considered the holiest in Hinduism?",
    "options": [
-    "The lower house of parliament",
-    "The upper house of parliament",
-    "The Supreme Court",
-    "The Central Bank"
+    "Ganga",
+    "Yamuna",
+    "Godavari",
+    "Narmada"
    ],
    "answer": 0,
-   "fact": "TDs sit in Dáil Éireann at Leinster House."
+   "fact": "Millions bathe in the Ganga each year, especially during the Kumbh Mela."
   },
   {
-   "q": "Molly Malone sold…",
+   "q": "The Thar Desert lies mainly in which state?",
    "options": [
-    "Cockles and mussels",
-    "Apples and pears",
-    "Fish and chips",
-    "Flowers"
+    "Rajasthan",
+    "Gujarat",
+    "Punjab",
+    "Haryana"
    ],
    "answer": 0,
-   "fact": "'Alive, alive-oh!' Her statue is on Suffolk Street."
+   "fact": "It is one of the most densely populated deserts in the world."
   },
   {
-   "q": "Which county is nicknamed The Kingdom?",
+   "q": "Which mountain range runs along India's northern border?",
    "options": [
-    "Kerry",
-    "Cork",
-    "Tipperary",
-    "Clare"
+    "Himalayas",
+    "Aravalli",
+    "Vindhya",
+    "Western Ghats"
    ],
    "answer": 0,
-   "fact": "Kerry has won more All-Ireland football titles than anyone."
+   "fact": "The Himalayas contain many of the world's highest peaks."
   },
   {
-   "q": "The Sam Maguire Cup is awarded in…",
+   "q": "Which is India's smallest state by area?",
    "options": [
-    "Gaelic football",
-    "Hurling",
-    "Rugby",
-    "Camogie"
+    "Goa",
+    "Sikkim",
+    "Tripura",
+    "Nagaland"
    ],
    "answer": 0,
-   "fact": "The hurling equivalent is the Liam MacCarthy Cup."
+   "fact": "Goa covers under 3,702 square kilometres."
   },
   {
-   "q": "Limerick is nicknamed…",
+   "q": "Which union territory was once a French colony?",
    "options": [
-    "The Treaty City",
-    "The Marble City",
-    "The Rebel City",
-    "The Tribes"
+    "Puducherry",
+    "Goa",
+    "Daman",
+    "Diu"
    ],
    "answer": 0,
-   "fact": "After the Treaty of Limerick of 1691."
+   "fact": "France returned Puducherry to India in 1954."
   },
   {
-   "q": "The Rock of Cashel is in which county?",
+   "q": "Which city is nicknamed the 'Silicon Valley of India'?",
    "options": [
-    "Tipperary",
-    "Kilkenny",
-    "Limerick",
-    "Cork"
+    "Bengaluru",
+    "Hyderabad",
+    "Pune",
+    "Chennai"
    ],
    "answer": 0,
-   "fact": "It was the seat of the Kings of Munster."
+   "fact": "Bengaluru is home to thousands of technology companies."
   },
   {
-   "q": "Which Irish saint's cross is woven from rushes?",
+   "q": "Which city is known as the 'City of Joy'?",
    "options": [
-    "Brigid",
-    "Patrick",
-    "Colmcille",
-    "Kevin"
+    "Kolkata",
+    "Mumbai",
+    "Delhi",
+    "Chennai"
    ],
    "answer": 0,
-   "fact": "Saint Brigid's Day, 1 February, is now a public holiday."
+   "fact": "Kolkata is famous for its trams, literature and sweets."
   },
   {
-   "q": "What does 'Slán' mean?",
+   "q": "Which city is called the 'Pink City'?",
    "options": [
-    "Goodbye",
-    "Hello",
-    "Thank you",
-    "Please"
+    "Jaipur",
+    "Jodhpur",
+    "Udaipur",
+    "Bikaner"
    ],
    "answer": 0,
-   "fact": "Slán go fóill means 'bye for now'."
+   "fact": "Jaipur's old city was painted pink in 1876 to welcome a royal visitor."
   },
   {
-   "q": "Which county is known as the Rebel County?",
+   "q": "Which city is called the 'Blue City'?",
    "options": [
-    "Cork",
-    "Kerry",
-    "Wexford",
-    "Tipperary"
+    "Jodhpur",
+    "Jaipur",
+    "Udaipur",
+    "Jaisalmer"
    ],
    "answer": 0,
-   "fact": "The name goes back to the 1490s."
+   "fact": "Many houses in old Jodhpur are painted a striking blue."
   },
   {
-   "q": "Which Irish city is called the Marble City?",
+   "q": "Which city is nicknamed the 'City of Lakes'?",
    "options": [
-    "Kilkenny",
-    "Galway",
-    "Waterford",
-    "Derry"
+    "Udaipur",
+    "Bhopal",
+    "Nainital",
+    "Srinagar"
    ],
    "answer": 0,
-   "fact": "Its dark limestone polishes like marble."
+   "fact": "Udaipur is built around several artificial and natural lakes."
   },
   {
-   "q": "Bunratty Castle is in which county?",
+   "q": "Assam is especially famous for producing which crop?",
    "options": [
-    "Clare",
-    "Limerick",
-    "Galway",
-    "Tipperary"
+    "Tea",
+    "Coffee",
+    "Cotton",
+    "Sugarcane"
    ],
    "answer": 0,
-   "fact": "It stands near Shannon Airport."
+   "fact": "Assam grows a large share of the world's tea."
+  },
+  {
+   "q": "Which Indian epic tells the story of Rama and Sita?",
+   "options": [
+    "Ramayana",
+    "Mahabharata",
+    "Purana",
+    "Gita"
+   ],
+   "answer": 0,
+   "fact": "It was composed by the sage Valmiki."
+  },
+  {
+   "q": "Which epic contains the Bhagavad Gita?",
+   "options": [
+    "Mahabharata",
+    "Ramayana",
+    "Vedas",
+    "Upanishads"
+   ],
+   "answer": 0,
+   "fact": "The Gita is Krishna's conversation with the warrior Arjuna."
+  },
+  {
+   "q": "Which classical dance form comes from Tamil Nadu?",
+   "options": [
+    "Bharatanatyam",
+    "Kathak",
+    "Odissi",
+    "Kathakali"
+   ],
+   "answer": 0,
+   "fact": "It is one of the oldest classical dance forms in India."
+  },
+  {
+   "q": "Which classical dance form from Kerala uses elaborate face paint?",
+   "options": [
+    "Kathakali",
+    "Bharatanatyam",
+    "Manipuri",
+    "Garba"
+   ],
+   "answer": 0,
+   "fact": "Performers can take hours to apply their vivid make-up."
+  },
+  {
+   "q": "Which classical dance form from North India is known for fast spins?",
+   "options": [
+    "Kathak",
+    "Bharatanatyam",
+    "Odissi",
+    "Mohiniyattam"
+   ],
+   "answer": 0,
+   "fact": "Kathak developed in the courts of North Indian kings."
+  },
+  {
+   "q": "Sitar and tabla are both types of what?",
+   "options": [
+    "Musical instruments",
+    "Dances",
+    "Festivals",
+    "Fabrics"
+   ],
+   "answer": 0,
+   "fact": "The sitar is a stringed instrument and the tabla a pair of hand drums."
+  },
+  {
+   "q": "Which Indian scientist won the Nobel Prize in Physics in 1930?",
+   "options": [
+    "C.V. Raman",
+    "Homi Bhabha",
+    "S. Chandrasekhar",
+    "Har Gobind Khorana"
+   ],
+   "answer": 0,
+   "fact": "He discovered how light changes when it passes through matter — the Raman effect."
+  },
+  {
+   "q": "Who is known as the 'Missile Man of India' and later became President?",
+   "options": [
+    "A.P.J. Abdul Kalam",
+    "Vikram Sarabhai",
+    "Homi Bhabha",
+    "C.V. Raman"
+   ],
+   "answer": 0,
+   "fact": "Kalam helped develop India's satellite and missile programmes."
+  },
+  {
+   "q": "What is India's space agency called?",
+   "options": [
+    "ISRO",
+    "NASA",
+    "DRDO",
+    "CSIR"
+   ],
+   "answer": 0,
+   "fact": "ISRO stands for the Indian Space Research Organisation."
+  },
+  {
+   "q": "What was India's 2023 mission that landed near the Moon's south pole?",
+   "options": [
+    "Chandrayaan-3",
+    "Mangalyaan",
+    "Aditya-L1",
+    "Gaganyaan"
+   ],
+   "answer": 0,
+   "fact": "India became the first country to land near the lunar south pole."
+  },
+  {
+   "q": "What was India's first mission to Mars called?",
+   "options": [
+    "Mangalyaan",
+    "Chandrayaan",
+    "Aditya",
+    "Gaganyaan"
+   ],
+   "answer": 0,
+   "fact": "It reached Mars orbit in 2014 on its very first attempt."
+  },
+  {
+   "q": "How many times has India won the men's Cricket World Cup?",
+   "options": [
+    "Two",
+    "One",
+    "Three",
+    "Four"
+   ],
+   "answer": 0,
+   "fact": "India lifted the trophy in 1983 and 2011."
+  },
+  {
+   "q": "Who captained India to their first Cricket World Cup win in 1983?",
+   "options": [
+    "Kapil Dev",
+    "Sunil Gavaskar",
+    "MS Dhoni",
+    "Sachin Tendulkar"
+   ],
+   "answer": 0,
+   "fact": "India beat the West Indies in the final at Lord's."
+  },
+  {
+   "q": "Which cricketer is nicknamed the 'Master Blaster'?",
+   "options": [
+    "Sachin Tendulkar",
+    "Virat Kohli",
+    "MS Dhoni",
+    "Kapil Dev"
+   ],
+   "answer": 0,
+   "fact": "Tendulkar scored 100 international centuries during his career."
+  },
+  {
+   "q": "Which Indian city hosts the annual Pushkar Camel Fair?",
+   "options": [
+    "Pushkar",
+    "Jaisalmer",
+    "Bikaner",
+    "Jodhpur"
+   ],
+   "answer": 0,
+   "fact": "Thousands of camels, traders and tourists gather there each year."
+  },
+  {
+   "q": "Which festival involves flying kites to mark the start of the harvest season?",
+   "options": [
+    "Makar Sankranti",
+    "Holi",
+    "Diwali",
+    "Navratri"
+   ],
+   "answer": 0,
+   "fact": "Gujarat holds an especially famous International Kite Festival."
+  },
+  {
+   "q": "Onam, the harvest festival with snake-boat races, is celebrated in which state?",
+   "options": [
+    "Kerala",
+    "Tamil Nadu",
+    "Karnataka",
+    "Andhra Pradesh"
+   ],
+   "answer": 0,
+   "fact": "Onam also features the flower carpet design called pookalam."
+  },
+  {
+   "q": "Pongal, a major harvest festival, is celebrated mainly in which state?",
+   "options": [
+    "Tamil Nadu",
+    "Kerala",
+    "Andhra Pradesh",
+    "Odisha"
+   ],
+   "answer": 0,
+   "fact": "Families cook the festival dish, also called pongal, in a new clay pot."
+  },
+  {
+   "q": "Bihu is a major festival of which state?",
+   "options": [
+    "Assam",
+    "Manipur",
+    "Tripura",
+    "Nagaland"
+   ],
+   "answer": 0,
+   "fact": "Bihu is celebrated with traditional dance and music three times a year."
+  },
+  {
+   "q": "The Hornbill Festival is celebrated in which state?",
+   "options": [
+    "Nagaland",
+    "Manipur",
+    "Mizoram",
+    "Sikkim"
+   ],
+   "answer": 0,
+   "fact": "It brings together many of Nagaland's tribal communities each December."
+  },
+  {
+   "q": "The Sundarbans mangrove forest, home to the Royal Bengal Tiger, is found in which state?",
+   "options": [
+    "West Bengal",
+    "Odisha",
+    "Kerala",
+    "Gujarat"
+   ],
+   "answer": 0,
+   "fact": "It is the world's largest mangrove forest, shared with Bangladesh."
+  },
+  {
+   "q": "Kaziranga National Park, famous for the one-horned rhinoceros, is in which state?",
+   "options": [
+    "Assam",
+    "West Bengal",
+    "Odisha",
+    "Bihar"
+   ],
+   "answer": 0,
+   "fact": "Kaziranga is home to the largest population of the species in the world."
+  },
+  {
+   "q": "The Great Rann of Kutch, a vast white salt marsh, is found in which state?",
+   "options": [
+    "Gujarat",
+    "Rajasthan",
+    "Maharashtra",
+    "Punjab"
+   ],
+   "answer": 0,
+   "fact": "It hosts a colourful cultural festival called the Rann Utsav."
   }
  ]
 }

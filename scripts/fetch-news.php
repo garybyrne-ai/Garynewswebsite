@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Refresh the news wire from the real Irish sources in config/sources.json.
+ * Refresh the news wire from the real Indian sources in config/sources.json.
  * Run from cron every 15–20 minutes, e.g.:
  *   (cron) 15-minute interval:  php /var/www/menews/scripts/fetch-news.php >> /var/www/menews/storage/logs/wire.log 2>&1
  *

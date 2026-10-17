@@ -17,7 +17,7 @@ final class Stories
     }
 
     /**
-     * Published stories. Filters: q, category, county, location, kind, author, exclude, featured.
+     * Published stories. Filters: q, category, county, language, location, kind, author, exclude, featured.
      */
     public static function feed(array $f = [], int $limit = 40, int $offset = 0): array
     {
@@ -34,6 +34,10 @@ final class Stories
         if (!empty($f['county'])) {
             $sql .= ' AND s.county LIKE ?';
             $args[] = $f['county'];
+        }
+        if (!empty($f['language'])) {
+            $sql .= ' AND s.language=?';
+            $args[] = $f['language'];
         }
         if (!empty($f['location'])) {
             $sql .= ' AND (s.location_name LIKE ? OR s.local_area LIKE ? OR s.county LIKE ?)';
@@ -66,6 +70,58 @@ final class Stories
         return array_map([self::class, 'present'], Database::all($sql, $args));
     }
 
+    /**
+     * Like feed(), but when $lang is set, shows only stories originally reported in that language,
+     * topped up with English wire stories to fill the slot when that language doesn't have enough —
+     * so picking a language never leaves a section empty, it just prefers that language first.
+     */
+    public static function feedLang(array $f, int $limit, int $offset, ?string $lang): array
+    {
+        if (!$lang) {
+            return self::feed($f, $limit, $offset);
+        }
+        $nativeFilters = $f;
+        $nativeFilters['language'] = $lang;
+        $native = self::feed($nativeFilters, $limit, $offset);
+        if ($lang === 'en' || count($native) >= $limit) {
+            // Already English: a fallback pass would just re-run the same filter and find nothing new.
+            return $native;
+        }
+        $fallbackFilters = $f;
+        $fallbackFilters['language'] = 'en';
+        $fallbackFilters['exclude'] = array_merge($f['exclude'] ?? [], array_column($native, 'id'));
+        $fallback = self::feed($fallbackFilters, $limit - count($native), $offset);
+        return array_merge($native, $fallback);
+    }
+
+    /**
+     * A personalised mix: fresh stories from the visitor's state interleaved with fresh stories in
+     * their chosen language, deduplicated. Empty when neither preference is set, so the caller can
+     * skip the section entirely rather than show a redundant copy of the general feed.
+     */
+    public static function forYou(?string $county, ?string $language, array $exclude = [], int $limit = 8): array
+    {
+        if (!$county && !$language) {
+            return [];
+        }
+        $byCounty = $county ? self::feed(['county' => $county, 'exclude' => $exclude], $limit) : [];
+        $exclude = array_merge($exclude, array_column($byCounty, 'id'));
+        $byLanguage = $language ? self::feed(['language' => $language, 'exclude' => $exclude], $limit) : [];
+        $mixed = [];
+        for ($i = 0; count($mixed) < $limit && ($i < count($byCounty) || $i < count($byLanguage)); $i++) {
+            if (isset($byCounty[$i])) {
+                $mixed[] = $byCounty[$i];
+            }
+            if (count($mixed) >= $limit) {
+                break;
+            }
+            if (isset($byLanguage[$i])) {
+                $mixed[] = $byLanguage[$i];
+            }
+        }
+        return array_slice($mixed, 0, $limit);
+    }
+
     public static function countPublished(array $f = []): int
     {
         $sql = "SELECT COUNT(*) FROM stories s WHERE s.status='published'";
@@ -80,6 +136,13 @@ final class Stories
         if (!empty($f['county'])) {
             $sql .= ' AND s.county LIKE ?';
             $args[] = $f['county'];
+        }
+        if (!empty($f['language'])) {
+            $sql .= ' AND s.language=?';
+            $args[] = $f['language'];
+        } elseif (!empty($f['language_in'])) {
+            $sql .= ' AND s.language IN (' . implode(',', array_fill(0, count($f['language_in']), '?')) . ')';
+            array_push($args, ...$f['language_in']);
         }
         if (!empty($f['q'])) {
             $sql .= ' AND (s.title LIKE ? OR s.summary LIKE ? OR s.body LIKE ? OR s.location_name LIKE ? OR s.county LIKE ?)';
@@ -154,6 +217,59 @@ final class Stories
         $since = gmdate('Y-m-d\TH:i:s', time() - 3 * 86400) . '+00:00';
         $rows = Database::all(self::SELECT . " WHERE s.status='published' AND COALESCE(s.published_at,s.created_at)>? ORDER BY s.views DESC LIMIT ?", [$since, $limit]);
         return array_map([self::class, 'present'], $rows);
+    }
+
+    /** Record one view in the current hourly bucket, for the breakingNow() velocity score. */
+    public static function logView(string $storyId): void
+    {
+        $hour = gmdate('Y-m-d\TH:00');
+        Database::query(
+            'INSERT INTO story_view_hours(story_id,hour,views) VALUES(?,?,1)
+             ON CONFLICT(story_id,hour) DO UPDATE SET views=views+1',
+            [$storyId, $hour]
+        );
+    }
+
+    /**
+     * "Breaking now": ranked by recent reading velocity (views in the last 3 hours), not the
+     * cumulative total trending() uses — a story published an hour ago that's suddenly getting
+     * read a lot outranks an old story that quietly racked up views over days.
+     */
+    public static function breakingNow(int $limit = 6): array
+    {
+        $since = gmdate('Y-m-d\TH:i:s', time() - 48 * 3600) . '+00:00';
+        $fromHour = gmdate('Y-m-d\TH:00', time() - 3 * 3600);
+        $rows = Database::all(
+            self::SELECT . " JOIN (SELECT story_id, SUM(views) AS recent_views FROM story_view_hours WHERE hour>=? GROUP BY story_id) v ON v.story_id=s.id
+             WHERE s.status='published' AND COALESCE(s.published_at,s.created_at)>? AND v.recent_views>0
+             ORDER BY v.recent_views DESC LIMIT ?",
+            [$fromHour, $since, $limit]
+        );
+        return array_map([self::class, 'present'], $rows);
+    }
+
+    /**
+     * "Because you read X": the single most recent story a signed-in reader opened, plus a
+     * handful more from the same category and state — content-based, no ML, nothing beyond
+     * what they've actually read (never their saved list or browsing elsewhere).
+     */
+    public static function becauseYouRead(string $userId, int $limit = 6): ?array
+    {
+        $seedId = Database::value('SELECT story_id FROM story_reads WHERE user_id=? ORDER BY created_at DESC LIMIT 1', [$userId]);
+        $seed = $seedId ? self::byId((string)$seedId) : null;
+        if (!$seed) {
+            return null;
+        }
+        $exclude = array_column(Database::all('SELECT story_id FROM story_reads WHERE user_id=?', [$userId]), 'story_id');
+        $rows = $seed['category'] ? self::feed(['category' => $seed['category'], 'exclude' => $exclude], $limit) : [];
+        if ($seed['county'] && count($rows) < $limit) {
+            $exclude2 = array_merge($exclude, array_column($rows, 'id'));
+            $rows = array_merge($rows, self::feed(['county' => $seed['county'], 'exclude' => $exclude2], $limit - count($rows)));
+        }
+        if (!$rows) {
+            return null;
+        }
+        return ['seed' => $seed, 'rows' => array_slice($rows, 0, $limit)];
     }
 
     /** Stories published per hour for the last 24 hours (oldest → newest). */
@@ -259,7 +375,7 @@ final class Stories
 
     public static function comments(string $storyId): array
     {
-        return Database::all("SELECT c.id,c.created_at,c.author,c.body,u.handle,u.accent,u.is_verified,u.plan FROM comments c LEFT JOIN users u ON u.id=c.user_id WHERE c.story_id=? AND c.status='published' ORDER BY c.created_at", [$storyId]);
+        return Database::all("SELECT c.id,c.created_at,c.author,c.body,u.handle,u.accent,u.is_verified,u.plan,u.reputation,u.reports_published,u.home_county FROM comments c LEFT JOIN users u ON u.id=c.user_id WHERE c.story_id=? AND c.status='published' ORDER BY c.created_at", [$storyId]);
     }
 
     public static function confirmations(string $storyId): int

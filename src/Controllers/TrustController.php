@@ -25,8 +25,8 @@ final class TrustController
     public static function corrections(Request $r): Response
     {
         return View::page('corrections', self::base([
-            'title' => 'Corrections policy & log — ME News Ireland',
-            'description' => 'How ME News corrects mistakes, and a public log of every correction we have made.',
+            'title' => 'Corrections policy & log — Bharat Wire India',
+            'description' => 'How Bharat Wire corrects mistakes, and a public log of every correction we have made.',
             'log' => Database::all('SELECT c.*, s.slug, s.title AS story_title FROM corrections c LEFT JOIN stories s ON s.id=c.story_id ORDER BY c.created_at DESC LIMIT 200'),
         ]));
     }
@@ -34,21 +34,21 @@ final class TrustController
     public static function ownership(Request $r): Response
     {
         return View::page('ownership', self::base([
-            'title' => 'Who owns ME News — ownership, funding and editors',
-            'description' => 'Who owns ME News Ireland, how it is funded, who the editors are and how to reach them.',
+            'title' => 'Who owns Bharat Wire — ownership, funding and editors',
+            'description' => 'Who owns Bharat Wire India, how it is funded, who the editors are and how to reach them.',
             'editors' => Database::all("SELECT display_name,handle,title,desk,home_county FROM users WHERE role IN ('editor','admin','contributor') ORDER BY role='admin' DESC, created_at"),
             'owner' => Database::setting('owner_name', 'Gary Byrne'),
-            'company' => Database::setting('owner_company', 'ME News Ireland'),
+            'company' => Database::setting('owner_company', 'Bharat Wire India'),
             'contact' => Database::setting('contact_email', \MeNews\Config::get('MAIL_REPLY_TO', Mailer::from())),
-            'address' => Database::setting('owner_address', 'Ireland'),
+            'address' => Database::setting('owner_address', 'India'),
         ]));
     }
 
     public static function privacy(Request $r): Response
     {
         return View::page('privacy', self::base([
-            'title' => 'Privacy & cookies — ME News Ireland',
-            'description' => 'What ME News stores, which cookies it sets, how location and advertising work, and your rights under GDPR.',
+            'title' => 'Privacy & cookies — Bharat Wire India',
+            'description' => 'What Bharat Wire stores, which cookies it sets, how location and advertising work, and your rights under India\'s DPDPA.',
             'contact' => Database::setting('contact_email', \MeNews\Config::get('MAIL_REPLY_TO', Mailer::from())),
         ]));
     }
@@ -56,12 +56,23 @@ final class TrustController
     public static function moderation(Request $r): Response
     {
         return View::page('moderation', self::base([
-            'title' => 'Moderation policy & takedowns — ME News Ireland',
+            'title' => 'Moderation policy & takedowns — Bharat Wire India',
             'description' => 'How community reports and comments are screened, our no-naming rule, and how to ask for something to be removed.',
         ]));
     }
 
-    /** Notice-and-action route (Digital Services Act): anyone can flag content for removal. */
+    /** A directory of major central government schemes, linking to each official portal. */
+    public static function schemes(Request $r): Response
+    {
+        $data = json_decode((string)file_get_contents(ME_ROOT . '/config/schemes.json'), true, 512, JSON_THROW_ON_ERROR);
+        return View::page('schemes', self::base([
+            'title' => 'Government schemes directory — Bharat Wire India',
+            'description' => 'Major central government schemes — PM-Kisan, Ayushman Bharat, PM Awas Yojana and more — with links to the official portal for each.',
+            'schemes' => $data['schemes'],
+        ]));
+    }
+
+    /** Notice-and-action route (IT Rules, 2021): anyone can flag content for removal. */
     public static function takedown(Request $r): Response
     {
         RateLimiter::hit($r->ip() . '|takedown', 10, 3600, 'Too many requests from this connection.');
@@ -105,7 +116,7 @@ final class TrustController
         $storyId = $r->post('story_id', '', 40) ?: null;
         Database::insert('corrections', ['created_at' => now(), 'story_id' => $storyId, 'title' => $title, 'summary' => $summary, 'detail' => $r->post('detail', '', 3000), 'editor_id' => $u['id']]);
         if ($storyId) {
-            Database::query('UPDATE stories SET editorial_note=COALESCE(editorial_note,\'\') || ? , updated_at=? WHERE id=?', [(Database::value('SELECT editorial_note FROM stories WHERE id=?', [$storyId]) ? "\n" : '') . 'Correction (' . date_irish(now(), 'j M Y') . '): ' . $summary, now(), $storyId]);
+            Database::query('UPDATE stories SET editorial_note=COALESCE(editorial_note,\'\') || ? , updated_at=? WHERE id=?', [(Database::value('SELECT editorial_note FROM stories WHERE id=?', [$storyId]) ? "\n" : '') . 'Correction (' . date_in(now(), 'j M Y') . '): ' . $summary, now(), $storyId]);
         }
         Audit::log($u['id'], 'correction.add', 'story', $storyId ?? '', $title);
         return Response::json(['ok' => true]);

@@ -22,7 +22,7 @@
         <button class="btn btn--sm btn--ghost" type="button" data-clear>Clear</button>
       </span>
     </div>
-    <div class="puzzle__done" data-done hidden>🎉 <b>Maith thú!</b> You finished today's crossword. Come back tomorrow for No. <?= (int)$p['edition'] + 1 ?>.</div>
+    <div class="puzzle__done" data-done hidden>🎉 <b>Shabaash!</b> You finished today's crossword. Come back tomorrow for No. <?= (int)$p['edition'] + 1 ?>.</div>
     <div class="xw">
       <div class="xw__gridwrap"><div class="xw__grid" data-grid style="--cols:<?= (int)$p['cols'] ?>;--rows:<?= (int)$p['rows'] ?>" role="grid" aria-label="Crossword grid">
         <?php for ($r = 0; $r < $p['rows']; $r++): for ($c = 0; $c < $p['cols']; $c++): $ch = $p['cells'][$r][$c]; ?>

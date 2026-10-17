@@ -9,7 +9,7 @@ use MeNews\Http\HttpException;
 use MeNews\Stories;
 
 /**
- * The Signal — ME News' own ranking.
+ * The Signal — Bharat Wire' own ranking.
  *
  * Readers don't just upvote: they say WHY a story matters (⚡ Matters, 🔥 Talking point,
  * 💚 Good news, 🔎 Needs digging). Each vote carries a weight:
@@ -30,7 +30,7 @@ use MeNews\Stories;
 final class Signal
 {
     public const SIGNALS = [
-        'matters' => ['label' => 'Matters', 'icon' => '⚡', 'weight' => 1.4, 'colour' => '#139a5c', 'blurb' => 'Important for Ireland'],
+        'matters' => ['label' => 'Matters', 'icon' => '⚡', 'weight' => 1.4, 'colour' => '#139a5c', 'blurb' => 'Important for India'],
         'talking' => ['label' => 'Talking point', 'icon' => '🔥', 'weight' => 1.0, 'colour' => '#ff4d6d', 'blurb' => 'Everyone will be discussing this'],
         'good' => ['label' => 'Good news', 'icon' => '💚', 'weight' => 1.1, 'colour' => '#26c072', 'blurb' => 'A story that lifts the day'],
         'digging' => ['label' => 'Needs digging', 'icon' => '🔎', 'weight' => 1.2, 'colour' => '#ffb547', 'blurb' => 'Reporters should look closer'],

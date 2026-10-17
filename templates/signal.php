@@ -1,7 +1,7 @@
 <?php use MeNews\Services\Signal; use MeNews\Ui; $S = Signal::SIGNALS; $top3 = array_slice($board, 0, 3); $rest = array_slice($board, 3); $st = $stats; ?>
 <section class="container pagehead">
   <span class="kicker">The Signal</span>
-  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon('signal') ?></span>What Ireland <em>voted for.</em></h1>
+  <h1 class="pagehead__title"><span class="pagehead__icon"><?= icon('signal') ?></span>What India <em>voted for.</em></h1>
   <p class="pagehead__blurb">Not likes. Not clicks. Readers say why a story matters — and the Signal ranks the answer with an algorithm you can read, below.</p>
   <div class="signal__stats mono"><span><b><?= (int)$st['votes_today'] ?></b> votes today</span><span><b><?= (int)$st['voters_today'] ?></b> readers</span><span><b><?= (int)$st['stories_today'] ?></b> stories</span><span><b><?= (int)$st['votes_all'] ?></b> all time</span></div>
 </section>
@@ -10,7 +10,7 @@
     <nav class="mapchips" aria-label="Window">
       <?php foreach (['today' => 'Today', 'week' => 'This week', 'rising' => 'Rising now'] as $w => $label): ?><a class="<?= $window === $w ? 'is-active' : '' ?>" href="/signal?window=<?= e($w) ?><?= $county ? '&county=' . rawurlencode($county) : '' ?>"><?= e($label) ?></a><?php endforeach; ?>
     </nav>
-    <form class="signal__county" method="get" action="/signal"><input type="hidden" name="window" value="<?= e($window) ?>"><select name="county" onchange="this.form.submit()"><option value="">All Ireland</option><?php foreach ($counties as $c): ?><option <?= $county === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select><?php if ($myCounty && $county !== $myCounty): ?><a class="mono" href="/signal?window=<?= e($window) ?>&county=<?= rawurlencode($myCounty) ?>">Near me: Co. <?= e($myCounty) ?> →</a><?php endif; ?></form>
+    <form class="signal__county" method="get" action="/signal"><input type="hidden" name="window" value="<?= e($window) ?>"><select name="county" onchange="this.form.submit()"><option value="">All India</option><?php foreach ($counties as $c): ?><option <?= $county === $c ? 'selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?></select><?php if ($myCounty && $county !== $myCounty): ?><a class="mono" href="/signal?window=<?= e($window) ?>&county=<?= rawurlencode($myCounty) ?>">Near me: <?= e($myCounty) ?> →</a><?php endif; ?></form>
     <div class="signal__legend mono"><?php foreach ($S as $k => $m): ?><span style="--c:<?= e($m['colour']) ?>"><i></i><?= e($m['icon']) ?> <?= e($m['label']) ?><?= isset($st['signals_today'][$k]) ? ' · ' . (int)$st['signals_today'][$k] : '' ?></span><?php endforeach; ?></div>
   </div>
 
@@ -37,7 +37,7 @@
         <li class="sigrow reveal" style="--c:<?= e($top['colour'] ?? '#139a5c') ?>">
           <span class="sigrow__rank mono">#<?= (int)$s['signal_rank'] ?></span>
           <div class="sigrow__body">
-            <div class="card__meta"><?= Ui::categoryChip($s['category']) ?><?php if ($top): ?><span class="chip" style="color:var(--c)"><?= e($top['icon']) ?> <?= e($top['label']) ?></span><?php endif; ?><span class="mono" style="color:var(--muted)"><?= e($s['location_name'] ?: 'Ireland') ?> · <?= e(time_ago($s['time'])) ?></span></div>
+            <div class="card__meta"><?= Ui::categoryChip($s['category']) ?><?php if ($top): ?><span class="chip" style="color:var(--c)"><?= e($top['icon']) ?> <?= e($top['label']) ?></span><?php endif; ?><span class="mono" style="color:var(--muted)"><?= e($s['location_name'] ?: 'India') ?> · <?= e(time_ago($s['time'])) ?></span></div>
             <h3><a href="<?= e($s['url']) ?>"><?= e($s['title']) ?></a></h3>
             <div class="sigmix" aria-hidden="true"><?php foreach ($S as $k => $m): ?><i style="--c:<?= e($m['colour']) ?>;width:<?= (int)$s['signal_mix'][$k] ?>%"></i><?php endforeach; ?></div>
           </div>
@@ -51,7 +51,7 @@
   <?php endif; ?>
 
   <?php if (!$board): ?>
-    <div class="empty"><div class="empty__glyph"><?= icon('signal') ?></div><h3>No votes <?= $window === 'today' ? 'yet today' : 'in this window' ?><?= $county ? ' from Co. ' . e($county) : '' ?>.</h3><p>Be the first: open any story and tap a signal, or vote straight from the cards below.</p></div>
+    <div class="empty"><div class="empty__glyph"><?= icon('signal') ?></div><h3>No votes <?= $window === 'today' ? 'yet today' : 'in this window' ?><?= $county ? ' from ' . e($county) : '' ?>.</h3><p>Be the first: open any story and tap a signal, or vote straight from the cards below.</p></div>
   <?php endif; ?>
 
   <?php if ($warmup): ?>
@@ -80,19 +80,19 @@
         <pre class="how__formula mono">weight  = signal × voter × local
 signal  = ⚡ 1.4 · 🔎 1.2 · 💚 1.1 · 🔥 1.0
 voter   = signed-in 1.25 · anonymous 1.0
-local   = 1.5 when your county matches the story's
+local   = 1.5 when your state matches the story's
 
 Signal  = ( Σ weights + 2×confirmations + 0.5×comments + 2×votes in last 3 h )
           ÷ ( hours since publication + 4 ) ^ 1.2</pre>
       </div>
       <ul class="how__rules">
         <li><b>One vote per reader per story.</b> Signed in, your vote follows you across devices; otherwise it's tied to this browser. Tap the same signal again to withdraw it.</li>
-        <li><b>Local voices weigh more.</b> Turn on <a href="/near">Near me</a> and votes on stories from your county count ×1.5. Nobody knows Bray like Bray.</li>
+        <li><b>Local voices weigh more.</b> Turn on <a href="/near">Near me</a> and votes on stories from your state count ×1.5. Nobody knows your neighbourhood like you do.</li>
         <li><b>Momentum matters, briefly.</b> Votes in the last three hours count double — that's what powers <a href="/signal?window=rising">Rising now</a>.</li>
         <li><b>Gravity is real.</b> A day-old story needs roughly five times the support of a fresh one to hold its place.</li>
         <li><b>No dark patterns.</b> Votes are rate-limited, never bought, and advertising can't touch the board.</li>
       </ul>
     </div>
-    <?php if ($st['counties']): ?><div class="how__counties mono"><span>Voting today:</span><?php foreach ($st['counties'] as $c): ?><a href="/signal?window=<?= e($window) ?>&county=<?= rawurlencode($c['county']) ?>">Co. <?= e($c['county']) ?> <b><?= (int)$c['n'] ?></b></a><?php endforeach; ?></div><?php endif; ?>
+    <?php if ($st['counties']): ?><div class="how__counties mono"><span>Voting today:</span><?php foreach ($st['counties'] as $c): ?><a href="/signal?window=<?= e($window) ?>&county=<?= rawurlencode($c['county']) ?>"><?= e($c['county']) ?> <b><?= (int)$c['n'] ?></b></a><?php endforeach; ?></div><?php endif; ?>
   </section>
 </div>

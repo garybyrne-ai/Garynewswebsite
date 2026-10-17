@@ -6,8 +6,11 @@ namespace MeNews\Support;
 use MeNews\Database;
 
 /**
- * Coordinates for Irish counties and towns (config/geo.json, built from OpenStreetMap
- * Nominatim by scripts/geocode-locations.php). Used to pin wire stories on the live map.
+ * Coordinates for Indian states/UTs and towns (config/geo.json, built from GeoNames' free "IN"
+ * export — see Locations::refreshOfficial() — with scripts/geocode-locations.php available to
+ * fill in any town added by hand via OpenStreetMap Nominatim). Used to pin wire stories on the
+ * live map. Public method names here still say "county" for compatibility with every caller;
+ * the values are Indian states/UTs.
  */
 final class Geo
 {
@@ -24,7 +27,7 @@ final class Geo
         if (self::$data === null) {
             $file = ME_ROOT . '/config/geo.json';
             self::$data = is_file($file) ? (json_decode((string)file_get_contents($file), true) ?: []) : [];
-            self::$data += ['counties' => [], 'towns' => []];
+            self::$data += ['states' => [], 'towns' => []];
         }
         return self::$data;
     }
@@ -35,7 +38,9 @@ final class Geo
         $d = self::data();
         $town = trim((string)$town);
         $county = trim((string)$county);
-        if ($town !== '' && !str_starts_with($town, 'Co.')) {
+        // When there is no real town, callers pass the state name itself as the "town" label
+        // (e.g. location_name falls back to the state); skip the town lookup in that case.
+        if ($town !== '' && $town !== $county) {
             if ($county !== '' && isset($d['towns'][$town . '|' . $county])) {
                 return [...$d['towns'][$town . '|' . $county], 'town'];
             }
@@ -45,21 +50,21 @@ final class Geo
                 }
             }
         }
-        if ($county !== '' && isset($d['counties'][$county])) {
-            return [...$d['counties'][$county], 'county'];
+        if ($county !== '' && isset($d['states'][$county])) {
+            return [...$d['states'][$county], 'county'];
         }
         return null;
     }
 
-    /** County centroid. */
+    /** State/UT centroid. */
     public static function county(string $county): ?array
     {
-        return self::data()['counties'][$county] ?? null;
+        return self::data()['states'][$county] ?? null;
     }
 
     /**
      * Coordinates for a story with a deterministic scatter so stories from the same place
-     * do not stack on one pixel. County-level matches scatter more widely than town-level.
+     * do not stack on one pixel. State-level matches scatter more widely than town-level.
      */
     public static function forStory(?string $town, ?string $county, string $seed): ?array
     {
@@ -101,8 +106,10 @@ final class Geo
     }
 
     /**
-     * Resolve a position to the nearest known Irish town and its county.
-     * @return array{town:?string,county:?string,province:string,town_km:?float,county_km:?float,in_ireland:bool}
+     * Resolve a position to the nearest known Indian town and its state. India's states are far
+     * bigger than typical countries' administrative regions, so the "in India" and "close enough
+     * to be this town" radii are generous.
+     * @return array{town:?string,county:?string,province:string,town_km:?float,county_km:?float,in_india:bool}
      */
     public static function nearest(float $lat, float $lng): array
     {
@@ -118,21 +125,21 @@ final class Geo
         }
         $bestCounty = null;
         $bestCountyKm = INF;
-        foreach ($d['counties'] as $name => $pt) {
+        foreach ($d['states'] as $name => $pt) {
             $km = self::distanceKm($lat, $lng, (float)$pt[0], (float)$pt[1]);
             if ($km < $bestCountyKm) {
                 $bestCountyKm = $km;
                 $bestCounty = $name;
             }
         }
-        $inIreland = $bestCountyKm < 120;
-        $town = $inIreland && $bestTown !== null && $bestTownKm < 35 ? explode('|', $bestTown)[0] : null;
-        // The nearest town is a better county guess than the nearest centroid.
-        $county = $inIreland ? ($bestTown !== null && $bestTownKm < 35 ? explode('|', $bestTown)[1] : $bestCounty) : null;
+        $inIndia = $bestCountyKm < 350;
+        $town = $inIndia && $bestTown !== null && $bestTownKm < 60 ? explode('|', $bestTown)[0] : null;
+        // The nearest town is a better state guess than the nearest centroid.
+        $county = $inIndia ? ($bestTown !== null && $bestTownKm < 60 ? explode('|', $bestTown)[1] : $bestCounty) : null;
         return [
             'town' => $town, 'county' => $county, 'province' => $county ? Locations::provinceFor($county) : '',
             'town_km' => $bestTownKm === INF ? null : round($bestTownKm, 1), 'county_km' => $bestCountyKm === INF ? null : round($bestCountyKm, 1),
-            'in_ireland' => $inIreland,
+            'in_india' => $inIndia,
         ];
     }
 

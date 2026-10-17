@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace MeNews\Support;
 
 /**
- * The visitor's chosen locality, kept in two small cookies set by the browser:
- *   me_loc    = "lat,lng"   (from the Geolocation API, rounded to ~100 m)
- *   me_county = "Wicklow"   (manual choice, or derived from me_loc)
- * Nothing is stored server-side; the cookies only shape the "Near you" section.
+ * The visitor's chosen locality, kept in small cookies set by the browser:
+ *   me_loc        = "lat,lng"      (from the Geolocation API, rounded to ~100 m)
+ *   me_county     = "Maharashtra"  (current city/state — manual choice, or derived from me_loc)
+ *   me_home_county = "Kerala"      (hometown — set independently; moving doesn't lose it)
+ * Nothing is stored server-side; the cookies only shape the "Near you" section and personalisation.
  */
 final class Visitor
 {
@@ -37,6 +38,18 @@ final class Visitor
         return null;
     }
 
+    /** The visitor's separately-saved hometown — unaffected by changing their current state. */
+    public static function homeCounty(): ?string
+    {
+        $raw = trim((string)($_COOKIE['me_home_county'] ?? ''));
+        foreach (Locations::countyNames() as $c) {
+            if (strcasecmp($c, $raw) === 0) {
+                return $c;
+            }
+        }
+        return null;
+    }
+
     /**
      * Resolve everything the "Near you" section needs.
      * @return array{mode:string,place:?array,stories:array,radius:int,county:?string,title:string}
@@ -46,21 +59,21 @@ final class Visitor
         $pos = self::position();
         if ($pos) {
             $place = Geo::nearest($pos['lat'], $pos['lng']);
-            if ($place['in_ireland']) {
+            if ($place['in_india']) {
                 $radius = 40;
                 $stories = \MeNews\Stories::near($pos['lat'], $pos['lng'], $radius, $limit, $place['county']);
                 if (count($stories) < 4) {
                     $radius = 80;
                     $stories = \MeNews\Stories::near($pos['lat'], $pos['lng'], $radius, $limit, $place['county']);
                 }
-                $title = $place['town'] ? $place['town'] . ', Co. ' . $place['county'] : 'Co. ' . $place['county'];
+                $title = $place['town'] ? $place['town'] . ', ' . $place['county'] : $place['county'];
                 return ['mode' => 'gps', 'place' => $place, 'stories' => $stories, 'radius' => $radius, 'county' => $place['county'], 'title' => $title, 'position' => $pos];
             }
-            return ['mode' => 'abroad', 'place' => $place, 'stories' => [], 'radius' => 0, 'county' => null, 'title' => 'Outside Ireland', 'position' => $pos];
+            return ['mode' => 'abroad', 'place' => $place, 'stories' => [], 'radius' => 0, 'county' => null, 'title' => 'Outside India', 'position' => $pos];
         }
         $county = self::county();
         if ($county) {
-            return ['mode' => 'county', 'place' => null, 'stories' => \MeNews\Stories::feed(['county' => $county], $limit), 'radius' => 0, 'county' => $county, 'title' => 'Co. ' . $county, 'position' => null];
+            return ['mode' => 'county', 'place' => null, 'stories' => \MeNews\Stories::feed(['county' => $county], $limit), 'radius' => 0, 'county' => $county, 'title' => $county, 'position' => null];
         }
         return ['mode' => 'none', 'place' => null, 'stories' => [], 'radius' => 0, 'county' => null, 'title' => 'Near you', 'position' => null];
     }

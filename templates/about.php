@@ -1,7 +1,7 @@
 <section class="container pagehead pagehead--narrow">
-  <span class="kicker">How ME works</span>
+  <span class="kicker">How Bharat Wire works</span>
   <h1 class="pagehead__title">Built for trust, <em>not for clicks.</em></h1>
-  <p class="pagehead__blurb">ME News Ireland combines two streams: a live wire of headlines from established Irish publishers, and community reports from the people who live where the news happens. Both pass through the same editorial labels.</p>
+  <p class="pagehead__blurb">Bharat Wire India combines two streams: a live wire of headlines from established Indian publishers, and community reports from the people who live where the news happens. Both pass through the same editorial labels.</p>
 </section>
 <div class="container prose">
   <div class="steps">
@@ -13,12 +13,12 @@
 
   <h2 id="labels">How we check things: the labels</h2>
   <div class="labels-grid">
-    <div><?= \MeNews\Ui::label('Wire') ?><p>A headline from an established publisher, curated by our desk and linked to the original. ME has not independently checked it; the publisher's own standards apply.</p></div>
+    <div><?= \MeNews\Ui::label('Wire') ?><p>A headline from an established publisher, curated by our desk and linked to the original. Bharat Wire has not independently checked it; the publisher's own standards apply.</p></div>
     <div><?= \MeNews\Ui::label('Corroborated') ?><p>A community report that three separate people have independently confirmed with “I saw this too”.</p></div>
     <div><?= \MeNews\Ui::label('Community Report') ?><p>Reported by a member of the public. Screened for safety but not yet corroborated.</p></div>
     <div><?= \MeNews\Ui::label('Developing') ?><p>Editors are actively checking. Details may change.</p></div>
-    <div><?= \MeNews\Ui::label('Verified') ?><p>Checked by an ME editor: the reporter was contacted, the media and location examined, and the facts stood up. Never applied to wire headlines.</p></div>
-    <div><?= \MeNews\Ui::label('Official') ?><p>Based on a published statement from a public body such as a council, Garda Síochána or a Government department.</p></div>
+    <div><?= \MeNews\Ui::label('Verified') ?><p>Checked by a Bharat Wire editor: the reporter was contacted, the media and location examined, and the facts stood up. Never applied to wire headlines.</p></div>
+    <div><?= \MeNews\Ui::label('Official') ?><p>Based on a published statement from a public body such as the police, a state government department or a central Ministry.</p></div>
   </div>
 
   <h2 id="sources">Our wire sources</h2>
@@ -31,14 +31,14 @@
     <h2>Recent wire activity</h2>
     <div class="tablewrap"><table class="table mono">
       <thead><tr><th>Source</th><th>Started</th><th>Fetched</th><th>New</th><th>Result</th></tr></thead>
-      <tbody><?php foreach ($runs as $r): ?><tr><td><?= e($r['source_key']) ?></td><td><?= e(date_irish($r['started_at'], 'D H:i')) ?></td><td><?= (int)$r['fetched'] ?></td><td><?= (int)$r['inserted'] ?></td><td><?= $r['error'] ? '<span class="is-bad">' . e(excerpt($r['error'], 60)) . '</span>' : '<span class="is-good">ok</span>' ?></td></tr><?php endforeach; ?></tbody>
+      <tbody><?php foreach ($runs as $r): ?><tr><td><?= e($r['source_key']) ?></td><td><?= e(date_in($r['started_at'], 'D H:i')) ?></td><td><?= (int)$r['fetched'] ?></td><td><?= (int)$r['inserted'] ?></td><td><?= $r['error'] ? '<span class="is-bad">' . e(excerpt($r['error'], 60)) . '</span>' : '<span class="is-good">ok</span>' ?></td></tr><?php endforeach; ?></tbody>
     </table></div>
   <?php endif; ?>
 
   <h2 id="desk">The desk and the newsroom pulse</h2>
   <p>Five desk editors curate the wire and check community reports. The pulse shows stories published per hour over the last day.</p>
   <?php if (!empty($contributors)): ?><ul class="sources"><?php foreach ($contributors as $c): ?><li><a href="/contributors/<?= e($c['handle']) ?>"><b><?= e($c['display_name']) ?></b><span class="mono">Curates <?= e($c['desk']) ?> · <?= (int)$c['reported'] ?> original · <?= (int)$c['curated'] ?> curated</span></a></li><?php endforeach; ?></ul><?php endif; ?>
-  <?php if (!empty($pulse)): ?><div class="panel panel--pulse" style="max-width:520px"><header class="panel__head"><span class="kicker">Newsroom pulse</span><span class="mono panel__hint">24 h</span></header><?= \MeNews\Ui::sparkline($pulse) ?><div class="pulse__stats mono"><span><b><?= e((string)array_sum($pulse)) ?></b> stories / 24 h</span><span><b><?= e((string)max($pulse)) ?></b> peak per hour</span></div></div><?php endif; ?>
+  <?php if (!empty($pulse)): ?><div class="panel panel--pulse" style="max-width:520px"><header class="panel__head"><span class="kicker">Newsroom pulse</span><span class="mono panel__hint">24 h</span></header><?= \MeNews\Ui::sparkline($pulse) ?><div class="pulse__stats mono"><span><b class="countup" data-count="<?= (int)array_sum($pulse) ?>">0</b> stories / 24 h</span><span><b class="countup" data-count="<?= (int)max($pulse) ?>">0</b> peak per hour</span></div></div><?php endif; ?>
 
   <h2>Principles</h2>
   <p><b>Safety is not truth.</b> The safety score asks whether content presents a harmful-content or privacy risk. The confidence score is only an evidence signal. Neither is permission to call a claim true.</p>

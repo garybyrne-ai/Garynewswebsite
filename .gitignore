@@ -7,9 +7,10 @@
 storage/*
 !storage/.gitkeep
 
-# Local tooling
-vendor/
-node_modules/
+# Local tooling (repo-root only — public/assets/vendor/ holds committed, self-hosted
+# third-party frontend libraries like Leaflet and must stay tracked)
+/vendor/
+/node_modules/
 *.log
 .DS_Store
 Thumbs.db

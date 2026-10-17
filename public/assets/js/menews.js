@@ -1,4 +1,4 @@
-/* ME News Ireland — site runtime (no framework, no build step) */
+/* Bharat Wire India — site runtime (no framework, no build step) */
 (function () {
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
@@ -18,6 +18,12 @@
   window.ME = window.ME || {};
   window.ME.api = api;
   window.ME.esc = esc;
+
+  /* Register the service worker unconditionally so the site installs as an app
+     even before push is configured — push subscription (below) reuses this registration. */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
+  }
 
   /* ---------- toast ---------- */
   let toastTimer;
@@ -50,12 +56,12 @@
     paint();
   }
 
-  /* ---------- HUD clock (Irish time) ---------- */
+  /* ---------- HUD clock (Indian time) ---------- */
   const clock = $('#hud-clock'), dateEl = $('#hud-date');
   if (clock) {
-    const tf = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    const df = new Intl.DateTimeFormat('en-IE', { timeZone: 'Europe/Dublin', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    const tick = () => { const d = new Date(); clock.textContent = tf.format(d); if (dateEl) dateEl.textContent = df.format(d) + ' · Dublin'; };
+    const tf = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const df = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const tick = () => { const d = new Date(); clock.textContent = tf.format(d); if (dateEl) dateEl.textContent = df.format(d) + ' · IST'; };
     tick(); setInterval(tick, 1000);
   }
 
@@ -64,6 +70,36 @@
     const io = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: .05 });
     $$('.reveal').forEach(el => io.observe(el));
   } else document.documentElement.classList.add('no-observer');
+
+  /* ---------- animated stat counters ---------- */
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    const countUp = el => {
+      const to = parseInt(el.dataset.count, 10); if (!Number.isFinite(to)) return;
+      const dur = 900, t0 = performance.now();
+      const step = now => {
+        const p = Math.min(1, (now - t0) / dur), eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(to * eased).toLocaleString('en-IN');
+        if (p < 1) requestAnimationFrame(step); else el.textContent = to.toLocaleString('en-IN');
+      };
+      requestAnimationFrame(step);
+    };
+    const cio = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { countUp(en.target); cio.unobserve(en.target); } }), { threshold: .4 });
+    $$('.countup').forEach(el => cio.observe(el));
+  } else {
+    $$('.countup').forEach(el => { const n = parseInt(el.dataset.count, 10); if (Number.isFinite(n)) el.textContent = n.toLocaleString('en-IN'); });
+  }
+
+  /* ---------- cursor-reactive card glow ---------- */
+  if (!reduceMotion && matchMedia('(hover: hover)').matches) {
+    document.addEventListener('pointermove', e => {
+      const el = e.target.closest ? e.target.closest('.card, .panel') : null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    }, { passive: true });
+  }
 
   /* ---------- language menu ---------- */
   const langToggle = $('#lang-toggle'), langMenu = $('#lang-menu');
@@ -101,7 +137,7 @@
     authNext = next && next.startsWith('/') ? next : null;
     $$('[data-auth-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.authTab === view));
     $$('[data-auth-view]').forEach(f => f.hidden = f.dataset.authView !== view);
-    $('#auth-title').textContent = view === 'register' ? 'Create your ME News account' : 'Sign in to ME News';
+    $('#auth-title').textContent = view === 'register' ? 'Create your Bharat Wire account' : 'Sign in to Bharat Wire';
     $('#auth-result').textContent = '';
     openModal('auth-modal');
   }
@@ -264,13 +300,51 @@
   });
   loadSavedMarks();
 
+  /* ---------- follow a story (notified when the wire adds new coverage) ---------- */
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-follow-story]'); if (!b) return;
+    e.preventDefault();
+    if (!window.ME.user) { toast('Sign in to follow this story'); showAuth('signin'); return; }
+    const id = b.dataset.followStory;
+    const following = b.getAttribute('aria-pressed') === 'true';
+    try {
+      const j = await api('/api/story/' + id + '/' + (following ? 'unfollow' : 'follow'), { method: 'POST' });
+      b.setAttribute('aria-pressed', j.following ? 'true' : 'false');
+      const l = $('[data-follow-label]', b); if (l) l.textContent = j.following ? 'Following' : 'Follow this story';
+      b.classList.toggle('is-following', !!j.following);
+      toast(j.following ? "Following — we'll tell you about new coverage" : 'Unfollowed');
+    } catch (err) { toast(err.message); }
+  });
+
+  /* ---------- listen to a story (browser text-to-speech, no server round-trip) ---------- */
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-tts]'); if (!b) return;
+    e.preventDefault();
+    if (!('speechSynthesis' in window)) { toast('Your browser cannot read aloud'); return; }
+    const label = $('[data-tts-label]', b);
+    if (speechSynthesis.speaking || b.getAttribute('aria-pressed') === 'true') {
+      speechSynthesis.cancel();
+      if (label) label.textContent = 'Listen'; b.setAttribute('aria-pressed', 'false');
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(b.dataset.ttsTitle + '. ' + b.dataset.ttsText);
+    const lang = b.dataset.ttsLang || 'en';
+    const bcp47 = { hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN', ta: 'ta-IN', ur: 'ur-IN' }[lang] || 'en-IN';
+    const voices = speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang === bcp47) || voices.find(v => v.lang && v.lang.startsWith(lang)) || null;
+    u.lang = bcp47; if (voice) u.voice = voice; u.rate = 0.95;
+    u.onend = u.onerror = () => { if (label) label.textContent = 'Listen'; b.setAttribute('aria-pressed', 'false'); };
+    if (label) label.textContent = 'Stop'; b.setAttribute('aria-pressed', 'true');
+    speechSynthesis.speak(u);
+  });
+
   /* ---------- locations & counties ---------- */
   let countiesLoaded = false;
   async function loadCounties() {
     if (countiesLoaded) return; countiesLoaded = true;
     try {
       const a = await api('/api/counties');
-      const html = '<option value="">Select county</option>' + a.map(x => `<option value="${esc(x.county)}">${esc(x.county)}</option>`).join('');
+      const html = '<option value="">Select state</option>' + a.map(x => `<option value="${esc(x.county)}">${esc(x.county)}</option>`).join('');
       $$('[data-county-select]').forEach(s => { const v = s.value; s.innerHTML = html; s.value = v; });
     } catch (e) { }
   }
@@ -302,12 +376,30 @@
     if (!navigator.geolocation) return toast('Location is unavailable');
     navigator.geolocation.getCurrentPosition(p => { $('#report-lat').value = p.coords.latitude.toFixed(6); $('#report-lng').value = p.coords.longitude.toFixed(6); toast('GPS added to your report'); }, () => toast('Location permission was not granted'));
   });
+  /** Solve a lightweight, no-third-party proof-of-work challenge (native Web Crypto, no CDN/CSP change). */
+  async function solvePow() {
+    const ch = await api('/api/pow/challenge');
+    const need = '0'.repeat(ch.difficulty);
+    const enc = new TextEncoder();
+    for (let nonce = 0; ; nonce++) {
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(ch.id + ':' + nonce));
+      const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if (hex.startsWith(need)) return { id: ch.id, nonce: String(nonce) };
+    }
+  }
   $('#report-form')?.addEventListener('submit', async e => {
     e.preventDefault();
     const out = $('#report-result'); out.classList.remove('is-error'); out.textContent = 'Uploading privately and running safety checks…';
     const btn = e.target.querySelector('[type=submit]'); btn.disabled = true;
     try {
-      const j = await api('/api/report', { method: 'POST', body: new FormData(e.target) });
+      const fd = new FormData(e.target);
+      if (!window.ME.user) {
+        out.textContent = 'Verifying…';
+        const sol = await solvePow();
+        fd.set('pow_id', sol.id); fd.set('pow_nonce', sol.nonce);
+        out.textContent = 'Uploading privately and running safety checks…';
+      }
+      const j = await api('/api/report', { method: 'POST', body: fd });
       out.textContent = j.message || `Thanks — your report is with the newsroom (safety ${j.safety_score}/100, confidence ${j.trust_score}/100). You'll hear back either way.`;
       e.target.reset(); const pv = $('.dropzone__preview'); if (pv) { pv.hidden = true; pv.innerHTML = ''; } setTimeout(closeModals, j.message ? 6000 : 3200);
     } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
@@ -347,15 +439,113 @@
   /* ---------- near me (geolocation) ---------- */
   const setCookie = (k, v, days) => { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=' + (days * 86400) + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : ''); };
   const delCookie = k => { document.cookie = k + '=;path=/;max-age=0;SameSite=Lax'; };
+  const getCookie = k => { const m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : ''; };
+
+  /* ---------- breaking news push notifications ---------- */
+  (async function initPush() {
+    const btn = $('#push-toggle');
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
+    let cfg;
+    try { cfg = await api('/api/push/config'); } catch (e) { return; }
+    if (!cfg.configured) return;
+    function toUint8(base64) {
+      const padding = '='.repeat((4 - base64.length % 4) % 4);
+      const raw = atob((base64 + padding).replace(/-/g, '+').replace(/_/g, '/'));
+      return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+    }
+    function paint(subscribed) {
+      if (!btn) return;
+      btn.hidden = false;
+      btn.classList.toggle('is-active', subscribed);
+      btn.setAttribute('aria-pressed', String(subscribed));
+      btn.title = subscribed ? 'Breaking news alerts on — tap to turn off' : 'Get breaking news alerts';
+    }
+    let reg, existing;
+    try {
+      reg = await navigator.serviceWorker.register('/sw.js');
+      existing = await reg.pushManager.getSubscription();
+    } catch (e) { return; }
+    paint(!!existing);
+    async function doSubscribe() {
+      if (Notification.permission === 'denied') { toast('Notifications are blocked in your browser settings'); return false; }
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toUint8(cfg.publicKey) });
+      const county = getCookie('me_county');
+      await api('/api/push/subscribe' + (county ? '?county=' + encodeURIComponent(county) : ''), { method: 'POST', body: JSON.stringify(sub.toJSON()), headers: { 'Content-Type': 'application/json' } });
+      paint(true);
+      toast(county ? 'Breaking news alerts on for ' + county : 'Breaking news alerts on');
+      return true;
+    }
+    btn?.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const current = await reg.pushManager.getSubscription();
+        if (current) {
+          await api('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: current.endpoint }), headers: { 'Content-Type': 'application/json' } });
+          await current.unsubscribe();
+          paint(false);
+          toast('Breaking news alerts turned off');
+        } else {
+          await doSubscribe();
+        }
+      } catch (err) { toast(err.message || 'Could not update alerts'); }
+      btn.disabled = false;
+    });
+
+    /* Contextual nudge: after reading a few stories from the visitor's own state, offer alerts
+       directly instead of relying on them noticing the bell icon. Shown at most once ever. */
+    if (existing || Notification.permission === 'denied') return;
+    const storyCounty = $('[data-story-county]')?.dataset.storyCounty;
+    const myCounty = getCookie('me_county');
+    if (!storyCounty || !myCounty || storyCounty !== myCounty) return;
+    let reads = {};
+    try { reads = JSON.parse(localStorage.getItem('me_state_reads') || '{}'); } catch (e) { }
+    if (reads.county !== myCounty) reads = { county: myCounty, count: 0 };
+    reads.count = (reads.count || 0) + 1;
+    try { localStorage.setItem('me_state_reads', JSON.stringify(reads)); } catch (e) { }
+    let nudged = false;
+    try { nudged = localStorage.getItem('me_push_nudged') === '1'; } catch (e) { }
+    if (reads.count < 3 || nudged) return;
+    try { localStorage.setItem('me_push_nudged', '1'); } catch (e) { }
+    const bellSvg = '<svg class="icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
+    const el = document.createElement('div');
+    el.className = 'pushnudge';
+    el.innerHTML = '<span>' + bellSvg + '</span><span class="pushnudge__text">Get breaking news alerts for ' + esc(myCounty) + '?</span>'
+      + '<span class="pushnudge__actions"><button type="button" class="pushnudge__enable">Enable</button><button type="button" class="pushnudge__dismiss">Not now</button></span>';
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-show')));
+    const hide = () => { el.classList.remove('is-show'); setTimeout(() => el.remove(), 300); };
+    el.querySelector('.pushnudge__dismiss').addEventListener('click', hide);
+    el.querySelector('.pushnudge__enable').addEventListener('click', async () => {
+      hide();
+      try { await doSubscribe(); } catch (err) { toast(err.message || 'Could not enable alerts'); }
+    });
+    setTimeout(hide, 12000);
+  })();
   const dismissed = () => { try { return (Number(localStorage.getItem('me_loc_dismissed') || 0)) > Date.now(); } catch (e) { return false; } };
   const locbar = null;
   /* county picker: one tap on first visit, no permission needed */
   const countyModal = $('#county-modal');
   const openCounty = () => openModal('county-modal');
-  $$('[data-open-county]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); closeDrawer(); openCounty(); }));
+  function setCountyMode(mode) {
+    if (!countyModal) return;
+    countyModal.dataset.countyActiveMode = mode;
+    $$('[data-county-mode-btn]').forEach(t => { const on = t.dataset.countyModeBtn === mode; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+    $$('[data-county-mode-lede]').forEach(el => { el.hidden = el.dataset.countyModeLede !== mode; });
+    $$('[data-county-mode-grid]').forEach(el => { el.hidden = el.dataset.countyModeGrid !== mode; });
+    $$('[data-county-mode-actions]').forEach(el => { el.hidden = el.dataset.countyModeActions !== mode; });
+    const title = $('[data-county-mode-title]'); if (title) title.textContent = mode === 'home' ? 'Where’s home?' : 'Where are you?';
+  }
+  $$('[data-open-county]').forEach(b => b.addEventListener('click', e => {
+    e.preventDefault(); closeDrawer();
+    if (b.dataset.openCounty === 'home') setCountyMode('home');
+    openCounty();
+  }));
   if (countyModal && !window.ME.located && !dismissed() && document.body.classList.contains('page-home') && !new URLSearchParams(location.search).get('county')) setTimeout(openCounty, 900);
   $$('[data-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_county', b.dataset.county, 180); delCookie('me_loc'); toast('Leading with ' + b.dataset.county); location.reload(); }));
+  $$('[data-home-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_home_county', b.dataset.homeCounty, 365); toast('Hometown set to ' + b.dataset.homeCounty); location.reload(); }));
+  $('[data-forget-home-county]')?.addEventListener('click', () => { delCookie('me_home_county'); toast('Hometown cleared'); location.reload(); });
   $('[data-county-later]')?.addEventListener('click', () => { closeModals(); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
+  $$('[data-county-mode-btn]').forEach(tab => tab.addEventListener('click', () => setCountyMode(tab.dataset.countyModeBtn)));
   async function applyPosition(lat, lng) {
     setCookie('me_loc', lat.toFixed(3) + ',' + lng.toFixed(3), 30); delCookie('me_county');
     const near = $('[data-near]');
@@ -365,7 +555,7 @@
         const j = await api(`/api/near?lat=${lat.toFixed(3)}&lng=${lng.toFixed(3)}${document.body.classList.contains('page-home') ? '&compact=1&limit=8' : '&limit=24'}`);
         const tmp = document.createElement('div'); tmp.innerHTML = j.html;
         const fresh = tmp.firstElementChild; near.replaceWith(fresh); fresh.classList.add('is-in'); bindNear();
-        toast(j.place.in_ireland ? 'Local section set to ' + j.title : 'You seem to be outside Ireland — choose a county');
+        toast(j.place.in_india ? 'Local section set to ' + j.title : 'You seem to be outside India — choose a state');
         if (!document.body.classList.contains('page-home')) location.reload();
       } catch (e) { near.classList.remove('is-loading'); toast(e.message); }
     } else location.reload();
@@ -376,7 +566,7 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Locating…'; }
     navigator.geolocation.getCurrentPosition(
       pos => { closeModals(); applyPosition(pos.coords.latitude, pos.coords.longitude); },
-      err => { if (btn) { btn.disabled = false; btn.textContent = 'Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a county instead' : 'Could not get your location'); },
+      err => { if (btn) { btn.disabled = false; btn.textContent = 'Use my location'; } toast(err.code === 1 ? 'Location permission was not granted — you can pick a state instead' : 'Could not get your location'); },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 }
     );
   }
@@ -460,7 +650,7 @@
     if (btn) btn.disabled = false;
   }));
   $$('[data-subscribe]').forEach(f => { const c = $('[data-subscribe-county]', f); if (c && !c.value && window.ME.county) c.value = window.ME.county; if (c && c.tagName === 'INPUT' && !c.value) { c.value = ''; } });
-  $$('[data-subscribe]').forEach(f => f.addEventListener('submit', e => { const c = $('[data-subscribe-county]', f); if (c && !c.value) { e.preventDefault(); e.stopImmediatePropagation(); toast('Choose your county first'); window.ME.openModal && window.ME.openModal('county-modal'); } }, true));
+  $$('[data-subscribe]').forEach(f => f.addEventListener('submit', e => { const c = $('[data-subscribe-county]', f); if (c && !c.value) { e.preventDefault(); e.stopImmediatePropagation(); toast('Choose your state first'); window.ME.openModal && window.ME.openModal('county-modal'); } }, true));
   bindForm('[data-subscribe]', '/api/alerts/subscribe', '[data-subscribe-result]', (j, f) => { if (j.confirmed) f.reset(); });
   bindForm('[data-closure]', '/api/alerts/closure', '[data-closure-result]', (j, f) => f.reset());
   bindForm('#takedown-form', '/api/takedown', '#takedown-result', (j, f) => f.reset());
@@ -485,7 +675,7 @@
     try {
       const p = await api('/api/poll/vote', { method: 'POST', body: fd });
       $$('.pollopt', w).forEach(o => { const i = Number(o.dataset.option); const pct = p.results.pct[i] || 0; o.classList.add('is-result'); o.classList.toggle('is-mine', p.mine === i); $('i', o).style.setProperty('--v', pct); $('[data-pct]', o).textContent = pct + '%'; });
-      const foot = $('[data-poll-foot]', w); if (foot) foot.textContent = 'Thanks · ' + (p.results.total >= 10 ? p.results.total + ' votes so far' : 'tap another option to change') + (!window.ME.county ? ' · choose your county so it counts locally' : '');
+      const foot = $('[data-poll-foot]', w); if (foot) foot.textContent = 'Thanks · ' + (p.results.total >= 10 ? p.results.total + ' votes so far' : 'tap another option to change') + (!window.ME.county ? ' · choose your state so it counts locally' : '');
       toast('Vote counted' + (window.ME.county ? ' for ' + window.ME.county : ''));
     } catch (err) { toast(err.message); }
   });
@@ -498,11 +688,11 @@
     try {
       const j = await api('/api/bulletin?county=' + encodeURIComponent(b.dataset.bulletin || ''));
       bulletinEl = document.createElement('div'); bulletinEl.className = 'bulletin';
-      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'Ireland') + ' bulletin…</span><button type="button">Stop</button>';
+      bulletinEl.innerHTML = '<span class="livedot"></span><span class="bulletin__line">Reading the ' + (j.county || 'India') + ' bulletin…</span><button type="button">Stop</button>';
       document.body.appendChild(bulletinEl);
       bulletinEl.querySelector('button').onclick = () => { speechSynthesis.cancel(); bulletinEl.remove(); bulletinEl = null; };
-      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IE/i.test(v.lang)) || voices.find(v => /en-GB/i.test(v.lang)) || null;
-      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IE'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
+      const voices = speechSynthesis.getVoices(); const voice = voices.find(v => /en-IN/i.test(v.lang)) || voices.find(v => /hi-IN/i.test(v.lang)) || null;
+      j.lines.forEach((line, i) => { const u = new SpeechSynthesisUtterance(line); u.lang = 'en-IN'; if (voice) u.voice = voice; u.rate = 1; u.onstart = () => { if (bulletinEl) bulletinEl.querySelector('.bulletin__line').textContent = line; }; if (i === j.lines.length - 1) u.onend = () => { if (bulletinEl) { bulletinEl.remove(); bulletinEl = null; } }; speechSynthesis.speak(u); });
     } catch (err) { toast(err.message); }
   }));
 })();

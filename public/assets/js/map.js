@@ -1,4 +1,4 @@
-/* ME News Ireland — live map (Leaflet, self-hosted) */
+/* Bharat Wire India — live map (Leaflet, self-hosted) */
 (function () {
   'use strict';
   const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -53,7 +53,7 @@
         pts.forEach((p, i) => L.marker([p.latitude, p.longitude], { icon: pinIcon(p, i), riseOnHover: true }).bindPopup(popup(p), { maxWidth: 300, className: 'me-popup' }).addTo(pinLayer));
       }
       if (opts.count) opts.count.textContent = pts.length + (clustered ? ' stories' : ' pins');
-      if (opts.list) opts.list.innerHTML = pts.slice(0, 40).map((p, i) => `<button type="button" class="maplist__item" data-i="${all.indexOf(p)}"><span class="maplist__dot" style="--c:${colours[p.category] || '#139a5c'}"></span><span><b>${esc(p.title)}</b><small>${esc(p.location_name || p.county || 'Ireland')} · ${esc(p.ago)}</small></span></button>`).join('');
+      if (opts.list) opts.list.innerHTML = pts.slice(0, 40).map((p, i) => `<button type="button" class="maplist__item" data-i="${all.indexOf(p)}"><span class="maplist__dot" style="--c:${colours[p.category] || '#139a5c'}"></span><span><b>${esc(p.title)}</b><small>${esc(p.location_name || p.county || 'India')} · ${esc(p.ago)}</small></span></button>`).join('');
       return pts;
     }
     /** Fit to whatever is drawn (pins when zoomed in, county bubbles when clustered). Never throws on an empty map. */

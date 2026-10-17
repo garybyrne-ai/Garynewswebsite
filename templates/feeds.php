@@ -1,7 +1,7 @@
 <section class="container pagehead">
   <span class="kicker">Syndication</span>
   <h1 class="pagehead__title">Feeds for readers <em>and aggregators.</em></h1>
-  <p class="pagehead__blurb">Every section and county has its own feed in RSS 2.0, Atom 1.0 and JSON Feed 1.1. Wire headlines link straight to their publishers; our own reporting carries full text, author and image. Google News, Apple News, Flipboard, Feedly, NewsNow, Inoreader and any other reader can subscribe without scraping.</p>
+  <p class="pagehead__blurb">Every section and state has its own feed in RSS 2.0, Atom 1.0 and JSON Feed 1.1. Wire headlines link straight to their publishers; our own reporting carries full text, author and image. Google News, Apple News, Flipboard, Feedly, NewsNow, Inoreader and any other reader can subscribe without scraping.</p>
 </section>
 <div class="container" style="padding-bottom:50px">
   <div class="plans" style="padding-top:0;grid-template-columns:repeat(2,minmax(0,520px))">
@@ -30,7 +30,7 @@
     <thead><tr><th>Feed</th><th>RSS</th><th>Atom</th><th>JSON</th></tr></thead>
     <tbody>
     <?php foreach ($feeds as $key => $f): $base = substr($f['path'], 0, -4); ?>
-      <tr><td><b><?= e(str_replace('ME News Ireland — ', '', $f['title'])) ?></b><span class="sub"><?= e($f['blurb'] ?? '') ?></span></td><td><a href="<?= e($f['path']) ?>"><?= e($f['path']) ?></a></td><td><a href="<?= e($base) ?>.atom">.atom</a></td><td><a href="<?= e($base) ?>.json">.json</a></td></tr>
+      <tr><td><b><?= e(str_replace('Bharat Wire India — ', '', $f['title'])) ?></b><span class="sub"><?= e($f['blurb'] ?? '') ?></span></td><td><a href="<?= e($f['path']) ?>"><?= e($f['path']) ?></a></td><td><a href="<?= e($base) ?>.atom">.atom</a></td><td><a href="<?= e($base) ?>.json">.json</a></td></tr>
     <?php endforeach; ?>
     </tbody>
   </table></div>
