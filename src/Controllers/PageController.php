@@ -221,12 +221,18 @@ final class PageController
         if (!$story) {
             throw new HttpException(404, 'Story not found');
         }
+        // Merged duplicate: one URL answers for the story, permanently.
+        if (!empty($story['redirect_to']) && $story['redirect_to'] !== $story['slug']) {
+            return Response::redirect(absolute_url('/story/' . $story['redirect_to']), 301);
+        }
         Database::query('UPDATE stories SET views=views+1 WHERE id=?', [$story['id']]);
         $story['views']++;
         $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role,reports_published,plan FROM users WHERE id=?', [$story['author_user_id']]) : null;
         $isWire = $story['kind'] === 'wire';
         // Members' archive: community reports older than the archive window are summarised for non-members.
         $archived = !$isWire && \MeNews\Services\Membership::isArchived($story, Auth::user());
+        // Declared in the structured data for everyone, even when a crawler is served the full text.
+        $gated = !$isWire && \MeNews\Services\Membership::isGated($story);
         return View::page('story', self::base([
             // Wire pages canonicalise to the publisher and stay out of the index: the original is the article.
             'canonical' => $isWire ? $story['source_url'] : absolute_url($story['url']),
@@ -239,8 +245,10 @@ final class PageController
             'story' => $story,
             'author' => $author,
             'archived' => $archived,
+            'gated' => $gated,
             'feedLinks' => [['/feed/section/' . Categories::slug((string)$story['category']) . '.xml', $story['category']], $story['county'] ? ['/feed/county/' . slugify($story['county']) . '.xml', 'Co. ' . $story['county']] : null],
-            'robots' => $isWire ? 'noindex,follow' : ($archived ? 'noindex,follow' : null),
+            // Never noindex our own reporting: the gate below is declared in the JSON-LD instead.
+            'robots' => $isWire ? 'noindex,follow' : null,
             'comments' => Stories::comments($story['id']),
             'confirmations' => Stories::confirmations($story['id']),
             'related' => Stories::related($story, 4),
@@ -437,42 +445,99 @@ final class PageController
         Media::stream(Media::path($row['media_original'], 'quarantine'));
     }
 
-    public static function sitemap(Request $r): Response
+    /** Every indexable page, newest first, with the date it last changed. Wire headlines are left out: they belong to their publishers. */
+    private static function sitemapEntries(): array
     {
-        $urls = ['/', '/near', '/signal', '/map', '/advertise', '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game', '/contributors', '/about', '/plus', '/feeds'];
+        $today = gmdate('Y-m-d');
+        $urls = [];
+        $add = static function (string $path, ?string $lastmod = null, string $freq = '', string $priority = '') use (&$urls): void {
+            $urls[] = ['loc' => absolute_url($path), 'lastmod' => $lastmod ? substr($lastmod, 0, 10) : null, 'freq' => $freq, 'priority' => $priority];
+        };
+        $add('/', $today, 'hourly', '1.0');
+        foreach (['/near', '/signal', '/map', '/notices', '/alerts', '/poll'] as $p) {
+            $add($p, $today, 'hourly', '0.8');
+        }
         foreach (Categories::ALL as $meta) {
-            $urls[] = '/section/' . $meta['slug'];
+            $add('/section/' . $meta['slug'], $today, 'hourly', '0.8');
         }
         foreach (Locations::countyNames() as $c) {
-            $urls[] = '/county/' . slugify($c);
+            $slug = slugify($c);
+            $add('/county/' . $slug, $today, 'hourly', '0.8');
+            $add('/county/' . $slug . '/map', $today, 'weekly', '0.4');
+            $add('/notices?county=' . rawurlencode($c), $today, 'daily', '0.4');
+            $add('/alerts?county=' . rawurlencode($c), $today, 'daily', '0.4');
         }
-        $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        foreach ($urls as $u) {
-            $xml .= '<url><loc>' . e(absolute_url($u)) . '</loc></url>';
-        }
-        // Only our own pages are indexed: county, section, utility and community pages. Wire headlines belong to their publishers.
-        $urls[] = '/notices';
-        $urls[] = '/alerts';
-        $urls[] = '/poll';
-        $urls[] = '/corrections';
-        $urls[] = '/ownership';
-        $urls[] = '/privacy';
-        $urls[] = '/moderation';
         foreach (\MeNews\Services\Notices::KINDS as $k => $meta) {
-            $urls[] = '/notices/' . $k;
+            $add('/notices/' . $k, $today, 'daily', '0.5');
         }
-        foreach (Locations::countyNames() as $c) {
-            $urls[] = '/county/' . slugify($c) . '/map';
-            $urls[] = '/notices?county=' . rawurlencode($c);
-            $urls[] = '/alerts?county=' . rawurlencode($c);
+        foreach (['/advertise', '/plus', '/contributors', '/about', '/feeds', '/corrections', '/ownership', '/privacy', '/moderation',
+                  '/kids', '/kids/crossword', '/kids/wordsearch', '/kids/quiz', '/kids/county-game'] as $p) {
+            $add($p, $today, 'monthly', '0.3');
         }
-        foreach (Database::all("SELECT kind, slug, COALESCE(updated_at,created_at) AS u FROM notices WHERE status='published' ORDER BY published_at DESC LIMIT 2000") as $n) {
-            $xml .= '<url><loc>' . e(absolute_url('/notices/' . $n['kind'] . '/' . $n['slug'])) . '</loc><lastmod>' . e(substr((string)$n['u'], 0, 10)) . '</lastmod></url>';
+        foreach (Database::all("SELECT handle, COALESCE(last_seen_at,created_at) AS u FROM users WHERE handle IS NOT NULL AND handle<>'' AND reports_published>0 ORDER BY reports_published DESC LIMIT 500") as $c) {
+            $add('/contributors/' . $c['handle'], (string)$c['u'], 'weekly', '0.4');
         }
-        foreach (Database::all("SELECT slug, COALESCE(updated_at,created_at) AS u FROM stories WHERE status='published' AND kind='community' ORDER BY COALESCE(published_at,created_at) DESC LIMIT 2000") as $s) {
-            $xml .= '<url><loc>' . e(absolute_url('/story/' . $s['slug'])) . '</loc><lastmod>' . e(substr((string)$s['u'], 0, 10)) . '</lastmod></url>';
+        foreach (Database::all("SELECT kind, slug, COALESCE(updated_at,created_at) AS u FROM notices WHERE status='published' ORDER BY published_at DESC LIMIT 5000") as $n) {
+            $add('/notices/' . $n['kind'] . '/' . $n['slug'], (string)$n['u'], 'monthly', '0.5');
         }
-        return Response::text($xml . '</urlset>', 'application/xml; charset=utf-8');
+        // Our own reporting: everything published, excluding anything merged into another story.
+        foreach (Database::all("SELECT slug, COALESCE(updated_at,published_at,created_at) AS u FROM stories WHERE status='published' AND kind='community' AND COALESCE(redirect_to,'')='' ORDER BY COALESCE(published_at,created_at) DESC") as $st) {
+            $add('/story/' . $st['slug'], (string)$st['u'], 'weekly', '0.7');
+        }
+        return $urls;
+    }
+
+    private static function urlset(array $entries): string
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        foreach ($entries as $u) {
+            $xml .= '<url><loc>' . e($u['loc']) . '</loc>';
+            $xml .= $u['lastmod'] ? '<lastmod>' . e($u['lastmod']) . '</lastmod>' : '';
+            $xml .= $u['freq'] ? '<changefreq>' . e($u['freq']) . '</changefreq>' : '';
+            $xml .= $u['priority'] ? '<priority>' . e($u['priority']) . '</priority>' : '';
+            $xml .= '</url>';
+        }
+        return $xml . '</urlset>';
+    }
+
+    /**
+     * /sitemap.xml, plus /sitemap-1.xml and friends once the site passes the protocol's
+     * 50,000-URL limit, in which case /sitemap.xml becomes the index that lists them.
+     */
+    public static function sitemap(Request $r, array $p = []): Response
+    {
+        $chunk = 20000;
+        $entries = self::sitemapEntries();
+        $pages = (int)max(1, ceil(count($entries) / $chunk));
+        $part = $p['part'] ?? null;
+        if ($part !== null) {
+            $n = (int)$part;
+            if ($n < 1 || $n > $pages) {
+                throw new HttpException(404, 'Sitemap not found');
+            }
+            $xml = self::urlset(array_slice($entries, ($n - 1) * $chunk, $chunk));
+        } elseif ($pages > 1) {
+            $last = gmdate('Y-m-d');
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            for ($n = 1; $n <= $pages; $n++) {
+                $xml .= '<sitemap><loc>' . e(absolute_url('/sitemap-' . $n . '.xml')) . '</loc><lastmod>' . $last . '</lastmod></sitemap>';
+            }
+            $xml .= '<sitemap><loc>' . e(absolute_url('/news-sitemap.xml')) . '</loc><lastmod>' . $last . '</lastmod></sitemap>';
+            $xml .= '</sitemapindex>';
+        } else {
+            $xml = self::urlset($entries);
+        }
+        return Response::text($xml, 'application/xml; charset=utf-8')->withHeader('Cache-Control', 'public, max-age=900');
+    }
+
+    /** IndexNow fetches this to check the key we ping with really belongs to this site. */
+    public static function indexNowKey(Request $r, array $p): Response
+    {
+        $key = \MeNews\Services\Seo::indexNowKey();
+        if (!hash_equals($key, (string)$p['key'])) {
+            throw new HttpException(404, 'Not found');
+        }
+        return Response::text($key, 'text/plain; charset=utf-8');
     }
 
     /** RSS / Atom / JSON Feed for the whole site, one section, one county or original reporting only. */

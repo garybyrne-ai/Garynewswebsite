@@ -78,10 +78,10 @@ p{margin:0}
 
 /* ---------- header ---------- */
 .topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid var(--line)}
-.topbar__in{display:flex;align-items:center;gap:20px;height:70px}
-.brand{display:flex;align-items:center;gap:12px;flex:none}
+.topbar__in{display:flex;align-items:center;gap:20px;height:70px;min-width:0}
+.brand{display:flex;align-items:center;gap:12px;flex:0 1 auto;min-width:0;overflow:hidden}
 .brand__mark{width:40px;height:40px;filter:drop-shadow(0 0 12px rgba(38,192,114,.35))}
-.brand__word{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:-.03em;line-height:1;display:flex;align-items:baseline;gap:.35em}
+.brand__word{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:-.03em;line-height:1;display:flex;align-items:baseline;gap:.35em;min-width:0;white-space:nowrap}
 .brand__word b{font-weight:800;background:var(--aurora);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:1.35em}
 .brand__word small{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:500}
 .brand__word--lg{font-size:2rem}
@@ -93,7 +93,7 @@ p{margin:0}
 .search--big{max-width:none;margin:1rem 0}
 .search--big input{padding:16px 130px 16px 22px;font-size:1.05rem}
 .search--big button{width:auto;padding:0 20px;border-radius:999px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;background:var(--aurora);color:var(--on-accent);font-weight:700;height:38px}
-.topbar__actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.topbar__actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
 .iconbtn{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:1.05rem;transition:.2s}
 .iconbtn:hover{border-color:var(--line-2);color:var(--ink);transform:translateY(-1px)}
 #theme-toggle .sun{display:none}
@@ -450,8 +450,8 @@ p{margin:0}
 .tabs{display:flex;gap:6px;margin-bottom:18px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
 .tabs button{flex:1;padding:8px;border-radius:999px;color:var(--muted);font-weight:700}
 .tabs button.is-active{background:var(--aurora);color:var(--on-accent)}
-.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(6,16,11,.6);backdrop-filter:blur(10px)}
-.modal__box{width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(6,16,11,.6);backdrop-filter:blur(10px);overflow:auto;overscroll-behavior:contain}
+.modal__box{width:min(480px,100%);max-width:100%;min-width:0;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow:auto;overscroll-behavior:contain;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
 .modal__box--wide{width:min(680px,100%)}
 @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
 .modal__head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
@@ -1045,7 +1045,7 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
    ===================================================================== */
 .hud__right a{color:var(--muted);display:inline-flex;align-items:center;gap:4px}
 .hud__right a:hover{color:var(--ink)}
-.countychip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px 8px 10px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);font-weight:700;font-size:.88rem;color:var(--ink);flex:none;transition:.2s;max-width:180px}
+.countychip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px 8px 10px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);font-weight:700;font-size:.88rem;color:var(--ink);flex:0 1 auto;min-width:0;transition:.2s;max-width:180px}
 .countychip:hover{border-color:var(--cy);background:var(--surface-2)}
 .countychip .icon--pin{color:var(--cy)}
 .countychip__label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1105,10 +1105,11 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
 
 /* county picker */
 .modal__lede{color:var(--ink-2);margin-bottom:16px;font-size:.95rem}
-.countygrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.countygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:18px;min-width:0}
+.countygrid__prov{min-width:0}
 .countygrid__prov h4{color:var(--cy);margin-bottom:8px}
 .countygrid__list{display:flex;flex-direction:column;gap:4px}
-.countybtn{text-align:left;padding:7px 10px;border-radius:8px;font-weight:600;font-size:.92rem;color:var(--ink-2);border:1px solid transparent;transition:.15s}
+.countybtn{text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:7px 10px;border-radius:8px;font-weight:600;font-size:.92rem;color:var(--ink-2);border:1px solid transparent;transition:.15s}
 .countybtn:hover{background:var(--surface-2);color:var(--ink)}
 .countybtn.is-active{background:var(--aurora);color:var(--on-accent);font-weight:800}
 .form__actions--split{justify-content:space-between}
@@ -1160,10 +1161,15 @@ a.paper__item:hover h2,a.paper__item:hover h3{text-decoration:underline;text-dec
 body.has-bottombar .consent{bottom:64px}
 
 @media (max-width:1240px){.lead{grid-template-columns:1fr}.lead__latest{display:none}}
-@media (max-width:1024px){.countygrid{grid-template-columns:repeat(2,1fr)}.moremenu__panel{grid-template-columns:1fr 1fr}}
+@media (max-width:1024px){.moremenu__panel{grid-template-columns:1fr 1fr}}
 @media (max-width:760px){
   .hud__right{display:none}
   .topbar__in{flex-wrap:nowrap;gap:8px;padding:8px 0}
+  .brand{gap:8px}
+  .brand__mark{width:34px;height:34px;flex:none}
+  .brand__word{font-size:1.02rem}
+  .brand__word small{display:none}
+  .topbar__actions{gap:8px}
   .search{display:none}
   .countychip{max-width:120px;padding:7px 9px 7px 8px;font-size:.8rem;margin-left:auto}
   .btn--report{padding:8px 12px}
@@ -1176,7 +1182,7 @@ body.has-bottombar .consent{bottom:64px}
   .reportcta{grid-template-columns:1fr;padding:18px}
   .reportcta__card .card{transform:none}
   .reportcats{grid-template-columns:1fr 1fr}
-  .countygrid{grid-template-columns:1fr 1fr;gap:10px}
+  .countygrid{grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px}
   .countybtn{font-size:.86rem;padding:6px 8px}
   body:not(.page-app){padding-bottom:70px}
   .bottombar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:100;background:color-mix(in srgb,var(--bg-2) 92%,transparent);backdrop-filter:blur(16px);border-top:1px solid var(--line-2);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
@@ -1475,3 +1481,45 @@ font[style]{background:inherit!important;box-shadow:none!important}
 .sharecard__i svg{width:14px;height:14px}
 @media print{.sharebar,#share-modal{display:none!important}}
 @media (max-width:600px){.sharegrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}}
+
+/* Phones: dialogs become bottom sheets and can never widen the page */
+@media (max-width:620px){
+  .modal{padding:0;place-items:end stretch}
+  .modal__box,.modal__box--wide,.modal--sheet .modal__box{width:100%;max-width:100%;border-radius:20px 20px 0 0;max-height:88vh;max-height:88dvh;animation:sheetup .28s cubic-bezier(.2,.8,.2,1)}
+  .modal__head{padding:16px 16px 14px;position:sticky;top:0;background:var(--bg-2);z-index:2}
+  .modal__head h2{font-size:1.1rem}
+  .modal__body{padding:16px}
+  .countygrid{gap:6px}
+  .countybtn{padding:9px 10px}
+}
+@keyframes sheetup{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
+/* The cookie bar never sits on top of an open dialog */
+body.has-modal .consent{display:none}
+
+/* Nothing may push the page sideways: a horizontal scroll makes every page look
+   shifted to the left on a phone. Vertical scrolling is untouched. */
+html{overflow-x:hidden}
+body{overflow-x:clip}
+@media (max-width:430px){
+  .btn--report span{display:none}
+  .btn--report{padding:8px 11px}
+  .countychip{max-width:112px}
+}
+
+/* Partner content: unmistakable above the headline, disclosed again at the end. */
+.sponsorlabel{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:10px 14px;border-radius:12px;border:1px solid var(--line-2);background:linear-gradient(90deg,rgba(255,176,32,.16),transparent);font-size:.9rem}
+.sponsorlabel svg{width:18px;height:18px;flex:none;color:#b07400}
+.sponsorlabel b{font-family:var(--display);letter-spacing:-.01em}
+.sponsorlabel span{color:var(--muted)}
+.disclosure{margin:18px 0 0;padding:14px 16px;border-radius:12px;border:1px dashed var(--line-2);background:var(--surface-2);color:var(--muted);font-size:.92rem;line-height:1.55}
+.disclosure b{color:var(--ink)}
+.article__body a{color:var(--brand);text-decoration:underline;text-underline-offset:3px;word-break:break-word}
+.trustnote--warn{border-color:rgba(214,64,64,.4)}
+.trustnote--warn .btn{margin-left:6px}
+
+/* Editorial standards list on the About page: plain prose, not the link-card list above it. */
+.standards{display:grid;gap:12px;margin:14px 0 0;padding:0;list-style:none}
+.standards li{padding-left:18px;position:relative;line-height:1.6;color:var(--muted)}
+.standards li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--brand)}
+.standards li b{color:var(--ink)}
+.standards li a{color:var(--brand);text-decoration:underline;text-underline-offset:3px}

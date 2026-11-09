@@ -40,6 +40,17 @@
   <?php if (!empty($contributors)): ?><ul class="sources"><?php foreach ($contributors as $c): ?><li><a href="/contributors/<?= e($c['handle']) ?>"><b><?= e($c['display_name']) ?></b><span class="mono">Curates <?= e($c['desk']) ?> · <?= (int)$c['reported'] ?> original · <?= (int)$c['curated'] ?> curated</span></a></li><?php endforeach; ?></ul><?php endif; ?>
   <?php if (!empty($pulse)): ?><div class="panel panel--pulse" style="max-width:520px"><header class="panel__head"><span class="kicker">Newsroom pulse</span><span class="mono panel__hint">24 h</span></header><?= \MeNews\Ui::sparkline($pulse) ?><div class="pulse__stats mono"><span><b><?= e((string)array_sum($pulse)) ?></b> stories / 24 h</span><span><b><?= e((string)max($pulse)) ?></b> peak per hour</span></div></div><?php endif; ?>
 
+  <h2 id="standards">Editorial standards, ownership and corrections</h2>
+  <p>Google, Bing and the AI assistants weigh these signals when they decide whether a local news site can be trusted. They are also simply what a reader is owed.</p>
+  <ul class="standards">
+    <li><b>Who owns us.</b> <?= e(\MeNews\Database::setting('owner_company', 'ME News Ireland')) ?>, published by <?= e(\MeNews\Database::setting('owner_name', 'Gary Byrne')) ?><?= \MeNews\Database::setting('owner_address') ? ', ' . e(\MeNews\Database::setting('owner_address')) : '' ?>. The full <a href="/ownership">ownership and funding statement</a> sets out every revenue source.</li>
+    <li><b>Who writes what.</b> Every original report carries a named byline linking to that contributor's profile and their published record. Wire headlines name the publisher, link to the original, and are never presented as our reporting.</li>
+    <li><b>How we verify.</b> Photos are screened for metadata and reverse-searched, locations are checked against the reported position, and only an editor sets the public label. The <a href="#labels">labels</a> above say exactly what each one means.</li>
+    <li><b>When we get it wrong.</b> We correct on the page, with a dated note, and keep the record on the <a href="/corrections">corrections page</a>. Tell us at <a href="mailto:<?= e(\MeNews\Database::setting('contact_email') ?: 'news@menews.ie') ?>"><?= e(\MeNews\Database::setting('contact_email') ?: 'news@menews.ie') ?></a> and we will answer.</li>
+    <li><b>Paid coverage is labelled.</b> Partner content carries a <b>Business Spotlight</b> label above the headline, a disclosure at the end, and sponsored links. It is never counted as reporting.</li>
+    <li><b>How to reach the desk.</b> <a href="mailto:<?= e(\MeNews\Database::setting('contact_email') ?: 'news@menews.ie') ?>"><?= e(\MeNews\Database::setting('contact_email') ?: 'news@menews.ie') ?></a>, or the Report button on any page. Our <a href="/moderation">moderation policy</a> covers comments and community reports.</li>
+  </ul>
+
   <h2>Principles</h2>
   <p><b>Safety is not truth.</b> The safety score asks whether content presents a harmful-content or privacy risk. The confidence score is only an evidence signal. Neither is permission to call a claim true.</p>
   <p><b>Advertising never touches editorial.</b> Local business adverts are approved separately and are always marked as sponsored.</p>

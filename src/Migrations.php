@@ -22,6 +22,11 @@ final class Migrations
             'exif_json' => 'TEXT',
             'corroborations' => 'INTEGER NOT NULL DEFAULT 0',
             'cluster_checked' => 'INTEGER NOT NULL DEFAULT 0',
+            // The slug this story was merged into: the duplicate 301s to the one we kept.
+            'redirect_to' => 'TEXT',
+            // Promotional coverage: labelled above the headline, disclosed at the end, outbound links rel=sponsored.
+            'sponsored' => 'INTEGER NOT NULL DEFAULT 0',
+            'sponsor_name' => 'TEXT',
         ],
         'confirmations' => [
             'voter_key' => 'TEXT',
@@ -81,5 +86,7 @@ final class Migrations
         \MeNews\Services\AdPackages::seedDefaults($pdo);
         $pdo->exec("UPDATE ads SET tier='premium' WHERE is_house=1 AND tier<>'premium'");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_confirmations_voter ON confirmations(story_id, voter_key)");
+        // The members' archive gate ships off: a gate in front of our own reporting keeps it out of search.
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('archive_gate','0'),('canonical_redirect','1')");
     }
 }

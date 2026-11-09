@@ -88,8 +88,15 @@
   }
 
   /* ---------- modals ---------- */
-  function openModal(id) { const m = $('#' + id); if (!m) return; m.hidden = false; document.body.style.overflow = 'hidden'; const f = m.querySelector('input:not([type=hidden]),textarea,select'); if (f) setTimeout(() => f.focus(), 50); }
-  function closeModals() { $$('.modal').forEach(m => m.hidden = true); document.body.style.overflow = ''; }
+  function openModal(id) {
+    const m = $('#' + id); if (!m) return;
+    m.hidden = false; document.body.style.overflow = 'hidden'; document.body.classList.add('has-modal');
+    const f = m.querySelector('input:not([type=hidden]),textarea,select'); if (f) setTimeout(() => f.focus(), 50);
+  }
+  function closeModals() {
+    $$('.modal').forEach(m => m.hidden = true);
+    document.body.style.overflow = ''; document.body.classList.remove('has-modal');
+  }
   $$('.modal [data-close]').forEach(b => b.addEventListener('click', closeModals));
   $$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModals(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModals(); });
@@ -353,7 +360,17 @@
   const countyModal = $('#county-modal');
   const openCounty = () => openModal('county-modal');
   $$('[data-open-county]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); closeDrawer(); openCounty(); }));
-  if (countyModal && !window.ME.located && !dismissed() && document.body.classList.contains('page-home') && !new URLSearchParams(location.search).get('county')) setTimeout(openCounty, 900);
+  // First visit: ask for a county, but never on top of the cookie bar - that one goes first.
+  if (countyModal && !window.ME.located && !dismissed() && document.body.classList.contains('page-home') && !new URLSearchParams(location.search).get('county')) {
+    const askCounty = () => setTimeout(openCounty, 700);
+    let consentAnswered = true;
+    try { consentAnswered = !!localStorage.getItem('me_consent'); } catch (e) { }
+    if (!consentAnswered && $('#consent')) {
+      $$('[data-consent]').forEach(b => b.addEventListener('click', askCounty, { once: true }));
+    } else {
+      askCounty();
+    }
+  }
   $$('[data-county]').forEach(b => b.addEventListener('click', () => { setCookie('me_county', b.dataset.county, 180); delCookie('me_loc'); toast('Leading with ' + b.dataset.county); location.reload(); }));
   $('[data-county-later]')?.addEventListener('click', () => { closeModals(); try { localStorage.setItem('me_loc_dismissed', String(Date.now() + 7 * 86400000)); } catch (e) { } });
   async function applyPosition(lat, lng) {
@@ -404,7 +421,7 @@
   const consent = $('#consent');
   if (consent) {
     let seen = false; try { seen = !!localStorage.getItem('me_consent'); } catch (e) { }
-    if (!seen && !document.body.classList.contains('page-app')) consent.hidden = false;
+    if (!seen && !document.body.classList.contains('page-app') && !document.body.classList.contains('has-modal')) consent.hidden = false;
     $$('[data-consent]').forEach(b => b.addEventListener('click', () => { try { localStorage.setItem('me_consent', b.dataset.consent); } catch (e) { } consent.hidden = true; }));
   }
   if (window.innerWidth < 761) document.body.classList.add('has-bottombar');

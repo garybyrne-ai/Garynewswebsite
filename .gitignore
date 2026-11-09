@@ -7,8 +7,9 @@
 storage/*
 !storage/.gitkeep
 
-# Local tooling
-vendor/
+# Local tooling (Composer's own folder only: the self-hosted browser libraries in
+# public/assets/vendor/ ship with the site and must stay in the repository)
+/vendor/
 node_modules/
 *.log
 .DS_Store

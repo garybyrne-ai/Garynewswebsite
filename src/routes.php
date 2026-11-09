@@ -78,6 +78,9 @@ return static function (Router $r): void {
     $r->get('/sitemap.xml', [Page::class, 'sitemap']);
     $r->get('/news-sitemap.xml', [Page::class, 'newsSitemap']);
     $r->get('/robots.txt', [Page::class, 'robots']);
+    $r->get('/sitemap-{part:[a-z0-9-]+}.xml', [Page::class, 'sitemap']);
+    // IndexNow proves we own the site by serving the key back at its own address.
+    $r->get('/{key:[a-f0-9]+}.txt', [Page::class, 'indexNowKey']);
     $r->get('/opensearch.xml', [Page::class, 'opensearch']);
     $r->get('/feeds', [Page::class, 'feedsPage']);
     $r->get('/feed.xml', [Page::class, 'rss']);
@@ -171,6 +174,7 @@ return static function (Router $r): void {
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/decision', [Admin::class, 'decision']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/rerun-safety', [Admin::class, 'rerun']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/edit', [Admin::class, 'edit']);
+    $r->post('/api/admin/stories/{id:[a-f0-9]+}/merge', [Admin::class, 'merge']);
     $r->get('/api/admin/mail', [Admin::class, 'mail']);
     $r->post('/api/admin/mail', [Admin::class, 'saveMail']);
     $r->post('/api/admin/mail/test', [Admin::class, 'testMail']);

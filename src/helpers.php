@@ -144,3 +144,25 @@ function t(string $text): string
 {
     return \MeNews\Support\Lang::t($text);
 }
+
+/**
+ * Render a report's body: escaped, paragraphed, with bare web addresses turned into links.
+ *
+ * Links out of a sponsored story carry rel="sponsored" so they never read as an editorial
+ * endorsement to Google; every other outbound link is nofollow by default, because a
+ * reader-submitted address is not a recommendation either.
+ */
+function article_body(string $body, bool $sponsored = false): string
+{
+    $rel = $sponsored ? 'sponsored nofollow noopener' : 'nofollow noopener';
+    $out = preg_replace_callback(
+        '~(?<![\w@/])(https?://[^\s<>"\']+[^\s<>"\'.,;:!?)\]])~i',
+        static function (array $m) use ($rel): string {
+            $url = $m[1];
+            $label = mb_strimwidth(preg_replace('~^https?://(www\.)?~i', '', $url) ?? $url, 0, 60, '…');
+            return '<a href="' . e($url) . '" rel="' . $rel . '" target="_blank">' . e($label) . '</a>';
+        },
+        e($body)
+    );
+    return nl2br((string)$out);
+}

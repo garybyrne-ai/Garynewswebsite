@@ -59,6 +59,6 @@ final class Categories
     /** Community reporting categories offered in the report form. */
     public static function community(): array
     {
-        return ['Community', 'Traffic', 'Council', 'Sport', "What's On", 'Business', 'Local'];
+        return ['Community', 'Traffic', 'Sport', 'Business', "What's On", 'Council', 'Local'];
     }
 }

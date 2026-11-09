@@ -74,6 +74,7 @@ final class AdminController
             if ($s['kind'] === 'community') {
                 $s['public_media_url'] = $s['media_original'] && $s['media_type'] === 'image' ? Media::signedQuarantineUrl($s['id']) : null;
                 $s['duplicates'] = $s['image_hash'] ? self::duplicates($s['id'], $s['image_hash']) : [];
+                $s['similar_headlines'] = self::similarHeadlines($s['id'], (string)$s['title']);
                 $s['incident_reports'] = $s['cluster_id'] ? Database::all('SELECT id,title,author_name,location_name,status,created_at FROM stories WHERE cluster_id=? AND id<>? ORDER BY created_at', [$s['cluster_id'], $s['id']]) : [];
                 $s['gps_distance_km'] = (!empty($exif['gps']) && $s['latitude'] !== null && empty($exif['gps_used_for_pin'])) ? round(\MeNews\Support\Geo::distanceKm((float)$s['latitude'], (float)$s['longitude'], (float)$exif['gps']['lat'], (float)$exif['gps']['lng']), 1) : null;
             }
@@ -93,6 +94,42 @@ final class AdminController
             }
         }
         return $out;
+    }
+
+    /**
+     * Stories filed in the last week whose headline covers the same ground. Publishing both
+     * splits the ranking signals between two addresses and reads as padding, so the editor
+     * is warned before it happens and can merge one into the other.
+     *
+     * @return list<array{id:string,title:string,status:string,url:string,overlap:int,created_at:string,slug:string}>
+     */
+    private static function similarHeadlines(string $id, string $title, int $days = 7): array
+    {
+        $words = static function (string $t): array {
+            $stop = ['the', 'and', 'for', 'with', 'from', 'that', 'this', 'after', 'over', 'into', 'out', 'has', 'have', 'was', 'were', 'are', 'its', 'new', 'says', 'said', 'you', 'your', 'our'];
+            $w = preg_split('/[^a-z0-9]+/', mb_strtolower($t)) ?: [];
+            return array_values(array_unique(array_filter($w, static fn($x) => mb_strlen($x) > 2 && !in_array($x, $stop, true))));
+        };
+        $mine = $words($title);
+        if (count($mine) < 2) {
+            return [];
+        }
+        $since = gmdate('Y-m-d\TH:i:s', time() - $days * 86400) . '+00:00';
+        $out = [];
+        foreach (Database::all("SELECT id,slug,title,status,created_at,redirect_to FROM stories WHERE id<>? AND kind='community' AND status IN ('published','review','hold') AND created_at>? ORDER BY created_at DESC LIMIT 300", [$id, $since]) as $o) {
+            if (!empty($o['redirect_to'])) {
+                continue;
+            }
+            $theirs = $words((string)$o['title']);
+            $shared = count(array_intersect($mine, $theirs));
+            $smaller = max(1, min(count($mine), count($theirs)));
+            if ($shared >= 3 || ($shared >= 2 && $shared / $smaller >= 0.6)) {
+                $out[] = ['id' => $o['id'], 'slug' => (string)$o['slug'], 'title' => $o['title'], 'status' => $o['status'],
+                    'url' => '/story/' . $o['slug'], 'overlap' => $shared, 'created_at' => $o['created_at']];
+            }
+        }
+        usort($out, static fn($a, $b) => $b['overlap'] <=> $a['overlap']);
+        return array_slice($out, 0, 5);
     }
 
     /** Preview quarantined media for editors. */
@@ -140,6 +177,7 @@ final class AdminController
         if ($status === 'published' && $s['status'] !== 'published') {
             Notifier::localAlerts($s);
         }
+        \MeNews\Services\Seo::pingStory(['kind' => $s['kind'], 'status' => $status, 'slug' => $s['slug']]);
         return Response::json(['ok' => true, 'status' => $status]);
     }
 
@@ -175,12 +213,53 @@ final class AdminController
         if ($featured) {
             Database::query('UPDATE stories SET is_featured=0 WHERE is_featured=1');
         }
+        $sponsored = (int)($r->post('sponsored', ($s['sponsored'] ?? 0) ? '1' : '0') === '1');
+        $sponsorName = $r->post('sponsor_name', (string)($s['sponsor_name'] ?? ''), 120);
+        Database::query('UPDATE stories SET sponsored=?,sponsor_name=? WHERE id=?', [$sponsored, $sponsored ? $sponsorName : null, $s['id']]);
         Database::query('UPDATE stories SET category=?,county=?,province=?,location_name=?,verification_label=?,is_featured=?,category_locked=?,suggested_category=?,updated_at=? WHERE id=?', [
             $category, $county, $county !== '' ? Locations::provinceFor($county) : null,
             $r->post('location_name', (string)$s['location_name'], 100), $label, $featured, $category !== $s['category'] ? 1 : (int)$s['category_locked'], $category, now(), $s['id'],
         ]);
-        Audit::log($u['id'], 'story.edit', 'story', $s['id'], "$category/$county/$label/featured=$featured");
+        Audit::log($u['id'], 'story.edit', 'story', $s['id'], "$category/$county/$label/featured=$featured/sponsored=$sponsored");
+        \MeNews\Services\Seo::pingStory(['kind' => $s['kind'], 'status' => $s['status'], 'slug' => $s['slug']]);
         return Response::json(['ok' => true]);
+    }
+
+    /**
+     * Merge a duplicate into the story we are keeping: the copy stops being published and
+     * permanently redirects, so one URL answers for the story instead of splitting its signals.
+     */
+    public static function merge(Request $r, array $p): Response
+    {
+        $u = self::staff();
+        $s = Database::one('SELECT * FROM stories WHERE id=?', [$p['id']]);
+        if (!$s) {
+            throw new HttpException(404, 'Story not found');
+        }
+        $keep = trim($r->post('keep', '', 200));
+        if ($keep === '') {
+            // Undo: the story stands on its own URL again.
+            Database::query("UPDATE stories SET redirect_to=NULL, updated_at=? WHERE id=?", [now(), $s['id']]);
+            Audit::log($u['id'], 'story.unmerge', 'story', $s['id'], '');
+            return Response::json(['ok' => true, 'redirect_to' => null]);
+        }
+        $keep = basename(parse_url($keep, PHP_URL_PATH) ?: $keep);
+        $target = Database::one('SELECT id,slug FROM stories WHERE slug=? OR id=?', [$keep, $keep]);
+        if (!$target) {
+            throw new HttpException(404, 'No story with that address to merge into');
+        }
+        if ($target['id'] === $s['id']) {
+            throw new HttpException(400, 'A story cannot be merged into itself');
+        }
+        if ((string)$target['slug'] === '') {
+            throw new HttpException(400, 'The story being kept has no public address yet');
+        }
+        Database::query('UPDATE stories SET redirect_to=?, updated_at=? WHERE id=?', [$target['slug'], now(), $s['id']]);
+        // Anything that already pointed here follows the chain to the story we kept.
+        Database::query('UPDATE stories SET redirect_to=? WHERE redirect_to=?', [$target['slug'], $s['slug']]);
+        Audit::log($u['id'], 'story.merge', 'story', $s['id'], 'into ' . $target['slug']);
+        \MeNews\Services\Seo::pingStory(['kind' => $s['kind'], 'status' => 'published', 'slug' => $target['slug']]);
+        return Response::json(['ok' => true, 'redirect_to' => $target['slug']]);
     }
 
     public static function users(Request $r): Response
@@ -442,9 +521,13 @@ final class AdminController
         $keys = self::settingKeys();
         $out = [];
         foreach ($keys as $k => $meta) {
-            $out[$k] = ['value' => Database::setting($k, (string)$meta['default']), 'label' => $meta['label'], 'group' => $meta['group'], 'type' => $meta['type'], 'options' => $meta['options'] ?? null, 'hint' => $meta['hint'] ?? null];
+            $out[$k] = ['value' => Database::setting($k, (string)$meta['default']), 'label' => $meta['label'], 'group' => $meta['group'], 'type' => $meta['type'], 'options' => $meta['options'] ?? null, 'labels' => $meta['labels'] ?? null, 'hint' => $meta['hint'] ?? null];
         }
         $out['site_url']['hint'] = 'Currently using ' . rtrim(absolute_url('/'), '/') . ' for the sitemap, canonical tags, feeds, emails and payment return URLs. Leave blank to follow whichever domain visitors use.';
+        $key = \MeNews\Services\Seo::indexNowKey();
+        $out['_indexnow'] = ['value' => $key, 'label' => 'IndexNow key', 'group' => 'Search engines', 'type' => 'readonly',
+            'hint' => 'Served at ' . absolute_url('/' . $key . '.txt') . '. Bing, Yandex, Seznam and Naver are told the moment a story is published or edited.'
+                . (Database::setting('indexnow_last_at') ? ' Last ping ' . Database::setting('indexnow_last_at') . ' → ' . Database::setting('indexnow_last_result') . '.' : ' No ping sent yet.')];
         return Response::json($out);
     }
 
@@ -626,8 +709,13 @@ final class AdminController
     {
         $keys = [
             'site_url' => ['label' => 'Site address (canonical domain)', 'group' => 'Ownership', 'type' => 'text', 'default' => ''],
+            'canonical_redirect' => ['label' => 'Send every other address to the canonical domain (301)', 'group' => 'Ownership', 'type' => 'select', 'options' => ['1', '0'], 'labels' => ['1' => 'Yes — redirect to the site address', '0' => 'No — serve on any address'], 'default' => '1',
+                'hint' => 'With the site address set, a visit to the hosting address or the bare domain is permanently redirected to it, so Google credits one address. Needs the site address above.'],
+            'archive_gate' => ['label' => 'Members\' archive gate', 'group' => 'Membership', 'type' => 'select', 'options' => ['0', '1'], 'labels' => ['0' => 'Off — every report stays free', '1' => 'On — older reports are members-only'], 'default' => '0',
+                'hint' => 'Off: every published report stays free and indexable. On: reports older than the window below are summarised for non-members — search and AI crawlers still get the full text, and the page declares the gate in its structured data.'],
+            'archive_days' => ['label' => 'Free archive window (days)', 'group' => 'Membership', 'type' => 'int', 'default' => '14', 'hint' => 'Only used when the gate above is on.'],
             'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
-            'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'default' => '1'],
+            'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'labels' => ['1' => 'Yes', '0' => 'No'], 'default' => '1'],
             'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],
             'plus_annual_cents' => ['label' => 'ME+ annual price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '3900'],
             'ads_price_cents' => ['label' => 'Advertising monthly price (€)', 'group' => 'Advertising', 'type' => 'cents', 'default' => '2500'],
@@ -640,6 +728,15 @@ final class AdminController
             'owner_company' => ['label' => 'Publishing company', 'group' => 'Ownership', 'type' => 'text', 'default' => 'ME News Ireland'],
             'owner_address' => ['label' => 'Registered address', 'group' => 'Ownership', 'type' => 'text', 'default' => 'Ireland'],
         ];
+        // Search engine ownership checks, pasted straight from each console.
+        foreach (\MeNews\Services\Seo::VERIFY as $key => $meta) {
+            $keys[$key] = ['label' => ucfirst(explode('_', $key)[1]) . ' verification code', 'group' => 'Search engines', 'type' => 'text', 'default' => '',
+                'hint' => 'The content value only, not the whole tag. Published as <meta name="' . $meta . '">.'];
+        }
+        // Published as schema.org sameAs so Google and AI assistants can tie the accounts to the publication.
+        foreach (\MeNews\Services\Seo::SOCIAL as $key => $label) {
+            $keys[$key] = ['label' => $label, 'group' => 'Social profiles', 'type' => 'text', 'default' => ''];
+        }
         foreach (Locations::countyNames() as $c) {
             $keys['whatsapp_' . slugify($c)] = ['label' => $c . ' WhatsApp reporting number', 'group' => 'WhatsApp by county', 'type' => 'text', 'default' => ''];
             $keys['whatsapp_channel_' . slugify($c)] = ['label' => $c . ' WhatsApp channel link', 'group' => 'WhatsApp channels by county', 'type' => 'text', 'default' => ''];

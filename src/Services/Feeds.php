@@ -147,7 +147,7 @@ final class Feeds
     public static function newsSitemap(): string
     {
         $since = gmdate('Y-m-d\TH:i:s', time() - 48 * 3600) . '+00:00';
-        $rows = Database::all("SELECT slug,title,category,county,location_name,COALESCE(published_at,created_at) AS t FROM stories WHERE status='published' AND kind='community' AND COALESCE(published_at,created_at)>=? ORDER BY t DESC LIMIT 1000", [$since]);
+        $rows = Database::all("SELECT slug,title,category,county,location_name,COALESCE(published_at,created_at) AS t FROM stories WHERE status='published' AND kind='community' AND COALESCE(redirect_to,'')='' AND COALESCE(published_at,created_at)>=? ORDER BY t DESC LIMIT 1000", [$since]);
         $x = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">';
         foreach ($rows as $s) {
             $keywords = implode(', ', array_filter([$s['category'], $s['county'] ? 'County ' . $s['county'] : null, $s['location_name'] ?: null, 'Ireland']));
@@ -174,11 +174,13 @@ final class Feeds
     /** Organization record for aggregators and Google's publisher panel. */
     public static function organization(): array
     {
-        $same = array_values(array_filter([Database::setting('social_facebook'), Database::setting('social_x'), Database::setting('social_instagram'), Database::setting('social_youtube')]));
+        $same = \MeNews\Services\Seo::sameAs();
         return [
             '@type' => 'NewsMediaOrganization', '@id' => absolute_url('/#organization'), 'name' => self::SITE, 'url' => absolute_url('/'),
             'logo' => ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/logo-512.png'), 'width' => 512, 'height' => 512],
             'sameAs' => $same, 'foundingLocation' => ['@type' => 'Country', 'name' => 'Ireland'],
+            'publishingPrinciples' => absolute_url('/about#labels'), 'diversityPolicy' => absolute_url('/about#standards'), 'actionableFeedbackPolicy' => absolute_url('/corrections'),
+            'image' => ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/og.png'), 'width' => 1200, 'height' => 630],
             'masthead' => absolute_url('/contributors'), 'ethicsPolicy' => absolute_url('/about#labels'), 'correctionsPolicy' => absolute_url('/corrections'), 'ownershipFundingInfo' => absolute_url('/ownership'),
             'contactPoint' => ['@type' => 'ContactPoint', 'contactType' => 'newsroom', 'email' => Database::setting('contact_email') ?: Config::get('MAIL_FROM', 'news@menews.ie')],
         ];

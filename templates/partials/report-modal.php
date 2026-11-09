@@ -7,7 +7,13 @@ use MeNews\Support\Categories;
 $whatsapp = \MeNews\Database::installed() ? (\MeNews\Database::setting('whatsapp_' . slugify((string)$county)) ?: \MeNews\Database::setting('whatsapp_number')) : null;
 $town = \MeNews\Support\Visitor::position() ? (\MeNews\Support\Geo::nearest(\MeNews\Support\Visitor::position()['lat'], \MeNews\Support\Visitor::position()['lng'])['town'] ?? null) : null;
 $where = $town ?: ($county ?: 'your area');
-$prompts = ['Community' => 'Something happening now', 'Traffic' => 'A crash, closure or delay', 'Sport' => 'A club result or fixture'];
+$prompts = [
+    'Community' => 'Something happening now',
+    'Traffic' => 'A crash, closure or delay',
+    'Sport' => 'A club result or fixture',
+    'Business' => 'An opening, closure, job or deal',
+    "What's On" => 'An event, festival or gig',
+];
 ?>
 <div class="modal" id="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-title" hidden>
   <div class="modal__box modal__box--wide">
@@ -19,7 +25,8 @@ $prompts = ['Community' => 'Something happening now', 'Traffic' => 'A crash, clo
       <form id="report-form" class="form" enctype="multipart/form-data">
         <div class="reportcats" role="group" aria-label="What kind of report?">
           <?php foreach ($prompts as $cat => $hint): ?><label class="reportcat"><input type="radio" name="category" value="<?= e($cat) ?>" <?= $cat === 'Community' ? 'checked' : '' ?>><span><?= icon(Categories::ALL[$cat]['icon']) ?><b><?= e($cat === 'Community' ? 'Something happening' : $cat) ?></b><small><?= e($hint) ?></small></span></label><?php endforeach; ?>
-          <label class="reportcat reportcat--more"><input type="radio" name="category" value="Council"><span><?= icon('more') ?><b>Other</b><small>Council, event, business…</small></span></label>
+          <label class="reportcat reportcat--more"><input type="radio" name="category" value="Council"><span><?= icon('council') ?><b>Council</b><small>Planning, roads, local authority</small></span></label>
+          <label class="reportcat reportcat--more"><input type="radio" name="category" value="Local"><span><?= icon('more') ?><b>Something else</b><small>Anything the desk should know about</small></span></label>
         </div>
         <label class="dropzone" data-dropzone>
           <input name="media" type="file" accept="image/*,video/*" capture="environment">

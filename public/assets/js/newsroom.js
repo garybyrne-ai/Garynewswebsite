@@ -54,6 +54,7 @@
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
       <h3>${esc(x.title)}</h3>
       <div class="meta">${esc(x.location_name || '')}${x.county ? ', ' + esc(x.county) : ''} · ${esc(x.author_name || '')}${x.reporter_verified ? ' ✓' : ''}${x.author_user_id ? ` · reputation ${x.reporter_reputation ?? '—'}` : (x.reporter_verified_at ? ' · <span class="is-good">guest, contact confirmed</span>' : ` · <span class="is-bad">guest, not yet confirmed</span> (${esc(x.reporter_contact || '')})`)}${x.latitude ? ' · GPS' : ''}</div>
+      ${x.similar_headlines && x.similar_headlines.length ? `<div class="trustnote trustnote--warn"><b class="is-bad">A headline this close was filed in the last week.</b> Publishing both splits the story across two addresses. ${x.similar_headlines.map(d => `<a href="${esc(d.url)}" target="_blank">${esc(d.title)}</a> (${esc(d.status)}) <button class="btn btn--ghost btn--sm" type="button" data-merge="${esc(d.slug)}">Merge this into it</button>`).join(' · ')}</div>` : ''}
       ${x.incident_reports && x.incident_reports.length ? `<div class="trustnote"><b>${x.incident_reports.length + 1} reports of this incident.</b> ${x.incident_reports.map(i => `<a href="#" data-jump="${i.id}">${esc(i.author_name || 'Reporter')} · ${esc(i.location_name || '')} · ${esc(i.status)}</a>`).join(' · ')}</div>` : ''}
       ${media}
       ${x.media_type === 'image' && x.media_url ? `<div class="evidence">
@@ -89,6 +90,12 @@
         toast('Decision saved'); await Promise.all([summary(), loadQueue()]);
       } else if (e.target.hasAttribute('data-rerun')) {
         e.target.disabled = true; await api('/api/admin/stories/' + id + '/rerun-safety', { method: 'POST' }); toast('Safety screening re-run'); await Promise.all([summary(), loadQueue()]);
+      } else if (e.target.dataset.merge) {
+        // One address per story: this copy stops being published and permanently redirects to the one we keep.
+        if (!confirm('Merge this report into the other story? Its address will permanently redirect there.')) return;
+        e.target.disabled = true;
+        await api('/api/admin/stories/' + id + '/merge', { method: 'POST', body: fd({ keep: e.target.dataset.merge }) });
+        toast('Merged — the duplicate now redirects'); await Promise.all([summary(), loadQueue()]);
       }
     } catch (err) { toast(err.message); }
   });
@@ -96,13 +103,14 @@
   async function loadStories() {
     const q = $('#stories-q').value, kind = $('#stories-kind').value, status = $('#stories-status').value;
     const a = await api(`/api/admin/stories?q=${encodeURIComponent(q)}&kind=${kind}&status=${status}&limit=150`);
-    $('#stories-table').innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>Story</th><th>Section</th><th>County</th><th>Label</th><th>Status</th><th>Featured</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
+    $('#stories-table').innerHTML = `<div class="tablewrap"><table class="table"><thead><tr><th>Story</th><th>Section</th><th>County</th><th>Label</th><th>Status</th><th>Featured</th><th title="Paid or owner-run coverage: labelled on the page and its links marked rel=sponsored">Partner</th><th></th></tr></thead><tbody>${a.map(x => `<tr data-id="${x.id}">
       <td><b>${x.status === 'published' ? `<a href="${esc(x.url)}" target="_blank">${esc(x.title)}</a>` : esc(x.title)}</b><span class="sub">${esc(x.kind)} · ${esc(x.source_name || x.author_name || '')} · ${fmt(x.published_at || x.created_at)} · ${x.views} views</span></td>
       <td><select data-cat>${opts(CATS, x.category)}</select></td>
       <td><select data-county><option value="">—</option>${opts(COUNTIES, x.county)}</select></td>
       <td><select data-label>${opts(LABELS, x.verification_label)}</select></td>
       <td><span class="status ${esc(x.status)}">${esc(x.status)}</span></td>
       <td><input type="checkbox" data-featured ${x.is_featured ? 'checked' : ''}></td>
+      <td><input type="checkbox" data-sponsored ${x.sponsored ? 'checked' : ''}><input data-sponsor-name value="${esc(x.sponsor_name || '')}" placeholder="Business name" size="12" style="margin-top:4px"></td>
       <td class="actions"><button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
   }
   ['stories-q', 'stories-kind', 'stories-status'].forEach(id => $('#' + id).addEventListener('change', loadStories));
@@ -112,7 +120,7 @@
     const id = row.dataset.id;
     try {
       if (e.target.hasAttribute('data-save')) {
-        await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: $('[data-cat]', row).value, county: $('[data-county]', row).value, label: $('[data-label]', row).value, is_featured: $('[data-featured]', row).checked ? '1' : '0' }) });
+        await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: $('[data-cat]', row).value, county: $('[data-county]', row).value, label: $('[data-label]', row).value, is_featured: $('[data-featured]', row).checked ? '1' : '0', sponsored: $('[data-sponsored]', row).checked ? '1' : '0', sponsor_name: $('[data-sponsor-name]', row).value }) });
         toast('Saved'); loadStories();
       } else if (e.target.hasAttribute('data-unpublish')) {
         await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: 'unpublish', label: $('[data-label]', row).value, note: 'Unpublished from the newsroom' }) }); toast('Unpublished'); loadStories(); summary();
@@ -341,7 +349,12 @@
       const s = await api('/api/admin/settings');
       const groups = {};
       Object.entries(s).forEach(([k, v]) => { (groups[v.group] ??= []).push([k, v]); });
-      const field = ([k, v]) => `<label>${esc(v.label)}${v.type === 'select' ? `<select name="${k}">${v.options.map(o => `<option ${o === v.value ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://menews.ie"' : ''}>`}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
+      const control = (k, v) => {
+        if (v.type === 'readonly') return `<input value="${esc(v.value)}" readonly tabindex="-1">`;
+        if (v.type === 'select') return `<select name="${k}">${v.options.map(o => `<option value="${esc(o)}" ${o === v.value ? 'selected' : ''}>${esc((v.labels || {})[o] || o)}</option>`).join('')}</select>`;
+        return `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://menews.ie"' : ''}>`;
+      };
+      const field = ([k, v]) => `<label>${esc(v.label)}${control(k, v)}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
       $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(field).join('')}</div></details>` : items.map(field).join('')).join('');
     } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
   }

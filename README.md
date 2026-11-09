@@ -156,7 +156,13 @@ tests/smoke.php         end-to-end smoke test against a running server
 
 **Sharing** — a small row of share buttons on every story and notice (WhatsApp, Facebook, X, email, copy link) with a "More" sheet holding 30+ networks, a searchable list, the link to copy and Print. On phones the device's own share sheet leads, and app-only entries (Messenger, Viber, text message) appear only where they work. Everything is a plain link built from the page's own URL: no AddThis, no third-party script, no tracking, nothing extra to load. Add or reorder networks in `src/Support/Share.php`.
 
-**Site address** — canonical URLs (sitemap, `<link rel=canonical>`, Open Graph, feeds, emails, payment return URLs) come from **Settings → Site address** in the newsroom. Leave it blank and the site follows whichever domain the visitor used; set it to pin one canonical domain. A `PUBLIC_BASE_URL` in `.env` is still honoured, but only when its host matches the live request, so a stale staging address can never poison the sitemap after a domain move.
+**Search visibility** — original reporting is always indexable: nothing the newsroom writes ever emits `noindex`, and the members' archive gate ships **off** (Settings → Membership). Turn it on and crawlers are still served the full text under Google's flexible-sampling rules, with the gated part declared as `isAccessibleForFree: false` plus a `hasPart` selector. `sitemap.xml` carries every indexable page with `<lastmod>`, splits into a sitemap index past 20,000 URLs, and leaves out wire headlines and merged duplicates; `news-sitemap.xml` covers the last 48 hours; a rewrite rule makes both — and `robots.txt` — beat any stale file left on the server. **Settings → Search engines** holds the Google, Bing, Yandex, Pinterest and Facebook verification codes (published as meta tags) and shows the IndexNow key, which is served at `/<key>.txt` and pinged automatically whenever a story is published, edited or merged. **Settings → Social profiles** feeds `sameAs` on the publisher record.
+
+**One address per story** — the review queue warns when a headline filed in the last week covers the same ground, and one click merges the copy into the story being kept: it leaves the lists, the feeds and the sitemap, and its URL permanently redirects (301). Chains follow through to the final story.
+
+**Partner content** — mark a story as partner content in **Newsroom → Stories** (with the business name) and it carries a *Business Spotlight* label above the headline, a disclosure block at the end, `rel="sponsored"` on every outbound link in the body, and `AdvertiserContentArticle` structured data instead of `NewsArticle`. Links in ordinary reports are `rel="nofollow"`.
+
+**Site address** — canonical URLs (sitemap, `<link rel=canonical>`, Open Graph, feeds, emails, payment return URLs) come from **Settings → Site address** in the newsroom. Leave it blank and the site follows whichever domain the visitor used; set it to pin one canonical domain. With it set, every other address — the hosting URL, the bare domain — is permanently redirected to it (switchable in the same panel), so Google credits one site rather than two. A `PUBLIC_BASE_URL` in `.env` is still honoured, but only when its host matches the live request, so a stale staging address can never poison the sitemap after a domain move.
 
 **Syndication** — RSS 2.0 (Atom, Dublin Core, Media RSS and `content:encoded` extensions), Atom 1.0 and JSON Feed 1.1 for the whole site, every section, every county and original reporting only (`/feeds` lists them); a Google News sitemap at `/news-sitemap.xml` (own reporting from the last 48 hours) referenced from a dynamic `robots.txt`; `NewsMediaOrganization` on the home page and full `NewsArticle` structured data (author, section, keywords, location, publisher logo, paywall markup for the members' archive) on every report; Open Graph, Twitter and `article:*` meta, OpenSearch and feed autodiscovery in the page head. Wire headlines link to their publishers in every feed.
 
@@ -185,7 +191,7 @@ php -S 127.0.0.1:8000 -t public public/router.php &
 php tests/smoke.php
 ```
 
-The smoke test covers every public page, the API, registration, cookie and bearer sessions, the CSRF guard, plan limits, community reporting, comments, confirmations, adverts and the full newsroom decision flow.
+The smoke test covers every public page, the API, registration, cookie and bearer sessions, the CSRF guard, plan limits, community reporting, comments, confirmations, adverts, search indexing (robots meta, sitemaps, IndexNow, canonical redirect, duplicate merges, partner-content labelling) and the full newsroom decision flow.
 
 ## Editorial principle
 

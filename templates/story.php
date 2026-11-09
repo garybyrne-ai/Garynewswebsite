@@ -2,17 +2,34 @@
 $isWire = $story['kind'] === 'wire';
 $cluster = $cluster ?? null; $members = $members ?? [];
 $archived = !empty($archived);
+$gated = !empty($gated);
+// Promotional coverage is labelled above the headline, disclosed at the end, and its
+// outbound links are marked rel="sponsored" so they are never read as editorial endorsement.
+$sponsored = !$isWire && !empty($story['sponsored']);
+$sponsorName = trim((string)($story['sponsor_name'] ?? ''));
+$storyImages = [];
+if ($story['image']) {
+    $img = ['@type' => 'ImageObject', 'url' => absolute_url($story['image'])];
+    $size = \MeNews\Services\Media::dimensions($story);
+    if ($size) {
+        $img['width'] = $size[0];
+        $img['height'] = $size[1];
+    }
+    $storyImages[] = $img;
+}
+// Always offer one image comfortably past Google's 1200px minimum.
+$storyImages[] = ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/og.png'), 'width' => 1200, 'height' => 630];
 $jsonld = $isWire ? null : [
-    '@context' => 'https://schema.org', '@type' => 'NewsArticle', '@id' => absolute_url($story['url']), 'url' => absolute_url($story['url']),
+    '@context' => 'https://schema.org', '@type' => $sponsored ? 'AdvertiserContentArticle' : 'NewsArticle', '@id' => absolute_url($story['url']), 'url' => absolute_url($story['url']),
     'headline' => mb_substr($story['title'], 0, 110), 'datePublished' => $story['time'], 'dateModified' => $story['updated_at'] ?: $story['time'],
-    'description' => $story['summary'] ?: excerpt($story['body'], 200), 'image' => $story['image'] ? [absolute_url($story['image'])] : [absolute_url('/assets/img/og.png')],
+    'description' => $story['summary'] ?: excerpt($story['body'], 200), 'image' => $storyImages,
     'articleSection' => $story['category'], 'inLanguage' => 'en-IE', 'wordCount' => str_word_count((string)$story['body']),
     'keywords' => implode(', ', array_filter([$story['category'], $story['county'] ? 'County ' . $story['county'] : null, $story['location_name'] ?: null, 'Ireland'])),
     'author' => ['@type' => 'Person', 'name' => $story['author_name'] ?: 'ME News community'] + (!empty($author['handle']) ? ['url' => absolute_url('/contributors/' . $author['handle'])] : []),
     'publisher' => ['@type' => 'NewsMediaOrganization', '@id' => absolute_url('/#organization'), 'name' => 'ME News Ireland', 'url' => absolute_url('/'), 'logo' => ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/logo-512.png'), 'width' => 512, 'height' => 512]],
     'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => absolute_url($story['url'])],
-    'isAccessibleForFree' => !$archived,
-] + ($archived ? ['hasPart' => ['@type' => 'WebPageElement', 'isAccessibleForFree' => false, 'cssSelector' => '.article__body']] : [])
+    'isAccessibleForFree' => !$gated,
+] + ($gated ? ['hasPart' => ['@type' => 'WebPageElement', 'isAccessibleForFree' => false, 'cssSelector' => '.article__body']] : [])
   + ($story['county'] ? ['contentLocation' => ['@type' => 'Place', 'name' => trim(($story['location_name'] ? $story['location_name'] . ', ' : '') . 'County ' . $story['county'] . ', Ireland')]] : []);
 ?>
 <div class="progress" aria-hidden="true"><i id="read-progress"></i></div>
@@ -21,6 +38,7 @@ $jsonld = $isWire ? null : [
 <article class="container article" data-story-id="<?= e($story['id']) ?>">
   <header class="article__head">
     <nav class="crumbs mono" aria-label="Breadcrumb"><a href="/">Around Me</a><span>/</span><a href="/section/<?= e($story['category_slug']) ?>"><?= e($story['category']) ?></a><?php if ($story['county']): ?><span>/</span><a href="/county/<?= e(slugify($story['county'])) ?>">Co. <?= e($story['county']) ?></a><?php endif; ?></nav>
+    <?php if ($sponsored): ?><div class="sponsorlabel"><?= icon('briefcase') ?><b>Business Spotlight</b><span>Partner content<?= $sponsorName !== '' ? ' from ' . e($sponsorName) : '' ?> — paid for and not independent reporting.</span></div><?php endif; ?>
     <div class="article__labels"><?= $isWire ? '<a class="chip chip--label is-wire" href="/about#labels" title="How we check things"><i></i>Wire · ' . e($story['source_name']) . '</a>' : Ui::label($story['verification_label']) ?><?= Ui::categoryChip($story['category']) ?><?= $cluster && $cluster['count'] > 1 ? '<a class="chip chip--cluster" href="#coverage">' . icon('layers') . ' ' . (int)$cluster['count'] . ' outlets covering this</a>' : '' ?><?= !$isWire && (int)($story['corroborations'] ?? 0) >= 3 ? '<span class="chip chip--label is-corroborated"><i></i>Corroborated ×' . (int)$story['corroborations'] . '</span>' : '' ?></div>
     <h1 class="article__title"><?= e($story['title']) ?></h1>
     <?php if ($story['summary']): ?><p class="article__standfirst"><?= e($story['summary']) ?></p><?php endif; ?>
@@ -79,7 +97,7 @@ $jsonld = $isWire ? null : [
           </section>
         <?php endif; ?>
       <?php elseif (!empty($archived)): ?>
-        <div class="article__body article__body--locked"><?= nl2br(e(excerpt($story['body'], 420))) ?></div>
+        <div class="article__body article__body--locked"><?= article_body(excerpt($story['body'], 420), $sponsored) ?></div>
         <div class="archivegate">
           <span class="chip chip--plus">ME+</span>
           <h2>This report is in the members' archive</h2>
@@ -87,7 +105,8 @@ $jsonld = $isWire ? null : [
           <div class="inline"><a class="btn btn--primary" href="/plus">Get ME+</a><?php if (empty($user)): ?><button class="btn btn--ghost" type="button" data-open-auth="signin">Already a member? Sign in</button><?php endif; ?></div>
         </div>
       <?php else: ?>
-        <div class="article__body"><?= nl2br(e($story['body'])) ?></div>
+        <div class="article__body"><?= article_body((string)$story['body'], $sponsored) ?></div>
+        <?php if ($sponsored): ?><div class="disclosure"><b>Disclosure.</b> This is partner content<?= $sponsorName !== '' ? ', produced with ' . e($sponsorName) : '' ?>. ME News was paid to publish it. It was not reported or verified by the newsroom, and links in it are marked as sponsored. Our <a href="/about#labels">labels</a> explain how we tell the two apart.</div><?php endif; ?>
         <?php if ($story['editorial_note']): ?><div class="editornote"><span class="kicker">Editor's note</span><p><?= e($story['editorial_note']) ?></p></div><?php endif; ?>
       <?php endif; ?>
 

@@ -7,6 +7,8 @@ DirectoryIndex index.php
     RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
     # Block dotfiles
     RewriteRule (^|/)\. - [F,L]
+    # robots.txt and the sitemaps are generated: never serve a stale file left on the server
+    RewriteRule ^(robots\.txt|sitemap\.xml|sitemap-[a-z0-9-]+\.xml|news-sitemap\.xml|opensearch\.xml)$ index.php [QSA,L]
     # Front controller
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [QSA,L]

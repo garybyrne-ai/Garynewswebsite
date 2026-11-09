@@ -50,6 +50,15 @@ final class Membership
         return self::isPlus($user) || ($user !== null && in_array($user['role'] ?? '', ['editor', 'admin'], true));
     }
 
+    /**
+     * Is the members' archive gate switched on at all? It ships off, because a gate in front
+     * of our own reporting keeps it out of Google, Bing and AI answers.
+     */
+    public static function gateEnabled(): bool
+    {
+        return (string)(Database::setting('archive_gate', '0') ?? '0') === '1';
+    }
+
     public static function archiveDays(): int
     {
         return max(1, (int)(Database::setting('archive_days', '14') ?? 14));
@@ -58,7 +67,25 @@ final class Membership
     /** ISO timestamp before which stories are members-only, or null when the reader has the full archive. */
     public static function archiveCutoff(?array $user): ?string
     {
-        return self::fullArchive($user) ? null : gmdate('Y-m-d\TH:i:s', time() - self::archiveDays() * 86400) . '+00:00';
+        // Flexible sampling: search and AI crawlers are served the whole archive, with the
+        // gated part declared in the page's structured data. Anything less is cloaking.
+        if (!self::gateEnabled() || self::fullArchive($user) || \MeNews\Support\Crawler::isBot()) {
+            return null;
+        }
+        return gmdate('Y-m-d\TH:i:s', time() - self::archiveDays() * 86400) . '+00:00';
+    }
+
+    /**
+     * Is this story behind the members' gate as a matter of policy, whoever is reading?
+     * The page declares that in its structured data even while a crawler is served the full text.
+     */
+    public static function isGated(array $story): bool
+    {
+        if (!self::gateEnabled()) {
+            return false;
+        }
+        $cutoff = gmdate('Y-m-d\TH:i:s', time() - self::archiveDays() * 86400) . '+00:00';
+        return (string)($story['published_at'] ?: $story['created_at']) < $cutoff;
     }
 
     public static function isArchived(array $story, ?array $user): bool

@@ -49,6 +49,25 @@ final class Media
         return [$name, $type];
     }
 
+    /**
+     * Pixel size of a story's published photo, or null when it is a remote image or missing.
+     * Used by the structured data, which wants to state the real width and height.
+     *
+     * @return array{0:int,1:int}|null
+     */
+    public static function dimensions(array $story): ?array
+    {
+        if (($story['media_type'] ?? '') !== 'image' || empty($story['media_public'])) {
+            return null;
+        }
+        $file = Config::storage() . '/uploads/public/' . basename(str_replace('\\', '/', (string)$story['media_public']));
+        if (!is_file($file)) {
+            return null;
+        }
+        $size = @getimagesize($file);
+        return ($size && $size[0] > 0 && $size[1] > 0) ? [(int)$size[0], (int)$size[1]] : null;
+    }
+
     public static function publish(array $story): ?string
     {
         if (empty($story['media_original'])) {

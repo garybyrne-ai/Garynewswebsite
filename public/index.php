@@ -31,6 +31,13 @@ if ($request->isSecure()) {
 Auth::boot($request);
 
 try {
+    if (MeNews\Database::installed()) {
+        $to = MeNews\Services\Seo::canonicalRedirect($request->method, (string)($_SERVER['HTTP_HOST'] ?? ''), (string)($_SERVER['REQUEST_URI'] ?? '/'));
+        if ($to !== null) {
+            Response::redirect($to, 301)->send();
+            exit;
+        }
+    }
     if (!MeNews\Database::installed()) {
         // Not installed yet: offer the browser installer (or the CLI: php scripts/setup.php --seed).
         if ($request->path === '/install') {

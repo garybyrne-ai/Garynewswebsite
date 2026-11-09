@@ -46,6 +46,8 @@ $more = [
 <meta name="description" content="<?= e($description) ?>">
 <?php if ($robots): ?><meta name="robots" content="<?= e($robots) ?>"><?php endif; ?>
 <?php if ($canonical): ?><link rel="canonical" href="<?= e($canonical) ?>"><?php endif; ?>
+<?php foreach (\MeNews\Services\Seo::verificationTags() as $vName => $vContent): ?><meta name="<?= e($vName) ?>" content="<?= e($vContent) ?>">
+<?php endforeach; ?>
 <meta name="theme-color" content="#139a5c">
 <meta property="og:site_name" content="ME News Ireland">
 <meta property="og:title" content="<?= e($title) ?>">

@@ -21,7 +21,8 @@ final class Stories
      */
     public static function feed(array $f = [], int $limit = 40, int $offset = 0): array
     {
-        $sql = self::SELECT . " WHERE s.status='published'";
+        // A story merged into another never appears twice in a list: only the one we kept does.
+        $sql = self::SELECT . " WHERE s.status='published' AND COALESCE(s.redirect_to,'')=''";
         $args = [];
         if (empty($f['all_versions']) && \MeNews\Services\Wire::collapsed()) {
             // Clustered mode: one card per story, fronted by the outlet that led.
@@ -95,6 +96,7 @@ final class Stories
     public static function bySlug(string $slug): ?array
     {
         $row = Database::one(self::SELECT . " WHERE s.slug=? AND s.status='published'", [$slug]);
+        // A merged duplicate still resolves, so the page can redirect to the story we kept.
         return $row ? self::present($row) : null;
     }
 

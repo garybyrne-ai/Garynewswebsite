@@ -299,6 +299,84 @@ if ($failClosed) {
 check('feature a story', $s === 200);
 [$s, $html] = http('GET', '/', [], [], false);
 check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
+echo "\nSearch, indexing and labelling\n";
+[, $pubStory] = http('GET', '/api/story/' . $reportId);
+$pubSlug = (string)($pubStory['slug'] ?? '');
+if (!$failClosed && $pubSlug !== '') {
+    [$s, $page] = http('GET', '/story/' . $pubSlug, [], [], false);
+    check('an original story is never noindex', $s === 200 && !str_contains($page, 'name="robots"'));
+    check('an original story is declared free to read', str_contains($page, '"isAccessibleForFree":true'));
+    check('structured data names the author and the publisher', str_contains($page, '"@type":"Person"') && str_contains($page, '"@type":"NewsMediaOrganization"') && str_contains($page, '"dateModified"'));
+    [, $sm] = http('GET', '/sitemap.xml', [], [], false);
+    check('the story is in the sitemap with a last-modified date', str_contains($sm, '/story/' . $pubSlug . '</loc><lastmod>'));
+    [, $ns] = http('GET', '/news-sitemap.xml', [], [], false);
+    check('the story is in the Google News sitemap', str_contains($ns, '/story/' . $pubSlug . '</loc>') && str_contains($ns, '<news:publication_date>'));
+
+    // The archive gate must never cost us the index, however the newsroom sets it.
+    http('POST', '/api/admin/settings', ['archive_gate' => '1', 'archive_days' => '1']);
+    [$s, $gatedPage] = http('GET', '/story/' . $pubSlug, [], [], false);
+    check('with the members\' gate on a story is still indexable', $s === 200 && !str_contains($gatedPage, 'name="robots"'));
+    http('POST', '/api/admin/settings', ['archive_gate' => '0', 'archive_days' => '14']);
+
+    // Partner content: labelled above the headline, disclosed at the end, links marked sponsored.
+    [$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Business', 'county' => 'Wicklow', 'label' => 'Verified', 'sponsored' => '1', 'sponsor_name' => 'Smoke Test Ltd']);
+    check('a story can be marked as partner content', $s === 200);
+    [, $sp] = http('GET', '/story/' . $pubSlug, [], [], false);
+    check('partner content is labelled, disclosed and typed as advertiser content',
+        str_contains($sp, 'Business Spotlight') && str_contains($sp, 'Smoke Test Ltd') && str_contains($sp, 'class="disclosure"') && str_contains($sp, 'AdvertiserContentArticle'));
+    [$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Community', 'county' => 'Wicklow', 'label' => 'Verified', 'sponsored' => '0']);
+    check('partner labelling can be taken off again', $s === 200);
+
+    // Duplicates: one address answers for the story.
+    [$s, $dup] = http('POST', '/api/report', ['title' => "Smoke test report {$stamp}", 'body' => 'A second filing of the same story, used to check duplicate handling. Nothing is happening.', 'location_name' => 'Bray', 'county' => 'Wicklow', 'category' => 'Community']);
+    $dupId = (string)($dup['id'] ?? '');
+    check('a near-identical report can be filed', $s === 201 || $s === 200, (string)($dup['detail'] ?? ''));
+    if ($dupId !== '') {
+        [, $queue2] = http('GET', '/api/admin/stories?kind=community&status=review');
+        $row = null;
+        foreach ($queue2 as $q) {
+            if (($q['id'] ?? '') === $dupId) {
+                $row = $q;
+            }
+        }
+        check('the review queue warns about the matching headline', $row !== null && !empty($row['similar_headlines']));
+        [$s] = http('POST', "/api/admin/stories/{$dupId}/decision", ['decision' => 'publish', 'label' => 'Community Report', 'note' => 'Duplicate for the smoke test']);
+        [, $dupStory] = http('GET', '/api/story/' . $dupId);
+        $dupSlug = (string)($dupStory['slug'] ?? '');
+        [$s] = http('POST', "/api/admin/stories/{$dupId}/merge", ['keep' => $pubSlug]);
+        check('a duplicate merges into the story we kept', $s === 200);
+        if ($dupSlug !== '') {
+            $ch = curl_init($base . '/story/' . $dupSlug);
+            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_NOBODY => true, CURLOPT_TIMEOUT => 30]);
+            $head = (string)curl_exec($ch);
+            $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            check('the merged duplicate permanently redirects', $code === 301 && str_contains($head, '/story/' . $pubSlug));
+            [, $sm3] = http('GET', '/sitemap.xml', [], [], false);
+            check('the merged duplicate is out of the sitemap', !str_contains($sm3, '/story/' . $dupSlug . '</loc>'));
+        }
+        http('POST', "/api/admin/stories/{$dupId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
+    }
+}
+[, $robots] = http('GET', '/robots.txt', [], [], false);
+check('robots.txt points at both sitemaps by absolute address', str_contains($robots, 'Sitemap: ' . $base . '/sitemap.xml') && str_contains($robots, 'Sitemap: ' . $base . '/news-sitemap.xml'));
+[$s, $settingsNow] = http('GET', '/api/admin/settings');
+$indexNowKey = (string)($settingsNow['_indexnow']['value'] ?? '');
+check('an IndexNow key exists', $s === 200 && preg_match('/^[a-f0-9]{8,128}$/', $indexNowKey) === 1);
+[$s, $keyFile] = http('GET', '/' . $indexNowKey . '.txt', [], [], false);
+check('the IndexNow key file serves the key', $s === 200 && trim($keyFile) === $indexNowKey);
+[$s] = http('GET', '/00000000000000000000000000000000.txt', [], [], false);
+check('a wrong IndexNow key is not served', $s === 404);
+[$s] = http('POST', '/api/admin/settings', ['verify_google' => 'smoke-verify-' . $stamp, 'social_facebook' => 'https://facebook.com/smoke-' . $stamp]);
+[, $home3] = http('GET', '/', [], [], false);
+check('ownership verification tags are published', str_contains($home3, '<meta name="google-site-verification" content="smoke-verify-' . $stamp . '">'));
+check('social profiles are published as sameAs', str_contains($home3, '"sameAs"') && str_contains($home3, 'facebook.com/smoke-' . $stamp));
+http('POST', '/api/admin/settings', ['verify_google' => '', 'social_facebook' => '']);
+[, $about] = http('GET', '/about', [], [], false);
+check('the about page carries the editorial standards section', str_contains($about, 'id="standards"') && str_contains($about, 'corrections'));
+[, $homeForm] = http('GET', '/', [], [], false);
+check('the report form offers Business and events', str_contains($homeForm, 'value="Business"') && str_contains($homeForm, 'value="What&#039;s On"'));
+
 [$s] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
 check('reject (cleanup)', $s === 200);
 echo "\nAdvertising packages\n";
@@ -348,6 +426,21 @@ check('site address saves', $s === 200);
 check('sitemap follows the configured site address', $s === 200 && str_contains($sm, '<loc>https://smoke-canonical.example/</loc>'));
 [$s, $home2] = http('GET', '/', [], [], false);
 check('canonical tag follows the configured site address', $s === 200 && str_contains($home2, 'href="https://smoke-canonical.example/"'));
+// Every other address hands its ranking credit to the canonical one.
+$ch = curl_init($base . '/about');
+curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_NOBODY => true, CURLOPT_HTTPHEADER => ['Host: old-host.example'], CURLOPT_TIMEOUT => 30]);
+curl_exec($ch);
+$rdCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$rdTo = (string)curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+curl_close($ch);
+check('another domain is permanently redirected to the site address', $rdCode === 301 && $rdTo === 'https://smoke-canonical.example/about', $rdCode . ' ' . $rdTo);
+http('POST', '/api/admin/settings', ['canonical_redirect' => '0']);
+$ch = curl_init($base . '/about');
+curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_NOBODY => true, CURLOPT_HTTPHEADER => ['Host: old-host.example'], CURLOPT_TIMEOUT => 30]);
+curl_exec($ch);
+check('the redirect can be switched off', (int)curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200);
+curl_close($ch);
+http('POST', '/api/admin/settings', ['canonical_redirect' => '1']);
 http('POST', '/api/admin/settings', ['site_url' => '']);
 [$s, $sm2] = http('GET', '/sitemap.xml', [], [], false);
 check('with no site address the live host is used', $s === 200 && str_contains($sm2, '<loc>' . $base . '/</loc>'), $base);
