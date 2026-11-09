@@ -481,7 +481,8 @@ final class PageController
             $add('/notices/' . $n['kind'] . '/' . $n['slug'], (string)$n['u'], 'monthly', '0.5');
         }
         // Our own reporting: everything published, excluding anything merged into another story.
-        foreach (Database::all("SELECT slug, COALESCE(updated_at,published_at,created_at) AS u FROM stories WHERE status='published' AND kind='community' AND COALESCE(redirect_to,'')='' ORDER BY COALESCE(published_at,created_at) DESC") as $st) {
+        // Capped at the protocol's own ceiling so building the list can never exhaust memory.
+        foreach (Database::all("SELECT slug, COALESCE(updated_at,published_at,created_at) AS u FROM stories WHERE status='published' AND kind='community' AND COALESCE(redirect_to,'')='' ORDER BY COALESCE(published_at,created_at) DESC LIMIT 50000") as $st) {
             $add('/story/' . $st['slug'], (string)$st['u'], 'weekly', '0.7');
         }
         return $urls;

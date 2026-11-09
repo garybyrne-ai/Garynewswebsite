@@ -61,11 +61,21 @@ final class Media
             return null;
         }
         $file = Config::storage() . '/uploads/public/' . basename(str_replace('\\', '/', (string)$story['media_public']));
-        if (!is_file($file)) {
+        if (!is_file($file) || !is_readable($file)) {
             return null;
         }
-        $size = @getimagesize($file);
-        return ($size && $size[0] > 0 && $size[1] > 0) ? [(int)$size[0], (int)$size[1]] : null;
+        // Reading a header off disk on every article view is only worth it for an ordinary
+        // photo; a structured-data nicety must never be what makes a story page fall over.
+        $bytes = @filesize($file);
+        if ($bytes === false || $bytes > 32 * 1024 * 1024) {
+            return null;
+        }
+        try {
+            $size = @getimagesize($file);
+        } catch (\Throwable) {
+            return null;
+        }
+        return (is_array($size) && ($size[0] ?? 0) > 0 && ($size[1] ?? 0) > 0) ? [(int)$size[0], (int)$size[1]] : null;
     }
 
     public static function publish(array $story): ?string

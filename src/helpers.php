@@ -155,14 +155,21 @@ function t(string $text): string
 function article_body(string $body, bool $sponsored = false): string
 {
     $rel = $sponsored ? 'sponsored nofollow noopener' : 'nofollow noopener';
+    $escaped = e($body);
     $out = preg_replace_callback(
-        '~(?<![\w@/])(https?://[^\s<>"\']+[^\s<>"\'.,;:!?)\]])~i',
+        '~(?<![\w@/])(https?://[^\s<>"\']{1,500})~i',
         static function (array $m) use ($rel): string {
-            $url = $m[1];
-            $label = mb_strimwidth(preg_replace('~^https?://(www\.)?~i', '', $url) ?? $url, 0, 60, '…');
-            return '<a href="' . e($url) . '" rel="' . $rel . '" target="_blank">' . e($label) . '</a>';
+            // Trailing sentence punctuation belongs to the sentence, not the address.
+            $url = rtrim($m[1], '.,;:!?)]\'"');
+            $tail = substr($m[1], strlen($url));
+            $shown = preg_replace('~^https?://(www\.)?~i', '', $url) ?? $url;
+            if (mb_strlen($shown) > 60) {
+                $shown = mb_substr($shown, 0, 59) . '…';
+            }
+            return '<a href="' . e($url) . '" rel="' . $rel . '" target="_blank">' . e($shown) . '</a>' . e($tail);
         },
-        e($body)
+        $escaped
     );
-    return nl2br((string)$out);
+    // If the pattern ever gives up on a pathological body, show the text rather than nothing.
+    return nl2br(is_string($out) ? $out : $escaped);
 }

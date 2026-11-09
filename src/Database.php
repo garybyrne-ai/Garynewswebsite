@@ -97,7 +97,15 @@ final class Database
     public static function migrate(?PDO $pdo = null): void
     {
         $pdo ??= self::pdo();
-        $pdo->exec(file_get_contents(ME_ROOT . '/database/schema.sql'));
+        // An incomplete upload is the usual cause of a site-wide 500 after a deploy. Say so
+        // plainly here rather than failing later with a type error no one can act on.
+        $schemaFile = ME_ROOT . '/database/schema.sql';
+        $schema = is_readable($schemaFile) ? file_get_contents($schemaFile) : false;
+        if ($schema === false || trim($schema) === '') {
+            throw new \RuntimeException('database/schema.sql is missing or unreadable at ' . $schemaFile
+                . ' — the deploy is incomplete. Upload the whole release, then run php scripts/doctor.php.');
+        }
+        $pdo->exec($schema);
         Migrations::run($pdo);
         $pdo->exec("INSERT INTO settings(key,value) VALUES('schema_version','" . self::SCHEMA_VERSION . "') ON CONFLICT(key) DO UPDATE SET value=excluded.value");
     }
