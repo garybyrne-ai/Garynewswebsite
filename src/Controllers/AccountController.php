@@ -494,7 +494,11 @@ final class AccountController
         }
         try {
             $mod = Moderation::screen($body);
-            $status = $mod['flagged'] ? 'review' : 'published';
+            // A comment goes straight onto the page with nobody reading it first, so it is
+            // only auto-published when real AI screening cleared it. The word filter is not
+            // enough on its own: those wait for an editor in the moderation queue.
+            $trusted = ($mod['provider'] ?? '') === 'openai';
+            $status = ($mod['flagged'] || !$trusted) ? 'review' : 'published';
         } catch (\Throwable $e) {
             error_log($e->getMessage());
             $mod = ['provider' => 'unavailable', 'flagged' => true];

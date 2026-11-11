@@ -175,6 +175,9 @@ return static function (Router $r): void {
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/rerun-safety', [Admin::class, 'rerun']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/edit', [Admin::class, 'edit']);
     $r->post('/api/admin/stories/{id:[a-f0-9]+}/merge', [Admin::class, 'merge']);
+    // Writing original newsroom stories, as opposed to moderating what the public sends in.
+    $r->post('/api/admin/compose', [Admin::class, 'compose']);
+    $r->get('/api/admin/compose/{id:[a-f0-9]+}', [Admin::class, 'composeLoad']);
     $r->get('/api/admin/mail', [Admin::class, 'mail']);
     $r->post('/api/admin/mail', [Admin::class, 'saveMail']);
     $r->post('/api/admin/mail/test', [Admin::class, 'testMail']);

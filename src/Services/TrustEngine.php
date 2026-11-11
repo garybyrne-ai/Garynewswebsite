@@ -39,7 +39,8 @@ final class TrustEngine
             $len = mb_strlen(trim(($s['body'] ?? '') . $transcript));
             $trust = min(82, 38 + ($len > 80 ? 8 : 0) + ($len > 250 ? 5 : 0) + ($s['media_original'] ? 9 : 0)
                 + ($s['latitude'] !== null && $s['longitude'] !== null ? 6 : 0) + (!empty($author['is_verified']) ? 8 : 0));
-            $safety = $mod['flagged'] ? 18 : 97;
+            // An AI screening earns more confidence than the word filter; both beat nothing.
+            $safety = $mod['flagged'] ? 18 : (($mod['provider'] ?? '') === 'openai' ? 97 : 72);
             $status = $mod['flagged'] ? 'hold' : (Config::bool('AUTO_PUBLISH_SAFE') && !empty($s['reporter_verified_at']) ? 'published' : 'review');
             $public = null;
             $publishedAt = $s['published_at'];
@@ -99,14 +100,40 @@ final class TrustEngine
     }
 
     /** Refuse publication unless a complete, clean screening exists (OpenAI in production). */
-    public static function gate(array $story): void
+    /** Is the newsroom insisting on an AI screening before anything is published? */
+    public static function strictScreening(): bool
+    {
+        return (string)(Database::setting('screening_mode', 'auto') ?? 'auto') === 'strict';
+    }
+
+    /**
+     * May this story be published? Flagged or entirely unscreened material never passes.
+     *
+     * @param bool $override an editor has taken responsibility for publishing without a
+     *                       clean automated screening. Recorded in the audit log by the caller.
+     */
+    public static function gate(array $story, bool $override = false): void
     {
         $m = json_decode($story['moderation_json'] ?? '{}', true) ?: [];
-        if (($story['safety_score'] ?? 0) <= 0 || !array_key_exists('flagged', $m) || $m['flagged']) {
-            throw new HttpException(409, 'A complete, clean safety screening is required before publication.');
+        $screened = ($story['safety_score'] ?? 0) > 0 && array_key_exists('flagged', $m);
+        if ($m['flagged'] ?? false) {
+            if (!$override) {
+                throw new HttpException(409, 'Safety screening flagged this report. An editor must publish it deliberately, which is recorded.');
+            }
+            return;
         }
-        if (Config::production() && ($m['provider'] ?? '') !== 'openai') {
-            throw new HttpException(409, 'Production publication requires OpenAI moderation.');
+        if (!$screened) {
+            if ($override) {
+                return;
+            }
+            throw new HttpException(409, 'This report has not been screened yet. Use “Re-run safety screening”, or publish it deliberately — that is recorded against your account.');
+        }
+        if (self::strictScreening() && ($m['provider'] ?? '') !== 'openai') {
+            if ($override) {
+                return;
+            }
+            throw new HttpException(409, 'The newsroom is set to require AI screening before publication (Settings → Moderation), and this report was screened by '
+                . ($m['provider'] ?? 'no provider') . '. Add an OpenAI key, switch the setting to “automatic”, or publish it deliberately.');
         }
     }
 }

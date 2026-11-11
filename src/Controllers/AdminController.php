@@ -13,6 +13,7 @@ use MeNews\Services\Media;
 use MeNews\Services\NewsWire;
 use MeNews\Services\Notifier;
 use MeNews\Services\TrustEngine;
+use MeNews\Stories;
 use MeNews\Support\Categories;
 use MeNews\Support\Locations;
 
@@ -75,6 +76,7 @@ final class AdminController
                 $s['public_media_url'] = $s['media_original'] && $s['media_type'] === 'image' ? Media::signedQuarantineUrl($s['id']) : null;
                 $s['duplicates'] = $s['image_hash'] ? self::duplicates($s['id'], $s['image_hash']) : [];
                 $s['similar_headlines'] = self::similarHeadlines($s['id'], (string)$s['title']);
+                $s['screening'] = self::screeningNote($s);
                 $s['incident_reports'] = $s['cluster_id'] ? Database::all('SELECT id,title,author_name,location_name,status,created_at FROM stories WHERE cluster_id=? AND id<>? ORDER BY created_at', [$s['cluster_id'], $s['id']]) : [];
                 $s['gps_distance_km'] = (!empty($exif['gps']) && $s['latitude'] !== null && empty($exif['gps_used_for_pin'])) ? round(\MeNews\Support\Geo::distanceKm((float)$s['latitude'], (float)$s['longitude'], (float)$exif['gps']['lat'], (float)$exif['gps']['lng']), 1) : null;
             }
@@ -156,14 +158,20 @@ final class AdminController
         if (!$status || !Categories::validLabel($label)) {
             throw new HttpException(400, 'Invalid decision or label');
         }
+        // An editor may publish without a clean automated screening. It is a deliberate act:
+        // it is written into the audit log and onto the story, against their name.
+        $override = $r->post('override', '0') === '1';
         $public = $s['media_public'];
         $publishedAt = $s['published_at'];
         if ($status === 'published') {
             if ($s['kind'] === 'community') {
-                TrustEngine::gate($s);
+                TrustEngine::gate($s, $override);
                 $public = Media::publish($s);
             }
             $publishedAt = $publishedAt ?: now();
+        }
+        if ($override && $status === 'published') {
+            Audit::log($u['id'], 'story.publish.override', 'story', $s['id'], 'published without a clean automated screening');
         }
         $note = $r->post('note', '', 2000);
         Database::query('UPDATE stories SET status=?,editorial_note=?,verification_label=?,media_public=?,published_at=?,updated_at=? WHERE id=?', [$status, $note, $label, $public, $publishedAt, now(), $s['id']]);
@@ -179,6 +187,27 @@ final class AdminController
         }
         \MeNews\Services\Seo::pingStory(['kind' => $s['kind'], 'status' => $status, 'slug' => $s['slug']]);
         return Response::json(['ok' => true, 'status' => $status]);
+    }
+
+    /** What screened this story, in words an editor can act on. */
+    private static function screeningNote(array $story): array
+    {
+        $m = json_decode($story['moderation_json'] ?? '{}', true) ?: [];
+        $provider = (string)($m['provider'] ?? '');
+        return [
+            'provider' => $provider,
+            'flagged' => (bool)($m['flagged'] ?? false),
+            'screened' => $provider !== '' && array_key_exists('flagged', $m),
+            'label' => match ($provider) {
+                'openai' => 'AI safety screening',
+                'keyword' => 'Built-in word filter (no AI key configured)',
+                'newsroom' => 'Written in the newsroom',
+                '' => 'Not screened',
+                default => $provider,
+            },
+            'blocks_publication' => !(($provider !== '' && array_key_exists('flagged', $m) && !($m['flagged'] ?? false))
+                && (!TrustEngine::strictScreening() || $provider === 'openai' || $provider === 'newsroom')),
+        ];
     }
 
     public static function rerun(Request $r, array $p): Response
@@ -260,6 +289,107 @@ final class AdminController
         Audit::log($u['id'], 'story.merge', 'story', $s['id'], 'into ' . $target['slug']);
         \MeNews\Services\Seo::pingStory(['kind' => $s['kind'], 'status' => 'published', 'slug' => $target['slug']]);
         return Response::json(['ok' => true, 'redirect_to' => $target['slug']]);
+    }
+
+    /**
+     * Write or update an original newsroom story — the desk's own reporting, a business
+     * spotlight, a blog post. This is newsroom copy, not a public submission, so it does not
+     * go through the community Trust Engine: the person writing it is the editor, and their
+     * account is on the byline and in the audit log.
+     */
+    public static function compose(Request $r): Response
+    {
+        $u = self::staff();
+        $id = $r->post('id', '', 40);
+        $existing = $id !== '' ? Database::one('SELECT * FROM stories WHERE id=?', [$id]) : null;
+        if ($id !== '' && !$existing) {
+            throw new HttpException(404, 'Story not found');
+        }
+        if ($existing && ($existing['kind'] ?? '') === 'wire') {
+            throw new HttpException(400, 'Wire headlines belong to their publisher and cannot be rewritten here.');
+        }
+
+        $title = trim($r->post('title', '', 180));
+        $body = trim($r->post('body', '', 60000));
+        if (mb_strlen($title) < 8) {
+            throw new HttpException(400, 'Give the story a headline of at least 8 characters.');
+        }
+        if (mb_strlen($body) < 40) {
+            throw new HttpException(400, 'Write at least a couple of sentences before saving.');
+        }
+        $category = $r->post('category', 'Local', 40);
+        if (!Categories::valid($category)) {
+            throw new HttpException(400, 'Choose a section that exists.');
+        }
+        $label = $r->post('label', 'Official', 40);
+        if (!Categories::validLabel($label) || $label === 'Wire') {
+            throw new HttpException(400, 'Choose an editorial label.');
+        }
+        $county = $r->post('county', '', 80);
+        if ($county !== '' && !in_array($county, Locations::countyNames(), true)) {
+            throw new HttpException(400, 'That is not an Irish county.');
+        }
+        $imageUrl = trim($r->post('image_url', '', 500));
+        if ($imageUrl !== '' && !preg_match('~^https?://~i', $imageUrl)) {
+            throw new HttpException(400, 'The image address must start with http:// or https://');
+        }
+        $summary = trim($r->post('summary', '', 400));
+        $summary = $summary !== '' ? $summary : excerpt($body, 220);
+        $sponsored = (int)($r->post('sponsored', '0') === '1');
+        $publish = $r->post('status', 'hold') === 'published';
+
+        // Newsroom copy is screened by the person writing it. Recorded as such so the
+        // publication gate and the review queue both show where the check came from.
+        $moderation = json_encode(['provider' => 'newsroom', 'flagged' => false,
+            'note' => 'Written in the newsroom by ' . $u['display_name'] . '. Editorial copy is not machine screened.']);
+
+        $fields = [
+            'title' => $title, 'summary' => $summary, 'body' => $body, 'category' => $category,
+            'county' => $county, 'province' => $county !== '' ? Locations::provinceFor($county) : null,
+            'location_name' => $r->post('location_name', '', 100), 'verification_label' => $label,
+            'image_url' => $imageUrl !== '' ? $imageUrl : null,
+            'sponsored' => $sponsored, 'sponsor_name' => $sponsored ? $r->post('sponsor_name', '', 120) : null,
+            'status' => $publish ? 'published' : 'hold', 'updated_at' => now(),
+            'moderation_json' => $moderation, 'safety_score' => 95, 'category_locked' => 1,
+        ];
+
+        if ($existing) {
+            $fields['published_at'] = $publish ? ($existing['published_at'] ?: now()) : $existing['published_at'];
+            $set = implode(',', array_map(static fn($k) => $k . '=?', array_keys($fields)));
+            Database::query('UPDATE stories SET ' . $set . ' WHERE id=?', array_merge(array_values($fields), [$existing['id']]));
+            $storyId = $existing['id'];
+            $slug = (string)$existing['slug'];
+            Audit::log($u['id'], 'story.compose.update', 'story', $storyId, $title);
+        } else {
+            $storyId = uuid();
+            $slug = Stories::makeSlug($title, $storyId);
+            Database::insert('stories', array_merge($fields, [
+                'id' => $storyId, 'slug' => $slug, 'kind' => 'community', 'created_at' => now(),
+                'author_user_id' => $u['id'], 'author_name' => $u['display_name'],
+                'published_at' => $publish ? now() : null,
+                'trust_score' => 80, 'reporter_verified_at' => now(),
+            ]));
+            Audit::log($u['id'], 'story.compose', 'story', $storyId, $title . ($publish ? ' (published)' : ' (draft)'));
+            if ($publish) {
+                Database::query('UPDATE users SET reports_published=reports_published+1 WHERE id=?', [$u['id']]);
+            }
+        }
+        if ($publish) {
+            \MeNews\Services\Seo::pingStory(['kind' => 'community', 'status' => 'published', 'slug' => $slug]);
+        }
+        return Response::json(['ok' => true, 'id' => $storyId, 'slug' => $slug,
+            'url' => '/story/' . $slug, 'status' => $publish ? 'published' : 'hold']);
+    }
+
+    /** One story with its full body, for loading back into the writing form. */
+    public static function composeLoad(Request $r, array $p): Response
+    {
+        self::staff();
+        $s = Database::one('SELECT id,slug,kind,title,summary,body,category,county,location_name,verification_label,image_url,sponsored,sponsor_name,status FROM stories WHERE id=?', [$p['id']]);
+        if (!$s) {
+            throw new HttpException(404, 'Story not found');
+        }
+        return Response::json($s);
     }
 
     public static function users(Request $r): Response
@@ -714,6 +844,10 @@ final class AdminController
             'archive_gate' => ['label' => 'Members\' archive gate', 'group' => 'Membership', 'type' => 'select', 'options' => ['0', '1'], 'labels' => ['0' => 'Off — every report stays free', '1' => 'On — older reports are members-only'], 'default' => '0',
                 'hint' => 'Off: every published report stays free and indexable. On: reports older than the window below are summarised for non-members — search and AI crawlers still get the full text, and the page declares the gate in its structured data.'],
             'archive_days' => ['label' => 'Free archive window (days)', 'group' => 'Membership', 'type' => 'int', 'default' => '14', 'hint' => 'Only used when the gate above is on.'],
+            'screening_mode' => ['label' => 'Safety screening before publication', 'group' => 'Moderation', 'type' => 'select', 'options' => ['auto', 'strict'],
+                'labels' => ['auto' => 'Automatic — use AI when a key is set, the word filter otherwise', 'strict' => 'Strict — refuse to publish without a clean AI screening'],
+                'default' => 'auto',
+                'hint' => 'Automatic keeps the newsroom working whether or not an OpenAI key is configured; an editor still approves every report by hand. Strict is for newsrooms that have a key and want it enforced. Either way an editor can publish deliberately, and that is recorded in the audit log.'],
             'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
             'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'labels' => ['1' => 'Yes', '0' => 'No'], 'default' => '1'],
             'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],

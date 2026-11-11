@@ -14,7 +14,7 @@
     $$('.view').forEach(v => v.classList.toggle('is-active', v.id === 'view-' + id));
     $$('.appnav button').forEach(b => b.classList.toggle('is-active', b.dataset.view === id));
     history.replaceState(null, '', '#' + id);
-    ({ stories: loadStories, comments: loadComments, users: loadUsers, ads: loadAds, wire: loadWire, audit: loadAudit, review: loadQueue, sections: loadSections, notices: loadNotices, closures: loadClosures, trust: loadTrust, settings: loadSettings })[id]?.();
+    ({ stories: loadStories, comments: loadComments, users: loadUsers, ads: loadAds, wire: loadWire, audit: loadAudit, review: loadQueue, sections: loadSections, notices: loadNotices, closures: loadClosures, trust: loadTrust, settings: loadSettings, write: loadWrite })[id]?.();
   }
   $$('.appnav button').forEach(b => b.addEventListener('click', () => show(b.dataset.view)));
 
@@ -66,12 +66,13 @@
           <li>Reverse search: <a href="https://lens.google.com/uploadbyurl?url=${encodeURIComponent(x.public_media_url || '')}" target="_blank" rel="noopener">Google Lens</a> · <a href="https://tineye.com/search?url=${encodeURIComponent(x.public_media_url || '')}" target="_blank" rel="noopener">TinEye</a> · <a href="https://yandex.com/images/search?rpt=imageview&url=${encodeURIComponent(x.public_media_url || '')}" target="_blank" rel="noopener">Yandex</a> <span class="sub">(24-hour signed link to the quarantined file)</span></li>
         </ul></div>` : ''}
       <p>${esc(x.body || x.summary || '')}</p>
+      ${x.screening ? `<div class="trustnote ${x.screening.blocks_publication ? 'trustnote--warn' : ''}"><b>${esc(x.screening.label)}</b>${x.screening.flagged ? ' <b class="is-bad">— flagged</b>' : ''}${x.screening.blocks_publication ? ' · Publish is blocked until this is resolved. Re-run the screening, or use <b>Publish anyway</b> below — that is recorded against your account.' : ''}</div>` : ''}
       <div class="scores"><div class="score"><span class="mono">Safety</span><b class="${x.safety_score > 50 ? 'is-good' : 'is-bad'}">${x.safety_score}/100</b></div><div class="score"><span class="mono">Confidence</span><b>${x.trust_score}/100</b></div></div>
       <div class="trustnote">Confidence is an evidence signal only. It does not prove the report is true — you decide the public label.</div>
       <div class="form__row"><label class="form-label">Editorial label<select data-label>${opts(LABELS, x.verification_label)}</select></label><label class="form-label">Section<select data-cat>${opts(CATS, x.category)}</select></label></div>
       <label class="form-label">Editor note (sent to the reporter)<textarea data-note rows="2">${esc(x.editorial_note || '')}</textarea></label>
       <details><summary>Moderation audit</summary><pre class="audit">${esc(JSON.stringify(x.moderation, null, 2))}</pre></details>
-      <div class="actions"><button class="btn btn--good btn--sm" data-decide="publish">Publish</button><button class="btn btn--warn btn--sm" data-decide="hold">Hold</button><button class="btn btn--hot btn--sm" data-decide="reject">Reject</button><button class="btn btn--dark btn--sm" data-rerun>Re-run safety</button></div>
+      <div class="actions"><button class="btn btn--good btn--sm" data-decide="publish">Publish</button><button class="btn btn--warn btn--sm" data-decide="hold">Hold</button><button class="btn btn--hot btn--sm" data-decide="reject">Reject</button><button class="btn btn--dark btn--sm" data-rerun>Re-run safety</button>${x.screening && x.screening.blocks_publication ? '<button class="btn btn--ghost btn--sm" data-decide="publish" data-override="1" title="Publishes without a clean automated screening. Your name is written to the audit log.">Publish anyway</button>' : ''}</div>
     </article>`;
   }
   async function loadQueue() {
@@ -85,9 +86,11 @@
     const id = card.dataset.id;
     try {
       if (e.target.dataset.decide) {
+        const override = e.target.dataset.override === '1';
+        if (override && !confirm('Publish this report without a clean automated screening?\n\nYour account is recorded in the audit log as having approved it.')) return;
         await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: $('[data-cat]', card).value, label: $('[data-label]', card).value }) });
-        await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: e.target.dataset.decide, label: $('[data-label]', card).value, note: $('[data-note]', card).value }) });
-        toast('Decision saved'); await Promise.all([summary(), loadQueue()]);
+        await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: e.target.dataset.decide, label: $('[data-label]', card).value, note: $('[data-note]', card).value, override: override ? '1' : '0' }) });
+        toast(override ? 'Published — recorded in the audit log' : 'Decision saved'); await Promise.all([summary(), loadQueue()]);
       } else if (e.target.hasAttribute('data-rerun')) {
         e.target.disabled = true; await api('/api/admin/stories/' + id + '/rerun-safety', { method: 'POST' }); toast('Safety screening re-run'); await Promise.all([summary(), loadQueue()]);
       } else if (e.target.dataset.merge) {
@@ -98,6 +101,70 @@
         toast('Merged — the duplicate now redirects'); await Promise.all([summary(), loadQueue()]);
       }
     } catch (err) { toast(err.message); }
+  });
+
+  /* ---- writing desk ---- */
+  let writeReady = false;
+  function loadWrite() {
+    if (writeReady) return;
+    $('#write-category').innerHTML = opts(CATS, 'Local');
+    $('#write-county').innerHTML = '<option value="">Ireland-wide</option>' + opts(COUNTIES, '');
+    $('#write-label').innerHTML = opts(LABELS.filter(l => l !== 'Wire'), 'Official');
+    writeReady = true;
+  }
+  function writeReset() {
+    $('#write-form').reset();
+    $('#write-id').value = '';
+    $('#write-title').textContent = 'Write a story';
+    $('#write-new').hidden = true;
+    $('#write-result').textContent = '';
+    loadWrite();
+    $('#write-category').value = 'Local';
+    $('#write-label').value = 'Official';
+  }
+  $('#write-new').addEventListener('click', writeReset);
+
+  async function writeLoad(id) {
+    loadWrite();
+    const s = await api('/api/admin/compose/' + id);
+    const f = $('#write-form');
+    $('#write-id').value = s.id;
+    f.title.value = s.title || '';
+    f.summary.value = s.summary || '';
+    f.body.value = s.body || '';
+    f.category.value = s.category || 'Local';
+    f.county.value = s.county || '';
+    f.location_name.value = s.location_name || '';
+    f.label.value = s.verification_label === 'Wire' ? 'Official' : (s.verification_label || 'Official');
+    f.image_url.value = s.image_url || '';
+    f.sponsored.checked = !!Number(s.sponsored);
+    f.sponsor_name.value = s.sponsor_name || '';
+    $('#write-title').textContent = s.status === 'published' ? 'Edit a published story' : 'Edit a draft';
+    $('#write-new').hidden = false;
+    $('#write-result').textContent = '';
+    show('write');
+    $('#write-headline').focus();
+  }
+
+  $('#write-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const out = $('#write-result');
+    const status = (e.submitter && e.submitter.dataset.status) || 'hold';
+    const body = new FormData(e.target);
+    body.set('status', status);
+    if (!body.get('sponsored')) body.set('sponsored', '0');
+    out.classList.remove('is-error');
+    out.textContent = status === 'published' ? 'Publishing…' : 'Saving…';
+    try {
+      const j = await api('/api/admin/compose', { method: 'POST', body });
+      $('#write-id').value = j.id;
+      $('#write-new').hidden = false;
+      out.innerHTML = j.status === 'published'
+        ? `Published — <a href="${esc(j.url)}" target="_blank">open the story</a>. Edits from here update it in place.`
+        : `Saved as a draft. It is under All stories with the status “hold”; publish it from here when it is ready.`;
+      toast(j.status === 'published' ? 'Story published' : 'Draft saved');
+      summary();
+    } catch (err) { out.classList.add('is-error'); out.textContent = err.message; }
   });
 
   async function loadStories() {
@@ -111,7 +178,7 @@
       <td><span class="status ${esc(x.status)}">${esc(x.status)}</span></td>
       <td><input type="checkbox" data-featured ${x.is_featured ? 'checked' : ''}></td>
       <td><input type="checkbox" data-sponsored ${x.sponsored ? 'checked' : ''}><input data-sponsor-name value="${esc(x.sponsor_name || '')}" placeholder="Business name" size="12" style="margin-top:4px"></td>
-      <td class="actions"><button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
+      <td class="actions">${x.kind === 'community' ? '<button class="btn btn--ghost btn--sm" data-write>Edit text</button>' : ''}<button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
   }
   ['stories-q', 'stories-kind', 'stories-status'].forEach(id => $('#' + id).addEventListener('change', loadStories));
   $('#stories-q').addEventListener('input', () => { clearTimeout(window._sq); window._sq = setTimeout(loadStories, 300); });
@@ -119,7 +186,9 @@
     const row = e.target.closest('tr[data-id]'); if (!row) return;
     const id = row.dataset.id;
     try {
-      if (e.target.hasAttribute('data-save')) {
+      if (e.target.hasAttribute('data-write')) {
+        await writeLoad(id);
+      } else if (e.target.hasAttribute('data-save')) {
         await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: $('[data-cat]', row).value, county: $('[data-county]', row).value, label: $('[data-label]', row).value, is_featured: $('[data-featured]', row).checked ? '1' : '0', sponsored: $('[data-sponsored]', row).checked ? '1' : '0', sponsor_name: $('[data-sponsor-name]', row).value }) });
         toast('Saved'); loadStories();
       } else if (e.target.hasAttribute('data-unpublish')) {

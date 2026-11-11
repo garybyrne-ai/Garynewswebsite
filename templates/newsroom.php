@@ -14,6 +14,7 @@
   <div id="newsroom" class="appshell" hidden>
     <nav class="appnav" aria-label="Newsroom">
       <div class="appnav__head"><span class="livedot"></span><span><b id="who">Newsroom</b><small id="who-role">editor</small></span></div>
+      <button data-view="write">Write a story</button>
       <button class="is-active" data-view="review">Review queue <span class="badge" id="nav-review-count">0</span></button>
       <button data-view="stories">All stories</button>
       <button data-view="sections">Section check <span class="badge" id="nav-sections-count">0</span></button>
@@ -31,6 +32,38 @@
     <section>
       <div class="stats" id="stats" style="margin-bottom:22px"></div>
       <p class="mono" id="wire-last" style="color:var(--muted);margin-bottom:18px"></p>
+
+      <div id="view-write" class="view">
+        <div class="inline" style="justify-content:space-between">
+          <div><h1 id="write-title">Write a story</h1><p class="pagehead__blurb">The desk's own reporting, a business spotlight or a blog post. It publishes under your byline.</p></div>
+          <button class="btn btn--ghost btn--sm" type="button" id="write-new" hidden>Start a new story</button>
+        </div>
+        <form id="write-form" class="form" autocomplete="off">
+          <input type="hidden" name="id" id="write-id">
+          <label>Headline<input name="title" id="write-headline" required maxlength="180" placeholder="What happened, in a line"></label>
+          <label>Standfirst <small class="form__hint">One sentence under the headline. Left blank, it is taken from the opening of the story.</small><input name="summary" maxlength="400"></label>
+          <label>The story<textarea name="body" id="write-body" rows="16" required placeholder="Write it as you would for the page. Leave a blank line between paragraphs; web addresses become links automatically."></textarea></label>
+          <div class="form__row">
+            <label>Section<select name="category" id="write-category"></select></label>
+            <label>County<select name="county" id="write-county"><option value="">Ireland-wide</option></select></label>
+            <label>Town or area<input name="location_name" maxlength="100" list="all-locations"></label>
+          </div>
+          <div class="form__row">
+            <label>Editorial label<select name="label" id="write-label"></select></label>
+            <label>Lead image address <small class="form__hint">Optional. A full https:// address, at least 1200px wide.</small><input name="image_url" maxlength="500" placeholder="https://"></label>
+          </div>
+          <div class="form__row">
+            <label class="inline" style="gap:8px"><input type="checkbox" name="sponsored" value="1" id="write-sponsored"> Partner content (paid)</label>
+            <label>Business name <small class="form__hint">Shown in the label and the disclosure.</small><input name="sponsor_name" maxlength="120"></label>
+          </div>
+          <div class="form__actions">
+            <button class="btn btn--primary" type="submit" data-status="published">Publish now</button>
+            <button class="btn btn--ghost" type="submit" data-status="hold">Save as a draft</button>
+            <span class="form__hint">Drafts sit under All stories with the status “hold” until you publish them.</span>
+          </div>
+        </form>
+        <p class="form__result" id="write-result"></p>
+      </div>
 
       <div id="view-review" class="view is-active">
         <div class="inline" style="justify-content:space-between"><div><h1>Editorial review</h1><p class="pagehead__blurb">AI safety screening assists the newsroom. Publication and verification labels remain human decisions.</p></div><select id="queue-status" class="filters"><option value="review">Awaiting review</option><option value="hold">Held</option><option value="processing">Processing</option><option value="rejected">Rejected</option><option value="published">Published community</option></select></div>

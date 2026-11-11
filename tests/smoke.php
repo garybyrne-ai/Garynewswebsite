@@ -20,8 +20,10 @@ foreach (file(dirname(__DIR__) . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPT
         $env[trim($k)] = trim($v, " \"'");
     }
 }
-// In production without an OpenAI key the Trust Engine fails closed: comments are held and publication is refused.
-$failClosed = ($env['APP_ENV'] ?? 'production') === 'production' && ($env['OPENAI_API_KEY'] ?? '') === '';
+// With no OpenAI key the built-in word filter screens instead. An editor still approves every
+// report by hand, so publication works; a comment has nobody reading it first, so it waits.
+$aiScreening = ($env['OPENAI_API_KEY'] ?? '') !== '';
+$failClosed = false;
 
 function http(string $method, string $path, array $body = [], array $headers = [], bool $json = true): array
 {
@@ -188,7 +190,7 @@ $reportId = $rep['id'] ?? '';
 [$s, $mine] = http('GET', '/api/me/reports');
 check('my reports', $s === 200 && ($mine[0]['id'] ?? '') === $reportId);
 [$s, $cm] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/comment', ['body' => 'Smoke test comment — factual and respectful.']);
-check('comment on a wire story', $s === 200 && ($cm['status'] ?? '') === ($failClosed ? 'review' : 'published'), 'status ' . ($cm['status'] ?? '?'));
+check('comment on a wire story', $s === 200 && ($cm['status'] ?? '') === ($aiScreening ? 'published' : 'review'), 'status ' . ($cm['status'] ?? '?'));
 [$s, $cf] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/confirm', []);
 check('confirm a story', $s === 200 && ($cf['confirmations'] ?? 0) >= 1);
 [$s] = http('POST', '/api/story/' . ($first['id'] ?? 'x') . '/confirm', []);
@@ -286,23 +288,30 @@ check('summary', $s === 200 && isset($sum['pending']), 'pending ' . ($sum['pendi
 [$s, $queue] = http('GET', '/api/admin/stories?kind=community&status=review');
 check('review queue lists the report', $s === 200 && in_array($reportId, array_column($queue, 'id'), true));
 [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'publish', 'label' => 'Verified', 'note' => 'Published by smoke test']);
-if ($failClosed) {
-    check('publish refused without clean OpenAI screening (production)', $s === 409, $dec['detail'] ?? '');
-    [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'hold', 'label' => 'Developing', 'note' => 'Held by smoke test']);
-    check('hold decision', $s === 200 && ($dec['status'] ?? '') === 'hold');
-} else {
-    check('publish decision', $s === 200 && ($dec['status'] ?? '') === 'published', $dec['detail'] ?? '');
-    [$s, $pub] = http('GET', '/api/story/' . $reportId);
-    check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
+check('publish decision', $s === 200 && ($dec['status'] ?? '') === 'published', $dec['detail'] ?? '');
+[$s, $pub] = http('GET', '/api/story/' . $reportId);
+check('published report is public', $s === 200 && ($pub['verification_label'] ?? '') === 'Verified');
+
+// Strict mode is the old behaviour, kept for newsrooms that have a key and want it enforced.
+if (!$aiScreening) {
+    http('POST', '/api/admin/settings', ['screening_mode' => 'strict']);
+    http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'hold', 'label' => 'Developing', 'note' => 'back to the queue']);
+    [$s, $strict] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'publish', 'label' => 'Verified', 'note' => '']);
+    check('strict mode refuses to publish without AI screening', $s === 409, $strict['detail'] ?? '');
+    [$s, $forced] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'publish', 'label' => 'Verified', 'note' => '', 'override' => '1']);
+    check('an editor can still publish deliberately', $s === 200 && ($forced['status'] ?? '') === 'published', $forced['detail'] ?? '');
+    [, $audit] = http('GET', '/api/admin/audit');
+    check('the deliberate publish is in the audit log', in_array('story.publish.override', array_column($audit, 'action'), true));
+    http('POST', '/api/admin/settings', ['screening_mode' => 'auto']);
 }
 [$s] = http('POST', "/api/admin/stories/{$reportId}/edit", ['category' => 'Community', 'county' => 'Wicklow', 'label' => 'Verified', 'is_featured' => '1', 'location_name' => 'Bray']);
 check('feature a story', $s === 200);
 [$s, $html] = http('GET', '/', [], [], false);
-check('featured story leads the home page', $s === 200 && ($failClosed || str_contains($html, "Smoke test report {$stamp}")), $failClosed ? 'skipped: report not publishable in fail-closed mode' : '');
+check('featured story leads the home page', $s === 200 && str_contains($html, "Smoke test report {$stamp}"));
 echo "\nSearch, indexing and labelling\n";
 [, $pubStory] = http('GET', '/api/story/' . $reportId);
 $pubSlug = (string)($pubStory['slug'] ?? '');
-if (!$failClosed && $pubSlug !== '') {
+if ($pubSlug !== '') {
     [$s, $page] = http('GET', '/story/' . $pubSlug, [], [], false);
     check('an original story is never noindex', $s === 200 && !str_contains($page, 'name="robots"'));
     check('an original story is declared free to read', str_contains($page, '"isAccessibleForFree":true'));
@@ -376,6 +385,33 @@ http('POST', '/api/admin/settings', ['verify_google' => '', 'social_facebook' =>
 check('the about page carries the editorial standards section', str_contains($about, 'id="standards"') && str_contains($about, 'corrections'));
 [, $homeForm] = http('GET', '/', [], [], false);
 check('the report form offers Business and events', str_contains($homeForm, 'value="Business"') && str_contains($homeForm, 'value="What&#039;s On"'));
+
+echo "\nWriting desk\n";
+$article = ['title' => "Desk-written story {$stamp} about the new library", 'category' => 'Council', 'county' => 'Wicklow',
+    'location_name' => 'Bray', 'label' => 'Official',
+    'body' => "The council approved the plan last night at its monthly meeting.\n\nThe building is due in 2028. The decision is at https://wicklow.ie/library in full."];
+[$s, $draft] = http('POST', '/api/admin/compose', array_merge($article, ['status' => 'hold']));
+check('the newsroom can write a story and save it as a draft', $s === 200 && ($draft['status'] ?? '') === 'hold', $draft['detail'] ?? '');
+$articleId = (string)($draft['id'] ?? '');
+[$s, $hidden] = http('GET', '/story/' . ($draft['slug'] ?? 'x'), [], [], false);
+check('a draft is not public', $s === 404);
+[$s, $live] = http('POST', '/api/admin/compose', array_merge($article, ['id' => $articleId, 'status' => 'published']));
+check('the newsroom can publish it', $s === 200 && ($live['status'] ?? '') === 'published', $live['detail'] ?? '');
+[$s, $page] = http('GET', (string)($live['url'] ?? '/x'), [], [], false);
+check('the written story is live, indexable and links out safely',
+    $s === 200 && !str_contains($page, 'name="robots"') && str_contains($page, 'rel="nofollow noopener"'), 'HTTP ' . $s);
+[$s, $back] = http('GET', '/api/admin/compose/' . $articleId);
+check('it loads back into the form for editing', $s === 200 && str_contains((string)($back['body'] ?? ''), 'approved the plan'));
+[$s, $edited] = http('POST', '/api/admin/compose', array_merge($article, ['id' => $articleId, 'status' => 'published', 'summary' => 'An edited standfirst.']));
+check('editing a published story keeps its address', $s === 200 && ($edited['slug'] ?? '') === ($live['slug'] ?? '-'));
+[$s] = http('POST', '/api/admin/compose', ['title' => 'Too short', 'body' => 'no']);
+check('a thin story is rejected', $s === 400);
+[$s] = http('POST', '/api/admin/compose', array_merge($article, ['category' => 'Not A Section']));
+check('an unknown section is rejected', $s === 400);
+[$s] = http('POST', '/api/admin/compose', array_merge($article, ['image_url' => 'javascript:alert(1)']));
+check('a non-http image address is rejected', $s === 400);
+[$s] = http('POST', "/api/admin/stories/{$articleId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
+check('written story cleanup', $s === 200);
 
 [$s] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
 check('reject (cleanup)', $s === 200);

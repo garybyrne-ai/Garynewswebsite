@@ -16,11 +16,9 @@ final class Moderation
     public static function screen(string $text, array $images = []): array
     {
         if (Config::get('OPENAI_API_KEY') === '') {
-            if (Config::production()) {
-                throw new RuntimeException('OpenAI moderation is not configured');
-            }
             $flagged = (bool)preg_match('/graphic blood|explicit nude|home address is|kill them|terrorist attack instructions/i', $text);
-            return ['provider' => 'local-dev-fallback', 'flagged' => $flagged, 'note' => 'Development-only screening'];
+            return ['provider' => 'keyword', 'flagged' => $flagged,
+                'note' => 'Screened by the built-in word filter. No AI moderation key is configured, so an editor is the only safety check on this report.'];
         }
         $input = [['type' => 'text', 'text' => mb_substr($text, 0, 30000)]];
         foreach (array_slice($images, 0, 16) as $file) {
