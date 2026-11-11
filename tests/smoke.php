@@ -367,6 +367,59 @@ if ($pubSlug !== '') {
         http('POST', "/api/admin/stories/{$dupId}/decision", ['decision' => 'reject', 'label' => 'Community Report', 'note' => 'Smoke test cleanup']);
     }
 }
+// Curated wire headlines: what the page tells Google must match what the sitemap says.
+[, $wireRows] = http('GET', '/api/admin/stories?kind=wire&status=published&limit=2');
+if (count($wireRows) >= 2) {
+    $bareId = $wireRows[0]['id'];
+    $angleId = $wireRows[1]['id'];
+    [, $bare] = http('GET', '/api/admin/compose/' . $bareId);
+    [, $angled] = http('GET', '/api/admin/compose/' . $angleId);
+    $deskTake = 'Local reporting written by the desk for the smoke test. It runs well past the sixty word floor so '
+        . 'that the commentary mode has something real to judge, because a page is only worth offering to a search '
+        . 'engine once somebody here has actually added something to it. It names the places affected, the meeting '
+        . 'where it will be decided, who is going to feel it first and what we have asked the department to confirm '
+        . 'before we update this page again later in the week.';
+    [$s2] = http('POST', "/api/admin/stories/{$angleId}/edit", ['category' => $wireRows[1]['category'], 'label' => $wireRows[1]['verification_label'], 'desk_take' => $deskTake]);
+    check('the desk can write a local angle on a wire headline', $s2 === 200);
+
+    $wireState = static function (string $slug) {
+        [, $html] = http('GET', '/story/' . $slug, [], [], false);
+        preg_match('~<link rel="canonical" href="([^"]+)"~', $html, $m);
+        [, $sm] = http('GET', '/sitemap.xml', [], [], false);
+        return ['noindex' => str_contains($html, 'name="robots"'),
+            'canonical_host' => (string)parse_url($m[1] ?? '', PHP_URL_HOST),
+            'in_sitemap' => str_contains($sm, '/story/' . $slug . '</loc>')];
+    };
+    $selfHost = (string)parse_url($base, PHP_URL_HOST);
+
+    http('POST', '/api/admin/settings', ['wire_indexing' => 'off']);
+    $a = $wireState($bare['slug']);
+    $b = $wireState($angled['slug']);
+    check('signpost mode keeps every wire page out of the index',
+        $a['noindex'] && $b['noindex'] && $a['canonical_host'] !== $selfHost && !$a['in_sitemap'] && !$b['in_sitemap']);
+
+    http('POST', '/api/admin/settings', ['wire_indexing' => 'commentary']);
+    $a = $wireState($bare['slug']);
+    $b = $wireState($angled['slug']);
+    check('commentary mode indexes only the headline the desk wrote on',
+        $a['noindex'] && $a['canonical_host'] !== $selfHost && !$a['in_sitemap']
+        && !$b['noindex'] && $b['canonical_host'] === $selfHost && $b['in_sitemap'],
+        json_encode(['bare' => $a, 'angled' => $b]));
+    [, $page] = http('GET', '/story/' . $angled['slug'], [], [], false);
+    check('the local angle is on the page and cites the publisher',
+        str_contains($page, 'What this means locally') && str_contains($page, 'isBasedOn') && str_contains($page, 'Full story at the source'));
+
+    http('POST', '/api/admin/settings', ['wire_indexing' => 'all']);
+    $a = $wireState($bare['slug']);
+    check('index-everything mode offers a bare headline too',
+        !$a['noindex'] && $a['canonical_host'] === $selfHost && $a['in_sitemap'], json_encode($a));
+
+    http('POST', '/api/admin/settings', ['wire_indexing' => 'off']);
+    [, $backOff] = http('GET', '/story/' . $angled['slug'], [], [], false);
+    check('switching back to signpost mode is a clean reversal', str_contains($backOff, 'name="robots"'));
+    http('POST', "/api/admin/stories/{$angleId}/edit", ['category' => $wireRows[1]['category'], 'label' => $wireRows[1]['verification_label'], 'desk_take' => '']);
+}
+
 [, $robots] = http('GET', '/robots.txt', [], [], false);
 check('robots.txt points at both sitemaps by absolute address', str_contains($robots, 'Sitemap: ' . $base . '/sitemap.xml') && str_contains($robots, 'Sitemap: ' . $base . '/news-sitemap.xml'));
 [$s, $settingsNow] = http('GET', '/api/admin/settings');

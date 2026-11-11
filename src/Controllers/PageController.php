@@ -229,14 +229,16 @@ final class PageController
         $story['views']++;
         $author = $story['author_user_id'] ? Database::one('SELECT id,display_name,handle,title,desk,bio,accent,is_verified,reputation,home_town,home_county,role,reports_published,plan FROM users WHERE id=?', [$story['author_user_id']]) : null;
         $isWire = $story['kind'] === 'wire';
+        // A curated headline points at the publisher unless the desk has made it our own.
+        $wireIndexable = $isWire && \MeNews\Services\Wire::indexable($story);
         // Members' archive: community reports older than the archive window are summarised for non-members.
         $archived = !$isWire && \MeNews\Services\Membership::isArchived($story, Auth::user());
         // Declared in the structured data for everyone, even when a crawler is served the full text.
         $gated = !$isWire && \MeNews\Services\Membership::isGated($story);
         return View::page('story', self::base([
             // Wire pages canonicalise to the publisher and stay out of the index: the original is the article.
-            'canonical' => $isWire ? $story['source_url'] : absolute_url($story['url']),
-            'robots' => $isWire ? 'noindex,follow' : null,
+            'canonical' => ($isWire && !$wireIndexable) ? $story['source_url'] : absolute_url($story['url']),
+            'robots' => ($isWire && !$wireIndexable) ? 'noindex,follow' : null,
             'cluster' => \MeNews\Services\Clusters::get($story['cluster_id'] ?? null),
             'members' => \MeNews\Services\Clusters::members($story['cluster_id'] ?? null, $story['id']),
             'title' => $story['title'] . ' — ME News Ireland',
@@ -248,7 +250,9 @@ final class PageController
             'gated' => $gated,
             'feedLinks' => [['/feed/section/' . Categories::slug((string)$story['category']) . '.xml', $story['category']], $story['county'] ? ['/feed/county/' . slugify($story['county']) . '.xml', 'Co. ' . $story['county']] : null],
             // Never noindex our own reporting: the gate below is declared in the JSON-LD instead.
-            'robots' => $isWire ? 'noindex,follow' : null,
+            'robots' => ($isWire && !$wireIndexable) ? 'noindex,follow' : null,
+            'wireIndexable' => $wireIndexable,
+            'commentaryWords' => $isWire ? \MeNews\Services\Wire::commentaryWords($story) : 0,
             'comments' => Stories::comments($story['id']),
             'confirmations' => Stories::confirmations($story['id']),
             'related' => Stories::related($story, 4),
@@ -484,6 +488,19 @@ final class PageController
         // Capped at the protocol's own ceiling so building the list can never exhaust memory.
         foreach (Database::all("SELECT slug, COALESCE(updated_at,published_at,created_at) AS u FROM stories WHERE status='published' AND kind='community' AND COALESCE(redirect_to,'')='' ORDER BY COALESCE(published_at,created_at) DESC LIMIT 50000") as $st) {
             $add('/story/' . $st['slug'], (string)$st['u'], 'weekly', '0.7');
+        }
+        // Curated headlines belong here only when the newsroom is offering them for indexing.
+        // A page listed in the sitemap while telling Google noindex is a contradiction.
+        $wireMode = \MeNews\Services\Wire::indexMode();
+        if ($wireMode !== 'off') {
+            $sql = "SELECT slug, kind, desk_take, COALESCE(updated_at,published_at,created_at) AS u FROM stories WHERE status='published' AND kind='wire' AND COALESCE(redirect_to,'')=''"
+                . ($wireMode === 'commentary' ? " AND COALESCE(desk_take,'')<>''" : '')
+                . ' ORDER BY COALESCE(published_at,created_at) DESC LIMIT 50000';
+            foreach (Database::all($sql) as $st) {
+                if (\MeNews\Services\Wire::indexable($st)) {
+                    $add('/story/' . $st['slug'], (string)$st['u'], 'weekly', '0.4');
+                }
+            }
         }
         return $urls;
     }

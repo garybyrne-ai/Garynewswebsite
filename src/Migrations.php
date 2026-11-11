@@ -27,6 +27,9 @@ final class Migrations
             // Promotional coverage: labelled above the headline, disclosed at the end, outbound links rel=sponsored.
             'sponsored' => 'INTEGER NOT NULL DEFAULT 0',
             'sponsor_name' => 'TEXT',
+            // ME's own reporting on top of a wire headline: the local angle, context or
+            // follow-up the desk adds. It is what makes a curated page worth indexing.
+            'desk_take' => 'TEXT',
         ],
         'confirmations' => [
             'voter_key' => 'TEXT',
@@ -87,6 +90,6 @@ final class Migrations
         $pdo->exec("UPDATE ads SET tier='premium' WHERE is_house=1 AND tier<>'premium'");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_confirmations_voter ON confirmations(story_id, voter_key)");
         // The members' archive gate ships off: a gate in front of our own reporting keeps it out of search.
-        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('archive_gate','0'),('canonical_redirect','1')");
+        $pdo->exec("INSERT OR IGNORE INTO settings(key,value) VALUES('archive_gate','0'),('canonical_redirect','1'),('wire_indexing','off')");
     }
 }

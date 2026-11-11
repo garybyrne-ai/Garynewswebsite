@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 
 define('ME_ROOT', dirname(__DIR__));
-define('ME_VERSION', '4.4.0');
+define('ME_VERSION', '4.5.0');
 // Asset cache-buster: changes whenever any stylesheet or script changes, so a deploy never leaves
 // browsers running yesterday's JavaScript against today's templates.
 define('ME_ASSETS', ME_VERSION . '.' . substr(md5(implode('|', array_map('filemtime', array_merge(glob(__DIR__ . '/../public/assets/css/*.css') ?: [], glob(__DIR__ . '/../public/assets/js/*.js') ?: [])))), 0, 8));

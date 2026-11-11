@@ -19,7 +19,11 @@ if ($story['image']) {
 }
 // Always offer one image comfortably past Google's 1200px minimum.
 $storyImages[] = ['@type' => 'ImageObject', 'url' => absolute_url('/assets/img/og.png'), 'width' => 1200, 'height' => 630];
-$jsonld = $isWire ? null : [
+$wireIndexable = !empty($wireIndexable);
+$deskTake = trim((string)($story['desk_take'] ?? ''));
+// A curated headline we have added our own reporting to is ours to describe: ME is the
+// author and publisher of the commentary, and the markup cites the publisher it came from.
+$jsonld = ($isWire && !$wireIndexable) ? null : [
     '@context' => 'https://schema.org', '@type' => $sponsored ? 'AdvertiserContentArticle' : 'NewsArticle', '@id' => absolute_url($story['url']), 'url' => absolute_url($story['url']),
     'headline' => mb_substr($story['title'], 0, 110), 'datePublished' => $story['time'], 'dateModified' => $story['updated_at'] ?: $story['time'],
     'description' => $story['summary'] ?: excerpt($story['body'], 200), 'image' => $storyImages,
@@ -30,6 +34,12 @@ $jsonld = $isWire ? null : [
     'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => absolute_url($story['url'])],
     'isAccessibleForFree' => !$gated,
 ] + ($gated ? ['hasPart' => ['@type' => 'WebPageElement', 'isAccessibleForFree' => false, 'cssSelector' => '.article__body']] : [])
+  + ($isWire ? [
+      'isBasedOn' => $story['source_url'],
+      'citation' => ['@type' => 'CreativeWork', 'name' => $story['title'], 'url' => $story['source_url'],
+          'publisher' => ['@type' => 'Organization', 'name' => $story['source_name']]],
+      'articleBody' => $deskTake,
+  ] : [])
   + ($story['county'] ? ['contentLocation' => ['@type' => 'Place', 'name' => trim(($story['location_name'] ? $story['location_name'] . ', ' : '') . 'County ' . $story['county'] . ', Ireland')]] : []);
 ?>
 <div class="progress" aria-hidden="true"><i id="read-progress"></i></div>
@@ -78,6 +88,13 @@ $jsonld = $isWire ? null : [
       <?php if ($isWire): ?>
         <div class="article__body">
           <p class="article__lede"><?= e($story['summary']) ?></p>
+          <?php if ($deskTake !== ''): ?>
+            <section class="desktake">
+              <span class="kicker"><?= icon('pin') ?> What this means locally</span>
+              <?= article_body($deskTake) ?>
+              <p class="desktake__by mono">Local reporting by <?= $author && !empty($author['handle']) ? '<a href="/contributors/' . e($author['handle']) . '">' . e($author['display_name']) . '</a>' : 'the ME News desk' ?>. The headline above is <?= e($story['source_name']) ?>'s.</p>
+            </section>
+          <?php endif; ?>
           <div class="sourcebox">
             <span class="kicker">Full story at the source</span>
             <p>This is a wire headline from <b><?= e($story['source_name']) ?></b><?= $story['source_author'] ? ', reported by ' . e($story['source_author']) : '' ?>. ME did not report or verify it; we curated it into our <?= e($story['category']) ?> desk and link you straight to the publisher, who holds all rights to the full article, photographs and updates.</p>

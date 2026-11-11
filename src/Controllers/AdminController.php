@@ -66,7 +66,13 @@ final class AdminController
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
         $rows = Database::all($sql . ' ORDER BY s.created_at DESC LIMIT ' . $r->int('limit', 120, 1, 400), $args);
+        $wireIndexMode = \MeNews\Services\Wire::indexMode();
         foreach ($rows as &$s) {
+            if ($s['kind'] === 'wire') {
+                $s['commentary_words'] = \MeNews\Services\Wire::commentaryWords($s);
+                $s['indexable'] = \MeNews\Services\Wire::indexable($s);
+                $s['index_mode'] = $wireIndexMode;
+            }
             $s['moderation'] = json_decode($s['moderation_json'] ?? '{}', true) ?: new \stdClass();
             $s['media_url'] = $s['media_original'] ? '/api/admin/stories/' . $s['id'] . '/preview' : null;
             $s['url'] = '/story/' . $s['slug'];
@@ -242,6 +248,11 @@ final class AdminController
         if ($featured) {
             Database::query('UPDATE stories SET is_featured=0 WHERE is_featured=1');
         }
+        // The desk's own reporting on a curated headline. Written here, it is what lets the
+        // page be indexed in commentary mode.
+        if ($r->rawPost('desk_take') !== null) {
+            Database::query('UPDATE stories SET desk_take=? WHERE id=?', [trim($r->post('desk_take', '', 20000)) ?: null, $s['id']]);
+        }
         $sponsored = (int)($r->post('sponsored', ($s['sponsored'] ?? 0) ? '1' : '0') === '1');
         $sponsorName = $r->post('sponsor_name', (string)($s['sponsor_name'] ?? ''), 120);
         Database::query('UPDATE stories SET sponsored=?,sponsor_name=? WHERE id=?', [$sponsored, $sponsored ? $sponsorName : null, $s['id']]);
@@ -385,7 +396,7 @@ final class AdminController
     public static function composeLoad(Request $r, array $p): Response
     {
         self::staff();
-        $s = Database::one('SELECT id,slug,kind,title,summary,body,category,county,location_name,verification_label,image_url,sponsored,sponsor_name,status FROM stories WHERE id=?', [$p['id']]);
+        $s = Database::one('SELECT id,slug,kind,title,summary,body,desk_take,category,county,location_name,verification_label,image_url,sponsored,sponsor_name,status FROM stories WHERE id=?', [$p['id']]);
         if (!$s) {
             throw new HttpException(404, 'Story not found');
         }
@@ -848,6 +859,17 @@ final class AdminController
                 'labels' => ['auto' => 'Automatic — use AI when a key is set, the word filter otherwise', 'strict' => 'Strict — refuse to publish without a clean AI screening'],
                 'default' => 'auto',
                 'hint' => 'Automatic keeps the newsroom working whether or not an OpenAI key is configured; an editor still approves every report by hand. Strict is for newsrooms that have a key and want it enforced. Either way an editor can publish deliberately, and that is recorded in the audit log.'],
+            'wire_indexing' => ['label' => 'Search indexing of curated wire headlines', 'group' => 'Wire', 'type' => 'select',
+                'options' => \MeNews\Services\Wire::INDEX_MODES,
+                'labels' => [
+                    'off' => 'Signpost only — noindex, canonical to the publisher (recommended)',
+                    'commentary' => 'Index once the desk has added ' . \MeNews\Services\Wire::COMMENTARY_WORDS . '+ words of its own',
+                    'all' => 'Index every wire page (risky — read the note)',
+                ],
+                'default' => 'off',
+                'hint' => 'A wire page holds the publisher\'s headline and one-line summary and nothing else, so on "index every wire page" you are asking Google to index '
+                    . 'pages with no writing of your own. Google calls that scraped content and judges it across the whole site, which puts your original reporting at risk too. '
+                    . '"Index once the desk has added its own words" is the safe way to get value from them: write the local angle on a story under All stories, and that page becomes yours.'],
             'wire_mode' => ['label' => 'Wire display', 'group' => 'Wire', 'type' => 'select', 'options' => ['clustered', 'full', 'links'], 'default' => 'clustered'],
             'wire_images' => ['label' => 'Show publisher images on wire cards', 'group' => 'Wire', 'type' => 'select', 'options' => ['1', '0'], 'labels' => ['1' => 'Yes', '0' => 'No'], 'default' => '1'],
             'plus_price_cents' => ['label' => 'ME+ monthly price (€)', 'group' => 'Membership', 'type' => 'cents', 'default' => '399'],

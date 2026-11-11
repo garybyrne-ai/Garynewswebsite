@@ -175,10 +175,10 @@
       <td><select data-cat>${opts(CATS, x.category)}</select></td>
       <td><select data-county><option value="">—</option>${opts(COUNTIES, x.county)}</select></td>
       <td><select data-label>${opts(LABELS, x.verification_label)}</select></td>
-      <td><span class="status ${esc(x.status)}">${esc(x.status)}</span></td>
+      <td><span class="status ${esc(x.status)}">${esc(x.status)}</span>${x.kind === 'wire' && x.index_mode !== 'off' ? `<span class="sub">${x.indexable ? 'indexed as ours' : 'signpost only'}</span>` : ''}</td>
       <td><input type="checkbox" data-featured ${x.is_featured ? 'checked' : ''}></td>
       <td><input type="checkbox" data-sponsored ${x.sponsored ? 'checked' : ''}><input data-sponsor-name value="${esc(x.sponsor_name || '')}" placeholder="Business name" size="12" style="margin-top:4px"></td>
-      <td class="actions">${x.kind === 'community' ? '<button class="btn btn--ghost btn--sm" data-write>Edit text</button>' : ''}<button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
+      <td class="actions">${x.kind === 'wire' ? `<button class="btn btn--ghost btn--sm" data-angle title="Write ME's own reporting on this headline">${x.commentary_words ? `Local angle (${x.commentary_words}w)` : 'Add local angle'}</button>` : ''}${x.kind === 'community' ? '<button class="btn btn--ghost btn--sm" data-write>Edit text</button>' : ''}<button class="btn btn--ghost btn--sm" data-save>Save</button>${x.status === 'published' ? '<button class="btn btn--warn btn--sm" data-unpublish>Unpublish</button>' : (x.kind === 'wire' ? '<button class="btn btn--good btn--sm" data-republish>Publish</button>' : '')}</td></tr>`).join('')}</tbody></table></div>`;
   }
   ['stories-q', 'stories-kind', 'stories-status'].forEach(id => $('#' + id).addEventListener('change', loadStories));
   $('#stories-q').addEventListener('input', () => { clearTimeout(window._sq); window._sq = setTimeout(loadStories, 300); });
@@ -186,7 +186,23 @@
     const row = e.target.closest('tr[data-id]'); if (!row) return;
     const id = row.dataset.id;
     try {
-      if (e.target.hasAttribute('data-write')) {
+      if (e.target.hasAttribute('data-angle')) {
+        const current = await api('/api/admin/compose/' + id).catch(() => ({}));
+        const text = prompt(
+          'What this means locally — ME\u2019s own reporting on this headline.\n\n'
+          + 'The publisher\u2019s headline stays theirs and keeps its link. Write at least 60 words of\n'
+          + 'your own (context, who it affects locally, what happens next) and, in commentary mode,\n'
+          + 'this page becomes yours to index.\n',
+          current.desk_take || '');
+        if (text === null) return;
+        await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({
+          category: $('[data-cat]', row).value, county: $('[data-county]', row).value,
+          label: $('[data-label]', row).value, is_featured: $('[data-featured]', row).checked ? '1' : '0',
+          desk_take: text }) });
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        toast(words >= 60 ? `Saved — ${words} words, enough to index` : `Saved — ${words} words (60 needed to index)`);
+        loadStories();
+      } else if (e.target.hasAttribute('data-write')) {
         await writeLoad(id);
       } else if (e.target.hasAttribute('data-save')) {
         await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: $('[data-cat]', row).value, county: $('[data-county]', row).value, label: $('[data-label]', row).value, is_featured: $('[data-featured]', row).checked ? '1' : '0', sponsored: $('[data-sponsored]', row).checked ? '1' : '0', sponsor_name: $('[data-sponsor-name]', row).value }) });
