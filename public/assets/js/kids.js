@@ -18,6 +18,7 @@
 
   /* ---------------- crossword ---------------- */
   if (game === 'crossword') {
+    let inp = null; // the off-screen input that drives a phone's keyboard; created further down
     const cells = {}; $$('.xw-cell[data-r]').forEach(c => cells[c.dataset.r + ',' + c.dataset.c] = c);
     const words = [...data.across.map(w => ({ ...w, dir: 'across' })), ...data.down.map(w => ({ ...w, dir: 'down' }))];
     const cellsOf = w => Array.from({ length: w.len }, (_, i) => cells[(w.dir === 'across' ? w.row : w.row + i) + ',' + (w.dir === 'across' ? w.col + i : w.col)]);
@@ -36,7 +37,12 @@
       $$('.clues li').forEach(x => x.classList.remove('is-active'));
       const w = wordAt(cur.dataset.r, cur.dataset.c, dir);
       if (w) { cellsOf(w).forEach(x => x && x.classList.add('is-word')); const li = $(`[data-clue="${w.dir}-${w.n}"]`); if (li) { li.classList.add('is-active'); li.scrollIntoView({ block: 'nearest' }); } }
-      cur.classList.add('is-active'); cur.focus({ preventScroll: true });
+      cur.classList.add('is-active');
+      // Focus the hidden input, never the square. On a phone, focusing the square closes the
+      // virtual keyboard the instant the tap opens it, which makes the grid impossible to fill
+      // in. The highlight is a class, so nothing is lost. Desktop typing is unaffected: the
+      // keydown handler calls preventDefault, so the input can never double a letter.
+      (inp || cur).focus({ preventScroll: true });
     }
     function move(step) {
       if (!cur) return;
@@ -54,6 +60,11 @@
     $$('.clues li').forEach(li => li.addEventListener('click', () => select(cells[li.dataset.r + ',' + li.dataset.c], li.dataset.dir)));
     document.addEventListener('keydown', e => {
       if (!cur || e.metaKey || e.ctrlKey) return;
+      // Only the puzzle's own hidden input may feed the grid. Without this the crossword
+      // swallows every letter on the page, so the search box, the report form and anything
+      // else a reader tries to type into on this page silently takes nothing.
+      const t = e.target;
+      if (t && t !== inp && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
       if (/^[a-zA-Z]$/.test(e.key)) { setLetter(e.key.toUpperCase()); move(1); e.preventDefault(); }
       else if (e.key === 'Backspace') { if ($('[data-letter]', cur).textContent) setLetter(''); else { move(-1); setLetter(''); } e.preventDefault(); }
       else if (e.key === 'ArrowRight') { dir = 'across'; move(1); e.preventDefault(); } else if (e.key === 'ArrowLeft') { dir = 'across'; move(-1); e.preventDefault(); }
@@ -61,7 +72,7 @@
       else if (e.key === ' ' || e.key === 'Tab') { select(cur, dir === 'across' ? 'down' : 'across'); e.preventDefault(); }
     });
     // Mobile: a hidden input catches virtual keyboard
-    const inp = document.createElement('input'); inp.type = 'text'; inp.autocomplete = 'off'; inp.style.cssText = 'position:fixed;opacity:0;top:0;left:0;height:1px;width:1px;pointer-events:none'; document.body.appendChild(inp);
+    inp = document.createElement('input'); inp.type = 'text'; inp.autocomplete = 'off'; inp.style.cssText = 'position:fixed;opacity:0;top:0;left:0;height:1px;width:1px;pointer-events:none'; document.body.appendChild(inp);
     $$('.xw-cell[data-r]').forEach(c => c.addEventListener('touchend', () => inp.focus({ preventScroll: true })));
     inp.addEventListener('input', () => { const v = inp.value.slice(-1); inp.value = ''; if (/[a-zA-Z]/.test(v)) { setLetter(v.toUpperCase()); move(1); } });
     $('[data-check]').addEventListener('click', () => { words.forEach(w => cellsOf(w).forEach((x, i) => { const l = $('[data-letter]', x).textContent; if (l) x.classList.add(l === w.answer[i] ? 'is-right' : 'is-wrong'); })); });
@@ -78,22 +89,50 @@
     const cellAt = (r, c) => grid.querySelector(`.ws-cell[data-r="${r}"][data-c="${c}"]`);
     let found = new Set(store.get(key) || []);
     const paint = () => { data.words.forEach(w => { if (!found.has(w.word)) return; for (let i = 0; i < w.word.length; i++) cellAt(w.row + w.dr * i, w.col + w.dc * i)?.classList.add('is-found'); $(`[data-word="${w.word}"]`).classList.add('is-found'); }); $('[data-progress]').textContent = `${found.size} / ${data.words.length} found`; if (found.size === data.words.length) { $('[data-done]').hidden = false; t.stop(); } };
-    let start = null, path = [];
+    let start = null, path = [], moved = false, anchor = null;
     const line = (a, b) => { const dr = Math.sign(b.r - a.r), dc = Math.sign(b.c - a.c); const len = Math.max(Math.abs(b.r - a.r), Math.abs(b.c - a.c)); if (!(dr === 0 || dc === 0 || Math.abs(b.r - a.r) === Math.abs(b.c - a.c))) return [a]; return Array.from({ length: len + 1 }, (_, i) => ({ r: a.r + dr * i, c: a.c + dc * i })); };
     const pos = e => { const t = document.elementFromPoint(e.clientX, e.clientY); return t && t.classList.contains('ws-cell') ? { r: +t.dataset.r, c: +t.dataset.c } : null; };
     const show = () => { $$('.ws-cell.is-sel', grid).forEach(x => x.classList.remove('is-sel')); path.forEach(p => cellAt(p.r, p.c)?.classList.add('is-sel')); };
-    grid.addEventListener('pointerdown', e => { const p = pos(e); if (!p) return; start = p; path = [p]; show(); grid.setPointerCapture(e.pointerId); });
-    grid.addEventListener('pointermove', e => { if (!start) return; const p = pos(e); if (!p) return; path = line(start, p); show(); });
-    const finish = () => {
+    grid.addEventListener('pointerdown', e => {
+      const p = pos(e); if (!p) return;
+      start = p; moved = false;
+      path = anchor ? line(anchor, p) : [p];
+      show();
+      grid.setPointerCapture(e.pointerId);
+    });
+    grid.addEventListener('pointermove', e => {
       if (!start) return;
+      const p = pos(e); if (!p) return;
+      if (p.r !== start.r || p.c !== start.c) moved = true;
+      path = line(anchor || start, p); show();
+    });
+    /** Claim whatever the current path spells, in either direction. */
+    const claim = () => {
       const word = path.map(p => data.grid[p.r][p.c]).join(''), rev = word.split('').reverse().join('');
       const hit = data.words.find(w => w.word === word || w.word === rev);
       if (hit) { found.add(hit.word); store.set(key, [...found]); paint(); }
-      start = null; path = []; show();
+      return !!hit;
+    };
+    const clearSel = () => { anchor = null; path = []; show(); };
+    const finish = e => {
+      if (!start) return;
+      const end = (e && pos(e)) || start;
+      if (moved) {
+        // Pressed and dragged across the word.
+        path = line(anchor || start, end); claim(); clearSel();
+      } else if (anchor) {
+        // Tapped the first letter, now the last one. Tapping the same square cancels.
+        if (anchor.r === end.r && anchor.c === end.c) { clearSel(); }
+        else { path = line(anchor, end); claim(); clearSel(); }
+      } else {
+        // First tap: remember where the word starts and leave it lit.
+        anchor = end; path = [end]; show();
+      }
+      start = null; moved = false;
     };
     grid.addEventListener('pointerup', finish); grid.addEventListener('pointercancel', finish);
     $('[data-hint]').addEventListener('click', () => { const w = data.words.find(x => !found.has(x.word)); if (w) cellAt(w.row, w.col)?.classList.add('is-hint'); });
-    $('[data-clear]').addEventListener('click', () => { found = new Set(); store.set(key, []); $$('.ws-cell').forEach(x => x.classList.remove('is-found', 'is-hint')); $$('.ws__words li').forEach(x => x.classList.remove('is-found')); t.reset(); paint(); $('[data-done]').hidden = true; });
+    $('[data-clear]').addEventListener('click', () => { found = new Set(); store.set(key, []); $$('.ws-cell').forEach(x => x.classList.remove('is-found', 'is-hint', 'is-sel')); $$('.ws__words li').forEach(x => x.classList.remove('is-found')); clearSel(); t.reset(); paint(); $('[data-done]').hidden = true; });
     paint();
   }
 

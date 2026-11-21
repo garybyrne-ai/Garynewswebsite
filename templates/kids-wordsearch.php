@@ -14,7 +14,7 @@
       </div>
       <ul class="ws__words"><?php foreach ($p['words'] as $w): ?><li data-word="<?= e($w['word']) ?>"><?= e($w['word']) ?></li><?php endforeach; ?></ul>
     </div>
-    <p class="paper__note">Words run across, down and diagonally. Press and drag from the first letter to the last.</p>
+    <p class="paper__note">Words run across, down and diagonally. Tap the first letter and then the last one, or press and drag across the word.</p>
     <nav class="puzzle__archive mono" aria-label="Archive"><span>Archive:</span><?php foreach ($archive as $d): ?><a href="/kids/wordsearch/<?= e($d) ?>" class="<?= $d === $date ? 'is-active' : '' ?>"><?= e(date('j M', strtotime($d))) ?></a><?php endforeach; ?></nav>
   </div>
 </div>
