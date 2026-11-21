@@ -43,28 +43,34 @@
   async function summary() {
     const s = await api('/api/admin/summary');
     lastSummary = s;
-    const tiles = [['Review', s.pending, 'warn'], ['Held', s.held, 'bad']];
-    // Curated headlines that have been taken off the site are not review-queue work, so they
-    // get their own tile rather than inflating one that sits above a community-only queue.
-    if (s.wire_held) tiles.push(['Wire held', s.wire_held, 'warn', 'wire-hold']);
-    tiles.push(['Published', s.published], ['Community', s.community], ['Wire', s.wire], ['Users', s.users], ['Comments', s.comments_review], ['Ads', s.ads_review]);
-    $('#stats').innerHTML = tiles
-      .map(([k, v, c, go]) => `<div class="stat${go ? ' stat--link' : ''}"${go ? ` data-goto="${go}" role="button" tabindex="0" title="Show these under All stories"` : ''}><span class="mono">${k}</span><strong class="${c ? 'is-' + c : ''}">${v}</strong></div>`).join('');
+    $('#stats').innerHTML = [['Review', s.pending, 'warn'], ['Held', s.held, 'bad'], ['Published', s.published], ['Community', s.community], ['Wire', s.wire], ['Users', s.users], ['Comments', s.comments_review], ['Ads', s.ads_review]]
+      .map(([k, v, c]) => `<div class="stat"><span class="mono">${k}</span><strong class="${c ? 'is-' + c : ''}">${v}</strong></div>`).join('');
     $('#nav-review-count').textContent = s.pending; $('#nav-comments-count').textContent = s.comments_review; $('#nav-ads-count').textContent = s.ads_review;
     $('#nav-sections-count').textContent = s.section_check; $('#nav-notices-count').textContent = s.notices_review; $('#nav-takedowns-count').textContent = s.takedowns_open;
     $('#wire-last').textContent = s.wire_last_refresh ? 'Wire updated ' + fmt(s.wire_last_refresh) + (s.wire_stale ? ' (stale)' : '') : 'Wire never refreshed';
   }
 
-  $('#stats').addEventListener('click', e => {
-    const tile = e.target.closest('[data-goto]');
-    if (!tile || tile.dataset.goto !== 'wire-hold') return;
-    $('#stories-kind').value = 'wire';
-    $('#stories-status').value = 'hold';
-    $('#stories-q').value = '';
-    show('stories');
-  });
+  /**
+   * A curated wire headline in the queue. It has no photo to check, no reporter to weigh and
+   * no body of ours, so it gets a card that shows what there is and the two decisions that
+   * apply: put it back on the site, or reject it.
+   */
+  function wireCard(x) {
+    const host = (x.source_url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+    return `<article class="review review--wire" data-id="${x.id}" data-label="Wire">
+      <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="chip">Wire</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.published_at || x.created_at)}</span></div>
+      <h3>${esc(x.title)}</h3>
+      <div class="meta">${esc(x.source_name || 'Unknown source')}${x.source_author ? ' · ' + esc(x.source_author) : ''}${x.county ? ' · Co. ' + esc(x.county) : ''}${host ? ` · <a href="${esc(x.source_url)}" target="_blank" rel="noopener">${esc(host)}</a>` : ''}</div>
+      <p>${esc(x.summary || '')}</p>
+      <div class="trustnote">Curated from ${esc(x.source_name || 'the wire')}, not reported by ME. Holding it takes it off the section and county pages; publishing puts it back.</div>
+      <div class="actions">${x.status === 'published'
+        ? '<button class="btn btn--warn btn--sm" data-decide="unpublish">Take off the site</button>'
+        : '<button class="btn btn--good btn--sm" data-decide="publish">Put back on the site</button>'}<button class="btn btn--hot btn--sm" data-decide="reject">Reject</button>${x.status === 'published' ? `<a class="btn btn--ghost btn--sm" href="${esc(x.url)}" target="_blank">Open</a>` : ''}</div>
+    </article>`;
+  }
 
   function reviewCard(x) {
+    if (x.kind === 'wire') return wireCard(x);
     const media = x.media_url ? `<div class="review__media">${x.media_type === 'video' ? `<video controls preload="metadata" src="${x.media_url}"></video>` : `<img src="${x.media_url}" alt="">`}</div>` : '';
     return `<article class="review" data-id="${x.id}">
       <div class="inline"><span class="status ${esc(x.status)}">${esc(x.status)}</span><span class="chip chip--cat">${esc(x.category)}</span><span class="mono" style="margin-left:auto;color:var(--muted)">${fmt(x.created_at)}</span></div>
@@ -93,18 +99,13 @@
   }
   async function loadQueue() {
     const status = $('#queue-status').value;
-    const a = await api('/api/admin/stories?kind=community&status=' + encodeURIComponent(status));
-    const elsewhere = status === 'hold' && lastSummary.wire_held
-      ? `<p>${lastSummary.wire_held} curated wire ${lastSummary.wire_held === 1 ? 'headline is' : 'headlines are'} on hold. Those are not community reports, so they live under <a href="#" data-goto-stories>All stories</a>.</p>`
-      : '';
+    // Every story in the chosen status, whatever its kind, so the list matches the tile above
+    // it. The one exception is the published view, which is explicitly our own reporting —
+    // without that the wire's tens of thousands of headlines would bury it.
+    const kind = status === 'published' ? 'community' : '';
+    const a = await api(`/api/admin/stories?kind=${kind}&status=${encodeURIComponent(status)}&limit=400`);
     $('#queue').innerHTML = a.length ? a.map(reviewCard).join('')
-      : `<div class="empty"><div class="empty__glyph">—</div><h3>Nothing waiting.</h3><p>This queue holds community reports, which appear after the Trust Engine screens them.</p>${elsewhere}</div>`;
-    const jump = $('[data-goto-stories]');
-    if (jump) jump.addEventListener('click', ev => {
-      ev.preventDefault();
-      $('#stories-kind').value = 'wire'; $('#stories-status').value = 'hold'; $('#stories-q').value = '';
-      show('stories');
-    });
+      : `<div class="empty"><div class="empty__glyph">—</div><h3>Nothing ${status === 'review' ? 'waiting' : 'here'}.</h3><p>Community reports arrive here after the Trust Engine screens them; curated wire headlines appear once an editor holds or rejects one.</p></div>`;
   }
   $('#queue-status').addEventListener('change', loadQueue);
   $('#queue').addEventListener('click', async e => {
@@ -114,8 +115,11 @@
       if (e.target.dataset.decide) {
         const override = e.target.dataset.override === '1';
         if (override && !confirm('Publish this report without a clean automated screening?\n\nYour account is recorded in the audit log as having approved it.')) return;
-        await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: $('[data-cat]', card).value, label: $('[data-label]', card).value }) });
-        await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: e.target.dataset.decide, label: $('[data-label]', card).value, note: $('[data-note]', card).value, override: override ? '1' : '0' }) });
+        // A wire card carries no section, label or note controls: its label is fixed.
+        const catEl = $('[data-cat]', card), labelEl = $('[data-label]', card), noteEl = $('[data-note]', card);
+        const label = labelEl ? labelEl.value : (card.dataset.label || 'Wire');
+        if (catEl) await api('/api/admin/stories/' + id + '/edit', { method: 'POST', body: fd({ category: catEl.value, label }) });
+        await api('/api/admin/stories/' + id + '/decision', { method: 'POST', body: fd({ decision: e.target.dataset.decide, label, note: noteEl ? noteEl.value : '', override: override ? '1' : '0' }) });
         toast(override ? 'Published — recorded in the audit log' : 'Decision saved'); await Promise.all([summary(), loadQueue()]);
       } else if (e.target.hasAttribute('data-rerun')) {
         e.target.disabled = true; await api('/api/admin/stories/' + id + '/rerun-safety', { method: 'POST' }); toast('Safety screening re-run'); await Promise.all([summary(), loadQueue()]);

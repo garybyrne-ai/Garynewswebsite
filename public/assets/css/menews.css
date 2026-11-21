@@ -1530,6 +1530,6 @@ body{overflow-x:clip}
 .desktake .kicker svg{width:15px;height:15px}
 .desktake__by{margin:12px 0 0;color:var(--muted);font-size:.84rem}
 
-/* A stat tile that leads somewhere says so. */
-.stat--link{cursor:pointer;transition:border-color .15s,transform .15s}
-.stat--link:hover,.stat--link:focus-visible{border-color:var(--brand);transform:translateY(-1px)}
+/* A curated wire headline in the review queue: lighter than a community report card. */
+.review--wire{border-left:3px solid var(--line-2)}
+.review--wire p{color:var(--muted)}

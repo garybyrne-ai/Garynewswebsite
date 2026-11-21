@@ -30,13 +30,9 @@ final class AdminController
         self::staff();
         $out = [];
         foreach ([
-            // These two sit above the editorial review queue, which only ever shows community
-            // reports, so they must count the same thing. Counting wire stories here made the
-            // tile read 85 while the queue underneath it was empty.
-            'pending' => "stories WHERE kind='community' AND status='review'", 'held' => "stories WHERE kind='community' AND status='hold'",
-            // Curated headlines taken off the site. Not review-queue work, but not invisible either.
-            'wire_held' => "stories WHERE kind='wire' AND status='hold'", 'wire_review' => "stories WHERE kind='wire' AND status='review'",
-            'published' => "stories WHERE status='published'",
+            // These sit above the editorial review queue and the queue shows every kind in the
+            // status chosen, so they count every kind too. The tile and the list agree.
+            'pending' => "stories WHERE status='review'", 'held' => "stories WHERE status='hold'", 'published' => "stories WHERE status='published'",
             'community' => "stories WHERE kind='community' AND status='published'", 'wire' => "stories WHERE kind='wire' AND status='published'",
             'users' => 'users', 'comments_review' => "comments WHERE status='review'", 'ads_review' => "ads WHERE status='review'", 'ads_live' => "ads WHERE status='approved' AND paused=0",
             'notices_review' => "notices WHERE status='review' AND verified_at IS NOT NULL", 'closures_review' => "closures WHERE status='review'",

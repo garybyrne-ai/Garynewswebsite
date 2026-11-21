@@ -285,24 +285,27 @@ check('takedowns listed for editors', $s === 200 && count($tk) >= 1);
 check('daily cron runs', ($env['CRON_KEY'] ?? '') === '' ? $s === 403 : ($s === 200 && isset($cron['daily_sent'])), 'sent ' . ($cron['daily_sent'] ?? '?'));
 [$s, $sum] = http('GET', '/api/admin/summary');
 check('summary', $s === 200 && isset($sum['pending']), 'pending ' . ($sum['pending'] ?? '?') . ', wire ' . ($sum['wire'] ?? '?'));
-// The Review and Held tiles sit above a community-only queue, so they must count the same
-// thing it shows. Counting wire stories there made the tile read 85 over an empty queue.
-[, $qReview] = http('GET', '/api/admin/stories?kind=community&status=review&limit=400');
-[, $qHold] = http('GET', '/api/admin/stories?kind=community&status=hold&limit=400');
-check('the Review tile counts what the review queue shows', (int)($sum['pending'] ?? -1) === count($qReview), ($sum['pending'] ?? '?') . ' vs ' . count($qReview));
-check('the Held tile counts what the queue shows when set to Held', (int)($sum['held'] ?? -1) === count($qHold), ($sum['held'] ?? '?') . ' vs ' . count($qHold));
-// Hold a wire story: it must not leak into those tiles, and must not vanish either.
+// The Held tile sits above the review queue, and selecting Held must list what it counts —
+// wire headlines included, which is what used to be impossible.
+$queueFor = static function (string $status) {
+    [, $rows] = http('GET', '/api/admin/stories?kind=' . ($status === 'published' ? 'community' : '') . '&status=' . $status . '&limit=400');
+    return $rows;
+};
+check('the Review tile counts what the queue lists', (int)($sum['pending'] ?? -1) === count($queueFor('review')), ($sum['pending'] ?? '?') . ' vs ' . count($queueFor('review')));
+check('the Held tile counts what the queue lists', (int)($sum['held'] ?? -1) === count($queueFor('hold')), ($sum['held'] ?? '?') . ' vs ' . count($queueFor('hold')));
 [, $wireOne] = http('GET', '/api/admin/stories?kind=wire&status=published&limit=1');
 if ($wireOne) {
     $wireId = $wireOne[0]['id'];
-    http('POST', "/api/admin/stories/{$wireId}/decision", ['decision' => 'unpublish', 'label' => 'Wire', 'note' => 'smoke test hold']);
+    [$s2] = http('POST', "/api/admin/stories/{$wireId}/decision", ['decision' => 'unpublish', 'label' => 'Wire', 'note' => 'smoke test hold']);
+    check('a wire headline can be taken off the site', $s2 === 200);
     [, $sum2] = http('GET', '/api/admin/summary');
-    [, $qHold2] = http('GET', '/api/admin/stories?kind=community&status=hold&limit=400');
-    check('holding a wire story does not inflate the Held tile', (int)($sum2['held'] ?? -1) === count($qHold2), ($sum2['held'] ?? '?') . ' vs ' . count($qHold2));
-    check('a held wire story is counted separately instead of disappearing', (int)($sum2['wire_held'] ?? 0) >= 1, 'wire_held ' . ($sum2['wire_held'] ?? '?'));
-    [, $wireHeldList] = http('GET', '/api/admin/stories?kind=wire&status=hold&limit=400');
-    check('held wire stories are reachable under All stories', (int)($sum2['wire_held'] ?? -1) === count($wireHeldList));
-    http('POST', "/api/admin/stories/{$wireId}/decision", ['decision' => 'publish', 'label' => 'Wire', 'note' => 'smoke test restore']);
+    $held = $queueFor('hold');
+    check('the held wire headline appears in the queue', in_array($wireId, array_column($held, 'id'), true));
+    check('the Held tile still matches the queue with a wire story in it', (int)($sum2['held'] ?? -1) === count($held), ($sum2['held'] ?? '?') . ' vs ' . count($held));
+    // Putting it back must work from the queue, where there is no section or label control.
+    [$s3] = http('POST', "/api/admin/stories/{$wireId}/decision", ['decision' => 'publish', 'label' => 'Wire', 'note' => '']);
+    check('it can be put back on the site from the queue', $s3 === 200);
+    check('and it leaves the held list again', !in_array($wireId, array_column($queueFor('hold'), 'id'), true));
 }
 [$s, $queue] = http('GET', '/api/admin/stories?kind=community&status=review');
 check('review queue lists the report', $s === 200 && in_array($reportId, array_column($queue, 'id'), true));
