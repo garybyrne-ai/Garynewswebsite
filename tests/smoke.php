@@ -285,6 +285,25 @@ check('takedowns listed for editors', $s === 200 && count($tk) >= 1);
 check('daily cron runs', ($env['CRON_KEY'] ?? '') === '' ? $s === 403 : ($s === 200 && isset($cron['daily_sent'])), 'sent ' . ($cron['daily_sent'] ?? '?'));
 [$s, $sum] = http('GET', '/api/admin/summary');
 check('summary', $s === 200 && isset($sum['pending']), 'pending ' . ($sum['pending'] ?? '?') . ', wire ' . ($sum['wire'] ?? '?'));
+// The Review and Held tiles sit above a community-only queue, so they must count the same
+// thing it shows. Counting wire stories there made the tile read 85 over an empty queue.
+[, $qReview] = http('GET', '/api/admin/stories?kind=community&status=review&limit=400');
+[, $qHold] = http('GET', '/api/admin/stories?kind=community&status=hold&limit=400');
+check('the Review tile counts what the review queue shows', (int)($sum['pending'] ?? -1) === count($qReview), ($sum['pending'] ?? '?') . ' vs ' . count($qReview));
+check('the Held tile counts what the queue shows when set to Held', (int)($sum['held'] ?? -1) === count($qHold), ($sum['held'] ?? '?') . ' vs ' . count($qHold));
+// Hold a wire story: it must not leak into those tiles, and must not vanish either.
+[, $wireOne] = http('GET', '/api/admin/stories?kind=wire&status=published&limit=1');
+if ($wireOne) {
+    $wireId = $wireOne[0]['id'];
+    http('POST', "/api/admin/stories/{$wireId}/decision", ['decision' => 'unpublish', 'label' => 'Wire', 'note' => 'smoke test hold']);
+    [, $sum2] = http('GET', '/api/admin/summary');
+    [, $qHold2] = http('GET', '/api/admin/stories?kind=community&status=hold&limit=400');
+    check('holding a wire story does not inflate the Held tile', (int)($sum2['held'] ?? -1) === count($qHold2), ($sum2['held'] ?? '?') . ' vs ' . count($qHold2));
+    check('a held wire story is counted separately instead of disappearing', (int)($sum2['wire_held'] ?? 0) >= 1, 'wire_held ' . ($sum2['wire_held'] ?? '?'));
+    [, $wireHeldList] = http('GET', '/api/admin/stories?kind=wire&status=hold&limit=400');
+    check('held wire stories are reachable under All stories', (int)($sum2['wire_held'] ?? -1) === count($wireHeldList));
+    http('POST', "/api/admin/stories/{$wireId}/decision", ['decision' => 'publish', 'label' => 'Wire', 'note' => 'smoke test restore']);
+}
 [$s, $queue] = http('GET', '/api/admin/stories?kind=community&status=review');
 check('review queue lists the report', $s === 200 && in_array($reportId, array_column($queue, 'id'), true));
 [$s, $dec] = http('POST', "/api/admin/stories/{$reportId}/decision", ['decision' => 'publish', 'label' => 'Verified', 'note' => 'Published by smoke test']);

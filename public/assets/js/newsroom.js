@@ -39,14 +39,30 @@
     if (hash && $('#view-' + hash)) show(hash);
   }
 
+  let lastSummary = {};
   async function summary() {
     const s = await api('/api/admin/summary');
-    $('#stats').innerHTML = [['Review', s.pending, 'warn'], ['Held', s.held, 'bad'], ['Published', s.published], ['Community', s.community], ['Wire', s.wire], ['Users', s.users], ['Comments', s.comments_review], ['Ads', s.ads_review]]
-      .map(([k, v, c]) => `<div class="stat"><span class="mono">${k}</span><strong class="${c ? 'is-' + c : ''}">${v}</strong></div>`).join('');
+    lastSummary = s;
+    const tiles = [['Review', s.pending, 'warn'], ['Held', s.held, 'bad']];
+    // Curated headlines that have been taken off the site are not review-queue work, so they
+    // get their own tile rather than inflating one that sits above a community-only queue.
+    if (s.wire_held) tiles.push(['Wire held', s.wire_held, 'warn', 'wire-hold']);
+    tiles.push(['Published', s.published], ['Community', s.community], ['Wire', s.wire], ['Users', s.users], ['Comments', s.comments_review], ['Ads', s.ads_review]);
+    $('#stats').innerHTML = tiles
+      .map(([k, v, c, go]) => `<div class="stat${go ? ' stat--link' : ''}"${go ? ` data-goto="${go}" role="button" tabindex="0" title="Show these under All stories"` : ''}><span class="mono">${k}</span><strong class="${c ? 'is-' + c : ''}">${v}</strong></div>`).join('');
     $('#nav-review-count').textContent = s.pending; $('#nav-comments-count').textContent = s.comments_review; $('#nav-ads-count').textContent = s.ads_review;
     $('#nav-sections-count').textContent = s.section_check; $('#nav-notices-count').textContent = s.notices_review; $('#nav-takedowns-count').textContent = s.takedowns_open;
     $('#wire-last').textContent = s.wire_last_refresh ? 'Wire updated ' + fmt(s.wire_last_refresh) + (s.wire_stale ? ' (stale)' : '') : 'Wire never refreshed';
   }
+
+  $('#stats').addEventListener('click', e => {
+    const tile = e.target.closest('[data-goto]');
+    if (!tile || tile.dataset.goto !== 'wire-hold') return;
+    $('#stories-kind').value = 'wire';
+    $('#stories-status').value = 'hold';
+    $('#stories-q').value = '';
+    show('stories');
+  });
 
   function reviewCard(x) {
     const media = x.media_url ? `<div class="review__media">${x.media_type === 'video' ? `<video controls preload="metadata" src="${x.media_url}"></video>` : `<img src="${x.media_url}" alt="">`}</div>` : '';
@@ -78,7 +94,17 @@
   async function loadQueue() {
     const status = $('#queue-status').value;
     const a = await api('/api/admin/stories?kind=community&status=' + encodeURIComponent(status));
-    $('#queue').innerHTML = a.length ? a.map(reviewCard).join('') : '<div class="empty"><div class="empty__glyph">—</div><h3>Nothing waiting.</h3><p>Community reports appear here after the Trust Engine screens them.</p></div>';
+    const elsewhere = status === 'hold' && lastSummary.wire_held
+      ? `<p>${lastSummary.wire_held} curated wire ${lastSummary.wire_held === 1 ? 'headline is' : 'headlines are'} on hold. Those are not community reports, so they live under <a href="#" data-goto-stories>All stories</a>.</p>`
+      : '';
+    $('#queue').innerHTML = a.length ? a.map(reviewCard).join('')
+      : `<div class="empty"><div class="empty__glyph">—</div><h3>Nothing waiting.</h3><p>This queue holds community reports, which appear after the Trust Engine screens them.</p>${elsewhere}</div>`;
+    const jump = $('[data-goto-stories]');
+    if (jump) jump.addEventListener('click', ev => {
+      ev.preventDefault();
+      $('#stories-kind').value = 'wire'; $('#stories-status').value = 'hold'; $('#stories-q').value = '';
+      show('stories');
+    });
   }
   $('#queue-status').addEventListener('change', loadQueue);
   $('#queue').addEventListener('click', async e => {

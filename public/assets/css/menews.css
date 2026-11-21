@@ -1529,3 +1529,7 @@ body{overflow-x:clip}
 .desktake .kicker{display:flex;align-items:center;gap:6px;margin:0 0 10px;width:fit-content}
 .desktake .kicker svg{width:15px;height:15px}
 .desktake__by{margin:12px 0 0;color:var(--muted);font-size:.84rem}
+
+/* A stat tile that leads somewhere says so. */
+.stat--link{cursor:pointer;transition:border-color .15s,transform .15s}
+.stat--link:hover,.stat--link:focus-visible{border-color:var(--brand);transform:translateY(-1px)}
