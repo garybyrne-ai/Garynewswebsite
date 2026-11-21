@@ -420,6 +420,33 @@ if (count($wireRows) >= 2) {
     http('POST', "/api/admin/stories/{$angleId}/edit", ['category' => $wireRows[1]['category'], 'label' => $wireRows[1]['verification_label'], 'desk_take' => '']);
 }
 
+// Analytics: pasted in the newsroom, stored whole, and held back until the reader consents.
+$gaSnippet = "<!-- Google tag -->\n<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-SMOKE{$stamp}\"></script>\n"
+    . "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-SMOKE{$stamp}');</script>";
+[$s] = http('POST', '/api/admin/settings', ['analytics_snippet' => $gaSnippet, 'analytics_consent' => 'consent']);
+check('an analytics snippet saves from the newsroom', $s === 200);
+[, $settingsBack] = http('GET', '/api/admin/settings');
+check('the snippet is stored whole, not truncated', ($settingsBack['analytics_snippet']['value'] ?? '') === $gaSnippet);
+[, $homeA] = http('GET', '/', [], [], false);
+// The tag is in the markup, but sealed inside an inert <template> the browser will not run
+// until the reader accepts. What matters is that none of it sits loose in the page.
+$tplStart = strpos($homeA, '<template id="me-analytics">');
+$tplEnd = strpos($homeA, '</template>', $tplStart === false ? 0 : $tplStart);
+$looseTag = $tplStart === false || preg_match_all('~<script[^>]*googletagmanager\.com/gtag~', $homeA, $m, PREG_OFFSET_CAPTURE) === 0
+    ? true
+    : (bool)array_filter($m[0], static fn($hit) => $hit[1] < $tplStart || $hit[1] > $tplEnd);
+check('cookie-setting analytics waits for consent, sealed in a template',
+    $tplStart !== false && $tplEnd !== false && !$looseTag);
+[, $newsroomA] = http('GET', '/newsroom', [], [], false);
+check('staff pages are left out of analytics', !str_contains($newsroomA, 'me-analytics') && !str_contains($newsroomA, 'googletagmanager'));
+http('POST', '/api/admin/settings', ['analytics_consent' => 'always']);
+[, $homeB] = http('GET', '/', [], [], false);
+check('cookieless analytics loads on every page view',
+    !str_contains($homeB, 'id="me-analytics"') && str_contains($homeB, 'googletagmanager.com/gtag'));
+http('POST', '/api/admin/settings', ['analytics_snippet' => '', 'analytics_consent' => 'consent']);
+[, $homeC] = http('GET', '/', [], [], false);
+check('with no snippet nothing is added to the page', !str_contains($homeC, 'me-analytics') && !str_contains($homeC, 'googletagmanager'));
+
 [, $robots] = http('GET', '/robots.txt', [], [], false);
 check('robots.txt points at both sitemaps by absolute address', str_contains($robots, 'Sitemap: ' . $base . '/sitemap.xml') && str_contains($robots, 'Sitemap: ' . $base . '/news-sitemap.xml'));
 [$s, $settingsNow] = http('GET', '/api/admin/settings');

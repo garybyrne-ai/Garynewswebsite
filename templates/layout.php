@@ -84,6 +84,48 @@ $more = [
 <link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/assets/css/menews.css?v=<?= e(ME_ASSETS) ?>">
 <?php if (!empty($jsonld) && !isset($story) && !isset($notice)): ?><script type="application/ld+json"><?= json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script><?php endif; ?>
+<?php
+// Analytics, pasted in the newsroom under Settings -> Analytics. Deliberately printed as
+// given: it is a provider's own snippet, only an administrator can set it, and escaping it
+// would stop it running. Staff pages are left out so our own visits are not counted.
+$meAnalytics = $isApp ? '' : trim((string)(\MeNews\Database::installed() ? \MeNews\Database::setting('analytics_snippet', '') : ''));
+$meAnalyticsConsent = (string)(\MeNews\Database::installed() ? \MeNews\Database::setting('analytics_consent', 'consent') : 'consent');
+?>
+<?php if ($meAnalytics !== '' && $meAnalyticsConsent !== 'consent'): ?>
+<?= $meAnalytics ?>
+<?php elseif ($meAnalytics !== ''): ?>
+<template id="me-analytics"><?= $meAnalytics ?></template>
+<script>
+/* Cookie-setting analytics may not run until the reader has accepted. The snippet is held
+   in a template and only moved into the page once they have, in this visit or an earlier one. */
+(function () {
+  var tpl = document.getElementById('me-analytics'), done = false;
+  function run() {
+    if (done || !tpl) { return; }
+    done = true;
+    var nodes = tpl.content.childNodes;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (n.tagName === 'SCRIPT') {
+        /* A script copied with innerHTML never executes: it has to be rebuilt. */
+        var el = document.createElement('script');
+        for (var a = 0; a < n.attributes.length; a++) { el.setAttribute(n.attributes[a].name, n.attributes[a].value); }
+        el.text = n.textContent;
+        document.head.appendChild(el);
+      } else if (n.nodeType === 1) {
+        document.head.appendChild(n.cloneNode(true));
+      }
+    }
+  }
+  try { if (localStorage.getItem('me_consent') === 'all') { run(); } } catch (e) { }
+  /* Accepting now starts it in this visit, without a reload. */
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-consent]') : null;
+    if (b && b.dataset.consent === 'all') { run(); }
+  }, true);
+})();
+</script>
+<?php endif; ?>
 <script>try{var t=localStorage.getItem('me_theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);var ts=localStorage.getItem('me_textsize');if(ts)document.documentElement.setAttribute('data-textsize',ts)}catch(e){}</script>
 </head>
 <body class="<?= e($bodyClass) ?>">

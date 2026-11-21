@@ -838,7 +838,7 @@ final class AdminController
             } elseif ($meta['type'] === 'select' && !in_array($v, $meta['options'], true)) {
                 continue;
             }
-            Database::setSetting($k, mb_substr($v, 0, 500));
+            Database::setSetting($k, mb_substr($v, 0, (int)($meta['max'] ?? 500)));
             $saved[] = $k;
         }
         Audit::log($u['id'], 'settings.save', 'settings', '', implode(',', $saved));
@@ -855,6 +855,14 @@ final class AdminController
             'archive_gate' => ['label' => 'Members\' archive gate', 'group' => 'Membership', 'type' => 'select', 'options' => ['0', '1'], 'labels' => ['0' => 'Off — every report stays free', '1' => 'On — older reports are members-only'], 'default' => '0',
                 'hint' => 'Off: every published report stays free and indexable. On: reports older than the window below are summarised for non-members — search and AI crawlers still get the full text, and the page declares the gate in its structured data.'],
             'archive_days' => ['label' => 'Free archive window (days)', 'group' => 'Membership', 'type' => 'int', 'default' => '14', 'hint' => 'Only used when the gate above is on.'],
+            'analytics_snippet' => ['label' => 'Analytics / tracking code', 'group' => 'Analytics', 'type' => 'textarea', 'default' => '', 'max' => 8000,
+                'hint' => 'Paste the whole snippet your provider gives you — Google Analytics, Google Tag Manager, Plausible, Fathom, Umami, Clarity, a Meta or TikTok pixel. '
+                    . 'It goes into the <head> of every public page. It is left out of the newsroom and the dashboard so your own visits do not count as traffic.'],
+            'analytics_consent' => ['label' => 'When to load it', 'group' => 'Analytics', 'type' => 'select', 'options' => ['consent', 'always'],
+                'labels' => ['consent' => 'Only after the reader accepts cookies (required for Google Analytics in the EU)', 'always' => 'On every page view (cookieless analytics only)'],
+                'default' => 'consent',
+                'hint' => 'Google Analytics, Tag Manager and advertising pixels set cookies, so under GDPR and the Irish ePrivacy regulations they must wait for consent — keep the first option. '
+                    . 'Plausible, Fathom and Umami set no cookies and can load on every view.'],
             'screening_mode' => ['label' => 'Safety screening before publication', 'group' => 'Moderation', 'type' => 'select', 'options' => ['auto', 'strict'],
                 'labels' => ['auto' => 'Automatic — use AI when a key is set, the word filter otherwise', 'strict' => 'Strict — refuse to publish without a clean AI screening'],
                 'default' => 'auto',

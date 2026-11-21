@@ -436,11 +436,14 @@
       Object.entries(s).forEach(([k, v]) => { (groups[v.group] ??= []).push([k, v]); });
       const control = (k, v) => {
         if (v.type === 'readonly') return `<input value="${esc(v.value)}" readonly tabindex="-1">`;
+        if (v.type === 'textarea') return `<textarea name="${k}" rows="7" spellcheck="false" style="font-family:var(--mono);font-size:.82rem" placeholder="<!-- paste your provider's snippet here -->">${esc(v.value)}</textarea>`;
         if (v.type === 'select') return `<select name="${k}">${v.options.map(o => `<option value="${esc(o)}" ${o === v.value ? 'selected' : ''}>${esc((v.labels || {})[o] || o)}</option>`).join('')}</select>`;
         return `<input name="${k}" value="${esc(v.type === 'cents' ? (Number(v.value) / 100).toFixed(2) : v.value)}" ${k === 'site_url' ? 'placeholder="https://menews.ie"' : ''}>`;
       };
       const field = ([k, v]) => `<label>${esc(v.label)}${control(k, v)}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
-      $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(field).join('')}</div></details>` : items.map(field).join('')).join('');
+      // A pasted snippet needs the full width, not a column in the grid.
+      const wide = ([k, v]) => v.type === 'textarea' ? `<label style="grid-column:1/-1">${esc(v.label)}${control(k, v)}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>` : field([k, v]);
+      $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(wide).join('')}</div></details>` : items.map(wide).join('')).join('');
     } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
   }
   $('#settings-form').addEventListener('submit', async e => {
