@@ -149,10 +149,11 @@
       </div>
 
       <div id="view-settings" class="view">
-        <h1>Settings</h1><p class="pagehead__blurb">Prices, the wire's display mode, WhatsApp numbers and the ownership page. Administrators only.</p>
+        <h1>Settings</h1><p class="pagehead__blurb">Prices, analytics, search engines, the wire's display mode, WhatsApp numbers and the ownership page. Administrators only.</p>
+        <div class="filters"><input id="settings-find" type="search" placeholder="Find a setting — try analytics, Google, price, WhatsApp…" autocomplete="off" style="min-width:min(420px,100%)"><span class="mono" id="settings-count" style="color:var(--muted)"></span></div>
         <div class="panel" id="maildelivery"></div>
         <div class="panel" id="gateways"></div>
-        <form class="form" id="settings-form"><div class="settingsgrid" id="settings-grid"></div><div class="form__actions"><button class="btn btn--primary" type="submit">Save settings</button></div><p class="form__result" id="settings-result"></p></form>
+        <form class="form" id="settings-form"><div id="settings-grid"></div><div class="form__actions"><button class="btn btn--primary" type="submit">Save settings</button></div><p class="form__result" id="settings-result"></p></form>
       </div>
 
       <div id="view-audit" class="view"><h1>Audit log</h1><div id="audit-list"></div></div>

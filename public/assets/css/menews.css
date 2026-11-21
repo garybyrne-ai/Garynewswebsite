@@ -1533,3 +1533,14 @@ body{overflow-x:clip}
 /* A curated wire headline in the review queue: lighter than a community report card. */
 .review--wire{border-left:3px solid var(--line-2)}
 .review--wire p{color:var(--muted)}
+
+/* Settings is 87 fields across 11 groups: every group needs a heading you can find. */
+.settingsgroup{margin:0 0 26px}
+.settingsgroup>h3,.settingsgroup>summary{font-family:var(--display);font-size:1.02rem;letter-spacing:-.01em;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line-2);color:var(--ink)}
+.settingsgroup>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none}
+.settingsgroup>summary::-webkit-details-marker{display:none}
+.settingsgroup>summary::after{content:"▸";color:var(--muted);font-size:.8rem;transition:transform .15s}
+.settingsgroup[open]>summary::after{transform:rotate(90deg)}
+.settingsgroup>summary .mono{font-size:.72rem;color:var(--muted);font-weight:400;letter-spacing:0}
+.settingsgroup>summary b{font-weight:700}
+.settingsgroup[hidden]{display:none}

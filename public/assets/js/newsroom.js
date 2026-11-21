@@ -473,9 +473,47 @@
       const field = ([k, v]) => `<label>${esc(v.label)}${control(k, v)}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>`;
       // A pasted snippet needs the full width, not a column in the grid.
       const wide = ([k, v]) => v.type === 'textarea' ? `<label style="grid-column:1/-1">${esc(v.label)}${control(k, v)}${v.hint ? `<small class="form__hint">${esc(v.hint)}</small>` : ''}</label>` : field([k, v]);
-      $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8 ? `<details><summary class="mono" style="cursor:pointer;color:var(--cy);padding:8px 0">${esc(g)} (${items.length})</summary><div class="settingsgrid" style="margin-top:10px">${items.map(wide).join('')}</div></details>` : items.map(wide).join('')).join('');
+      $('#settings-grid').innerHTML = Object.entries(groups).map(([g, items]) => items.length > 8
+        ? `<details class="settingsgroup" data-group="${esc(g)}"><summary><b>${esc(g)}</b><span class="mono">${items.length} settings</span></summary><div class="settingsgrid">${items.map(wide).join('')}</div></details>`
+        : `<section class="settingsgroup is-open" data-group="${esc(g)}"><h3>${esc(g)}</h3><div class="settingsgrid">${items.map(wide).join('')}</div></section>`).join('');
+      settingsFilter();
     } catch (e) { $('#settings-grid').innerHTML = '<div class="empty"><h3>Settings require administrator access.</h3></div>'; }
   }
+  /** Narrow the settings panel to whatever the administrator typed. */
+  function settingsFilter() {
+    const box = $('#settings-find');
+    const q = (box ? box.value : '').trim().toLowerCase();
+    let shown = 0, total = 0;
+    $$('#settings-grid .settingsgroup').forEach(section => {
+      let hits = 0;
+      $$('label', section).forEach(l => {
+        total++;
+        const hay = (l.textContent + ' ' + (l.querySelector('[name]') || {}).name + ' ' + section.dataset.group).toLowerCase();
+        const match = !q || hay.includes(q);
+        l.hidden = !match;
+        if (match) { hits++; shown++; }
+      });
+      section.hidden = hits === 0;
+      // A search opens the big collapsed groups so matches inside them are not hidden twice.
+      if (section.tagName === 'DETAILS') section.open = !!q && hits > 0;
+    });
+    // Email delivery and the payment gateways are panels of their own above the grid. They
+    // are settings too, so a search for "brevo" or "stripe" must keep them and a search for
+    // "analytics" must get them out of the way instead of burying the match below them.
+    ['#maildelivery', '#gateways'].forEach(sel => {
+      const panel = $(sel);
+      if (panel) panel.hidden = !!q && !panel.textContent.toLowerCase().includes(q);
+    });
+    const count = $('#settings-count');
+    if (count) count.textContent = q ? `${shown} of ${total} settings` : '';
+    // Put the first match on screen rather than leaving it below the fold.
+    if (q) {
+      const first = $('#settings-grid .settingsgroup:not([hidden])') || $('#maildelivery:not([hidden])');
+      if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }
+  $('#settings-find')?.addEventListener('input', settingsFilter);
+
   $('#settings-form').addEventListener('submit', async e => {
     e.preventDefault(); const out = $('#settings-result');
     try { const j = await api('/api/admin/settings', { method: 'POST', body: new FormData(e.target) }); out.textContent = 'Saved ' + j.saved.length + ' settings.'; toast('Settings saved'); } catch (err) { out.textContent = err.message; }
